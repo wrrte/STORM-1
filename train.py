@@ -153,6 +153,15 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         if replay_buffer.ready() and total_steps % (train_agent_every_steps//num_envs) == 0 and total_steps*num_envs >= 0:
             if total_steps % (save_every_steps//num_envs) == 0:
                 log_video = True
+                
+                video_columns = 5
+                video_temporal_length = 5
+                num_videos = video_columns * video_temporal_length
+                openloop_obs, openloop_action, _, _ = replay_buffer.sample(
+                    num_videos, 0, imagine_context_length + imagine_batch_length)
+                
+                world_model.log_openloop_video(
+                    openloop_obs, openloop_action, imagine_context_length, imagine_batch_length, logger, video_columns=video_columns)
             else:
                 log_video = False
 
@@ -230,7 +239,7 @@ if __name__ == "__main__":
     # set seed
     seed_np_torch(seed=args.seed)
     # tensorboard writer
-    logger = Logger(path=f"runs/{args.n}")
+    logger = Logger(path=f"runs/{args.n}", config=conf)
     # copy config file
     shutil.copy(args.config_path, f"runs/{args.n}/config.yaml")
 

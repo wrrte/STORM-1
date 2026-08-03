@@ -8,6 +8,7 @@ from contextlib import contextmanager
 import time
 import yacs
 from yacs.config import CfgNode as CN
+import wandb
 
 
 def seed_np_torch(seed=20010105):
@@ -23,23 +24,77 @@ def seed_np_torch(seed=20010105):
 
 
 class Logger():
-    def __init__(self, path) -> None:
+    def __init__(self, path, config=None) -> None:
         self.writer = SummaryWriter(logdir=path, flush_secs=1)
         self.tag_step = {}
+
+        # Initialize wandb
+        try:
+            api_key_path = os.path.join(os.path.dirname(__file__), '.wandb_api_key')
+            if os.path.exists(api_key_path):
+                with open(api_key_path, 'r') as f:
+                    wandb.login(key=f.read().strip())
+            
+            run_name = path.split('/')[-1] if '/' in path else path
+            wandb.init(project="STORM", name=run_name, id=wandb.util.generate_id(), config=config)
+        except Exception as e:
+            print(f"Failed to initialize wandb: {e}")
 
     def log(self, tag, value):
         if tag not in self.tag_step:
             self.tag_step[tag] = 0
         else:
             self.tag_step[tag] += 1
+        
+        step = self.tag_step[tag]
+        
         if "video" in tag:
-            self.writer.add_video(tag, value, self.tag_step[tag], fps=15)
+            self.writer.add_video(tag, value, step, fps=15)
+            try:
+                if "openloop_video" in tag:
+                    wandb.log({tag: wandb.Video(value, fps=15, format='gif')})
+                else:
+                    wandb.log({tag: wandb.Video(value, fps=15, format='mp4')})
+            except Exception:
+                pass
+            
+            if "openloop_video" in tag:
+                try:
+                    import imageio
+                    vid = np.transpose(value, (0, 2, 3, 1))
+                    if vid.dtype != np.uint8:
+                        vid = (255 * np.clip(vid, 0, 1)).astype(np.uint8)
+                    
+                    scale = max(1, int(np.round(512 / vid.shape[1])))
+                    if scale > 1:
+                        vid = np.repeat(np.repeat(vid, scale, axis=1), scale, axis=2)
+                        
+                    safe_name = tag.replace('/', '_')
+                    logdir = getattr(self.writer, 'logdir', '.')
+                    filename = os.path.join(logdir, f"{step}_{safe_name}.mp4")
+                    os.makedirs(logdir, exist_ok=True)
+                    imageio.mimsave(filename, vid, fps=15, macro_block_size=1, quality=10, pixelformat='yuv444p')
+                except Exception as e:
+                    print(f"Failed to save video locally: {e}")
         elif "images" in tag:
-            self.writer.add_images(tag, value, self.tag_step[tag])
+            self.writer.add_images(tag, value, step)
+            try:
+                images = [wandb.Image(img) for img in value]
+                wandb.log({tag: images})
+            except Exception:
+                pass
         elif "hist" in tag:
-            self.writer.add_histogram(tag, value, self.tag_step[tag])
+            self.writer.add_histogram(tag, value, step)
+            try:
+                wandb.log({tag: wandb.Histogram(value)})
+            except Exception:
+                pass
         else:
-            self.writer.add_scalar(tag, value, self.tag_step[tag])
+            self.writer.add_scalar(tag, value, step)
+            try:
+                wandb.log({tag: value})
+            except Exception:
+                pass
 
 
 class EMAScalar():

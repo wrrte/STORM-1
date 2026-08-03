@@ -288,6 +288,63 @@ class WorldModel(nn.Module):
             prior_flattened_sample = self.flatten_sample(prior_sample)
         return prior_flattened_sample, last_dist_feat
 
+    def log_openloop_video(self, sample_obs, sample_action, context_length, imagine_length, logger, global_step=None, video_columns=5):
+        B = sample_obs.shape[0]
+        T_total = context_length + imagine_length
+        
+        true_context = (sample_obs[:, :context_length] * 255).clamp(0, 255).byte()
+        true_future = (sample_obs[:, context_length:T_total] * 255).clamp(0, 255).byte()
+        
+        context_latent = self.encode_obs(sample_obs[:, :context_length])
+        
+        self.storm_transformer.reset_kv_cache_list(B, dtype=self.tensor_dtype)
+        
+        for i in range(context_length):
+            last_obs_hat, _, _, last_latent, last_dist_feat = self.predict_next(
+                context_latent[:, i:i+1], sample_action[:, i:i+1], log_video=False)
+        
+        curr_latent = last_latent
+        obs_hat_list = []
+        for i in range(context_length, T_total):
+            last_obs_hat, _, _, last_latent, last_dist_feat = self.predict_next(
+                curr_latent, sample_action[:, i:i+1], log_video=True)
+            curr_latent = last_latent
+            obs_hat_list.append(last_obs_hat)
+            
+        with torch.autocast(device_type='cuda', dtype=torch.bfloat16, enabled=self.use_amp):
+            obs_hat_context = self.image_decoder(context_latent) * 255
+            
+        pred_context = obs_hat_context.clamp(0, 255).byte()
+        pred_future = (torch.cat(obs_hat_list, dim=1) * 255).clamp(0, 255).byte()
+        
+        error_context = ((pred_context.float() - true_context.float() + 255) / 2).clamp(0, 255).byte()
+        error_future = ((pred_future.float() - true_future.float() + 255) / 2).clamp(0, 255).byte()
+        
+        true_video = torch.cat([true_context, true_future], dim=1)
+        pred_video = torch.cat([pred_context, pred_future], dim=1)
+        error_video = torch.cat([error_context, error_future], dim=1)
+        
+        video = torch.cat([true_video, pred_video, error_video], dim=3)
+        
+        mask = torch.zeros_like(video, dtype=torch.bool)
+        mask[:, :, :, 2:-2, 2:-2] = True
+        border_green = torch.tensor([0, 255, 0], dtype=torch.uint8, device=video.device).view(1, 1, 3, 1, 1)
+        border_red = torch.tensor([255, 0, 0], dtype=torch.uint8, device=video.device).view(1, 1, 3, 1, 1)
+        
+        video[:, :context_length] = torch.where(mask[:, :context_length], video[:, :context_length], border_green)
+        video[:, context_length:] = torch.where(mask[:, context_length:], video[:, context_length:], border_red)
+        
+        N_vids, T_len, C, H, W = video.shape
+        pad_len = (video_columns - N_vids % video_columns) % video_columns
+        if pad_len > 0:
+            pad = torch.zeros(pad_len, T_len, C, H, W, dtype=video.dtype, device=video.device)
+            video = torch.cat([video, pad], dim=0)
+            
+        K = video.shape[0] // video_columns
+        video = video.view(K, video_columns, T_len, C, H, W)
+        grid = video.permute(0, 2, 3, 4, 1, 5).reshape(K * T_len, 3, H, video_columns * W).cpu().numpy()
+        logger.log("report/openloop_video", grid)
+
     def predict_next(self, last_flattened_sample, action, log_video=True):
         with torch.autocast(device_type='cuda', dtype=torch.bfloat16, enabled=self.use_amp):
             dist_feat = self.storm_transformer.forward_with_kv_cache(last_flattened_sample, action)
