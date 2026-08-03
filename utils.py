@@ -50,18 +50,22 @@ class Logger():
         
         if "video" in tag:
             self.writer.add_video(tag, value, step, fps=15)
+            
+            # handle 5D NTCHW by taking the first item for wandb and local saving
+            vid_val = value[0] if len(value.shape) == 5 else value
+            
             try:
                 if "openloop_video" in tag:
-                    wandb.log({tag: wandb.Video(value, fps=15, format='gif')})
+                    wandb.log({tag: wandb.Video(vid_val, fps=15, format='gif')})
                 else:
-                    wandb.log({tag: wandb.Video(value, fps=15, format='mp4')})
+                    wandb.log({tag: wandb.Video(vid_val, fps=15, format='mp4')})
             except Exception:
                 pass
             
             if "openloop_video" in tag:
                 try:
                     import imageio
-                    vid = np.transpose(value, (0, 2, 3, 1))
+                    vid = np.transpose(vid_val, (0, 2, 3, 1))
                     if vid.dtype != np.uint8:
                         vid = (255 * np.clip(vid, 0, 1)).astype(np.uint8)
                     

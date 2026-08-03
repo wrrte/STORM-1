@@ -342,7 +342,7 @@ class WorldModel(nn.Module):
             
         K = video.shape[0] // video_columns
         video = video.view(K, video_columns, T_len, C, H, W)
-        grid = video.permute(0, 2, 3, 4, 1, 5).reshape(K * T_len, 3, H, video_columns * W).cpu().numpy()
+        grid = video.permute(0, 2, 3, 4, 1, 5).reshape(1, K * T_len, 3, H, video_columns * W).cpu().numpy()
         logger.log("report/openloop_video", grid)
 
     def predict_next(self, last_flattened_sample, action, log_video=True):
