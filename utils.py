@@ -35,8 +35,12 @@ class Logger():
                 with open(api_key_path, 'r') as f:
                     wandb.login(key=f.read().strip())
             
-            run_name = path.split('/')[-1] if '/' in path else path
-            wandb.init(project="STORM", name=run_name, id=wandb.util.generate_id(), config=config)
+            base_name = path.split('/')[-1] if '/' in path else path
+            pure_env_name = base_name.split('-')[0]
+            run_id = wandb.util.generate_id()
+            run_name = f"{pure_env_name}_{run_id}"
+            
+            wandb.init(project="STORM", name=run_name, id=run_id, config=config)
         except Exception as e:
             print(f"Failed to initialize wandb: {e}")
 
