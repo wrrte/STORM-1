@@ -13,7 +13,7 @@ JointTrainAgent:
   BatchSize: 16
   DemonstrationBatchSize: 4
   BatchLength: 64
-  ImagineBatchSize: 1024
+  ImagineBatchSize: 1280
   ImagineDemonstrationBatchSize: 256
   ImagineContextLength: 8
   ImagineBatchLength: 16
@@ -36,7 +36,7 @@ JointTrainAgent:
     target: 16
     max_contexts: 256
     global_rebuild_enable: True
-    global_rebuild_threshold: 0.2
+    global_rebuild_threshold: 0.1
     global_rebuild_cooldown: 2000
 
 Models:
