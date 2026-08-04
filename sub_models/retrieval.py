@@ -1,5 +1,6 @@
 import torch
 import random
+import numpy as np
 from collections import deque
 
 class FastHashBucket:
@@ -74,6 +75,14 @@ class RetrievalContextManager:
         self.context_length = int(config.get("context_length", 8))
         self.max_bucket_size = int(config.get("max_bucket_size", 512))
         
+        self.trigger_mode = config.get("trigger_mode", "absolute")
+        self.anchor_offset = int(config.get("anchor_offset", -2))
+        self.z_score_threshold = float(config.get("z_score_threshold", 2.0))
+        self.ema_alpha = float(config.get("ema_alpha", 0.01))
+        
+        self.ema_mean = np.zeros(num_envs)
+        self.ema_var = np.ones(num_envs)
+        
         # Hashing config
         self.hash_bits = 12
         proj = torch.randn(latent_dim, self.hash_bits, dtype=torch.float32, device=device)
@@ -122,10 +131,28 @@ class RetrievalContextManager:
             if not is_first:
                 # Compute delta_v against prev_v
                 delta_v = abs(v_t - self.prev_v[i].item())
-                if delta_v >= self.threshold:
-                    anchor = (pointer - 1, i)
-                    self.active_anchors.append((anchor, self.prev_keys[i]))
-                    num_triggered += 1
+                triggered = False
+                
+                if getattr(self, "trigger_mode", "absolute") == "z_score":
+                    diff = delta_v - self.ema_mean[i]
+                    self.ema_mean[i] += self.ema_alpha * diff
+                    self.ema_var[i] = (1 - self.ema_alpha) * (self.ema_var[i] + self.ema_alpha * diff ** 2)
+                    
+                    import math
+                    z_score = abs(delta_v - self.ema_mean[i]) / (math.sqrt(self.ema_var[i]) + 1e-8)
+                    if z_score >= self.z_score_threshold:
+                        triggered = True
+                else:
+                    if delta_v >= self.threshold:
+                        triggered = True
+                        
+                if triggered:
+                    anchor_ptr = pointer + self.anchor_offset
+                    anchor_key = self.index_to_bucket.get((anchor_ptr, i), -1)
+                    if anchor_key != -1:
+                        anchor = (anchor_ptr, i)
+                        self.active_anchors.append((anchor, anchor_key))
+                        num_triggered += 1
                     
             self.prev_v[i] = v_t
             self.prev_keys[i] = keys[i]

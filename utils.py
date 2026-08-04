@@ -177,7 +177,11 @@ def load_config(config_path):
     
     conf.JointTrainAgent.Retrieval = CN()
     conf.JointTrainAgent.Retrieval.enable = False
+    conf.JointTrainAgent.Retrieval.trigger_mode = "absolute" # "absolute" or "z_score"
+    conf.JointTrainAgent.Retrieval.anchor_offset = -2
     conf.JointTrainAgent.Retrieval.threshold = 1.0
+    conf.JointTrainAgent.Retrieval.z_score_threshold = 2.0
+    conf.JointTrainAgent.Retrieval.ema_alpha = 0.01
     conf.JointTrainAgent.Retrieval.max_retrievals = 4
     conf.JointTrainAgent.Retrieval.max_bucket_size = 100000
     conf.JointTrainAgent.Retrieval.x_multiplier = 5
