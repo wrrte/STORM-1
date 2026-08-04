@@ -434,8 +434,6 @@ class RetrievalContextManager:
             keys = self._hash_keys(encoded)
             
             for (p, env_idx), key in zip(valid_indices, keys):
-                # Fake a positive delta_v for rebuilding so it gets stored normally
-                # The metric was just 1.0 previously in add_batch_transitions
-                self._insert_into_bucket(key, (p, env_idx), 1.0)
+                self._insert_into_bucket(p, env_idx, key)
                 
         print(f"[Retrieval] Global Rebuild completed. Re-hashed {valid_len * replay_buffer.num_envs} frames.")
