@@ -204,7 +204,8 @@ class RetrievalContextManager:
                 obs_arr = np.concatenate(obs_list, axis=0)
                 obs_tensor = torch.from_numpy(obs_arr).float().cuda() / 255.0
                 
-            obs_tensor = obs_tensor.unsqueeze(1) # [N, 1, C, H, W]
+            from einops import rearrange
+            obs_tensor = rearrange(obs_tensor, "N H W C -> N 1 C H W")
             
             with torch.no_grad():
                 encoded = world_model.encode_obs(obs_tensor) # [N, 1, latent_dim]
