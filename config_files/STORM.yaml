@@ -25,14 +25,15 @@ JointTrainAgent:
   Retrieval:
     enable: True
     trigger_mode: "z_score" # "absolute" or "z_score"
-    anchor_offset: -2 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 
     threshold: 1.0
     z_score_threshold: 2.0
+    anchor_offset: -2 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 
+    hash_bits: 12
     ema_alpha: 0.01
-    max_retrievals: 4
     max_bucket_size: 100000
-    x_multiplier: 5
-    y_target: 5
+    max_anchors: 16
+    x_multiplier: 8
+    y_target: 16
     z_max: 256
 
 Models:

@@ -68,10 +68,10 @@ class FastHashBucket:
 class RetrievalContextManager:
     def __init__(self, num_envs, config, latent_dim, device="cuda"):
         self.num_envs = num_envs
+        self.config = config
         self.device = device
         self.enabled = bool(config.get("enable", True))
-        self.threshold = float(config.get("threshold", 5.0))
-        self.max_retrievals = int(config.get("max_retrievals", 4))
+        self.threshold = float(config.get("threshold", 1.0))
         self.context_length = int(config.get("context_length", 8))
         self.max_bucket_size = int(config.get("max_bucket_size", 512))
         
@@ -84,7 +84,7 @@ class RetrievalContextManager:
         self.ema_var = np.ones(num_envs)
         
         # Hashing config
-        self.hash_bits = 12
+        self.hash_bits = int(config.get("hash_bits", 12))
         proj = torch.randn(latent_dim, self.hash_bits, dtype=torch.float32, device=device)
         self.hash_proj = proj
         bit_values = 2 ** torch.arange(self.hash_bits, dtype=torch.int64, device=device)

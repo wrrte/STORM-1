@@ -65,8 +65,13 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
 
     retrieved_count = 0
     if retrieval_manager is not None and retrieval_manager.enabled:
+        cfg = retrieval_manager.config
         ret_obs, ret_action, candidates_before_z = retrieval_manager.retrieve_contexts(
-            replay_buffer, world_model, max_anchors=10, x=5, y=5, z=256
+            replay_buffer, world_model, 
+            max_anchors=cfg.get("max_anchors", 10) if hasattr(cfg, "get") else getattr(cfg, "max_anchors", 10),
+            x=cfg.get("x_multiplier", 5) if hasattr(cfg, "get") else getattr(cfg, "x_multiplier", 5),
+            y=cfg.get("y_target", 5) if hasattr(cfg, "get") else getattr(cfg, "y_target", 5),
+            z=cfg.get("z_max", 256) if hasattr(cfg, "get") else getattr(cfg, "z_max", 256)
         )
         if ret_obs is not None:
             retrieved_count = ret_obs.shape[0]
