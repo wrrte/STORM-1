@@ -23,6 +23,7 @@ import env_wrapper
 import agents
 from sub_models.functions_losses import symexp
 from sub_models.world_models import WorldModel, MSELoss
+from sub_models.retrieval import RetrievalContextManager
 
 
 def build_single_env(env_name, image_size, seed):
@@ -52,6 +53,7 @@ def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel,
 @torch.no_grad()
 def world_model_imagine_data(replay_buffer: ReplayBuffer,
                              world_model: WorldModel, agent: agents.ActorCriticAgent,
+                             retrieval_manager,
                              imagine_batch_size, imagine_demonstration_batch_size,
                              imagine_context_length, imagine_batch_length,
                              log_video, logger):
@@ -61,11 +63,41 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
     world_model.eval()
     agent.eval()
 
+    retrieved_count = 0
+    if retrieval_manager is not None and retrieval_manager.enabled:
+        ret_obs, ret_action, candidates_before_z = retrieval_manager.retrieve_contexts(
+            replay_buffer, world_model, max_anchors=10, x=5, y=5, z=256
+        )
+        if ret_obs is not None:
+            retrieved_count = ret_obs.shape[0]
+            logger.log("Retrieval/candidates_before_z", candidates_before_z)
+            
+    random_batch_size = imagine_batch_size - retrieved_count
+    
     sample_obs, sample_action, sample_reward, sample_termination = replay_buffer.sample(
-        imagine_batch_size, imagine_demonstration_batch_size, imagine_context_length)
+        random_batch_size, imagine_demonstration_batch_size, imagine_context_length)
+        
+    if retrieved_count > 0:
+        sample_obs = torch.cat([sample_obs, ret_obs], dim=0)
+        sample_action = torch.cat([sample_action, ret_action], dim=0)
+        logger.log("Retrieval/retrieved_contexts", retrieved_count)
+        logger.log("Retrieval/active_anchors_queue", len(retrieval_manager.active_anchors))
+        
+        if len(retrieval_manager.hash_memory) > 0:
+            sizes = [len(b) for b in retrieval_manager.hash_memory.values()]
+            avg_size = sum(sizes) / len(sizes)
+            logger.log("Retrieval/avg_bucket_size", avg_size)
+            logger.log("Retrieval/num_active_buckets", len(sizes))
+            
+            # Record bucket distribution occasionally (e.g., if sizes has items)
+            # wandb histograms need a list of values
+            logger.log("Retrieval/bucket_size_hist", np.array(sizes))
+                
+    final_batch_size = sample_obs.shape[0]
+
     latent, action, reward_hat, termination_hat = world_model.imagine_data(
         agent, sample_obs, sample_action,
-        imagine_batch_size=imagine_batch_size+imagine_demonstration_batch_size,
+        imagine_batch_size=final_batch_size,
         imagine_batch_length=imagine_batch_length,
         log_video=log_video,
         logger=logger
@@ -94,6 +126,17 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     current_obs, current_info = vec_env.reset()
     context_obs = deque(maxlen=16)
     context_action = deque(maxlen=16)
+    
+    # retrieval setup
+    retrieval_config = getattr(conf.JointTrainAgent, 'Retrieval', {})
+    if hasattr(retrieval_config, 'update'): # if it's a dict or omegaconf
+        retrieval_config['context_length'] = imagine_context_length
+    else: # if it's omegaconf DictConfig, we can set attribute
+        setattr(retrieval_config, 'context_length', imagine_context_length)
+        
+    latent_dim = 32 * 32 # CategoricalDim * ClassDim for hashing only the single-frame latent
+    retrieval_manager = RetrievalContextManager(num_envs=num_envs, config=retrieval_config, latent_dim=latent_dim)
+    is_first_step = np.ones(num_envs, dtype=bool)
 
     # sample and train
     for total_steps in tqdm(range(max_steps//num_envs)):
@@ -109,18 +152,36 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                     model_context_action = np.stack(list(context_action), axis=1)
                     model_context_action = torch.Tensor(model_context_action).cuda()
                     prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent, model_context_action)
+                    agent_state = torch.cat([prior_flattened_sample, last_dist_feat], dim=-1)
                     action = agent.sample_as_env_action(
-                        torch.cat([prior_flattened_sample, last_dist_feat], dim=-1),
+                        agent_state,
                         greedy=False
                     )
+                    v_t = agent.value(agent_state)
+                    current_latent_for_hash = context_latent[:, -1]
 
             context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
             context_action.append(action)
         else:
             action = vec_env.action_space.sample()
+            agent_state = None
+            current_latent_for_hash = None
+            v_t = None
 
         obs, reward, done, truncated, info = vec_env.step(action)
         replay_buffer.append(current_obs, action, reward, np.logical_or(done, info["life_loss"]))
+        
+        if replay_buffer.ready() and v_t is not None:
+            num_trig = retrieval_manager.add_transition(
+                pointer=replay_buffer.last_pointer,
+                env_idx=-1,
+                latent_b=current_latent_for_hash,
+                value_b=v_t,
+                is_first_step_b=is_first_step
+            )
+            logger.log("Retrieval/triggered_anchors_step", num_trig)
+        
+        is_first_step = done
 
         done_flag = np.logical_or(done, truncated)
         if done_flag.any():
@@ -169,6 +230,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 replay_buffer=replay_buffer,
                 world_model=world_model,
                 agent=agent,
+                retrieval_manager=retrieval_manager,
                 imagine_batch_size=imagine_batch_size,
                 imagine_demonstration_batch_size=imagine_demonstration_batch_size,
                 imagine_context_length=imagine_context_length,

@@ -22,6 +22,15 @@ JointTrainAgent:
   UseDemonstration: False
   SaveEverySteps: 2500
 
+  Retrieval:
+    enable: True
+    threshold: 1.0
+    max_retrievals: 4
+    max_bucket_size: 100000
+    x_multiplier: 5
+    y_target: 5
+    z_max: 256
+
 Models:
   WorldModel:
     InChannels: 3

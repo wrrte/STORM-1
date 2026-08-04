@@ -174,6 +174,15 @@ def load_config(config_path):
     conf.JointTrainAgent.TrainAgentEverySteps = 0
     conf.JointTrainAgent.SaveEverySteps = 0
     conf.JointTrainAgent.UseDemonstration = False
+    
+    conf.JointTrainAgent.Retrieval = CN()
+    conf.JointTrainAgent.Retrieval.enable = False
+    conf.JointTrainAgent.Retrieval.threshold = 1.0
+    conf.JointTrainAgent.Retrieval.max_retrievals = 4
+    conf.JointTrainAgent.Retrieval.max_bucket_size = 100000
+    conf.JointTrainAgent.Retrieval.x_multiplier = 5
+    conf.JointTrainAgent.Retrieval.y_target = 5
+    conf.JointTrainAgent.Retrieval.z_max = 256
 
     conf.defrost()
     conf.merge_from_file(config_path)
