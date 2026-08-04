@@ -27,6 +27,7 @@ class Logger():
     def __init__(self, path, config=None) -> None:
         self.writer = SummaryWriter(logdir=path, flush_secs=1)
         self.tag_step = {}
+        self.wandb_buffer = {}
 
         # Initialize wandb
         try:
@@ -60,9 +61,9 @@ class Logger():
             
             try:
                 if "openloop_video" in tag:
-                    wandb.log({tag: wandb.Video(vid_val, fps=15, format='gif')})
+                    self.wandb_buffer[tag] = wandb.Video(vid_val, fps=15, format='gif')
                 else:
-                    wandb.log({tag: wandb.Video(vid_val, fps=15, format='mp4')})
+                    self.wandb_buffer[tag] = wandb.Video(vid_val, fps=15, format='mp4')
             except Exception:
                 pass
             
@@ -88,21 +89,30 @@ class Logger():
             self.writer.add_images(tag, value, step)
             try:
                 images = [wandb.Image(img) for img in value]
-                wandb.log({tag: images})
+                self.wandb_buffer[tag] = images
             except Exception:
                 pass
         elif "hist" in tag:
             self.writer.add_histogram(tag, value, step)
             try:
-                wandb.log({tag: wandb.Histogram(value)})
+                self.wandb_buffer[tag] = wandb.Histogram(value)
             except Exception:
                 pass
         else:
             self.writer.add_scalar(tag, value, step)
             try:
-                wandb.log({tag: value})
+                self.wandb_buffer[tag] = value
             except Exception:
                 pass
+
+    def flush_wandb(self):
+        """Flush all buffered wandb metrics in a single wandb.log() call."""
+        if self.wandb_buffer:
+            try:
+                wandb.log(self.wandb_buffer)
+            except Exception:
+                pass
+            self.wandb_buffer = {}
 
 
 class EMAScalar():

@@ -194,6 +194,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             torch.save(world_model.state_dict(), f"ckpt/{args.n}/world_model_{total_steps}.pth")
             torch.save(agent.state_dict(), f"ckpt/{args.n}/agent_{total_steps}.pth")
 
+        # flush all buffered wandb metrics for this step
+        logger.flush_wandb()
+
 
 def build_world_model(conf, action_dim):
     return WorldModel(
