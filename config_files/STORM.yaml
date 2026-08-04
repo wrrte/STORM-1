@@ -32,9 +32,9 @@ JointTrainAgent:
     ema_alpha: 0.01
     max_bucket_size: 100000
     max_anchors: 16
-    x_multiplier: 8
-    y_target: 16
-    z_max: 256
+    multiplier: 8
+    target: 16
+    max: 256
 
 Models:
   WorldModel:

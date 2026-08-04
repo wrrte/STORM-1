@@ -252,9 +252,9 @@ class RetrievalContextManager:
                 
         self.index_to_bucket[idx_tuple] = key
 
-    def retrieve_contexts(self, replay_buffer, world_model, max_anchors, x=5, y=5, z=256):
+    def retrieve_contexts(self, replay_buffer, world_model, max_anchors, multiplier=5, target=5, max=256):
         """
-        Pops up to `max_anchors` from `active_anchors` and retrieves up to z contexts in total.
+        Pops up to `max_anchors` from `active_anchors` and retrieves up to max contexts in total.
         Implements lazy recomputation using single frame encoding.
         """
         if not self.enabled or len(self.active_anchors) == 0:
@@ -277,7 +277,7 @@ class RetrievalContextManager:
             if not queue:
                 continue
                 
-            sampled_indices = queue.sample(k=x*(y-1), exclude=(anchor_ptr, anchor_env_idx))
+            sampled_indices = queue.sample(k=multiplier*(target-1), exclude=(anchor_ptr, anchor_env_idx))
             if not sampled_indices:
                 continue
                 
@@ -321,9 +321,9 @@ class RetrievalContextManager:
                         
             final_chosen_indices.extend(matched_indices)
             
-        candidates_before_z = len(final_chosen_indices)
-        if len(final_chosen_indices) > z:
-            final_chosen_indices = final_chosen_indices[:z]
+        candidates_before_max = len(final_chosen_indices)
+        if len(final_chosen_indices) > max:
+            final_chosen_indices = final_chosen_indices[:max]
             
         retrieved_obs_list = []
         retrieved_action_list = []
@@ -357,7 +357,7 @@ class RetrievalContextManager:
                 retrieved_action_list.append(action_tensor)
                 
         if len(retrieved_obs_list) == 0:
-            return None, None, candidates_before_z
+            return None, None, candidates_before_max
             
         if replay_buffer.store_on_gpu:
             ret_obs = torch.cat(retrieved_obs_list, dim=1).float() / 255.0
@@ -373,4 +373,4 @@ class RetrievalContextManager:
             ret_action = np.concatenate(retrieved_action_list, axis=1)
             ret_action = torch.from_numpy(ret_action).cuda().transpose(0, 1) # [B, T]
             
-        return ret_obs, ret_action, candidates_before_z
+        return ret_obs, ret_action, candidates_before_max

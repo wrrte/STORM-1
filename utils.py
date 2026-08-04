@@ -185,9 +185,9 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.ema_alpha = 0.01
     conf.JointTrainAgent.Retrieval.max_bucket_size = 100000
     conf.JointTrainAgent.Retrieval.max_anchors = 10
-    conf.JointTrainAgent.Retrieval.x_multiplier = 5
-    conf.JointTrainAgent.Retrieval.y_target = 5
-    conf.JointTrainAgent.Retrieval.z_max = 256
+    conf.JointTrainAgent.Retrieval.multiplier = 5
+    conf.JointTrainAgent.Retrieval.target = 5
+    conf.JointTrainAgent.Retrieval.max = 256
 
     conf.defrost()
     conf.merge_from_file(config_path)
