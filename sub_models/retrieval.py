@@ -258,7 +258,7 @@ class RetrievalContextManager:
         Implements lazy recomputation using single frame encoding.
         """
         if not self.enabled or len(self.active_anchors) == 0:
-            return None, None, 0
+            return None, None, 0, 0.0
             
         popped_anchors = []
         for _ in range(min(max_anchors, len(self.active_anchors))):
@@ -269,6 +269,9 @@ class RetrievalContextManager:
         
         max_buf_len = replay_buffer.max_length // replay_buffer.num_envs
         final_chosen_indices = []
+        
+        total_hit_rate = 0.0
+        num_hit_rate_samples = 0
         
         for anchor_tuple, anchor_key in popped_anchors:
             # anchor_tuple is (anchor_ptr, env_idx, sign)
@@ -311,12 +314,17 @@ class RetrievalContextManager:
                 
             current_keys = self._hash_keys(encoded)
             
+            if len(current_keys) > 0:
+                hit_rate = (torch.tensor(current_keys) == anchor_key).float().mean().item()
+                total_hit_rate += hit_rate
+                num_hit_rate_samples += 1
+            
             # Filter matches
             matched_indices = []
             for i_c, k_c in enumerate(current_keys):
                 if k_c == anchor_key:
                     matched_indices.append(valid_sampled[i_c])
-                    if len(matched_indices) >= (y - 1):
+                    if len(matched_indices) >= target:
                         break
                         
             final_chosen_indices.extend(matched_indices)
@@ -356,8 +364,9 @@ class RetrievalContextManager:
                 retrieved_obs_list.append(obs_tensor)
                 retrieved_action_list.append(action_tensor)
                 
+        avg_hit_rate = total_hit_rate / max(1, num_hit_rate_samples)
         if len(retrieved_obs_list) == 0:
-            return None, None, candidates_before_max
+            return None, None, candidates_before_max, avg_hit_rate
             
         if replay_buffer.store_on_gpu:
             ret_obs = torch.cat(retrieved_obs_list, dim=1).float() / 255.0
@@ -373,4 +382,60 @@ class RetrievalContextManager:
             ret_action = np.concatenate(retrieved_action_list, axis=1)
             ret_action = torch.from_numpy(ret_action).cuda().transpose(0, 1) # [B, T]
             
-        return ret_obs, ret_action, candidates_before_max
+        return ret_obs, ret_action, candidates_before_max, avg_hit_rate
+
+    @torch.no_grad()
+    def rebuild_all_hash_buckets(self, replay_buffer, world_model, chunk_size=1024):
+        """
+        Clears all hash buckets and re-hashes all valid transitions in the replay buffer 
+        using the latest world model to fix representation drift (Global Rebuild).
+        """
+        self.hash_memory.clear()
+        self.index_to_bucket.clear()
+        
+        if replay_buffer.length < self.context_length:
+            return
+            
+        max_buf_len = replay_buffer.max_length // replay_buffer.num_envs
+        valid_len = min(replay_buffer.length, max_buf_len)
+        
+        # We process in chunks to prevent GPU OOM
+        for start_idx in range(0, valid_len, chunk_size):
+            end_idx = min(start_idx + chunk_size, valid_len)
+            current_chunk_size = end_idx - start_idx
+            
+            # Prepare observations for the chunk across all envs
+            obs_list = []
+            valid_indices = []
+            
+            for p in range(start_idx, end_idx):
+                for env_idx in range(replay_buffer.num_envs):
+                    # For simplicity, we just use the current frame without context window check here
+                    # since we only need its latent for hashing. 
+                    # If it's near termination, it might be an issue, but hashing the single frame is fine.
+                    obs_list.append(replay_buffer.obs_buffer[p, env_idx:env_idx+1])
+                    valid_indices.append((p, env_idx))
+                    
+            if len(obs_list) == 0:
+                continue
+                
+            if replay_buffer.store_on_gpu:
+                obs_tensor = torch.cat(obs_list, dim=0).float() / 255.0
+            else:
+                import numpy as np
+                obs_arr = np.concatenate(obs_list, axis=0)
+                obs_tensor = torch.from_numpy(obs_arr).float().cuda() / 255.0
+                
+            from einops import rearrange
+            obs_tensor = rearrange(obs_tensor, "N H W C -> N 1 C H W")
+            
+            encoded = world_model.encode_obs(obs_tensor)
+            encoded = encoded.squeeze(1)
+            keys = self._hash_keys(encoded)
+            
+            for (p, env_idx), key in zip(valid_indices, keys):
+                # Fake a positive delta_v for rebuilding so it gets stored normally
+                # The metric was just 1.0 previously in add_batch_transitions
+                self._insert_into_bucket(key, (p, env_idx), 1.0)
+                
+        print(f"[Retrieval] Global Rebuild completed. Re-hashed {valid_len * replay_buffer.num_envs} frames.")

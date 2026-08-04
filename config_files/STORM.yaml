@@ -35,6 +35,9 @@ JointTrainAgent:
     multiplier: 8
     target: 16
     max: 256
+    global_rebuild_enable: True
+    global_rebuild_threshold: 0.2
+    global_rebuild_cooldown: 2000
 
 Models:
   WorldModel:

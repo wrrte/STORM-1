@@ -97,16 +97,12 @@ world model에서 학습을 진행하다가 큰 가치 추락 혹은 상승이 �
 
 
 
+20%도 [STORM.yaml](file;vscode-remote://ssh-remote%2B7b22686f73744e616d65223a22726f626f6e652d677075227d/media/storage_data/ai2lab/choemj/STORM/config_files/STORM.yaml) 에서 조정할 수 있도록 해 줘.
+또한 가치 차이의 부호가 있을 거잖아? 그리고 그를 앵커로 뽑은 타겟들도 부호가 있을 테고.
 
-global rebuild 하고 있나? 
-
-가치 변화 양수 음수를 나눠서 부호가 반대인 것을 먼저 새로운 설정값만큼 뽑고, 남은 걸 부호가 같은 걸로 채우면 너무 오버헤드가 심하려나? 그리고 부호가 반대인 것과 같은 것, 양수이면 양수, 음수이면 음수, 양수인데 음수, 음수인데 양수로 뽑힌 개수도 그래프로 그리고.
-
-배수만큼 lazy rebuild해서 같은 해시 버킷에 들어가는 비율도 그래프로 그리기.
+부호가 반대인 것과 같은 것, 양수이면 양수, 음수이면 음수, 양수인데 음수, 음수인데 양수로 뽑힌 개수도 그래프로 그리고.
 
 dreamerV3, drama의 경우 lazy rebuild를 할 때 hidden state를 도출하기 위해 warmup이 필요하지 않을까? 그럼 오버헤드가 너무 심해질 것 같은데.
-
-chatGPT에 대화중인 내용 고려
 
 
 

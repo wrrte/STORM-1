@@ -72,18 +72,21 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
     agent.eval()
 
     retrieved_count = 0
+    lazy_hit_rate = 0.0
     if retrieval_manager is not None and retrieval_manager.enabled:
         cfg = retrieval_manager.config
-        ret_obs, ret_action, candidates_before_max = retrieval_manager.retrieve_contexts(
+        ret_obs, ret_action, candidates_before_max, avg_hit_rate = retrieval_manager.retrieve_contexts(
             replay_buffer, world_model, 
             max_anchors=cfg.get("max_anchors", 10) if hasattr(cfg, "get") else getattr(cfg, "max_anchors", 10),
-            x=cfg.get("multiplier", 5) if hasattr(cfg, "get") else getattr(cfg, "multiplier", 5),
-            y=cfg.get("target", 5) if hasattr(cfg, "get") else getattr(cfg, "target", 5),
-            z=cfg.get("max", 256) if hasattr(cfg, "get") else getattr(cfg, "max", 256)
+            multiplier=cfg.get("multiplier", 5) if hasattr(cfg, "get") else getattr(cfg, "multiplier", 5),
+            target=cfg.get("target", 5) if hasattr(cfg, "get") else getattr(cfg, "target", 5),
+            max=cfg.get("max", 256) if hasattr(cfg, "get") else getattr(cfg, "max", 256)
         )
         if ret_obs is not None:
             retrieved_count = ret_obs.shape[0]
             logger.log("Retrieval/candidates_before_max", candidates_before_max)
+            logger.log("Retrieval/lazy_rebuild_hit_rate", avg_hit_rate)
+            lazy_hit_rate = avg_hit_rate
             
     random_batch_size = imagine_batch_size - retrieved_count
     
@@ -115,7 +118,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
         log_video=log_video,
         logger=logger
     )
-    return latent, action, None, None, reward_hat, termination_hat
+    return latent, action, None, None, reward_hat, termination_hat, lazy_hit_rate
 
 
 def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
@@ -150,6 +153,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     latent_dim = 32 * 32 # CategoricalDim * ClassDim for hashing only the single-frame latent
     retrieval_manager = RetrievalContextManager(num_envs=num_envs, config=retrieval_config, latent_dim=latent_dim)
     is_first_step = np.ones(num_envs, dtype=bool)
+    
+    # global rebuild tracking
+    last_rebuild_step = -getattr(retrieval_config, "global_rebuild_cooldown", 2000)
 
     # sample and train
     for total_steps in tqdm(range(max_steps//num_envs)):
@@ -243,7 +249,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             else:
                 log_video = False
 
-            imagine_latent, agent_action, agent_logprob, agent_value, imagine_reward, imagine_termination = world_model_imagine_data(
+            imagine_latent, agent_action, agent_logprob, agent_value, imagine_reward, imagine_termination, lazy_hit_rate = world_model_imagine_data(
                 replay_buffer=replay_buffer,
                 world_model=world_model,
                 agent=agent,
@@ -255,6 +261,19 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 log_video=log_video,
                 logger=logger
             )
+            
+            # Global Rebuild Check
+            if retrieval_manager is not None and retrieval_manager.enabled:
+                gr_enabled = getattr(retrieval_config, "global_rebuild_enable", True)
+                gr_threshold = getattr(retrieval_config, "global_rebuild_threshold", 0.2)
+                gr_cooldown = getattr(retrieval_config, "global_rebuild_cooldown", 2000)
+                
+                if gr_enabled and lazy_hit_rate < gr_threshold and total_steps - last_rebuild_step >= gr_cooldown:
+                    retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
+                    last_rebuild_step = total_steps
+                    logger.log("Retrieval/global_rebuild_triggered", 1.0)
+                else:
+                    logger.log("Retrieval/global_rebuild_triggered", 0.0)
 
             agent.update(
                 latent=imagine_latent,
