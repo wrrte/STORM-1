@@ -480,3 +480,5 @@ class WorldModel(nn.Module):
             logger.log("WorldModel/representation_loss", representation_loss.item())
             logger.log("WorldModel/representation_real_kl_div", representation_real_kl_div.item())
             logger.log("WorldModel/total_loss", total_loss.item())
+
+        return flattened_sample.detach(), dist_feat.detach()

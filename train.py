@@ -45,9 +45,15 @@ def build_vec_env(env_name, image_size, num_envs, seed):
     return vec_env
 
 
-def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel, batch_size, demonstration_batch_size, batch_length, logger):
-    obs, action, reward, termination = replay_buffer.sample(batch_size, demonstration_batch_size, batch_length)
-    world_model.update(obs, action, reward, termination, logger=logger)
+def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel, batch_size, demonstration_batch_size, batch_length, logger, agent=None, retrieval_manager=None, imagine_context_length=8):
+    obs, action, reward, termination, base_indexes, base_envs = replay_buffer.sample(batch_size, demonstration_batch_size, batch_length)
+    latent, dist_feat = world_model.update(obs, action, reward, termination, logger=logger)
+
+    if agent is not None and retrieval_manager is not None and retrieval_manager.enabled:
+        with torch.no_grad():
+            agent_state = torch.cat([latent, dist_feat], dim=-1)
+            v_t = agent.value(agent_state).squeeze(-1) # shape: (batch_size, batch_length)
+            retrieval_manager.add_batch_transitions(v_t, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length)
 
 
 @torch.no_grad()
@@ -79,7 +85,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
             
     random_batch_size = imagine_batch_size - retrieved_count
     
-    sample_obs, sample_action, sample_reward, sample_termination = replay_buffer.sample(
+    sample_obs, sample_action, sample_reward, sample_termination, _, _ = replay_buffer.sample(
         random_batch_size, imagine_demonstration_batch_size, imagine_context_length)
         
     if retrieved_count > 0:
@@ -162,7 +168,6 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                         agent_state,
                         greedy=False
                     )
-                    v_t = agent.value(agent_state)
                     current_latent_for_hash = context_latent[:, -1]
 
             context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
@@ -171,20 +176,16 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             action = vec_env.action_space.sample()
             agent_state = None
             current_latent_for_hash = None
-            v_t = None
 
         obs, reward, done, truncated, info = vec_env.step(action)
         replay_buffer.append(current_obs, action, reward, np.logical_or(done, info["life_loss"]))
         
-        if replay_buffer.ready() and v_t is not None:
-            num_trig = retrieval_manager.add_transition(
+        if replay_buffer.ready() and current_latent_for_hash is not None:
+            retrieval_manager.add_transition(
                 pointer=replay_buffer.last_pointer,
                 env_idx=-1,
-                latent_b=current_latent_for_hash,
-                value_b=v_t,
-                is_first_step_b=is_first_step
+                latent_b=current_latent_for_hash
             )
-            logger.log("Retrieval/triggered_anchors_step", num_trig)
         
         is_first_step = done
 
@@ -211,7 +212,10 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 batch_size=batch_size,
                 demonstration_batch_size=demonstration_batch_size,
                 batch_length=batch_length,
-                logger=logger
+                logger=logger,
+                agent=agent,
+                retrieval_manager=retrieval_manager,
+                imagine_context_length=imagine_context_length
             )
         # <<< train world model part
 
@@ -223,7 +227,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 video_columns = 5
                 video_temporal_length = 5
                 num_videos = video_columns * video_temporal_length
-                openloop_obs, openloop_action, _, _ = replay_buffer.sample(
+                openloop_obs, openloop_action, _, _, _, _ = replay_buffer.sample(
                     num_videos, 0, imagine_context_length + imagine_batch_length)
                 
                 world_model.log_openloop_video(

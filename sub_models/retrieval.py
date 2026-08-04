@@ -108,59 +108,81 @@ class RetrievalContextManager:
         keys = (bits.to(torch.int64) * self.hash_bit_values).sum(dim=-1)
         return keys.detach().cpu().tolist()
 
-    def add_transition(self, pointer, env_idx, latent_b, value_b, is_first_step_b):
+    def add_batch_transitions(self, v_t, base_indexes, base_envs, max_buf_len, skip_len=8):
+        if not self.enabled:
+            return 0
+            
+        v_t_eval = v_t[:, skip_len:]
+        delta_v = torch.abs(v_t_eval[:, 1:] - v_t_eval[:, :-1])
+        valid_mask = torch.from_numpy(base_envs != -1).to(delta_v.device)
+        
+        if not valid_mask.any():
+            return 0
+            
+        valid_delta_v = delta_v[valid_mask]
+        env_indices = torch.from_numpy(base_envs[valid_mask.cpu().numpy()]).to(delta_v.device)
+        
+        if getattr(self, "trigger_mode", "absolute") == "z_score":
+            ema_mean_t = torch.from_numpy(self.ema_mean).to(delta_v.device, dtype=torch.float32)
+            ema_var_t = torch.from_numpy(self.ema_var).to(delta_v.device, dtype=torch.float32)
+            b_ema_mean = ema_mean_t[env_indices].unsqueeze(1)
+            b_ema_var = ema_var_t[env_indices].unsqueeze(1)
+            
+            z_scores = torch.abs(valid_delta_v - b_ema_mean) / (torch.sqrt(b_ema_var) + 1e-8)
+            triggered = z_scores >= self.z_score_threshold
+            
+            for i in range(self.num_envs):
+                env_mask = (env_indices == i)
+                if env_mask.any():
+                    env_delta_v = valid_delta_v[env_mask]
+                    env_mean = env_delta_v.mean().item()
+                    env_var = env_delta_v.var(unbiased=False).item() if env_delta_v.numel() > 1 else 0.0
+                    
+                    diff = env_mean - self.ema_mean[i]
+                    self.ema_mean[i] += self.ema_alpha * diff
+                    self.ema_var[i] = (1 - self.ema_alpha) * (self.ema_var[i] + self.ema_alpha * (env_var + diff**2))
+        else:
+            triggered = valid_delta_v >= self.threshold
+            
+        triggered_indices = triggered.nonzero(as_tuple=False)
+        num_triggered = 0
+        valid_batch_indices = valid_mask.nonzero(as_tuple=False).squeeze(-1)
+        
+        for idx in range(triggered_indices.shape[0]):
+            valid_b_idx = triggered_indices[idx, 0].item()
+            t_idx = triggered_indices[idx, 1].item()
+            
+            orig_b_idx = valid_batch_indices[valid_b_idx].item()
+            env_idx = base_envs[orig_b_idx]
+            base_ptr = base_indexes[orig_b_idx]
+            
+            anchor_ptr = int(base_ptr + skip_len + 1 + t_idx + self.anchor_offset) % max_buf_len
+            
+            anchor_key = self.index_to_bucket.get((anchor_ptr, env_idx), -1)
+            if anchor_key != -1:
+                anchor = (anchor_ptr, env_idx)
+                self.active_anchors.append((anchor, anchor_key))
+                num_triggered += 1
+    def add_transition(self, pointer, env_idx, latent_b):
         """
         pointer: the buffer pointer at which current_obs was just appended.
         latent_b: (num_envs, latent_dim)
-        value_b: (num_envs,)
-        is_first_step_b: (num_envs,) bool array (True if the environment just reset)
         """
         if not self.enabled:
             return 0
             
         keys = self._hash_keys(latent_b)
-        num_triggered = 0
         
         for i in range(self.num_envs):
             if env_idx != -1 and i != env_idx:
                 continue # for individual updates if needed, though usually batch
                 
-            v_t = value_b[i].item()
-            is_first = is_first_step_b[i]
-            
-            if not is_first:
-                # Compute delta_v against prev_v
-                delta_v = abs(v_t - self.prev_v[i].item())
-                triggered = False
-                
-                if getattr(self, "trigger_mode", "absolute") == "z_score":
-                    diff = delta_v - self.ema_mean[i]
-                    self.ema_mean[i] += self.ema_alpha * diff
-                    self.ema_var[i] = (1 - self.ema_alpha) * (self.ema_var[i] + self.ema_alpha * diff ** 2)
-                    
-                    import math
-                    z_score = abs(delta_v - self.ema_mean[i]) / (math.sqrt(self.ema_var[i]) + 1e-8)
-                    if z_score >= self.z_score_threshold:
-                        triggered = True
-                else:
-                    if delta_v >= self.threshold:
-                        triggered = True
-                        
-                if triggered:
-                    anchor_ptr = pointer + self.anchor_offset
-                    anchor_key = self.index_to_bucket.get((anchor_ptr, i), -1)
-                    if anchor_key != -1:
-                        anchor = (anchor_ptr, i)
-                        self.active_anchors.append((anchor, anchor_key))
-                        num_triggered += 1
-                    
-            self.prev_v[i] = v_t
             self.prev_keys[i] = keys[i]
             
             # Add current latent to hash bucket
             self._insert_into_bucket(pointer, i, keys[i])
             
-        return num_triggered
+        return 0
 
     def _insert_into_bucket(self, pointer, env_idx, key):
         idx_tuple = (pointer, env_idx)

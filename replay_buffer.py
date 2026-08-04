@@ -57,9 +57,12 @@ class ReplayBuffer():
     def sample(self, batch_size, external_batch_size, batch_length, to_device="cuda"):
         if self.store_on_gpu:
             obs, action, reward, termination = [], [], [], []
+            base_indexes, base_envs = [], []
             if batch_size > 0:
                 for i in range(self.num_envs):
                     indexes = np.random.randint(0, self.length+1-batch_length, size=batch_size//self.num_envs)
+                    base_indexes.append(indexes)
+                    base_envs.append(np.full_like(indexes, i))
                     obs.append(torch.stack([self.obs_buffer[idx:idx+batch_length, i] for idx in indexes]))
                     action.append(torch.stack([self.action_buffer[idx:idx+batch_length, i] for idx in indexes]))
                     reward.append(torch.stack([self.reward_buffer[idx:idx+batch_length, i] for idx in indexes]))
@@ -72,17 +75,24 @@ class ReplayBuffer():
                 action.append(external_action)
                 reward.append(external_reward)
                 termination.append(external_termination)
+                base_indexes.append(np.full(external_batch_size, -1))
+                base_envs.append(np.full(external_batch_size, -1))
 
             obs = torch.cat(obs, dim=0).float() / 255
             obs = rearrange(obs, "B T H W C -> B T C H W")
             action = torch.cat(action, dim=0)
             reward = torch.cat(reward, dim=0)
             termination = torch.cat(termination, dim=0)
+            base_indexes = np.concatenate(base_indexes, axis=0)
+            base_envs = np.concatenate(base_envs, axis=0)
         else:
             obs, action, reward, termination = [], [], [], []
+            base_indexes, base_envs = [], []
             if batch_size > 0:
                 for i in range(self.num_envs):
                     indexes = np.random.randint(0, self.length+1-batch_length, size=batch_size//self.num_envs)
+                    base_indexes.append(indexes)
+                    base_envs.append(np.full_like(indexes, i))
                     obs.append(np.stack([self.obs_buffer[idx:idx+batch_length, i] for idx in indexes]))
                     action.append(np.stack([self.action_buffer[idx:idx+batch_length, i] for idx in indexes]))
                     reward.append(np.stack([self.reward_buffer[idx:idx+batch_length, i] for idx in indexes]))
@@ -95,14 +105,18 @@ class ReplayBuffer():
                 action.append(external_action)
                 reward.append(external_reward)
                 termination.append(external_termination)
+                base_indexes.append(np.full(external_batch_size, -1))
+                base_envs.append(np.full(external_batch_size, -1))
 
             obs = torch.from_numpy(np.concatenate(obs, axis=0)).float().cuda() / 255
             obs = rearrange(obs, "B T H W C -> B T C H W")
             action = torch.from_numpy(np.concatenate(action, axis=0)).cuda()
             reward = torch.from_numpy(np.concatenate(reward, axis=0)).cuda()
             termination = torch.from_numpy(np.concatenate(termination, axis=0)).cuda()
+            base_indexes = np.concatenate(base_indexes, axis=0)
+            base_envs = np.concatenate(base_envs, axis=0)
 
-        return obs, action, reward, termination
+        return obs, action, reward, termination, base_indexes, base_envs
 
     def append(self, obs, action, reward, termination):
         # obs/nex_obs: torch Tensor
