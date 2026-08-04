@@ -23,7 +23,9 @@ import env_wrapper
 import agents
 from sub_models.functions_losses import symexp
 from sub_models.world_models import WorldModel, MSELoss
-from sub_models.retrieval import RetrievalContextManager
+import sys
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
+from retrieval import RetrievalContextManager
 
 
 def build_single_env(env_name, image_size, seed):
@@ -75,7 +77,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
     lazy_hit_rate = 0.0
     if retrieval_manager is not None and retrieval_manager.enabled:
         cfg = retrieval_manager.config
-        ret_obs, ret_action, candidates_before_max, avg_hit_rate = retrieval_manager.retrieve_contexts(
+        ret_obs, ret_action, candidates_before_max, avg_hit_rate, _ = retrieval_manager.retrieve_contexts(
             replay_buffer, world_model, 
             max_anchors=cfg.get("max_anchors", 10) if hasattr(cfg, "get") else getattr(cfg, "max_anchors", 10),
             multiplier=cfg.get("multiplier", 5) if hasattr(cfg, "get") else getattr(cfg, "multiplier", 5),
