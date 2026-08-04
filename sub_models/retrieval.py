@@ -163,6 +163,9 @@ class RetrievalContextManager:
                 anchor = (anchor_ptr, env_idx)
                 self.active_anchors.append((anchor, anchor_key))
                 num_triggered += 1
+                
+        return num_triggered
+
     def add_transition(self, pointer, env_idx, latent_b):
         """
         pointer: the buffer pointer at which current_obs was just appended.
