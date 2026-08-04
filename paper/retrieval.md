@@ -40,6 +40,11 @@
 * **오버헤드 방지:** 현재 서버의 GPU VRAM(96GB)이 매우 여유로운 반면 CPU-GPU 간 데이터 전송은 병목이 되기 쉽습니다. 따라서 모든 마스킹, 필터링, Z-score 계산을 순수 텐서 연산(Vectorized)으로 구성하여 GPU 내부에서만 처리되도록 구현했습니다.
 * **스팸(Spamming) 방지:** 만약 Z-score 임계값이 낮거나 극단적인 배치 조합으로 인해 한 스텝에 수백 개의 앵커가 발굴되더라도, `max_anchors`(현재 16) 설정을 통해 큐(Queue)에서 상상 단계로 꺼내어 쓰는 앵커의 최대 개수를 엄격히 제한합니다. 이를 통해 검색 오버헤드로 인한 시스템 병목을 원천적으로 차단합니다.
 
+### 3.5. Hit-Rate 모니터링 및 청크(Chunk) 기반 Global Rebuild
+* **이슈:** 시간이 지나 World Model이 고도화될수록, 과거에 뽑아두었던 Latent 기반의 해시 버킷 배치는 점점 구식이 되어버립니다(Representation Drift). 이로 인해 앵커가 뽑은 타겟 프레임들을 최신 모델로 재검증(Lazy Rebuild)해 보면, 유사도가 떨어져 버려지는 프레임 비율이 극심해집니다.
+* **수정안:** 매 스텝 1차 추출 후 최신 모델로 재인코딩했을 때 원래 해시와 여전히 일치하는 비율(`lazy_hit_rate`)을 측정합니다. 이 히트율이 설정된 임계치(예: 20%) 미만으로 떨어지면, **해시 버킷 전체를 리셋하고 리플레이 버퍼의 모든 유효 프레임을 최신 모델로 전면 재해싱하는 Global Rebuild**를 발동시킵니다.
+* **OOM 방어:** 전체 버퍼를 한 번에 World Model에 통과시키면 발생할 GPU 메모리 폭발(OOM)을 막기 위해, 1024개씩 프레임을 잘라서(Chunking) 순차적으로 재해싱하는 안전장치를 두었습니다.
+
 ---
 
 ## 4. 모니터링 체계 (WandB 연동)
@@ -48,7 +53,9 @@
 * `Retrieval/triggered_anchors_step_neg`: 현재 모델 업데이트 스텝에서 발굴된 부정적 앵커 수
 * `Retrieval/active_anchors_queue`: 미처 처리되지 못하고 대기열에 쌓여있는 앵커의 수 (이 수치가 폭발할 경우 Z-score 임계값 상향 필요)
 * `Retrieval/candidates_before_max`: 해시 버킷에서 가져온 실제 후보 프레임의 갯수
-* `Retrieval/retrieved_contexts`: 최종적으로 필터링 및 `max` 컷오프를 거쳐 상상 배치에 삽입된 프레임 수
+* `Retrieval/retrieved_contexts`: 최종적으로 필터링 및 `max_contexts` 컷오프를 거쳐 상상 배치에 삽입된 프레임 수
+* `Retrieval/lazy_rebuild_hit_rate`: Lazy Rebuild 단계에서 최신 모델로 재해싱 시 타겟 프레임이 여전히 동일 버킷에 속하는 비율 (높을수록 좋음)
+* `Retrieval/global_rebuild_triggered`: 해시 버킷 전면 재정렬(Global Rebuild)이 발동된 시점을 나타내는 플래그 (1.0 = 발동)
 
 ---
 
@@ -63,7 +70,10 @@
 * **`max_anchors`** (예: `16`): 한 번의 상상(Imagine) 스텝에서 대기열(Queue)로부터 꺼내어 실제 해시 검색에 사용할 앵커의 '최대 개수'입니다. 앵커 스팸(Spamming)으로 인한 시스템 병목을 막는 일차적 방어선입니다.
 * **`target`** (예: `16`): 하나의 앵커가 주어졌을 때, 같은 해시 버킷에서 끌어올리고자 하는 '목표 유사 프레임 개수'입니다.
 * **`multiplier`** (예: `8`): 해시 버킷에서 프레임을 무작위로 추출할 때, `target`을 채우기 위해 넉넉하게 뽑아볼 후보군의 배수입니다. (`x * (y-1)` 개수만큼 1차 추출)
-* **`max`** (예: `256`): 여러 개의 앵커가 발굴하여 모아온 총 프레임들의 개수가 지나치게 많을 경우 상상 배치의 메모리 한계를 넘지 않도록 자르는(Truncate) 최종 상한선입니다.
+* **`max_contexts`** (예: `256`): 여러 개의 앵커가 발굴하여 모아온 총 프레임들의 개수가 지나치게 많을 경우 상상 배치의 메모리 한계를 넘지 않도록 자르는(Truncate) 최종 상한선입니다.
+* **`global_rebuild_enable`** (예: `True`): 히트율 기반의 해시 버킷 자동 리셋 기능(Global Rebuild)을 켤지 결정합니다.
+* **`global_rebuild_threshold`** (예: `0.2`): Lazy Rebuild 히트율이 이 수치 미만으로 떨어질 때 Global Rebuild를 발동시킵니다.
+* **`global_rebuild_cooldown`** (예: `2000`): 한 번 Global Rebuild가 발동된 후 최소 몇 스텝 동안은 다시 발동하지 않고 대기할지 결정합니다.
 
 ---
 
