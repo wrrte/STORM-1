@@ -47,8 +47,8 @@
 * `Retrieval/triggered_anchors_step_pos`: 현재 모델 업데이트 스텝에서 발굴된 긍정적 앵커 수
 * `Retrieval/triggered_anchors_step_neg`: 현재 모델 업데이트 스텝에서 발굴된 부정적 앵커 수
 * `Retrieval/active_anchors_queue`: 미처 처리되지 못하고 대기열에 쌓여있는 앵커의 수 (이 수치가 폭발할 경우 Z-score 임계값 상향 필요)
-* `Retrieval/candidates_before_z`: 해시 버킷에서 가져온 실제 후보 프레임의 갯수
-* `Retrieval/retrieved_contexts`: 최종적으로 필터링 및 `z_max` 컷오프를 거쳐 상상 배치에 삽입된 프레임 수
+* `Retrieval/candidates_before_max`: 해시 버킷에서 가져온 실제 후보 프레임의 갯수
+* `Retrieval/retrieved_contexts`: 최종적으로 필터링 및 `max` 컷오프를 거쳐 상상 배치에 삽입된 프레임 수
 
 ---
 
