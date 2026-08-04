@@ -80,7 +80,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
             max_anchors=cfg.get("max_anchors", 10) if hasattr(cfg, "get") else getattr(cfg, "max_anchors", 10),
             multiplier=cfg.get("multiplier", 5) if hasattr(cfg, "get") else getattr(cfg, "multiplier", 5),
             target=cfg.get("target", 5) if hasattr(cfg, "get") else getattr(cfg, "target", 5),
-            max=cfg.get("max", 256) if hasattr(cfg, "get") else getattr(cfg, "max", 256)
+            max_contexts=cfg.get("max_contexts", 256) if hasattr(cfg, "get") else getattr(cfg, "max_contexts", 256)
         )
         if ret_obs is not None:
             retrieved_count = ret_obs.shape[0]

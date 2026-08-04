@@ -252,7 +252,7 @@ class RetrievalContextManager:
                 
         self.index_to_bucket[idx_tuple] = key
 
-    def retrieve_contexts(self, replay_buffer, world_model, max_anchors, multiplier=5, target=5, max=256):
+    def retrieve_contexts(self, replay_buffer, world_model, max_anchors, multiplier=5, target=5, max_contexts=256):
         """
         Pops up to `max_anchors` from `active_anchors` and retrieves up to max contexts in total.
         Implements lazy recomputation using single frame encoding.
@@ -330,8 +330,8 @@ class RetrievalContextManager:
             final_chosen_indices.extend(matched_indices)
             
         candidates_before_max = len(final_chosen_indices)
-        if len(final_chosen_indices) > max:
-            final_chosen_indices = final_chosen_indices[:max]
+        if len(final_chosen_indices) > max_contexts:
+            final_chosen_indices = final_chosen_indices[:max_contexts]
             
         retrieved_obs_list = []
         retrieved_action_list = []

@@ -187,7 +187,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.max_anchors = 10
     conf.JointTrainAgent.Retrieval.multiplier = 5
     conf.JointTrainAgent.Retrieval.target = 5
-    conf.JointTrainAgent.Retrieval.max = 256
+    conf.JointTrainAgent.Retrieval.max_contexts = 256
     conf.JointTrainAgent.Retrieval.global_rebuild_enable = True
     conf.JointTrainAgent.Retrieval.global_rebuild_threshold = 0.2
     conf.JointTrainAgent.Retrieval.global_rebuild_cooldown = 2000
