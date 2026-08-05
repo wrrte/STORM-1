@@ -1,3 +1,5 @@
+export CUDA_VISIBLE_DEVICES=5
+
 env_name=Seaquest
 python -u eval.py \
     -env_name "ALE/${env_name}-v5" \
