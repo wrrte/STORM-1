@@ -191,6 +191,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.global_rebuild_enable = True
     conf.JointTrainAgent.Retrieval.global_rebuild_threshold = 0.2
     conf.JointTrainAgent.Retrieval.global_rebuild_cooldown = 2000
+    conf.JointTrainAgent.Retrieval.anchor_queue_capacity = 8192
 
     conf.defrost()
     conf.merge_from_file(config_path)
