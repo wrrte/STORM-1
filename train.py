@@ -145,7 +145,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     # reset envs and variables
     sum_reward = np.zeros(num_envs)
     current_obs, current_info = vec_env.reset()
-    context_obs = deque(maxlen=16)
+    context_latent = deque(maxlen=16)
     context_action = deque(maxlen=16)
     
     # retrieval setup
@@ -165,33 +165,38 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     # sample and train
     for total_steps in tqdm(range(max_steps//num_envs)):
         # sample part >>>
+        obs_tensor = torch.from_numpy(current_obs).cuda()
+        
         if replay_buffer.ready():
             world_model.eval()
             agent.eval()
             with torch.no_grad():
                 if len(context_action) == 0:
                     action = vec_env.action_space.sample()
+                    action_tensor = torch.from_numpy(action).cuda()
                 else:
-                    context_latent = world_model.encode_obs(torch.cat(list(context_obs), dim=1))
-                    model_context_action = np.stack(list(context_action), axis=1)
-                    model_context_action = torch.Tensor(model_context_action).cuda()
-                    prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent, model_context_action)
+                    context_latent_tensor = torch.cat(list(context_latent), dim=1)
+                    model_context_action = torch.stack(list(context_action), dim=1)
+                    prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent_tensor, model_context_action)
                     agent_state = torch.cat([prior_flattened_sample, last_dist_feat], dim=-1)
-                    action = agent.sample_as_env_action(
+                    action_tensor = agent.sample(
                         agent_state,
                         greedy=False
-                    )
-                    current_latent_for_hash = context_latent[:, -1]
+                    ).squeeze(-1)
+                    action = action_tensor.detach().cpu().numpy()
+                    current_latent_for_hash = context_latent_tensor[:, -1]
 
-            context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
-            context_action.append(action)
+                new_obs_input = rearrange(obs_tensor, "B H W C -> B 1 C H W").float() / 255.0
+                new_latent = world_model.encode_obs(new_obs_input)
+                context_latent.append(new_latent)
+                context_action.append(action_tensor)
         else:
             action = vec_env.action_space.sample()
             agent_state = None
             current_latent_for_hash = None
 
         obs, reward, done, truncated, info = vec_env.step(action)
-        replay_buffer.append(current_obs, action, reward, np.logical_or(done, info["life_loss"]))
+        replay_buffer.append(obs_tensor, action, reward, np.logical_or(done, info["life_loss"]))
         
         if replay_buffer.ready() and current_latent_for_hash is not None:
             retrieval_manager.add_transition(
