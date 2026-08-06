@@ -37,7 +37,7 @@ JointTrainAgent:
     target: 8
     max_contexts: 256
     global_rebuild_enable: True
-    global_rebuild_threshold: 0.01
+    global_rebuild_threshold: 0.03
     global_rebuild_cooldown: 2000
 
 Models:
