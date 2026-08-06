@@ -1,10 +1,6 @@
 export CUDA_VISIBLE_DEVICES=5
 
 games=(
-    Alien
-    Amidar
-    Assault
-    Asterix
     BankHeist
     BattleZone
     Boxing
@@ -27,6 +23,10 @@ games=(
     RoadRunner
     Seaquest
     UpNDown
+    Alien
+    Amidar
+    Assault
+    Asterix
 )
 
 declare -A seed_map
