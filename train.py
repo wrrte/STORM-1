@@ -364,6 +364,13 @@ if __name__ == "__main__":
         world_model = build_world_model(conf, action_dim)
         agent = build_agent(conf, action_dim)
 
+        print(colorama.Fore.MAGENTA + "Applying torch.compile to sub-modules for acceleration..." + colorama.Style.RESET_ALL)
+        world_model.encoder = torch.compile(world_model.encoder)
+        world_model.storm_transformer = torch.compile(world_model.storm_transformer)
+        world_model.image_decoder = torch.compile(world_model.image_decoder)
+        agent.actor = torch.compile(agent.actor)
+        agent.critic = torch.compile(agent.critic)
+
         # build replay buffer
         replay_buffer = ReplayBuffer(
             obs_shape=(conf.BasicSettings.ImageSize, conf.BasicSettings.ImageSize, 3),
