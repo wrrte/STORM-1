@@ -1,14 +1,6 @@
 export CUDA_VISIBLE_DEVICES=5
 
 games=(
-    BankHeist
-    BattleZone
-    Boxing
-    Breakout
-    ChopperCommand
-    CrazyClimber
-    DemonAttack
-    Freeway
     Frostbite
     Gopher
     Hero
@@ -27,6 +19,14 @@ games=(
     Amidar
     Assault
     Asterix
+    BankHeist
+    BattleZone
+    Boxing
+    Breakout
+    ChopperCommand
+    CrazyClimber
+    DemonAttack
+    Freeway
 )
 
 declare -A seed_map
