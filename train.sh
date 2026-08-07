@@ -2,6 +2,7 @@ export CUDA_VISIBLE_DEVICES=5
 
 games=(
     Frostbite
+    Frostbite
     Gopher
     Hero
     Jamesbond
