@@ -99,20 +99,17 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
         sample_obs = torch.cat([sample_obs, ret_obs], dim=0)
         sample_action = torch.cat([sample_action, ret_action], dim=0)
         logger.log("Retrieval/retrieved_contexts", retrieved_count)
-        logger.log("Retrieval/active_anchors_queue", retrieval_manager.anchor_count.item())
+        logger.log("Retrieval/active_anchors_queue", len(retrieval_manager.active_anchors))
         
-        active_mask = retrieval_manager.bucket_lens > 0
-        active_sizes = retrieval_manager.bucket_lens[active_mask]
-        
-        if len(active_sizes) > 0:
-            sizes = active_sizes.cpu().numpy()
-            avg_size = np.mean(sizes)
+        if len(retrieval_manager.hash_memory) > 0:
+            sizes = [len(b) for b in retrieval_manager.hash_memory.values()]
+            avg_size = sum(sizes) / len(sizes)
             logger.log("Retrieval/avg_bucket_size", avg_size)
             logger.log("Retrieval/num_active_buckets", len(sizes))
             
             # Record bucket distribution occasionally (e.g., if sizes has items)
             # wandb histograms need a list of values
-            logger.log("Retrieval/bucket_size_hist", sizes)
+            logger.log("Retrieval/bucket_size_hist", np.array(sizes))
                 
     final_batch_size = sample_obs.shape[0]
 
@@ -133,9 +130,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   batch_size, demonstration_batch_size, batch_length,
                                   imagine_batch_size, imagine_demonstration_batch_size,
                                   imagine_context_length, imagine_batch_length,
-                                  save_every_steps, seed, logger, save_dir):
+                                  save_every_steps, seed, logger):
     # create ckpt dir
-    os.makedirs(save_dir, exist_ok=True)
+    os.makedirs(f"ckpt/{args.n}", exist_ok=True)
 
     # build vec env, not useful in the Atari100k setting
     # but when the max_steps is large, you can use parallel envs to speed up
@@ -145,7 +142,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     # reset envs and variables
     sum_reward = np.zeros(num_envs)
     current_obs, current_info = vec_env.reset()
-    context_latent = deque(maxlen=16)
+    context_obs = deque(maxlen=16)
     context_action = deque(maxlen=16)
     
     # retrieval setup
@@ -165,38 +162,33 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     # sample and train
     for total_steps in tqdm(range(max_steps//num_envs)):
         # sample part >>>
-        obs_tensor = torch.from_numpy(current_obs).cuda()
-        
         if replay_buffer.ready():
             world_model.eval()
             agent.eval()
             with torch.no_grad():
                 if len(context_action) == 0:
                     action = vec_env.action_space.sample()
-                    action_tensor = torch.from_numpy(action).cuda()
                 else:
-                    context_latent_tensor = torch.cat(list(context_latent), dim=1)
-                    model_context_action = torch.stack(list(context_action), dim=1)
-                    prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent_tensor, model_context_action)
+                    context_latent = world_model.encode_obs(torch.cat(list(context_obs), dim=1))
+                    model_context_action = np.stack(list(context_action), axis=1)
+                    model_context_action = torch.Tensor(model_context_action).cuda()
+                    prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent, model_context_action)
                     agent_state = torch.cat([prior_flattened_sample, last_dist_feat], dim=-1)
-                    action_tensor = agent.sample(
+                    action = agent.sample_as_env_action(
                         agent_state,
                         greedy=False
-                    ).squeeze(-1)
-                    action = action_tensor.detach().cpu().numpy()
-                    current_latent_for_hash = context_latent_tensor[:, -1]
+                    )
+                    current_latent_for_hash = context_latent[:, -1]
 
-                new_obs_input = rearrange(obs_tensor, "B H W C -> B 1 C H W").float() / 255.0
-                new_latent = world_model.encode_obs(new_obs_input)
-                context_latent.append(new_latent)
-                context_action.append(action_tensor)
+            context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
+            context_action.append(action)
         else:
             action = vec_env.action_space.sample()
             agent_state = None
             current_latent_for_hash = None
 
         obs, reward, done, truncated, info = vec_env.step(action)
-        replay_buffer.append(obs_tensor, action, reward, np.logical_or(done, info["life_loss"]))
+        replay_buffer.append(current_obs, action, reward, np.logical_or(done, info["life_loss"]))
         
         if replay_buffer.ready() and current_latent_for_hash is not None:
             retrieval_manager.add_transition(
@@ -299,8 +291,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         # save model per episode
         if total_steps % (save_every_steps//num_envs) == 0:
             print(colorama.Fore.GREEN + f"Saving model at total steps {total_steps}" + colorama.Style.RESET_ALL)
-            torch.save(world_model.state_dict(), f"{save_dir}/world_model_{total_steps}.pth")
-            torch.save(agent.state_dict(), f"{save_dir}/agent_{total_steps}.pth")
+            torch.save(world_model.state_dict(), f"ckpt/{args.n}/world_model_{total_steps}.pth")
+            torch.save(agent.state_dict(), f"ckpt/{args.n}/agent_{total_steps}.pth")
 
         # flush all buffered wandb metrics for this step
         logger.flush_wandb()
@@ -349,18 +341,10 @@ if __name__ == "__main__":
 
     # set seed
     seed_np_torch(seed=args.seed)
-    
-    import wandb
-    pure_env_name = args.n.split('-')[0]
-    run_id = wandb.util.generate_id()
-    run_name = f"{pure_env_name}_{run_id}"
-    save_dir = f"ckpt/{pure_env_name}/{run_id}"
-    os.makedirs(save_dir, exist_ok=True)
-
     # tensorboard writer
-    logger = Logger(path=save_dir, config=conf, run_id=run_id, run_name=run_name)
+    logger = Logger(path=f"runs/{args.n}", config=conf)
     # copy config file
-    shutil.copy(args.config_path, f"{save_dir}/config.yaml")
+    shutil.copy(args.config_path, f"runs/{args.n}/config.yaml")
 
     # distinguish between tasks, other debugging options are removed for simplicity
     if conf.Task == "JointTrainAgent":
@@ -371,13 +355,6 @@ if __name__ == "__main__":
         # build world model and agent
         world_model = build_world_model(conf, action_dim)
         agent = build_agent(conf, action_dim)
-
-        print(colorama.Fore.MAGENTA + "Applying torch.compile to sub-modules for acceleration..." + colorama.Style.RESET_ALL)
-        world_model.encoder = torch.compile(world_model.encoder)
-        world_model.storm_transformer = torch.compile(world_model.storm_transformer)
-        world_model.image_decoder = torch.compile(world_model.image_decoder)
-        agent.actor = torch.compile(agent.actor)
-        agent.critic = torch.compile(agent.critic)
 
         # build replay buffer
         replay_buffer = ReplayBuffer(
@@ -413,8 +390,7 @@ if __name__ == "__main__":
             imagine_batch_length=conf.JointTrainAgent.ImagineBatchLength,
             save_every_steps=conf.JointTrainAgent.SaveEverySteps,
             seed=args.seed,
-            logger=logger,
-            save_dir=save_dir
+            logger=logger
         )
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")

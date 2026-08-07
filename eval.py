@@ -135,13 +135,10 @@ if __name__ == "__main__":
     steps.sort()
     steps = steps[-1:]
     print(steps)
-    def clean_state_dict(state_dict):
-        return {k.replace('_orig_mod.', ''): v for k, v in state_dict.items()}
-
     results = []
     for step in tqdm(steps):
-        world_model.load_state_dict(clean_state_dict(torch.load(f"{root_path}/world_model_{step}.pth")))
-        agent.load_state_dict(clean_state_dict(torch.load(f"{root_path}/agent_{step}.pth")))
+        world_model.load_state_dict(torch.load(f"{root_path}/world_model_{step}.pth"))
+        agent.load_state_dict(torch.load(f"{root_path}/agent_{step}.pth"))
         # # eval
         episode_avg_return = eval_episodes(
             num_episode=20,
@@ -153,7 +150,6 @@ if __name__ == "__main__":
             agent=agent
         )
         results.append([step, episode_avg_return])
-    os.makedirs(os.path.dirname(f"eval_result/{args.run_name}.csv"), exist_ok=True)
     with open(f"eval_result/{args.run_name}.csv", "w") as fout:
         fout.write("step, episode_avg_return\n")
         for step, episode_avg_return in results:

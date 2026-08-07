@@ -31,13 +31,12 @@ JointTrainAgent:
     hash_bits: 10
     ema_alpha: 0.01
     max_bucket_size: 100000
-    anchor_queue_capacity: 8192
     max_anchors: 16
-    multiplier: 32
+    multiplier: 8
     target: 16
     max_contexts: 256
     global_rebuild_enable: True
-    global_rebuild_threshold: 0.03
+    global_rebuild_threshold: 0.1
     global_rebuild_cooldown: 2000
 
 Models:
