@@ -2,3 +2,4 @@ wandb/
 ckpt/
 __pycache__/
 runs/
+eval_result/

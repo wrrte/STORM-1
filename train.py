@@ -130,9 +130,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   batch_size, demonstration_batch_size, batch_length,
                                   imagine_batch_size, imagine_demonstration_batch_size,
                                   imagine_context_length, imagine_batch_length,
-                                  save_every_steps, seed, logger):
+                                  save_every_steps, seed, logger, save_dir):
     # create ckpt dir
-    os.makedirs(f"ckpt/{args.n}", exist_ok=True)
+    os.makedirs(save_dir, exist_ok=True)
 
     # build vec env, not useful in the Atari100k setting
     # but when the max_steps is large, you can use parallel envs to speed up
@@ -291,8 +291,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         # save model per episode
         if total_steps % (save_every_steps//num_envs) == 0:
             print(colorama.Fore.GREEN + f"Saving model at total steps {total_steps}" + colorama.Style.RESET_ALL)
-            torch.save(world_model.state_dict(), f"ckpt/{args.n}/world_model_{total_steps}.pth")
-            torch.save(agent.state_dict(), f"ckpt/{args.n}/agent_{total_steps}.pth")
+            torch.save(world_model.state_dict(), f"{save_dir}/world_model_{total_steps}.pth")
+            torch.save(agent.state_dict(), f"{save_dir}/agent_{total_steps}.pth")
 
         # flush all buffered wandb metrics for this step
         logger.flush_wandb()
@@ -341,10 +341,18 @@ if __name__ == "__main__":
 
     # set seed
     seed_np_torch(seed=args.seed)
+    
+    import wandb
+    pure_env_name = args.n.split('-')[0]
+    run_id = wandb.util.generate_id()
+    run_name = f"{pure_env_name}_{run_id}"
+    save_dir = f"ckpt/{pure_env_name}/{run_id}"
+    os.makedirs(save_dir, exist_ok=True)
+
     # tensorboard writer
-    logger = Logger(path=f"runs/{args.n}", config=conf)
+    logger = Logger(path=save_dir, config=conf, run_id=run_id, run_name=run_name)
     # copy config file
-    shutil.copy(args.config_path, f"runs/{args.n}/config.yaml")
+    shutil.copy(args.config_path, f"{save_dir}/config.yaml")
 
     # distinguish between tasks, other debugging options are removed for simplicity
     if conf.Task == "JointTrainAgent":
@@ -390,7 +398,8 @@ if __name__ == "__main__":
             imagine_batch_length=conf.JointTrainAgent.ImagineBatchLength,
             save_every_steps=conf.JointTrainAgent.SaveEverySteps,
             seed=args.seed,
-            logger=logger
+            logger=logger,
+            save_dir=save_dir
         )
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")
