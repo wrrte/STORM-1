@@ -2,9 +2,10 @@ export CUDA_VISIBLE_DEVICES=5
 
 games=(
     Frostbite
-    Frostbite
-    Gopher
+    ChopperCommand
     Hero
+    Asterix
+    Gopher
     Jamesbond
     Kangaroo
     Krull
@@ -19,12 +20,10 @@ games=(
     Alien
     Amidar
     Assault
-    Asterix
     BankHeist
     BattleZone
     Boxing
     Breakout
-    ChopperCommand
     CrazyClimber
     DemonAttack
     Freeway
