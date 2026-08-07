@@ -99,17 +99,20 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
         sample_obs = torch.cat([sample_obs, ret_obs], dim=0)
         sample_action = torch.cat([sample_action, ret_action], dim=0)
         logger.log("Retrieval/retrieved_contexts", retrieved_count)
-        logger.log("Retrieval/active_anchors_queue", len(retrieval_manager.active_anchors))
+        logger.log("Retrieval/active_anchors_queue", retrieval_manager.anchor_count.item())
         
-        if len(retrieval_manager.hash_memory) > 0:
-            sizes = [len(b) for b in retrieval_manager.hash_memory.values()]
-            avg_size = sum(sizes) / len(sizes)
+        active_mask = retrieval_manager.bucket_lens > 0
+        active_sizes = retrieval_manager.bucket_lens[active_mask]
+        
+        if len(active_sizes) > 0:
+            sizes = active_sizes.cpu().numpy()
+            avg_size = np.mean(sizes)
             logger.log("Retrieval/avg_bucket_size", avg_size)
             logger.log("Retrieval/num_active_buckets", len(sizes))
             
             # Record bucket distribution occasionally (e.g., if sizes has items)
             # wandb histograms need a list of values
-            logger.log("Retrieval/bucket_size_hist", np.array(sizes))
+            logger.log("Retrieval/bucket_size_hist", sizes)
                 
     final_batch_size = sample_obs.shape[0]
 
