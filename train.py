@@ -174,10 +174,11 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                     model_context_action = torch.Tensor(model_context_action).cuda()
                     prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent, model_context_action)
                     agent_state = torch.cat([prior_flattened_sample, last_dist_feat], dim=-1)
-                    action = agent.sample_as_env_action(
+                    action_tensor = agent.sample(
                         agent_state,
                         greedy=False
-                    )
+                    ).squeeze(-1)
+                    action = action_tensor.detach().cpu().numpy()
                     current_latent_for_hash = context_latent[:, -1]
 
             context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
