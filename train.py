@@ -402,5 +402,38 @@ if __name__ == "__main__":
             logger=logger,
             save_dir=save_dir
         )
+
+        print(colorama.Fore.GREEN + "Training finished, starting evaluation..." + colorama.Style.RESET_ALL)
+        import eval
+        final_rewards = eval.eval_episodes(
+            num_episode=20,
+            env_name=args.env_name,
+            max_steps=conf.JointTrainAgent.SampleMaxSteps,
+            num_envs=5,
+            image_size=conf.BasicSettings.ImageSize,
+            world_model=world_model,
+            agent=agent
+        )
+        
+        try:
+            with open(os.path.join(os.path.dirname(__file__), "results/storm.json"), "r") as f:
+                storm_results = json.load(f)
+            baseline_scores = storm_results.get(pure_env_name, [])
+            if baseline_scores:
+                baseline_avg = np.mean(baseline_scores)
+                logger.log(f"sample/{args.env_name}_eval_reward_episodes", baseline_avg)
+                logger.flush_wandb()
+        except Exception as e:
+            print(colorama.Fore.RED + f"Could not load baseline scores: {e}" + colorama.Style.RESET_ALL)
+
+        for reward in final_rewards:
+            logger.log(f"sample/{args.env_name}_eval_reward_episodes", reward)
+            logger.flush_wandb()
+            
+        episode_avg_return = np.mean(final_rewards)
+        logger.log(f"sample/{args.env_name}_eval_reward_episodes", episode_avg_return)
+        logger.log(f"sample/{args.env_name}_eval_reward", episode_avg_return)
+        logger.flush_wandb()
+        print(colorama.Fore.GREEN + f"Evaluation finished! Mean reward: {episode_avg_return}" + colorama.Style.RESET_ALL)
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")
