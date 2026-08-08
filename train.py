@@ -130,9 +130,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   batch_size, demonstration_batch_size, batch_length,
                                   imagine_batch_size, imagine_demonstration_batch_size,
                                   imagine_context_length, imagine_batch_length,
-                                  save_every_steps, seed, logger, save_dir):
+                                  save_every_steps, seed, logger):
     # create ckpt dir
-    os.makedirs(save_dir, exist_ok=True)
+    os.makedirs(f"ckpt/{args.n}", exist_ok=True)
 
     # build vec env, not useful in the Atari100k setting
     # but when the max_steps is large, you can use parallel envs to speed up
@@ -174,11 +174,10 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                     model_context_action = torch.Tensor(model_context_action).cuda()
                     prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent, model_context_action)
                     agent_state = torch.cat([prior_flattened_sample, last_dist_feat], dim=-1)
-                    action_tensor = agent.sample(
+                    action = agent.sample_as_env_action(
                         agent_state,
                         greedy=False
-                    ).squeeze(-1)
-                    action = action_tensor.detach().cpu().numpy()
+                    )
                     current_latent_for_hash = context_latent[:, -1]
 
             context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
@@ -292,8 +291,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         # save model per episode
         if total_steps % (save_every_steps//num_envs) == 0:
             print(colorama.Fore.GREEN + f"Saving model at total steps {total_steps}" + colorama.Style.RESET_ALL)
-            torch.save(world_model.state_dict(), f"{save_dir}/world_model_{total_steps}.pth")
-            torch.save(agent.state_dict(), f"{save_dir}/agent_{total_steps}.pth")
+            torch.save(world_model.state_dict(), f"ckpt/{args.n}/world_model_{total_steps}.pth")
+            torch.save(agent.state_dict(), f"ckpt/{args.n}/agent_{total_steps}.pth")
 
         # flush all buffered wandb metrics for this step
         logger.flush_wandb()
@@ -342,18 +341,10 @@ if __name__ == "__main__":
 
     # set seed
     seed_np_torch(seed=args.seed)
-    
-    import wandb
-    pure_env_name = args.n.split('-')[0]
-    run_id = wandb.util.generate_id()
-    run_name = f"{pure_env_name}_{run_id}"
-    save_dir = f"ckpt/{pure_env_name}/{run_id}"
-    os.makedirs(save_dir, exist_ok=True)
-
     # tensorboard writer
-    logger = Logger(path=save_dir, config=conf, run_id=run_id, run_name=run_name)
+    logger = Logger(path=f"runs/{args.n}", config=conf)
     # copy config file
-    shutil.copy(args.config_path, f"{save_dir}/config.yaml")
+    shutil.copy(args.config_path, f"runs/{args.n}/config.yaml")
 
     # distinguish between tasks, other debugging options are removed for simplicity
     if conf.Task == "JointTrainAgent":
@@ -399,41 +390,7 @@ if __name__ == "__main__":
             imagine_batch_length=conf.JointTrainAgent.ImagineBatchLength,
             save_every_steps=conf.JointTrainAgent.SaveEverySteps,
             seed=args.seed,
-            logger=logger,
-            save_dir=save_dir
+            logger=logger
         )
-
-        print(colorama.Fore.GREEN + "Training finished, starting evaluation..." + colorama.Style.RESET_ALL)
-        import eval
-        final_rewards = eval.eval_episodes(
-            num_episode=20,
-            env_name=args.env_name,
-            max_steps=conf.JointTrainAgent.SampleMaxSteps,
-            num_envs=5,
-            image_size=conf.BasicSettings.ImageSize,
-            world_model=world_model,
-            agent=agent
-        )
-        
-        try:
-            with open(os.path.join(os.path.dirname(__file__), "results/storm.json"), "r") as f:
-                storm_results = json.load(f)
-            baseline_scores = storm_results.get(pure_env_name, [])
-            if baseline_scores:
-                baseline_avg = np.mean(baseline_scores)
-                logger.log(f"sample/{args.env_name}_eval_reward_episodes", baseline_avg)
-                logger.flush_wandb()
-        except Exception as e:
-            print(colorama.Fore.RED + f"Could not load baseline scores: {e}" + colorama.Style.RESET_ALL)
-
-        for reward in final_rewards:
-            logger.log(f"sample/{args.env_name}_eval_reward_episodes", reward)
-            logger.flush_wandb()
-            
-        episode_avg_return = np.mean(final_rewards)
-        logger.log(f"sample/{args.env_name}_eval_reward_episodes", episode_avg_return)
-        logger.log(f"sample/{args.env_name}_eval_reward", episode_avg_return)
-        logger.flush_wandb()
-        print(colorama.Fore.GREEN + f"Evaluation finished! Mean reward: {episode_avg_return}" + colorama.Style.RESET_ALL)
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")

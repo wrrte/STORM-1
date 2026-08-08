@@ -59,26 +59,14 @@ class ReplayBuffer():
             obs, action, reward, termination = [], [], [], []
             base_indexes, base_envs = [], []
             if batch_size > 0:
-                batch_per_env = batch_size // self.num_envs
-                indexes = np.random.randint(0, self.length + 1 - batch_length, size=(self.num_envs, batch_per_env))
-                env_idx = np.arange(self.num_envs)[:, None]
-                p_grid = indexes[..., None] + np.arange(batch_length)
-                e_grid = np.broadcast_to(env_idx[..., None], p_grid.shape)
-
-                obs_chunk = self.obs_buffer[p_grid, e_grid]
-                obs.append(obs_chunk.reshape(-1, batch_length, *self.obs_buffer.shape[2:]))
-
-                action_chunk = self.action_buffer[p_grid, e_grid]
-                action.append(action_chunk.reshape(-1, batch_length, *self.action_buffer.shape[2:]))
-
-                reward_chunk = self.reward_buffer[p_grid, e_grid]
-                reward.append(reward_chunk.reshape(-1, batch_length, *self.reward_buffer.shape[2:]))
-
-                term_chunk = self.termination_buffer[p_grid, e_grid]
-                termination.append(term_chunk.reshape(-1, batch_length, *self.termination_buffer.shape[2:]))
-
-                base_indexes.append(indexes.reshape(-1))
-                base_envs.append(np.broadcast_to(env_idx, indexes.shape).reshape(-1))
+                for i in range(self.num_envs):
+                    indexes = np.random.randint(0, self.length+1-batch_length, size=batch_size//self.num_envs)
+                    base_indexes.append(indexes)
+                    base_envs.append(np.full_like(indexes, i))
+                    obs.append(torch.stack([self.obs_buffer[idx:idx+batch_length, i] for idx in indexes]))
+                    action.append(torch.stack([self.action_buffer[idx:idx+batch_length, i] for idx in indexes]))
+                    reward.append(torch.stack([self.reward_buffer[idx:idx+batch_length, i] for idx in indexes]))
+                    termination.append(torch.stack([self.termination_buffer[idx:idx+batch_length, i] for idx in indexes]))
 
             if self.external_buffer_length is not None and external_batch_size > 0:
                 external_obs, external_action, external_reward, external_termination = self.sample_external(
@@ -101,26 +89,14 @@ class ReplayBuffer():
             obs, action, reward, termination = [], [], [], []
             base_indexes, base_envs = [], []
             if batch_size > 0:
-                batch_per_env = batch_size // self.num_envs
-                indexes = np.random.randint(0, self.length + 1 - batch_length, size=(self.num_envs, batch_per_env))
-                env_idx = np.arange(self.num_envs)[:, None]
-                p_grid = indexes[..., None] + np.arange(batch_length)
-                e_grid = np.broadcast_to(env_idx[..., None], p_grid.shape)
-
-                obs_chunk = self.obs_buffer[p_grid, e_grid]
-                obs.append(obs_chunk.reshape(-1, batch_length, *self.obs_buffer.shape[2:]))
-
-                action_chunk = self.action_buffer[p_grid, e_grid]
-                action.append(action_chunk.reshape(-1, batch_length, *self.action_buffer.shape[2:]))
-
-                reward_chunk = self.reward_buffer[p_grid, e_grid]
-                reward.append(reward_chunk.reshape(-1, batch_length, *self.reward_buffer.shape[2:]))
-
-                term_chunk = self.termination_buffer[p_grid, e_grid]
-                termination.append(term_chunk.reshape(-1, batch_length, *self.termination_buffer.shape[2:]))
-
-                base_indexes.append(indexes.reshape(-1))
-                base_envs.append(np.broadcast_to(env_idx, indexes.shape).reshape(-1))
+                for i in range(self.num_envs):
+                    indexes = np.random.randint(0, self.length+1-batch_length, size=batch_size//self.num_envs)
+                    base_indexes.append(indexes)
+                    base_envs.append(np.full_like(indexes, i))
+                    obs.append(np.stack([self.obs_buffer[idx:idx+batch_length, i] for idx in indexes]))
+                    action.append(np.stack([self.action_buffer[idx:idx+batch_length, i] for idx in indexes]))
+                    reward.append(np.stack([self.reward_buffer[idx:idx+batch_length, i] for idx in indexes]))
+                    termination.append(np.stack([self.termination_buffer[idx:idx+batch_length, i] for idx in indexes]))
 
             if self.external_buffer_length is not None and external_batch_size > 0:
                 external_obs, external_action, external_reward, external_termination = self.sample_external(
@@ -147,7 +123,7 @@ class ReplayBuffer():
         # action/reward/termination: int or float or bool
         self.last_pointer = (self.last_pointer + 1) % (self.max_length//self.num_envs)
         if self.store_on_gpu:
-            self.obs_buffer[self.last_pointer] = obs if isinstance(obs, torch.Tensor) else torch.from_numpy(obs)
+            self.obs_buffer[self.last_pointer] = torch.from_numpy(obs)
             self.action_buffer[self.last_pointer] = torch.from_numpy(action)
             self.reward_buffer[self.last_pointer] = torch.from_numpy(reward)
             self.termination_buffer[self.last_pointer] = torch.from_numpy(termination)
