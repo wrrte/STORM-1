@@ -33,9 +33,9 @@ JointTrainAgent:
     warmup_steps: 5000
     ema_alpha: 0.01
     max_bucket_size: 100000
-    max_anchors: 4
+    max_anchors: 1
     multiplier: 8
-    target: 8
+    target: 1
     max_contexts: 32
     global_rebuild_enable: True
     global_rebuild_threshold: 0.1
