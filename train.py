@@ -56,9 +56,9 @@ def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel,
             agent_state = torch.cat([latent, dist_feat], dim=-1)
             v_t = agent.value(agent_state).squeeze(-1) # shape: (batch_size, batch_length)
             gamma = getattr(agent, "gamma", 0.995)
-            num_trig_pos, num_trig_neg = retrieval_manager.add_batch_transitions(v_t, reward, termination, gamma, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length, is_warmup=is_warmup)
-            return num_trig_pos, num_trig_neg
-    return 0, 0
+            num_trig_pos, num_trig_neg, num_trig_both = retrieval_manager.add_batch_transitions(v_t, reward, termination, gamma, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length, is_warmup=is_warmup)
+            return num_trig_pos, num_trig_neg, num_trig_both
+    return 0, 0, 0
 
 
 @torch.no_grad()
@@ -78,7 +78,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
     lazy_hit_rate = 0.0
     if retrieval_manager is not None and retrieval_manager.enabled and not is_warmup:
         cfg = retrieval_manager.config
-        ret_obs, ret_action, candidates_before_max, avg_hit_rate, _ = retrieval_manager.retrieve_contexts(
+        ret_obs, ret_action, candidates_before_max, avg_hit_rate, retrieved_weights, num_valid_anchors = retrieval_manager.retrieve_contexts(
             replay_buffer, world_model, 
             max_anchors=cfg.get("max_anchors", 10) if hasattr(cfg, "get") else getattr(cfg, "max_anchors", 10),
             multiplier=cfg.get("multiplier", 5) if hasattr(cfg, "get") else getattr(cfg, "multiplier", 5),
@@ -91,14 +91,23 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
             logger.log("Retrieval/lazy_rebuild_hit_rate", avg_hit_rate)
             lazy_hit_rate = avg_hit_rate
             
-    random_batch_size = imagine_batch_size - retrieved_count
-    
+    if retrieved_count > 0:
+        random_batch_size = imagine_batch_size - num_valid_anchors
+    else:
+        random_batch_size = imagine_batch_size
+            
     sample_obs, sample_action, sample_reward, sample_termination, _, _ = replay_buffer.sample(
         random_batch_size, imagine_demonstration_batch_size, imagine_context_length)
+        
+    batch_weights = torch.ones(random_batch_size, device="cuda", dtype=torch.float32)
         
     if retrieved_count > 0:
         sample_obs = torch.cat([sample_obs, ret_obs], dim=0)
         sample_action = torch.cat([sample_action, ret_action], dim=0)
+        
+        ret_weights = torch.tensor(retrieved_weights, device="cuda", dtype=torch.float32)
+        batch_weights = torch.cat([batch_weights, ret_weights], dim=0)
+        
         logger.log("Retrieval/retrieved_contexts", retrieved_count)
         logger.log("Retrieval/active_anchors_queue", len(retrieval_manager.active_anchors))
         
@@ -121,7 +130,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
         log_video=log_video,
         logger=logger
     )
-    return latent, action, None, None, reward_hat, termination_hat, lazy_hit_rate
+    return latent, action, None, None, reward_hat, termination_hat, lazy_hit_rate, batch_weights
 
 
 def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
@@ -222,7 +231,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         if replay_buffer.ready() and total_steps % (train_dynamics_every_steps//num_envs) == 0:
             is_retrieval_warmup = total_steps * num_envs < getattr(retrieval_config, "warmup_steps", 5000)
 
-            num_trig_pos, num_trig_neg = train_world_model_step(
+            num_trig_pos, num_trig_neg, num_trig_both = train_world_model_step(
                 replay_buffer=replay_buffer,
                 world_model=world_model,
                 batch_size=batch_size,
@@ -241,6 +250,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 logger.log("Retrieval/triggered_anchors_step_neg", num_trig_neg)
             if num_trig_pos + num_trig_neg > 0:
                 logger.log("Retrieval/triggered_anchors_step", num_trig_pos + num_trig_neg)
+            if num_trig_both > 0:
+                logger.log("Retrieval/triggered_anchors_step_both", num_trig_both)
         # <<< train world model part
 
         # train agent part >>>
@@ -261,7 +272,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
 
             is_retrieval_warmup = total_steps * num_envs < getattr(retrieval_config, "warmup_steps", 5000)
 
-            imagine_latent, agent_action, agent_logprob, agent_value, imagine_reward, imagine_termination, lazy_hit_rate = world_model_imagine_data(
+            imagine_latent, agent_action, agent_logprob, agent_value, imagine_reward, imagine_termination, lazy_hit_rate, batch_weights = world_model_imagine_data(
                 replay_buffer=replay_buffer,
                 world_model=world_model,
                 agent=agent,
@@ -295,7 +306,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 old_value=agent_value,
                 reward=imagine_reward,
                 termination=imagine_termination,
-                logger=logger
+                logger=logger,
+                weights=batch_weights
             )
         # <<< train agent part
 

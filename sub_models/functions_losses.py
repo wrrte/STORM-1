@@ -35,7 +35,7 @@ class SymLogTwoHotLoss(nn.Module):
         self.register_buffer(
             'bins', torch.linspace(-20, 20, num_classes), persistent=False)
 
-    def forward(self, output, target):
+    def forward(self, output, target, weights=None):
         target = symlog(target)
         assert target.min() >= self.lower_bound and target.max() <= self.upper_bound
 
@@ -49,6 +49,9 @@ class SymLogTwoHotLoss(nn.Module):
 
         loss = -target_prob * F.log_softmax(output, dim=-1)
         loss = loss.sum(dim=-1)
+        if weights is not None:
+            loss = loss * weights.unsqueeze(-1)
+            return loss.sum() / (weights.sum() * loss.shape[1])
         return loss.mean()
 
     def decode(self, output):
