@@ -55,7 +55,8 @@ def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel,
         with torch.no_grad():
             agent_state = torch.cat([latent, dist_feat], dim=-1)
             v_t = agent.value(agent_state).squeeze(-1) # shape: (batch_size, batch_length)
-            num_trig_pos, num_trig_neg = retrieval_manager.add_batch_transitions(v_t, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length, is_warmup=is_warmup)
+            gamma = getattr(agent, "gamma", 0.995)
+            num_trig_pos, num_trig_neg = retrieval_manager.add_batch_transitions(v_t, reward, termination, gamma, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length, is_warmup=is_warmup)
             return num_trig_pos, num_trig_neg
     return 0, 0
 
