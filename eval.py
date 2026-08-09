@@ -92,7 +92,7 @@ def eval_episodes(num_episode, env_name, max_steps, num_envs, image_size,
                     sum_reward[i] = 0
                     if len(final_rewards) == num_episode:
                         print("Mean reward: " + colorama.Fore.YELLOW + f"{np.mean(final_rewards)}" + colorama.Style.RESET_ALL)
-                        return np.mean(final_rewards)
+                        return np.mean(final_rewards), final_rewards
 
         # update current_obs, current_info and sum_reward
         sum_reward += reward
@@ -140,7 +140,7 @@ if __name__ == "__main__":
         world_model.load_state_dict(torch.load(f"{root_path}/world_model_{step}.pth"))
         agent.load_state_dict(torch.load(f"{root_path}/agent_{step}.pth"))
         # # eval
-        episode_avg_return = eval_episodes(
+        episode_avg_return, _ = eval_episodes(
             num_episode=20,
             env_name=args.env_name,
             num_envs=5,

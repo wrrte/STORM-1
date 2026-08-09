@@ -392,5 +392,34 @@ if __name__ == "__main__":
             seed=args.seed,
             logger=logger
         )
+
+        print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
+        import eval
+        episode_avg_return, individual_returns = eval.eval_episodes(
+            num_episode=20,
+            env_name=args.env_name,
+            num_envs=5,
+            max_steps=conf.JointTrainAgent.SampleMaxSteps,
+            image_size=conf.BasicSettings.ImageSize,
+            world_model=world_model,
+            agent=agent
+        )
+
+        env_base = args.env_name.split('/')[1].split('-')[0]
+        baseline_score_avg = 0.0
+        try:
+            with open("results/storm.json", "r") as f:
+                storm_results = json.load(f)
+                if env_base in storm_results:
+                    baseline_score_avg = float(np.mean(storm_results[env_base]))
+        except Exception as e:
+            print(f"Failed to load baseline scores for {env_base}: {e}")
+
+        logger.log("eval/baseline_score_avg", baseline_score_avg)
+        logger.log("eval/episode_avg_return", episode_avg_return)
+        for i, ret in enumerate(individual_returns):
+            logger.log(f"eval/episode_return_{i}", ret)
+        logger.flush_wandb()
+
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")
