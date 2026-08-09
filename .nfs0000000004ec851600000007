@@ -1,6 +1,7 @@
 export CUDA_VISIBLE_DEVICES=6
 
 games=(
+    Frostbite
     Gopher
     Jamesbond
     Kangaroo
@@ -22,7 +23,6 @@ games=(
     CrazyClimber
     DemonAttack
     Freeway
-    Frostbite
     ChopperCommand
     Hero
     Asterix
@@ -34,7 +34,7 @@ declare -A seed_map
 for env_name in "${games[@]}"; do
     # Assign seed 1 for the first run, increment for subsequent runs
     if [[ -z "${seed_map[$env_name]}" ]]; then
-        seed_map[$env_name]=1
+        seed_map[$env_name]=3710
     else
         seed_map[$env_name]=$((seed_map[$env_name] + 1))
     fi
