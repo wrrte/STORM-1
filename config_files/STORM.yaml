@@ -37,6 +37,8 @@ JointTrainAgent:
     multiplier: 8
     target: 16
     max_contexts: 256
+    use_pca: True
+    max_pca_samples: 1000000
     global_rebuild_enable: True
     global_rebuild_threshold: 0.1
     global_rebuild_cooldown: 2000
