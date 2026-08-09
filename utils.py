@@ -180,6 +180,8 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.trigger_mode = "absolute" # "absolute" or "z_score"
     conf.JointTrainAgent.Retrieval.anchor_offset = -2
     conf.JointTrainAgent.Retrieval.hash_bits = 12
+    conf.JointTrainAgent.Retrieval.hash_sample_mode = "probs"
+    conf.JointTrainAgent.Retrieval.warmup_steps = 5000
     conf.JointTrainAgent.Retrieval.threshold = 1.0
     conf.JointTrainAgent.Retrieval.z_score_threshold = 2.0
     conf.JointTrainAgent.Retrieval.ema_alpha = 0.01

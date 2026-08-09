@@ -13,7 +13,7 @@ JointTrainAgent:
   BatchSize: 16
   DemonstrationBatchSize: 4
   BatchLength: 64
-  ImagineBatchSize: 1280
+  ImagineBatchSize: 1024
   ImagineDemonstrationBatchSize: 256
   ImagineContextLength: 8
   ImagineBatchLength: 16
@@ -29,6 +29,8 @@ JointTrainAgent:
     z_score_threshold: 3.5
     anchor_offset: -2 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 
     hash_bits: 10
+    hash_sample_mode: "probs"
+    warmup_steps: 5000
     ema_alpha: 0.01
     max_bucket_size: 100000
     max_anchors: 16
