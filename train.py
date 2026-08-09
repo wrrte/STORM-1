@@ -90,14 +90,15 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
             logger.log("Retrieval/lazy_rebuild_hit_rate", avg_hit_rate)
             lazy_hit_rate = avg_hit_rate
             
-    random_batch_size = imagine_batch_size - retrieved_count
+    # EXPERIMENT A: Do NOT subtract retrieved_count, always use full random batch
+    random_batch_size = imagine_batch_size
     
     sample_obs, sample_action, sample_reward, sample_termination, _, _ = replay_buffer.sample(
         random_batch_size, imagine_demonstration_batch_size, imagine_context_length)
         
     if retrieved_count > 0:
-        sample_obs = torch.cat([sample_obs, ret_obs], dim=0)
-        sample_action = torch.cat([sample_action, ret_action], dim=0)
+        # EXPERIMENT A: Do NOT concatenate ret_obs and ret_action to the batch.
+        # Just log the metrics.
         logger.log("Retrieval/retrieved_contexts", retrieved_count)
         logger.log("Retrieval/active_anchors_queue", len(retrieval_manager.active_anchors))
         

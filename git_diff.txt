@@ -1,0 +1,146 @@
+(base) ai2lab@gnode001:/media/storage_data/ai2lab/choemj$ git -C /media/storage_data/ai2lab/choemj/STORM diff e682e51 ada9894 2>&1 | head -200
+diff --git a/config_files/STORM.yaml b/config_files/STORM.yaml
+index acf1a97..7062fde 100644
+--- a/config_files/STORM.yaml
++++ b/config_files/STORM.yaml
+@@ -13,7 +13,7 @@ JointTrainAgent:
+   BatchSize: 16
+   DemonstrationBatchSize: 4
+   BatchLength: 64
+-  ImagineBatchSize: 1280
++  ImagineBatchSize: 1024
+   ImagineDemonstrationBatchSize: 256
+   ImagineContextLength: 8
+   ImagineBatchLength: 16
+@@ -29,6 +29,8 @@ JointTrainAgent:
+     z_score_threshold: 3.5
+     anchor_offset: -2 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 
+     hash_bits: 10
++    hash_sample_mode: "probs"
++    warmup_steps: 5000
+     ema_alpha: 0.01
+     max_bucket_size: 100000
+     max_anchors: 16
+diff --git a/sub_models/world_models.py b/sub_models/world_models.py
+index 0346d87..57bfde8 100644
+--- a/sub_models/world_models.py
++++ b/sub_models/world_models.py
+@@ -270,11 +270,11 @@ class WorldModel(nn.Module):
+         self.optimizer = torch.optim.Adam(self.parameters(), lr=1e-4)
+         self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_amp)
+ 
+-    def encode_obs(self, obs):
++    def encode_obs(self, obs, sample_mode="random_sample"):
+         with torch.autocast(device_type='cuda', dtype=torch.bfloat16, enabled=self.use_amp):
+             embedding = self.encoder(obs)
+             post_logits = self.dist_head.forward_post(embedding)
+-            sample = self.stright_throught_gradient(post_logits, sample_mode="random_sample")
++            sample = self.stright_throught_gradient(post_logits, sample_mode=sample_mode)
+             flattened_sample = self.flatten_sample(sample)
+         return flattened_sample
+ 
+diff --git a/train.py b/train.py
+index 2dfc1f1..4e744d2 100644
+--- a/train.py
++++ b/train.py
+@@ -47,7 +47,7 @@ def build_vec_env(env_name, image_size, num_envs, seed):
+     return vec_env
+ 
+ 
+-def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel, batch_size, demonstration_batch_size, batch_length, logger, agent=None, retrieval_manager=None, imagine_context_length=8):
++def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel, batch_size, demonstration_batch_size, batch_length, logger, agent=None, retrieval_manager=None, imagine_context_length=8, is_warmup=False):
+     obs, action, reward, termination, base_indexes, base_envs = replay_buffer.sample(batch_size, demonstration_batch_size, batch_length)
+     latent, dist_feat = world_model.update(obs, action, reward, termination, logger=logger)
+ 
+@@ -55,7 +55,7 @@ def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel,
+         with torch.no_grad():
+             agent_state = torch.cat([latent, dist_feat], dim=-1)
+             v_t = agent.value(agent_state).squeeze(-1) # shape: (batch_size, batch_length)
+-            num_trig_pos, num_trig_neg = retrieval_manager.add_batch_transitions(v_t, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length)
++            num_trig_pos, num_trig_neg = retrieval_manager.add_batch_transitions(v_t, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length, is_warmup=is_warmup)
+             return num_trig_pos, num_trig_neg
+     return 0, 0
+ 
+@@ -66,7 +66,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
+                              retrieval_manager,
+                              imagine_batch_size, imagine_demonstration_batch_size,
+                              imagine_context_length, imagine_batch_length,
+-                             log_video, logger):
++                             log_video, logger, is_warmup=False):
+     '''
+     Sample context from replay buffer, then imagine data with world model and agent
+     '''
+@@ -75,7 +75,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
+ 
+     retrieved_count = 0
+     lazy_hit_rate = 0.0
+-    if retrieval_manager is not None and retrieval_manager.enabled:
++    if retrieval_manager is not None and retrieval_manager.enabled and not is_warmup:
+         cfg = retrieval_manager.config
+         ret_obs, ret_action, candidates_before_max, avg_hit_rate, _ = retrieval_manager.retrieve_contexts(
+             replay_buffer, world_model, 
+@@ -178,7 +178,10 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
+                         agent_state,
+                         greedy=False
+                     )
+-                    current_latent_for_hash = context_latent[:, -1]
++                    current_latent_for_hash = world_model.encode_obs(
++                        torch.cat(list(context_obs), dim=1)[:, -1:], 
++                        sample_mode=getattr(retrieval_config, "hash_sample_mode", "probs")
++                    ).squeeze(1)
+ 
+             context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
+             context_action.append(action)
+@@ -216,6 +219,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
+ 
+         # train world model part >>>
+         if replay_buffer.ready() and total_steps % (train_dynamics_every_steps//num_envs) == 0:
++            is_retrieval_warmup = total_steps * num_envs < getattr(retrieval_config, "warmup_steps", 5000)
++
+             num_trig_pos, num_trig_neg = train_world_model_step(
+                 replay_buffer=replay_buffer,
+                 world_model=world_model,
+@@ -225,8 +230,10 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
+                 logger=logger,
+                 agent=agent,
+                 retrieval_manager=retrieval_manager,
+-                imagine_context_length=imagine_context_length
++                imagine_context_length=imagine_context_length,
++                is_warmup=is_retrieval_warmup
+             )
++            
+             if num_trig_pos > 0:
+                 logger.log("Retrieval/triggered_anchors_step_pos", num_trig_pos)
+             if num_trig_neg > 0:
+@@ -251,6 +258,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
+             else:
+                 log_video = False
+ 
++            is_retrieval_warmup = total_steps * num_envs < getattr(retrieval_config, "warmup_steps", 5000)
++
+             imagine_latent, agent_action, agent_logprob, agent_value, imagine_reward, imagine_termination, lazy_hit_rate = world_model_imagine_data(
+                 replay_buffer=replay_buffer,
+                 world_model=world_model,
+@@ -261,7 +270,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
+                 imagine_context_length=imagine_context_length,
+                 imagine_batch_length=imagine_batch_length,
+                 log_video=log_video,
+-                logger=logger
++                logger=logger,
++                is_warmup=is_retrieval_warmup
+             )
+             
+             # Global Rebuild Check
+diff --git a/utils.py b/utils.py
+index 12b5379..5de4024 100644
+--- a/utils.py
++++ b/utils.py
+@@ -180,6 +180,8 @@ def load_config(config_path):
+     conf.JointTrainAgent.Retrieval.trigger_mode = "absolute" # "absolute" or "z_score"
+     conf.JointTrainAgent.Retrieval.anchor_offset = -2
+     conf.JointTrainAgent.Retrieval.hash_bits = 12
++    conf.JointTrainAgent.Retrieval.hash_sample_mode = "probs"
++    conf.JointTrainAgent.Retrieval.warmup_steps = 5000
+     conf.JointTrainAgent.Retrieval.threshold = 1.0
+     conf.JointTrainAgent.Retrieval.z_score_threshold = 2.0
+     conf.JointTrainAgent.Retrieval.ema_alpha = 0.01
