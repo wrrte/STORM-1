@@ -292,12 +292,27 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 gr_threshold = getattr(retrieval_config, "global_rebuild_threshold", 0.2)
                 gr_cooldown = getattr(retrieval_config, "global_rebuild_cooldown", 2000)
                 
-                if gr_enabled and lazy_hit_rate < gr_threshold and total_steps - last_rebuild_step >= gr_cooldown:
-                    retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
-                    last_rebuild_step = total_steps
-                    logger.log("Retrieval/global_rebuild_triggered", 1.0)
-                else:
+                warmup_steps = getattr(retrieval_config, "warmup_steps", 15000)
+                buffer_warmup = getattr(conf.JointTrainAgent, "BufferWarmUp", 1024)
+                
+                train_freq = max(1, train_agent_every_steps // num_envs)
+                next_train_step = total_steps + train_freq
+                
+                is_just_before_warmup_end = (
+                    is_retrieval_warmup 
+                    and warmup_steps > buffer_warmup 
+                    and (next_train_step * num_envs >= warmup_steps)
+                )
+                
+                if is_retrieval_warmup and not is_just_before_warmup_end:
                     logger.log("Retrieval/global_rebuild_triggered", 0.0)
+                else:
+                    if is_just_before_warmup_end or (gr_enabled and lazy_hit_rate < gr_threshold and total_steps - last_rebuild_step >= gr_cooldown):
+                        retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
+                        last_rebuild_step = total_steps
+                        logger.log("Retrieval/global_rebuild_triggered", 1.0)
+                    else:
+                        logger.log("Retrieval/global_rebuild_triggered", 0.0)
 
             agent.update(
                 latent=imagine_latent,
