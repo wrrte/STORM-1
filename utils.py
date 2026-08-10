@@ -181,6 +181,8 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.anchor_offset = -2
     conf.JointTrainAgent.Retrieval.hash_bits = 12
     conf.JointTrainAgent.Retrieval.hash_sample_mode = "probs"
+    conf.JointTrainAgent.Retrieval.use_pca = True
+    conf.JointTrainAgent.Retrieval.max_pca_samples = 10000
     conf.JointTrainAgent.Retrieval.warmup_steps = 5000
     conf.JointTrainAgent.Retrieval.threshold = 1.0
     conf.JointTrainAgent.Retrieval.z_score_threshold = 2.0
