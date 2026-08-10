@@ -56,9 +56,9 @@ def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel,
             agent_state = torch.cat([latent, dist_feat], dim=-1)
             v_t = agent.value(agent_state).squeeze(-1) # shape: (batch_size, batch_length)
             gamma = getattr(agent, "gamma", 0.995)
-            num_trig_pos, num_trig_neg, num_trig_both = retrieval_manager.add_batch_transitions(v_t, reward, termination, gamma, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length, is_warmup=is_warmup)
-            return num_trig_pos, num_trig_neg, num_trig_both
-    return 0, 0, 0
+            num_trig = retrieval_manager.add_batch_transitions(v_t, reward, termination, gamma, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length, is_warmup=is_warmup)
+            return num_trig
+    return 0
 
 
 @torch.no_grad()
@@ -231,7 +231,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         if replay_buffer.ready() and total_steps % (train_dynamics_every_steps//num_envs) == 0:
             is_retrieval_warmup = total_steps * num_envs < getattr(retrieval_config, "warmup_steps", 5000)
 
-            num_trig_pos, num_trig_neg, num_trig_both = train_world_model_step(
+            num_trig = train_world_model_step(
                 replay_buffer=replay_buffer,
                 world_model=world_model,
                 batch_size=batch_size,
@@ -244,14 +244,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 is_warmup=is_retrieval_warmup
             )
             
-            if num_trig_pos > 0:
-                logger.log("Retrieval/triggered_anchors_step_pos", num_trig_pos)
-            if num_trig_neg > 0:
-                logger.log("Retrieval/triggered_anchors_step_neg", num_trig_neg)
-            if num_trig_pos + num_trig_neg > 0:
-                logger.log("Retrieval/triggered_anchors_step", num_trig_pos + num_trig_neg)
-            if num_trig_both > 0:
-                logger.log("Retrieval/triggered_anchors_step_both", num_trig_both)
+            logger.log("Retrieval/triggered_anchors_step", num_trig)
         # <<< train world model part
 
         # train agent part >>>
