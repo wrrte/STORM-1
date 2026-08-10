@@ -366,9 +366,13 @@ if __name__ == "__main__":
     parser.add_argument("-config_path", type=str, required=True)
     parser.add_argument("-env_name", type=str, required=True)
     parser.add_argument("-trajectory_path", type=str, required=True)
-    args = parser.parse_args()
+    args, extra_args = parser.parse_known_args()
     conf = load_config(args.config_path)
-    print(colorama.Fore.RED + str(args) + colorama.Style.RESET_ALL)
+    if extra_args:
+        conf.defrost()
+        conf.merge_from_list(extra_args)
+        conf.freeze()
+    print(colorama.Fore.RED + str(args) + " extra: " + str(extra_args) + colorama.Style.RESET_ALL)
 
     # set seed
     seed_np_torch(seed=args.seed)
