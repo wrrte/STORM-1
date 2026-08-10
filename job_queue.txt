@@ -1,11 +1,9 @@
-python -u train.py -n "Frostbite-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Frostbite-v5" -trajectory_path "D_TRAJ/Frostbite.pkl"
-python -u train.py -n "Frostbite-life_done-wm_2L512D8H-100k-seed2" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Frostbite-v5" -trajectory_path "D_TRAJ/Frostbite.pkl" JointTrainAgent.Retrieval.enable False
 python -u train.py -n "Gopher-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl"
-python -u train.py -n "Gopher-life_done-wm_2L512D8H-100k-seed2" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable False
+python -u train.py -n "Gopher-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable False
 python -u train.py -n "ChopperCommand-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/ChopperCommand-v5" -trajectory_path "D_TRAJ/ChopperCommand.pkl"
-python -u train.py -n "ChopperCommand-life_done-wm_2L512D8H-100k-seed2" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/ChopperCommand-v5" -trajectory_path "D_TRAJ/ChopperCommand.pkl" JointTrainAgent.Retrieval.enable False
+python -u train.py -n "ChopperCommand-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/ChopperCommand-v5" -trajectory_path "D_TRAJ/ChopperCommand.pkl" JointTrainAgent.Retrieval.enable False
 python -u train.py -n "Jamesbond-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl"
-python -u train.py -n "Jamesbond-life_done-wm_2L512D8H-100k-seed2" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl" JointTrainAgent.Retrieval.enable False
+python -u train.py -n "Jamesbond-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl" JointTrainAgent.Retrieval.enable False
 python -u train.py -n "Hero-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Hero-v5" -trajectory_path "D_TRAJ/Hero.pkl"
 python -u train.py -n "Asterix-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Asterix-v5" -trajectory_path "D_TRAJ/Asterix.pkl"
 python -u train.py -n "MsPacman-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/MsPacman-v5" -trajectory_path "D_TRAJ/MsPacman.pkl"
