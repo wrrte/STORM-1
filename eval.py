@@ -92,7 +92,7 @@ def eval_episodes(num_episode, env_name, max_steps, num_envs, image_size,
                     sum_reward[i] = 0
                     if len(final_rewards) == num_episode:
                         print("Mean reward: " + colorama.Fore.YELLOW + f"{np.mean(final_rewards)}" + colorama.Style.RESET_ALL)
-                        return np.mean(final_rewards), final_rewards
+                        return np.mean(final_rewards)
 
         # update current_obs, current_info and sum_reward
         sum_reward += reward
@@ -135,12 +135,15 @@ if __name__ == "__main__":
     steps.sort()
     steps = steps[-1:]
     print(steps)
+    def clean_state_dict(state_dict):
+        return {k.replace('_orig_mod.', ''): v for k, v in state_dict.items()}
+
     results = []
     for step in tqdm(steps):
-        world_model.load_state_dict(torch.load(f"{root_path}/world_model_{step}.pth"))
-        agent.load_state_dict(torch.load(f"{root_path}/agent_{step}.pth"))
+        world_model.load_state_dict(clean_state_dict(torch.load(f"{root_path}/world_model_{step}.pth")))
+        agent.load_state_dict(clean_state_dict(torch.load(f"{root_path}/agent_{step}.pth")))
         # # eval
-        episode_avg_return, _ = eval_episodes(
+        episode_avg_return = eval_episodes(
             num_episode=20,
             env_name=args.env_name,
             num_envs=5,
@@ -150,6 +153,7 @@ if __name__ == "__main__":
             agent=agent
         )
         results.append([step, episode_avg_return])
+    os.makedirs(os.path.dirname(f"eval_result/{args.run_name}.csv"), exist_ok=True)
     with open(f"eval_result/{args.run_name}.csv", "w") as fout:
         fout.write("step, episode_avg_return\n")
         for step, episode_avg_return in results:

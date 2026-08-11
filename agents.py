@@ -126,7 +126,7 @@ class ActorCriticAgent(nn.Module):
         action = self.sample(latent, greedy)
         return action.detach().cpu().squeeze(-1).numpy()
 
-    def update(self, latent, action, old_logprob, old_value, reward, termination, logger=None, weights=None):
+    def update(self, latent, action, old_logprob, old_value, reward, termination, logger=None):
         '''
         Update policy and value model
         '''
@@ -144,27 +144,17 @@ class ActorCriticAgent(nn.Module):
             lambda_return = calc_lambda_return(reward, value, termination, self.gamma, self.lambd)
 
             # update value function with slow critic regularization
-            value_loss = self.symlog_twohot_loss(raw_value[:, :-1], lambda_return.detach(), weights=weights)
-            slow_value_regularization_loss = self.symlog_twohot_loss(raw_value[:, :-1], slow_lambda_return.detach(), weights=weights)
+            value_loss = self.symlog_twohot_loss(raw_value[:, :-1], lambda_return.detach())
+            slow_value_regularization_loss = self.symlog_twohot_loss(raw_value[:, :-1], slow_lambda_return.detach())
 
             lower_bound = self.lowerbound_ema(percentile(lambda_return, 0.05))
             upper_bound = self.upperbound_ema(percentile(lambda_return, 0.95))
             S = upper_bound-lower_bound
             norm_ratio = torch.max(torch.ones(1).cuda(), S)  # max(1, S) in the paper
             norm_advantage = (lambda_return-value[:, :-1]) / norm_ratio
-            policy_loss = -(log_prob * norm_advantage.detach())
-            if weights is not None:
-                policy_loss = policy_loss * weights.unsqueeze(-1)
-                policy_loss = policy_loss.sum() / (weights.sum() * policy_loss.shape[1])
-            else:
-                policy_loss = policy_loss.mean()
+            policy_loss = -(log_prob * norm_advantage.detach()).mean()
 
-            entropy_loss = entropy
-            if weights is not None:
-                entropy_loss = entropy_loss * weights.unsqueeze(-1)
-                entropy_loss = entropy_loss.sum() / (weights.sum() * entropy_loss.shape[1])
-            else:
-                entropy_loss = entropy_loss.mean()
+            entropy_loss = entropy.mean()
 
             loss = policy_loss + value_loss + slow_value_regularization_loss - self.entropy_coef * entropy_loss
 

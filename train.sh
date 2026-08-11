@@ -1,12 +1,14 @@
-export CUDA_VISIBLE_DEVICES=6
+export CUDA_VISIBLE_DEVICES=5
 
 games=(
     Frostbite
     Gopher
+    Hero
     Jamesbond
     Kangaroo
     Krull
     KungFuMaster
+    MsPacman
     Pong
     PrivateEye
     Qbert
@@ -16,18 +18,15 @@ games=(
     Alien
     Amidar
     Assault
+    Asterix
     BankHeist
     BattleZone
     Boxing
     Breakout
+    ChopperCommand
     CrazyClimber
     DemonAttack
     Freeway
-    Frostbite
-    ChopperCommand
-    Hero
-    Asterix
-    MsPacman
 )
 
 declare -A seed_map
@@ -49,11 +48,3 @@ for env_name in "${games[@]}"; do
         -env_name "ALE/${env_name}-v5" \
         -trajectory_path "D_TRAJ/${env_name}.pkl" 
 done
-
-env_name="Frostbite"
-python -u train.py \
-        -n "${env_name}-life_done-wm_2L512D8H-100k-seed1" \
-        -seed 1 \
-        -config_path "config_files/STORM.yaml" \
-        -env_name "ALE/${env_name}-v5" \
-        -trajectory_path "D_TRAJ/${env_name}.pkl" 

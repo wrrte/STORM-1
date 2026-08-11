@@ -24,7 +24,7 @@ def seed_np_torch(seed=20010105):
 
 
 class Logger():
-    def __init__(self, path, config=None) -> None:
+    def __init__(self, path, config=None, run_id=None, run_name=None) -> None:
         self.writer = SummaryWriter(logdir=path, flush_secs=1)
         self.tag_step = {}
         self.wandb_buffer = {}
@@ -36,10 +36,11 @@ class Logger():
                 with open(api_key_path, 'r') as f:
                     wandb.login(key=f.read().strip())
             
-            base_name = path.split('/')[-1] if '/' in path else path
-            pure_env_name = base_name.split('-')[0]
-            run_id = wandb.util.generate_id()
-            run_name = f"{pure_env_name}_{run_id}"
+            if run_id is None:
+                base_name = path.split('/')[-1] if '/' in path else path
+                pure_env_name = base_name.split('-')[0]
+                run_id = wandb.util.generate_id()
+                run_name = f"{pure_env_name}_{run_id}"
             
             wandb.init(project="STORM", name=run_name, id=run_id, config=config)
         except Exception as e:
@@ -180,10 +181,6 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.trigger_mode = "absolute" # "absolute" or "z_score"
     conf.JointTrainAgent.Retrieval.anchor_offset = -2
     conf.JointTrainAgent.Retrieval.hash_bits = 12
-    conf.JointTrainAgent.Retrieval.hash_sample_mode = "probs"
-    conf.JointTrainAgent.Retrieval.use_pca = True
-    conf.JointTrainAgent.Retrieval.max_pca_samples = 10000
-    conf.JointTrainAgent.Retrieval.warmup_steps = 5000
     conf.JointTrainAgent.Retrieval.threshold = 1.0
     conf.JointTrainAgent.Retrieval.z_score_threshold = 2.0
     conf.JointTrainAgent.Retrieval.ema_alpha = 0.01
@@ -195,6 +192,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.global_rebuild_enable = True
     conf.JointTrainAgent.Retrieval.global_rebuild_threshold = 0.2
     conf.JointTrainAgent.Retrieval.global_rebuild_cooldown = 2000
+    conf.JointTrainAgent.Retrieval.anchor_queue_capacity = 8192
 
     conf.defrost()
     conf.merge_from_file(config_path)
