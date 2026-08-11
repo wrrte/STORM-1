@@ -374,6 +374,10 @@ if __name__ == "__main__":
         conf.freeze()
     print(colorama.Fore.RED + str(args) + " extra: " + str(extra_args) + colorama.Style.RESET_ALL)
 
+    if hasattr(conf, "JointTrainAgent") and hasattr(conf.JointTrainAgent, "Retrieval"):
+        args.n += "_O" if conf.JointTrainAgent.Retrieval.enable else "_X"
+
+
     # set seed
     seed_np_torch(seed=args.seed)
     # tensorboard writer
