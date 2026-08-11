@@ -24,7 +24,7 @@ def seed_np_torch(seed=20010105):
 
 
 class Logger():
-    def __init__(self, path, config=None) -> None:
+    def __init__(self, path, config=None, seed=None) -> None:
         self.writer = SummaryWriter(logdir=path, flush_secs=1)
         self.tag_step = {}
         self.wandb_buffer = {}
@@ -38,8 +38,19 @@ class Logger():
             
             base_name = path.split('/')[-1] if '/' in path else path
             pure_env_name = base_name.split('-')[0]
+            
+            suffix = ""
+            if base_name.endswith('_O'):
+                suffix = "_O"
+            elif base_name.endswith('_X'):
+                suffix = "_X"
+                
+            if pure_env_name.endswith('_O') or pure_env_name.endswith('_X'):
+                pure_env_name = pure_env_name[:-2]
+                
             run_id = wandb.util.generate_id()
-            run_name = f"{pure_env_name}_{run_id}"
+            seed_str = f"_{seed}" if seed is not None else ""
+            run_name = f"{pure_env_name}_{run_id}{seed_str}{suffix}"
             
             wandb.init(project="STORM", name=run_name, id=run_id, config=config)
         except Exception as e:

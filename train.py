@@ -381,7 +381,7 @@ if __name__ == "__main__":
     # set seed
     seed_np_torch(seed=args.seed)
     # tensorboard writer
-    logger = Logger(path=f"runs/{args.n}", config=conf)
+    logger = Logger(path=f"runs/{args.n}", config=conf, seed=args.seed)
     # copy config file
     shutil.copy(args.config_path, f"runs/{args.n}/config.yaml")
 
