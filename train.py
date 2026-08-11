@@ -47,7 +47,7 @@ def build_vec_env(env_name, image_size, num_envs, seed):
     return vec_env
 
 
-def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel, batch_size, demonstration_batch_size, batch_length, logger, agent=None, retrieval_manager=None, imagine_context_length=8):
+def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel, batch_size, demonstration_batch_size, batch_length, logger, agent=None, retrieval_manager=None, imagine_context_length=8, is_warmup=False):
     obs, action, reward, termination, base_indexes, base_envs = replay_buffer.sample(batch_size, demonstration_batch_size, batch_length)
     latent, dist_feat = world_model.update(obs, action, reward, termination, logger=logger)
 
@@ -55,9 +55,10 @@ def train_world_model_step(replay_buffer: ReplayBuffer, world_model: WorldModel,
         with torch.no_grad():
             agent_state = torch.cat([latent, dist_feat], dim=-1)
             v_t = agent.value(agent_state).squeeze(-1) # shape: (batch_size, batch_length)
-            num_trig_pos, num_trig_neg = retrieval_manager.add_batch_transitions(v_t, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length)
-            return num_trig_pos, num_trig_neg
-    return 0, 0
+            gamma = getattr(agent, "gamma", 0.995)
+            num_trig = retrieval_manager.add_batch_transitions(v_t, reward, termination, gamma, base_indexes, base_envs, replay_buffer.max_length, skip_len=imagine_context_length, is_warmup=is_warmup)
+            return num_trig
+    return 0
 
 
 @torch.no_grad()
@@ -66,7 +67,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
                              retrieval_manager,
                              imagine_batch_size, imagine_demonstration_batch_size,
                              imagine_context_length, imagine_batch_length,
-                             log_video, logger):
+                             log_video, logger, is_warmup=False):
     '''
     Sample context from replay buffer, then imagine data with world model and agent
     '''
@@ -75,9 +76,9 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
 
     retrieved_count = 0
     lazy_hit_rate = 0.0
-    if retrieval_manager is not None and retrieval_manager.enabled:
+    if retrieval_manager is not None and retrieval_manager.enabled and not is_warmup:
         cfg = retrieval_manager.config
-        ret_obs, ret_action, candidates_before_max, avg_hit_rate, _ = retrieval_manager.retrieve_contexts(
+        ret_obs, ret_action, candidates_before_max, avg_hit_rate, retrieved_weights, num_valid_anchors = retrieval_manager.retrieve_contexts(
             replay_buffer, world_model, 
             max_anchors=cfg.get("max_anchors", 10) if hasattr(cfg, "get") else getattr(cfg, "max_anchors", 10),
             multiplier=cfg.get("multiplier", 5) if hasattr(cfg, "get") else getattr(cfg, "multiplier", 5),
@@ -90,29 +91,35 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
             logger.log("Retrieval/lazy_rebuild_hit_rate", avg_hit_rate)
             lazy_hit_rate = avg_hit_rate
             
-    random_batch_size = imagine_batch_size - retrieved_count
-    
+    if retrieved_count > 0:
+        random_batch_size = imagine_batch_size - num_valid_anchors
+    else:
+        random_batch_size = imagine_batch_size
+            
     sample_obs, sample_action, sample_reward, sample_termination, _, _ = replay_buffer.sample(
         random_batch_size, imagine_demonstration_batch_size, imagine_context_length)
+        
+    batch_weights = torch.ones(random_batch_size, device="cuda", dtype=torch.float32)
         
     if retrieved_count > 0:
         sample_obs = torch.cat([sample_obs, ret_obs], dim=0)
         sample_action = torch.cat([sample_action, ret_action], dim=0)
+        
+        ret_weights = torch.tensor(retrieved_weights, device="cuda", dtype=torch.float32)
+        batch_weights = torch.cat([batch_weights, ret_weights], dim=0)
+        
         logger.log("Retrieval/retrieved_contexts", retrieved_count)
-        logger.log("Retrieval/active_anchors_queue", retrieval_manager.anchor_count.item())
+        logger.log("Retrieval/active_anchors_queue", len(retrieval_manager.active_anchors))
         
-        active_mask = retrieval_manager.bucket_lens > 0
-        active_sizes = retrieval_manager.bucket_lens[active_mask]
-        
-        if len(active_sizes) > 0:
-            sizes = active_sizes.cpu().numpy()
-            avg_size = np.mean(sizes)
+        if len(retrieval_manager.hash_memory) > 0:
+            sizes = [len(b) for b in retrieval_manager.hash_memory.values()]
+            avg_size = sum(sizes) / len(sizes)
             logger.log("Retrieval/avg_bucket_size", avg_size)
             logger.log("Retrieval/num_active_buckets", len(sizes))
             
             # Record bucket distribution occasionally (e.g., if sizes has items)
             # wandb histograms need a list of values
-            logger.log("Retrieval/bucket_size_hist", sizes)
+            logger.log("Retrieval/bucket_size_hist", np.array(sizes))
                 
     final_batch_size = sample_obs.shape[0]
 
@@ -123,7 +130,7 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
         log_video=log_video,
         logger=logger
     )
-    return latent, action, None, None, reward_hat, termination_hat, lazy_hit_rate
+    return latent, action, None, None, reward_hat, termination_hat, lazy_hit_rate, batch_weights
 
 
 def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
@@ -133,9 +140,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   batch_size, demonstration_batch_size, batch_length,
                                   imagine_batch_size, imagine_demonstration_batch_size,
                                   imagine_context_length, imagine_batch_length,
-                                  save_every_steps, seed, logger, save_dir):
+                                  save_every_steps, seed, logger):
     # create ckpt dir
-    os.makedirs(save_dir, exist_ok=True)
+    os.makedirs(f"ckpt/{args.n}", exist_ok=True)
 
     # build vec env, not useful in the Atari100k setting
     # but when the max_steps is large, you can use parallel envs to speed up
@@ -145,7 +152,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     # reset envs and variables
     sum_reward = np.zeros(num_envs)
     current_obs, current_info = vec_env.reset()
-    context_latent = deque(maxlen=16)
+    context_obs = deque(maxlen=16)
     context_action = deque(maxlen=16)
     
     # retrieval setup
@@ -165,38 +172,36 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     # sample and train
     for total_steps in tqdm(range(max_steps//num_envs)):
         # sample part >>>
-        obs_tensor = torch.from_numpy(current_obs).cuda()
-        
         if replay_buffer.ready():
             world_model.eval()
             agent.eval()
             with torch.no_grad():
                 if len(context_action) == 0:
                     action = vec_env.action_space.sample()
-                    action_tensor = torch.from_numpy(action).cuda()
                 else:
-                    context_latent_tensor = torch.cat(list(context_latent), dim=1)
-                    model_context_action = torch.stack(list(context_action), dim=1)
-                    prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent_tensor, model_context_action)
+                    context_latent = world_model.encode_obs(torch.cat(list(context_obs), dim=1))
+                    model_context_action = np.stack(list(context_action), axis=1)
+                    model_context_action = torch.Tensor(model_context_action).cuda()
+                    prior_flattened_sample, last_dist_feat = world_model.calc_last_dist_feat(context_latent, model_context_action)
                     agent_state = torch.cat([prior_flattened_sample, last_dist_feat], dim=-1)
-                    action_tensor = agent.sample(
+                    action = agent.sample_as_env_action(
                         agent_state,
                         greedy=False
-                    ).squeeze(-1)
-                    action = action_tensor.detach().cpu().numpy()
-                    current_latent_for_hash = context_latent_tensor[:, -1]
+                    )
+                    current_latent_for_hash = world_model.encode_obs(
+                        torch.cat(list(context_obs), dim=1)[:, -1:], 
+                        sample_mode=getattr(retrieval_config, "hash_sample_mode", "probs")
+                    ).squeeze(1)
 
-                new_obs_input = rearrange(obs_tensor, "B H W C -> B 1 C H W").float() / 255.0
-                new_latent = world_model.encode_obs(new_obs_input)
-                context_latent.append(new_latent)
-                context_action.append(action_tensor)
+            context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
+            context_action.append(action)
         else:
             action = vec_env.action_space.sample()
             agent_state = None
             current_latent_for_hash = None
 
         obs, reward, done, truncated, info = vec_env.step(action)
-        replay_buffer.append(obs_tensor, action, reward, np.logical_or(done, info["life_loss"]))
+        replay_buffer.append(current_obs, action, reward, np.logical_or(done, info["life_loss"]))
         
         if replay_buffer.ready() and current_latent_for_hash is not None:
             retrieval_manager.add_transition(
@@ -224,7 +229,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
 
         # train world model part >>>
         if replay_buffer.ready() and total_steps % (train_dynamics_every_steps//num_envs) == 0:
-            num_trig_pos, num_trig_neg = train_world_model_step(
+            is_retrieval_warmup = total_steps * num_envs < getattr(retrieval_config, "warmup_steps", 5000)
+
+            num_trig = train_world_model_step(
                 replay_buffer=replay_buffer,
                 world_model=world_model,
                 batch_size=batch_size,
@@ -233,14 +240,11 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 logger=logger,
                 agent=agent,
                 retrieval_manager=retrieval_manager,
-                imagine_context_length=imagine_context_length
+                imagine_context_length=imagine_context_length,
+                is_warmup=is_retrieval_warmup
             )
-            if num_trig_pos > 0:
-                logger.log("Retrieval/triggered_anchors_step_pos", num_trig_pos)
-            if num_trig_neg > 0:
-                logger.log("Retrieval/triggered_anchors_step_neg", num_trig_neg)
-            if num_trig_pos + num_trig_neg > 0:
-                logger.log("Retrieval/triggered_anchors_step", num_trig_pos + num_trig_neg)
+            
+            logger.log("Retrieval/triggered_anchors_step", num_trig)
         # <<< train world model part
 
         # train agent part >>>
@@ -259,7 +263,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             else:
                 log_video = False
 
-            imagine_latent, agent_action, agent_logprob, agent_value, imagine_reward, imagine_termination, lazy_hit_rate = world_model_imagine_data(
+            is_retrieval_warmup = total_steps * num_envs < getattr(retrieval_config, "warmup_steps", 5000)
+
+            imagine_latent, agent_action, agent_logprob, agent_value, imagine_reward, imagine_termination, lazy_hit_rate, batch_weights = world_model_imagine_data(
                 replay_buffer=replay_buffer,
                 world_model=world_model,
                 agent=agent,
@@ -269,7 +275,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 imagine_context_length=imagine_context_length,
                 imagine_batch_length=imagine_batch_length,
                 log_video=log_video,
-                logger=logger
+                logger=logger,
+                is_warmup=is_retrieval_warmup
             )
             
             # Global Rebuild Check
@@ -278,12 +285,27 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 gr_threshold = getattr(retrieval_config, "global_rebuild_threshold", 0.2)
                 gr_cooldown = getattr(retrieval_config, "global_rebuild_cooldown", 2000)
                 
-                if gr_enabled and lazy_hit_rate < gr_threshold and total_steps - last_rebuild_step >= gr_cooldown:
-                    retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
-                    last_rebuild_step = total_steps
-                    logger.log("Retrieval/global_rebuild_triggered", 1.0)
-                else:
+                warmup_steps = getattr(retrieval_config, "warmup_steps", 15000)
+                buffer_warmup = getattr(conf.JointTrainAgent, "BufferWarmUp", 1024)
+                
+                train_freq = max(1, train_agent_every_steps // num_envs)
+                next_train_step = total_steps + train_freq
+                
+                is_just_before_warmup_end = (
+                    is_retrieval_warmup 
+                    and warmup_steps > buffer_warmup 
+                    and (next_train_step * num_envs >= warmup_steps)
+                )
+                
+                if is_retrieval_warmup and not is_just_before_warmup_end:
                     logger.log("Retrieval/global_rebuild_triggered", 0.0)
+                else:
+                    if is_just_before_warmup_end or (gr_enabled and lazy_hit_rate < gr_threshold and total_steps - last_rebuild_step >= gr_cooldown):
+                        retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
+                        last_rebuild_step = total_steps
+                        logger.log("Retrieval/global_rebuild_triggered", 1.0)
+                    else:
+                        logger.log("Retrieval/global_rebuild_triggered", 0.0)
 
             agent.update(
                 latent=imagine_latent,
@@ -292,15 +314,16 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 old_value=agent_value,
                 reward=imagine_reward,
                 termination=imagine_termination,
-                logger=logger
+                logger=logger,
+                weights=batch_weights
             )
         # <<< train agent part
 
         # save model per episode
         if total_steps % (save_every_steps//num_envs) == 0:
             print(colorama.Fore.GREEN + f"Saving model at total steps {total_steps}" + colorama.Style.RESET_ALL)
-            torch.save(world_model.state_dict(), f"{save_dir}/world_model_{total_steps}.pth")
-            torch.save(agent.state_dict(), f"{save_dir}/agent_{total_steps}.pth")
+            torch.save(world_model.state_dict(), f"ckpt/{args.n}/world_model_{total_steps}.pth")
+            torch.save(agent.state_dict(), f"ckpt/{args.n}/agent_{total_steps}.pth")
 
         # flush all buffered wandb metrics for this step
         logger.flush_wandb()
@@ -343,24 +366,20 @@ if __name__ == "__main__":
     parser.add_argument("-config_path", type=str, required=True)
     parser.add_argument("-env_name", type=str, required=True)
     parser.add_argument("-trajectory_path", type=str, required=True)
-    args = parser.parse_args()
+    args, extra_args = parser.parse_known_args()
     conf = load_config(args.config_path)
-    print(colorama.Fore.RED + str(args) + colorama.Style.RESET_ALL)
+    if extra_args:
+        conf.defrost()
+        conf.merge_from_list(extra_args)
+        conf.freeze()
+    print(colorama.Fore.RED + str(args) + " extra: " + str(extra_args) + colorama.Style.RESET_ALL)
 
     # set seed
     seed_np_torch(seed=args.seed)
-    
-    import wandb
-    pure_env_name = args.n.split('-')[0]
-    run_id = wandb.util.generate_id()
-    run_name = f"{pure_env_name}_{run_id}"
-    save_dir = f"ckpt/{pure_env_name}/{run_id}"
-    os.makedirs(save_dir, exist_ok=True)
-
     # tensorboard writer
-    logger = Logger(path=save_dir, config=conf, run_id=run_id, run_name=run_name)
+    logger = Logger(path=f"runs/{args.n}", config=conf)
     # copy config file
-    shutil.copy(args.config_path, f"{save_dir}/config.yaml")
+    shutil.copy(args.config_path, f"runs/{args.n}/config.yaml")
 
     # distinguish between tasks, other debugging options are removed for simplicity
     if conf.Task == "JointTrainAgent":
@@ -371,13 +390,6 @@ if __name__ == "__main__":
         # build world model and agent
         world_model = build_world_model(conf, action_dim)
         agent = build_agent(conf, action_dim)
-
-        print(colorama.Fore.MAGENTA + "Applying torch.compile to sub-modules for acceleration..." + colorama.Style.RESET_ALL)
-        world_model.encoder = torch.compile(world_model.encoder)
-        world_model.storm_transformer = torch.compile(world_model.storm_transformer)
-        world_model.image_decoder = torch.compile(world_model.image_decoder)
-        agent.actor = torch.compile(agent.actor)
-        agent.critic = torch.compile(agent.critic)
 
         # build replay buffer
         replay_buffer = ReplayBuffer(
@@ -413,8 +425,36 @@ if __name__ == "__main__":
             imagine_batch_length=conf.JointTrainAgent.ImagineBatchLength,
             save_every_steps=conf.JointTrainAgent.SaveEverySteps,
             seed=args.seed,
-            logger=logger,
-            save_dir=save_dir
+            logger=logger
         )
+
+        print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
+        import eval
+        episode_avg_return, individual_returns = eval.eval_episodes(
+            num_episode=20,
+            env_name=args.env_name,
+            num_envs=5,
+            max_steps=conf.JointTrainAgent.SampleMaxSteps,
+            image_size=conf.BasicSettings.ImageSize,
+            world_model=world_model,
+            agent=agent
+        )
+
+        env_base = args.env_name.split('/')[1].split('-')[0]
+        baseline_score_avg = 0.0
+        try:
+            with open("results/storm.json", "r") as f:
+                storm_results = json.load(f)
+                if env_base in storm_results:
+                    baseline_score_avg = float(np.mean(storm_results[env_base]))
+        except Exception as e:
+            print(f"Failed to load baseline scores for {env_base}: {e}")
+
+        logger.log("eval/baseline_score_avg", baseline_score_avg)
+        logger.log("eval/episode_avg_return", episode_avg_return)
+        for i, ret in enumerate(individual_returns):
+            logger.log(f"eval/episode_return_{i}", ret)
+        logger.flush_wandb()
+
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")

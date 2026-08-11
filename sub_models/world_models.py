@@ -270,11 +270,11 @@ class WorldModel(nn.Module):
         self.optimizer = torch.optim.Adam(self.parameters(), lr=1e-4)
         self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_amp)
 
-    def encode_obs(self, obs):
+    def encode_obs(self, obs, sample_mode="random_sample"):
         with torch.autocast(device_type='cuda', dtype=torch.bfloat16, enabled=self.use_amp):
             embedding = self.encoder(obs)
             post_logits = self.dist_head.forward_post(embedding)
-            sample = self.stright_throught_gradient(post_logits, sample_mode="random_sample")
+            sample = self.stright_throught_gradient(post_logits, sample_mode=sample_mode)
             flattened_sample = self.flatten_sample(sample)
         return flattened_sample
 

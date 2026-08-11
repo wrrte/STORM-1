@@ -13,7 +13,7 @@ JointTrainAgent:
   BatchSize: 16
   DemonstrationBatchSize: 4
   BatchLength: 64
-  ImagineBatchSize: 1280
+  ImagineBatchSize: 1024
   ImagineDemonstrationBatchSize: 256
   ImagineContextLength: 8
   ImagineBatchLength: 16
@@ -23,21 +23,24 @@ JointTrainAgent:
   SaveEverySteps: 2500
 
   Retrieval:
-    enable: True
+    enable: False
     trigger_mode: "z_score" # "absolute" or "z_score"
     threshold: 1.0
     z_score_threshold: 3.5
     anchor_offset: -2 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 
     hash_bits: 10
+    hash_sample_mode: "probs"
+    use_pca: True
+    max_pca_samples: 100000
+    warmup_steps: 20000
     ema_alpha: 0.01
     max_bucket_size: 100000
-    anchor_queue_capacity: 8192
     max_anchors: 16
-    multiplier: 32
+    multiplier: 16
     target: 16
     max_contexts: 256
     global_rebuild_enable: True
-    global_rebuild_threshold: 0.03
+    global_rebuild_threshold: 0.06
     global_rebuild_cooldown: 2000
 
 Models:
