@@ -2,3 +2,5 @@ wandb/
 ckpt/
 __pycache__/
 runs/
+job_queue.txt
+venv/
