@@ -1,5 +1,5 @@
 #!/bin/bash
-export CUDA_VISIBLE_DEVICES=5
+export CUDA_VISIBLE_DEVICES=7
 
 QUEUE_FILE="job_queue.txt"
 LOCK_FILE="job_queue.lock"

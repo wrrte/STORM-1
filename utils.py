@@ -48,7 +48,11 @@ class Logger():
             if pure_env_name.endswith('_O') or pure_env_name.endswith('_X'):
                 pure_env_name = pure_env_name[:-2]
                 
-            run_id = wandb.util.generate_id()
+            try:
+                from wandb.sdk.lib.runid import generate_id
+                run_id = generate_id()
+            except ImportError:
+                run_id = wandb.util.generate_id()
             seed_str = f"_{seed}" if seed is not None else ""
             run_name = f"{pure_env_name}_{run_id}{seed_str}{suffix}"
             
