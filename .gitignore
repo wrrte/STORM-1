@@ -6,3 +6,5 @@ job_queue.txt
 venv/
 5_train.sh
 6_train.sh
+job_queue.txt
+populate_queue.sh
