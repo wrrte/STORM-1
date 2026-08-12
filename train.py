@@ -140,7 +140,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   batch_size, demonstration_batch_size, batch_length,
                                   imagine_batch_size, imagine_demonstration_batch_size,
                                   imagine_context_length, imagine_batch_length,
-                                  save_every_steps, seed, logger):
+                                  save_every_steps, seed, logger,
+                                  resume_step=0, resume_last_rebuild_step=None):
     # create ckpt dir
     os.makedirs(f"ckpt/{args.n}", exist_ok=True)
 
@@ -165,12 +166,24 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     latent_dim = 32 * 32 # CategoricalDim * ClassDim for hashing only the single-frame latent
     retrieval_manager = RetrievalContextManager(num_envs=num_envs, config=retrieval_config, latent_dim=latent_dim)
     is_first_step = np.ones(num_envs, dtype=bool)
-    
+
+    # Rebuild retrieval hash buckets if resuming with retrieval enabled
+    if resume_step > 0 and retrieval_manager.enabled and replay_buffer.ready():
+        print(colorama.Fore.CYAN + "Rebuilding retrieval hash buckets from replay buffer..." + colorama.Style.RESET_ALL)
+        retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
+
     # global rebuild tracking
-    last_rebuild_step = -getattr(retrieval_config, "global_rebuild_cooldown", 2000)
+    if resume_last_rebuild_step is not None:
+        last_rebuild_step = resume_last_rebuild_step
+    else:
+        last_rebuild_step = -getattr(retrieval_config, "global_rebuild_cooldown", 2000)
+
+    # signal-based checkpoint save
+    save_requested = False
+    signal_path = f"ckpt/{args.n}/SAVE_SIGNAL"
 
     # sample and train
-    for total_steps in tqdm(range(max_steps//num_envs)):
+    for total_steps in tqdm(range(resume_step, max_steps//num_envs)):
         # sample part >>>
         if replay_buffer.ready():
             world_model.eval()
@@ -226,6 +239,21 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         current_obs = obs
         current_info = info
         # <<< sample part
+
+        # checkpoint signal detection >>>
+        if not save_requested and os.path.exists(signal_path):
+            save_requested = True
+            try:
+                os.remove(signal_path)
+            except OSError:
+                pass
+            print(colorama.Fore.CYAN + f"[Step {total_steps}] Save signal detected! Will save full checkpoint at next episode termination." + colorama.Style.RESET_ALL)
+
+        if save_requested and done_flag.any():
+            ckpt_dir = f"ckpt/{args.n}/resume_ckpt_{total_steps}"
+            save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step)
+            save_requested = False
+        # <<< checkpoint signal detection
 
         # train world model part >>>
         if replay_buffer.ready() and total_steps % (train_dynamics_every_steps//num_envs) == 0:
@@ -352,6 +380,66 @@ def build_agent(conf, action_dim):
     ).cuda()
 
 
+def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step):
+    """Save all training state for resume."""
+    os.makedirs(ckpt_dir, exist_ok=True)
+
+    training_state = {
+        'total_steps': total_steps,
+        'world_model_state_dict': world_model.state_dict(),
+        'agent_state_dict': agent.state_dict(),
+        'world_model_optimizer_state_dict': world_model.optimizer.state_dict(),
+        'agent_optimizer_state_dict': agent.optimizer.state_dict(),
+        'world_model_scaler_state_dict': world_model.scaler.state_dict(),
+        'agent_scaler_state_dict': agent.scaler.state_dict(),
+        'agent_lowerbound_ema_scalar': agent.lowerbound_ema.scalar,
+        'agent_upperbound_ema_scalar': agent.upperbound_ema.scalar,
+        'logger_tag_step': copy.deepcopy(logger.tag_step),
+        'last_rebuild_step': last_rebuild_step,
+        'random_states': {
+            'torch': torch.random.get_rng_state(),
+            'cuda': torch.cuda.get_rng_state(),
+            'numpy': np.random.get_state(),
+            'python': random.getstate(),
+        },
+    }
+
+    torch.save(training_state, os.path.join(ckpt_dir, 'training_state.pt'))
+    replay_buffer.save_state(ckpt_dir)
+
+    print(colorama.Fore.CYAN + f"Full checkpoint saved to {ckpt_dir}" + colorama.Style.RESET_ALL)
+
+
+def load_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer):
+    """Load all training state for resume."""
+    training_state = torch.load(os.path.join(ckpt_dir, 'training_state.pt'), map_location='cuda', weights_only=False)
+
+    world_model.load_state_dict(training_state['world_model_state_dict'])
+    agent.load_state_dict(training_state['agent_state_dict'])
+    world_model.optimizer.load_state_dict(training_state['world_model_optimizer_state_dict'])
+    agent.optimizer.load_state_dict(training_state['agent_optimizer_state_dict'])
+    world_model.scaler.load_state_dict(training_state['world_model_scaler_state_dict'])
+    agent.scaler.load_state_dict(training_state['agent_scaler_state_dict'])
+
+    agent.lowerbound_ema.scalar = training_state['agent_lowerbound_ema_scalar']
+    agent.upperbound_ema.scalar = training_state['agent_upperbound_ema_scalar']
+
+    replay_buffer.load_state(ckpt_dir)
+
+    # Restore random states (RNG tensors must be on CPU for set_rng_state)
+    random_states = training_state['random_states']
+    torch.random.set_rng_state(random_states['torch'].cpu())
+    torch.cuda.set_rng_state(random_states['cuda'].cpu())
+    np.random.set_state(random_states['numpy'])
+    random.setstate(random_states['python'])
+
+    resume_step = training_state['total_steps']
+    logger_tag_step = training_state.get('logger_tag_step', {})
+    last_rebuild_step = training_state.get('last_rebuild_step', 0)
+
+    return resume_step, logger_tag_step, last_rebuild_step
+
+
 if __name__ == "__main__":
     # ignore warnings
     import warnings
@@ -366,6 +454,7 @@ if __name__ == "__main__":
     parser.add_argument("-config_path", type=str, required=True)
     parser.add_argument("-env_name", type=str, required=True)
     parser.add_argument("-trajectory_path", type=str, required=True)
+    parser.add_argument("--resume_from", type=str, default=None, help="Path to resume checkpoint directory")
     args, extra_args = parser.parse_known_args()
     conf = load_config(args.config_path)
     if extra_args:
@@ -409,6 +498,17 @@ if __name__ == "__main__":
             print(colorama.Fore.MAGENTA + f"loading demonstration trajectory from {args.trajectory_path}" + colorama.Style.RESET_ALL)
             replay_buffer.load_trajectory(path=args.trajectory_path)
 
+        # resume from checkpoint if specified
+        resume_step = 0
+        resume_last_rebuild_step = None
+        if args.resume_from:
+            print(colorama.Fore.CYAN + f"Resuming from checkpoint: {args.resume_from}" + colorama.Style.RESET_ALL)
+            resume_step, logger_tag_step, resume_last_rebuild_step = load_full_checkpoint(
+                args.resume_from, world_model, agent, replay_buffer
+            )
+            logger.tag_step = logger_tag_step
+            print(colorama.Fore.CYAN + f"Resumed from step {resume_step}, replay buffer length: {len(replay_buffer)}" + colorama.Style.RESET_ALL)
+
         # train
         joint_train_world_model_agent(
             env_name=args.env_name,
@@ -429,7 +529,9 @@ if __name__ == "__main__":
             imagine_batch_length=conf.JointTrainAgent.ImagineBatchLength,
             save_every_steps=conf.JointTrainAgent.SaveEverySteps,
             seed=args.seed,
-            logger=logger
+            logger=logger,
+            resume_step=resume_step,
+            resume_last_rebuild_step=resume_last_rebuild_step
         )
 
         print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)

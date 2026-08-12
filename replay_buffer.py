@@ -1,4 +1,5 @@
 import numpy as np
+import os
 import random
 import unittest
 import torch
@@ -138,3 +139,56 @@ class ReplayBuffer():
 
     def __len__(self):
         return self.length * self.num_envs
+
+    def save_state(self, dir_path):
+        """Save replay buffer state to directory for training resume."""
+        os.makedirs(dir_path, exist_ok=True)
+
+        if self.store_on_gpu:
+            obs = self.obs_buffer[:self.length].cpu().numpy()
+            action = self.action_buffer[:self.length].cpu().numpy()
+            reward = self.reward_buffer[:self.length].cpu().numpy()
+            termination = self.termination_buffer[:self.length].cpu().numpy()
+        else:
+            obs = self.obs_buffer[:self.length].copy()
+            action = self.action_buffer[:self.length].copy()
+            reward = self.reward_buffer[:self.length].copy()
+            termination = self.termination_buffer[:self.length].copy()
+
+        np.savez_compressed(
+            os.path.join(dir_path, "replay_buffer.npz"),
+            obs=obs, action=action, reward=reward, termination=termination,
+            length=np.array(self.length),
+            last_pointer=np.array(self.last_pointer),
+            num_envs=np.array(self.num_envs),
+            max_length=np.array(self.max_length)
+        )
+
+    def load_state(self, dir_path):
+        """Load replay buffer state from directory for training resume."""
+        data = np.load(os.path.join(dir_path, "replay_buffer.npz"), allow_pickle=True)
+
+        loaded_length = int(data["length"])
+        loaded_last_pointer = int(data["last_pointer"])
+        loaded_num_envs = int(data["num_envs"])
+
+        assert loaded_num_envs == self.num_envs, \
+            f"num_envs mismatch: saved {loaded_num_envs} vs current {self.num_envs}"
+
+        max_rows = self.max_length // self.num_envs
+        assert loaded_length <= max_rows, \
+            f"Loaded buffer length {loaded_length} exceeds current max {max_rows}"
+
+        if self.store_on_gpu:
+            self.obs_buffer[:loaded_length] = torch.from_numpy(data["obs"]).to("cuda")
+            self.action_buffer[:loaded_length] = torch.from_numpy(data["action"]).to("cuda")
+            self.reward_buffer[:loaded_length] = torch.from_numpy(data["reward"]).to("cuda")
+            self.termination_buffer[:loaded_length] = torch.from_numpy(data["termination"]).to("cuda")
+        else:
+            self.obs_buffer[:loaded_length] = data["obs"]
+            self.action_buffer[:loaded_length] = data["action"]
+            self.reward_buffer[:loaded_length] = data["reward"]
+            self.termination_buffer[:loaded_length] = data["termination"]
+
+        self.length = loaded_length
+        self.last_pointer = loaded_last_pointer
