@@ -191,6 +191,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             with torch.no_grad():
                 if len(context_action) == 0:
                     action = vec_env.action_space.sample()
+                    current_latent_for_hash = None
+                    agent_state = None
                 else:
                     context_latent = world_model.encode_obs(torch.cat(list(context_obs), dim=1))
                     model_context_action = np.stack(list(context_action), axis=1)
