@@ -23,7 +23,7 @@ JointTrainAgent:
   SaveEverySteps: 2500
 
   Retrieval:
-    enable: False
+    enable: True
     trigger_mode: "z_score" # "absolute" or "z_score"
     threshold: 1.0
     z_score_threshold: 3.5

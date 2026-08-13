@@ -275,6 +275,11 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             )
             
             logger.log("Retrieval/triggered_anchors_step", num_trig)
+            if retrieval_manager is not None and retrieval_manager.enabled:
+                logger.log("Retrieval/td_error_mean", retrieval_manager.ema_mean.mean())
+                logger.log("Retrieval/td_error_var", retrieval_manager.ema_var.mean())
+                logger.log("Retrieval/value_diff_mean", retrieval_manager.ema_vd_mean.mean())
+                logger.log("Retrieval/value_diff_var", retrieval_manager.ema_vd_var.mean())
         # <<< train world model part
 
         # train agent part >>>
