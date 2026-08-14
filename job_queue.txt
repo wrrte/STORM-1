@@ -1,16 +1,6 @@
-
-python -u train.py -n "Amidar-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Amidar-v5" -trajectory_path "D_TRAJ/Amidar.pkl" JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.warmup_steps 20000
-    
-python -u train.py -n "Alien-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Alien-v5" -trajectory_path "D_TRAJ/Alien.pkl" JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.warmup_steps 20000
-    
 python -u train.py -n "Assault-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Assault-v5" -trajectory_path "D_TRAJ/Assault.pkl" JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.warmup_steps 20000
-    
-python -u train.py -n "BankHeist-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "D_TRAJ/BankHeist.pkl" JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.warmup_steps 40000
-    
 python -u train.py -n "BattleZone-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/BattleZone-v5" -trajectory_path "D_TRAJ/BattleZone.pkl" JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.warmup_steps 40000
-    
 python -u train.py -n "Boxing-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Boxing-v5" -trajectory_path "D_TRAJ/Boxing.pkl" JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.warmup_steps 40000
-    
 python -u train.py -n "DemonAttack-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/DemonAttack-v5" -trajectory_path "D_TRAJ/DemonAttack.pkl" JointTrainAgent.Retrieval.enable False
 python -u train.py -n "Freeway-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Freeway-v5" -trajectory_path "D_TRAJ/Freeway.pkl" JointTrainAgent.Retrieval.enable False
 python -u train.py -n "Kangaroo-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable False
