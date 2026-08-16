@@ -82,7 +82,7 @@ To reproduce the speed metrics mentioned in the paper, please consider the follo
 We've recently observed if one **clones the repo** from `Powershell` and then calls `train.sh` under `WSL shell`, then it may throw an error related to arg parse. This may be due to invisible newlines in the files somehow generated when cloning with git. The solution is to download the zip or clone directly inside `WSL`.
 
 ### ALE error
-ALE 관련된 에러는 gymnasium인가를 적당한 버전으로 다시 깔면 해결되었음.
+pip install "gymnasium[atari,accept-rom-license]==0.29.1"
 
 ## Code references
 We've referenced several other projects during the development of this code:
