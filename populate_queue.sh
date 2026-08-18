@@ -5,14 +5,7 @@ START_SEED=2000
 
 # Original games list from the training scripts
 games=(
-    Qbert
-Hero
-MsPacman
-Gopher
-Asterix
-UpNDown
-Jamesbond
-Seaquest
+    Qbert ChopperCommand 
 )
 
 echo "Populating $QUEUE_FILE with default games..."
