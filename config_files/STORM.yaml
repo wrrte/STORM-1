@@ -24,6 +24,7 @@ JointTrainAgent:
 
   Retrieval:
     enable: True
+    batch_size_reduction: "anchors" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
     threshold: 1.0
     z_score_threshold: 3.5
