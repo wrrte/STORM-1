@@ -382,7 +382,7 @@ class WorldModel(nn.Module):
         This can slightly improve the efficiency of imagine_data
         But may vary across different machines
         '''
-        if self.imagine_batch_size > imagine_batch_size or self.imagine_batch_size + 256 < imagine_batch_size or self.imagine_batch_length != imagine_batch_length:
+        if self.imagine_batch_size != imagine_batch_size or self.imagine_batch_length != imagine_batch_length:
             print(f"init_imagine_buffer: {imagine_batch_size}x{imagine_batch_length}@{dtype}")
             self.imagine_batch_size = imagine_batch_size
             self.imagine_batch_length = imagine_batch_length
