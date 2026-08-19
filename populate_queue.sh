@@ -1,11 +1,11 @@
 #!/bin/bash
 
 QUEUE_FILE="job_queue.txt"
-START_SEED=5090
+START_SEED=10
 
 # Original games list from the training scripts
 games=(
-    BattleZone Alien Amidar Assault BankHeist Boxing DemonAttack
+    MsPacman
 )
 
 echo "Populating $QUEUE_FILE with default games..."
