@@ -92,7 +92,13 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
             lazy_hit_rate = avg_hit_rate
             
     if retrieved_count > 0:
-        random_batch_size = max(0, imagine_batch_size - num_valid_anchors)
+        cfg = retrieval_manager.config
+        batch_reduction_mode = cfg.get("batch_size_reduction", "anchors") if hasattr(cfg, "get") else getattr(cfg, "batch_size_reduction", "anchors")
+        
+        if batch_reduction_mode == "retrieved":
+            random_batch_size = max(0, imagine_batch_size - retrieved_count)
+        else:
+            random_batch_size = max(0, imagine_batch_size - num_valid_anchors)
     else:
         random_batch_size = imagine_batch_size
             
