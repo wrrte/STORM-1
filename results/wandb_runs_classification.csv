@@ -1,0 +1,148 @@
+Run Name,Run ID,State,Commit,Logic,Eval Return,Retrieval Enable,Warmup Steps,Seed
+Assault_dido71hu,dido71hu,finished,c48ae97,retrieved_count (without max),N/A,True,N/A,N/A
+Asterix_l4ym0k94,l4ym0k94,finished,c48ae97,retrieved_count (without max),N/A,True,N/A,N/A
+BankHeist_3j118kwy,3j118kwy,finished,fd75de5,retrieved_count (without max),N/A,True,N/A,N/A
+BattleZone_tb0nazhp,tb0nazhp,finished,26228dc,retrieved_count (without max),N/A,True,N/A,N/A
+Boxing_cl8oz4q3,cl8oz4q3,finished,9229652,retrieved_count (without max),N/A,True,N/A,N/A
+Breakout_726v606d,726v606d,finished,b735362,retrieved_count (without max),N/A,True,N/A,N/A
+ChopperCommand_bp6ykwxs,bp6ykwxs,finished,b735362,retrieved_count (without max),N/A,True,N/A,N/A
+CrazyClimber_5ifc4mwt,5ifc4mwt,finished,b735362,retrieved_count (without max),N/A,True,N/A,N/A
+DemonAttack_rtr1s4v6,rtr1s4v6,finished,b735362,retrieved_count (without max),N/A,True,N/A,N/A
+Freeway_h8nx72hu,h8nx72hu,finished,b735362,retrieved_count (without max),N/A,True,N/A,N/A
+Frostbite_hc1bfvxo,hc1bfvxo,finished,522459f,retrieved_count (without max),N/A,True,N/A,N/A
+ChopperCommand_fcrzqnfl,fcrzqnfl,finished,906d580,retrieved_count (without max),N/A,True,N/A,N/A
+Frostbite_lgr64hkl,lgr64hkl,finished,906d580,retrieved_count (without max),N/A,True,N/A,N/A
+ChopperCommand_qgi59l89,qgi59l89,finished,12197ab,retrieved_count (without max),N/A,True,N/A,N/A
+Frostbite_6phdabdf,6phdabdf,finished,f4ca35e,retrieved_count (without max),N/A,True,N/A,N/A
+Hero_kfgedx37,kfgedx37,finished,12197ab,retrieved_count (without max),N/A,True,N/A,N/A
+Asterix_pd3tngie,pd3tngie,finished,12197ab,retrieved_count (without max),N/A,True,N/A,N/A
+Gopher_iv8hsasj,iv8hsasj,finished,12197ab,retrieved_count (without max),N/A,True,N/A,N/A
+Gopher_4qrcg3zv,4qrcg3zv,finished,5d6dd17,retrieved_count (without max),N/A,True,N/A,N/A
+Frostbite_j5wlpk0l,j5wlpk0l,finished,e682e51,retrieved_count (without max),261,True,N/A,N/A
+Frostbite_yha95292,yha95292,finished,e682e51,retrieved_count (without max),2631,False,N/A,N/A
+Frostbite_eiuv70yq,eiuv70yq,finished,f0361d8,num_valid_anchors,1897,True,5000,N/A
+Gopher_u79ngx8e,u79ngx8e,finished,f0361d8,num_valid_anchors,1089,True,5000,N/A
+ChopperCommand_0xtsin0l,0xtsin0l,finished,f0361d8,num_valid_anchors,1420,True,5000,N/A
+Jamesbond_amedwsrz,amedwsrz,finished,f0361d8,num_valid_anchors,622.5,True,5000,N/A
+Gopher_cq2v19hx,cq2v19hx,finished,a68e4c8,num_valid_anchors,3844,True,20000,N/A
+Frostbite_aacxbr0j,aacxbr0j,finished,a68e4c8,num_valid_anchors,2535,True,20000,N/A
+Gopher_m8qi1l1h,m8qi1l1h,finished,a85ff0a,num_valid_anchors,4545,False,N/A,N/A
+Frostbite_8mq7xtze,8mq7xtze,finished,a85ff0a,num_valid_anchors,2709,True,20000,N/A
+Jamesbond_23itjn25,23itjn25,finished,a85ff0a,num_valid_anchors,625,True,20000,N/A
+Frostbite_p72nyono,p72nyono,finished,7c744f2,retrieved_count (without max),2068,False,N/A,N/A
+Frostbite_dam6q2r6,dam6q2r6,finished,7c744f2,retrieved_count (without max),1904,False,N/A,N/A
+Frostbite_g78da4qo,g78da4qo,finished,e8adbf6,num_valid_anchors,2408.5,True,20000,N/A
+Frostbite_8kao4rty,8kao4rty,finished,e8adbf6,num_valid_anchors,2666.5,True,20000,N/A
+Frostbite_rcqsx89t,rcqsx89t,finished,e8adbf6,num_valid_anchors,260.5,True,20000,N/A
+Frostbite_er2boj14,er2boj14,finished,e8adbf6,num_valid_anchors,266.5,False,N/A,N/A
+Hero_l245e0qe_10_O,l245e0qe,finished,90a0a5b,num_valid_anchors,12227.25,True,20000,10
+Hero_0g7od2ti_10_X,0g7od2ti,finished,90a0a5b,num_valid_anchors,12996.75,False,N/A,10
+ChopperCommand_fsy2x429_10_O,fsy2x429,finished,90a0a5b,num_valid_anchors,1870,True,20000,10
+ChopperCommand_ti2d8k6i_10_X,ti2d8k6i,finished,90a0a5b,num_valid_anchors,1960,False,N/A,10
+Gopher_lclcayju_1_O,lclcayju,finished,90a0a5b,num_valid_anchors,4067,True,20000,1
+Gopher_gu3gyrb0_1_X,gu3gyrb0,finished,90a0a5b,num_valid_anchors,5968,False,N/A,1
+MsPacman_l32mawg9_1_O,l32mawg9,finished,90a0a5b,num_valid_anchors,1549.5,True,20000,1
+MsPacman_m1aqiq1r_1_X,m1aqiq1r,finished,90a0a5b,num_valid_anchors,1807.5,False,N/A,1
+Frostbite_xkrcm9jk_710_X,xkrcm9jk,finished,90a0a5b,num_valid_anchors,2270.5,False,N/A,710
+Frostbite_7yto79qd_710_O,7yto79qd,finished,90a0a5b,num_valid_anchors,2008,True,20000,710
+Frostbite_y00apntd_710_O,y00apntd,finished,5b8ad47,num_valid_anchors,1453.5,True,20000,710
+Hero_o25d35ld_10_O,o25d35ld,finished,cd0fe1d,num_valid_anchors,13548,True,36000,10
+Amidar_e4lm7iap_2000_X,e4lm7iap,finished,e4966df,num_valid_anchors,177.55,False,N/A,2000
+Alien_tspqrlhz_2000_X,tspqrlhz,finished,112fc78,num_valid_anchors,688.5,False,N/A,2000
+Gopher_zunomcdb_1_O,zunomcdb,finished,a8545fe,num_valid_anchors,4938,True,60000,1
+MsPacman_zk4p36p3_1_O,zk4p36p3,finished,aa6e58c,num_valid_anchors,1740.5,True,11000,1
+Gopher_kj5xuf12_10_X,kj5xuf12,finished,aa6e58c,num_valid_anchors,3275,False,N/A,10
+Frostbite_3z9mqxuf_10_O,3z9mqxuf,finished,aa6e58c,num_valid_anchors,2403,True,20000,10
+Frostbite_es7rpyy3_710_O,es7rpyy3,finished,aa6e58c,num_valid_anchors,2101,True,20000,710
+Assault_44x6n4yp_2000_X,44x6n4yp,finished,112fc78,num_valid_anchors,620.4,False,N/A,2000
+BankHeist_d14nb2bu_2000_X,d14nb2bu,finished,112fc78,num_valid_anchors,163,False,N/A,2000
+Frostbite_8dazzzeq_3710_O,8dazzzeq,finished,aa6e58c,num_valid_anchors,2671,True,20000,3710
+MsPacman_f2f1pwux_10_X,f2f1pwux,finished,aa6e58c,num_valid_anchors,2007,False,N/A,10
+Hero_abdl7rky_1_X,abdl7rky,finished,aa6e58c,num_valid_anchors,7608.5,False,N/A,1
+Asterix_9vuw278h_1_X,9vuw278h,finished,aa6e58c,num_valid_anchors,515,False,N/A,1
+Qbert_w1hqiqbo_1_X,w1hqiqbo,finished,aa6e58c,num_valid_anchors,1771.25,False,N/A,1
+BattleZone_z3zh8ezk_2000_X,z3zh8ezk,finished,112fc78,num_valid_anchors,5300,False,N/A,2000
+Boxing_u1xxt1sd_2000_X,u1xxt1sd,finished,112fc78,num_valid_anchors,81,False,N/A,2000
+UpNDown_d2hkqq0o_1_X,d2hkqq0o,finished,aa6e58c,num_valid_anchors,9044,False,N/A,1
+Jamesbond_es6yncsk_1_X,es6yncsk,finished,aa6e58c,num_valid_anchors,490,False,N/A,1
+Frostbite_puk2s410_10_O,puk2s410,finished,3a3d560,num_valid_anchors,2565.5,True,20000,10
+Frostbite_51vm6i31_3710_O,51vm6i31,finished,3670190,retrieved_count (with max),3018,True,20000,3710
+Breakout_qilmuxin_2000_X,qilmuxin,finished,112fc78,num_valid_anchors,9.8,False,N/A,2000
+CrazyClimber_66u1ib58_2000_X,66u1ib58,finished,112fc78,num_valid_anchors,59970,False,N/A,2000
+Frostbite_t85dlvke_710_O,t85dlvke,finished,3670190,retrieved_count (with max),2694,True,20000,710
+Hero_a25uq0uk_1_O,a25uq0uk,finished,3670190,retrieved_count (with max),7267.75,True,15000,1
+Hero_di5yjl1t_10_O,di5yjl1t,finished,138ed31,retrieved_count (with max),12951.25,True,15000,10
+MsPacman_ybun9ejj_1_O,ybun9ejj,finished,138ed31,retrieved_count (with max),1897,True,40000,1
+MsPacman_ydbp9tkl_10_O,ydbp9tkl,finished,138ed31,retrieved_count (with max),1556,True,40000,10
+Gopher_76hfojnv_10_O,76hfojnv,finished,138ed31,retrieved_count (with max),3135,True,60000,10
+Gopher_tkia8g0g_1_O,tkia8g0g,finished,138ed31,retrieved_count (with max),4986,True,60000,1
+Seaquest_m5jcaa5a_1_X,m5jcaa5a,finished,138ed31,retrieved_count (with max),454,False,N/A,1
+Alien_s9hi31ki_1_X,s9hi31ki,finished,138ed31,retrieved_count (with max),1142,False,N/A,1
+Alien_93r1csof_1_O,93r1csof,finished,138ed31,retrieved_count (with max),1198.5,True,20000,1
+Assault_0i5yuas8_1_X,0i5yuas8,finished,138ed31,retrieved_count (with max),705,False,N/A,1
+Qbert_zc8i4p9r_1_O,zc8i4p9r,finished,138ed31,retrieved_count (with max),2985,True,36000,1
+Amidar_jo4xfrpw_1_O,jo4xfrpw,finished,138ed31,retrieved_count (with max),168.8,True,20000,1
+Assault_kz84l8bo_1_O,kz84l8bo,finished,138ed31,retrieved_count (with max),733.4,True,20000,1
+Qbert_moln5tny_10_X,moln5tny,finished,138ed31,retrieved_count (with max),3786.25,False,N/A,10
+Amidar_j8no9ulb_2000_O,j8no9ulb,finished,9c3440f,retrieved_count (with max),207.7,True,20000,2000
+Alien_xx429746_2000_O,xx429746,finished,d4c0ad6,retrieved_count (with max),620.5,True,20000,2000
+Amidar_towr6pad_5090_X,towr6pad,finished,9c3440f,retrieved_count (with max),204.85,False,N/A,5090
+Assault_xl85l6jo_2000_O,xl85l6jo,finished,d4c0ad6,retrieved_count (with max),654.1,True,20000,2000
+Amidar_4izyy5or_5090_O,4izyy5or,finished,9c3440f,retrieved_count (with max),222.65,True,50900,5090
+BankHeist_hec3j6ho_2000_O,hec3j6ho,finished,d4c0ad6,retrieved_count (with max),148,True,40000,2000
+BattleZone_vzh60s9k_2000_O,vzh60s9k,finished,d4c0ad6,retrieved_count (with max),10050,True,40000,2000
+Boxing_5vblkjly_2000_O,5vblkjly,finished,d4c0ad6,retrieved_count (with max),86.25,True,40000,2000
+Alien_ivw80t9d_5090_X,ivw80t9d,finished,9c3440f,retrieved_count (with max),842.5,False,N/A,5090
+DemonAttack_wyla6aj7_2000_X,wyla6aj7,finished,d4c0ad6,retrieved_count (with max),171.75,False,N/A,2000
+Freeway_h39cd3zm_2000_X,h39cd3zm,finished,d4c0ad6,retrieved_count (with max),0,False,N/A,2000
+Kangaroo_4xumbmww_2000_X,4xumbmww,finished,d4c0ad6,retrieved_count (with max),1470,False,N/A,2000
+Krull_302gbj88_2000_X,302gbj88,finished,d4c0ad6,retrieved_count (with max),4708.5,False,N/A,2000
+Assault_xqlr76ij_5090_X,xqlr76ij,finished,9c3440f,retrieved_count (with max),662.4,False,N/A,5090
+KungFuMaster_5v719v97_2000_X,5v719v97,finished,d4c0ad6,retrieved_count (with max),23815,False,N/A,2000
+Pong_v63zafer_2000_X,v63zafer,finished,d4c0ad6,retrieved_count (with max),5.7,False,N/A,2000
+DemonAttack_ceje5gqv_2000_O,ceje5gqv,finished,d4c0ad6,retrieved_count (with max),144.5,True,20000,2000
+Alien_22rpl8xp_2010_X,22rpl8xp,finished,d4c0ad6,retrieved_count (with max),817,False,N/A,2010
+BankHeist_ab41ct6i_5090_X,ab41ct6i,finished,9c3440f,retrieved_count (with max),521,False,N/A,5090
+Assault_ckrlgqy9_2010_X,ckrlgqy9,finished,4d949fe,retrieved_count (with max),605.8,False,N/A,2010
+BankHeist_innwmwhh_2010_X,innwmwhh,finished,4d949fe,retrieved_count (with max),699,False,N/A,2010
+BattleZone_c42aw4v3_5090_X,c42aw4v3,finished,9c3440f,retrieved_count (with max),9650,False,N/A,5090
+BattleZone_qzxk63jj_2010_X,qzxk63jj,finished,4d949fe,retrieved_count (with max),15900,False,N/A,2010
+Kangaroo_8tacn48b_2010_X,8tacn48b,finished,4d949fe,retrieved_count (with max),1730,False,N/A,2010
+Boxing_53feow6p_5090_X,53feow6p,finished,9c3440f,retrieved_count (with max),88.6,False,N/A,5090
+Krull_iyv69dz1_2010_X,iyv69dz1,finished,4d949fe,retrieved_count (with max),5913.5,False,N/A,2010
+KungFuMaster_vo2l3l6a_2010_X,vo2l3l6a,finished,4d949fe,retrieved_count (with max),20895,False,N/A,2010
+Pong_mbkdzqfm_2010_X,mbkdzqfm,finished,4d949fe,retrieved_count (with max),13.7,False,N/A,2010
+DemonAttack_prcbs56a_5090_X,prcbs56a,finished,9c3440f,retrieved_count (with max),188,False,N/A,5090
+Alien_fwk5rywl_2010_O,fwk5rywl,finished,c3f32d3,Unknown (Git error or train.py missing),1130,True,20000,2010
+Qbert_9wc68vrt_2000_X,9wc68vrt,finished,9c89feb,retrieved_count (with max),3193.75,False,N/A,2000
+Assault_jia38v5u_1_O,jia38v5u,finished,9c89feb,retrieved_count (with max),765.45,True,20000,1
+Assault_07o8zden_2010_O,07o8zden,finished,9c89feb,retrieved_count (with max),732.9,True,20000,2010
+Asterix_3ejw07af_1_O,3ejw07af,finished,9c89feb,retrieved_count (with max),682.5,True,20000,1
+BankHeist_al1c0nxn_2010_O,al1c0nxn,finished,9c89feb,retrieved_count (with max),683,True,70000,2010
+Qbert_d1ysoych_1_O,d1ysoych,finished,9c89feb,retrieved_count (with max),2667.5,True,60000,1
+UpNDown_84acktmr_1_O,84acktmr,finished,9c89feb,retrieved_count (with max),11733,True,20000,1
+BattleZone_ptt1y74h_2010_O,ptt1y74h,finished,9c89feb,retrieved_count (with max),13650,True,20000,2010
+Qbert_md455r0o_10_O,md455r0o,finished,9c89feb,retrieved_count (with max),4221.25,True,60000,10
+Kangaroo_4brm8ls8_2010_O,4brm8ls8,finished,9c89feb,retrieved_count (with max),1750,True,30000,2010
+Jamesbond_m0m5fsuj_1_O,m0m5fsuj,finished,9c89feb,retrieved_count (with max),420,True,70000,1
+Seaquest_0iq0fix7_1_O,0iq0fix7,finished,9c89feb,retrieved_count (with max),523,True,50000,1
+Krull_9a616vte_2010_O,9a616vte,finished,9c89feb,retrieved_count (with max),4948,True,20000,2010
+ChopperCommand_gx5i2iyc_2000_X,gx5i2iyc,finished,1fb1f8d,num_valid_anchors,1470,False,N/A,2000
+BattleZone_fmqrqzef_2000_O,fmqrqzef,finished,1fb1f8d,num_valid_anchors,6200,True,20000,2000
+BattleZone_ao3zivro_2010_O,ao3zivro,finished,1fb1f8d,num_valid_anchors,15550,True,20000,2010
+Assault_x4pmdsxa_2010_O,x4pmdsxa,finished,e36a984,num_valid_anchors,703.85,True,20000,2010
+DemonAttack_2ywpzauc_2000_O,2ywpzauc,finished,e36a984,num_valid_anchors,126.75,True,20000,2000
+Frostbite_l80bk5nx_10_O,l80bk5nx,finished,5054c4e,num_valid_anchors,2659,True,20000,10
+Qbert_kdl2k6zy_1_O,kdl2k6zy,finished,5054c4e,num_valid_anchors,1316.25,True,36000,1
+BattleZone_08x5wdbp_5090_O,08x5wdbp,running,7099555,num_valid_anchors,N/A,True,20000,5090
+Qbert_nms4yv4t_10_O,nms4yv4t,finished,5054c4e,num_valid_anchors,3847.5,True,60000,10
+UpNDown_sr4w62m1_10_O,sr4w62m1,finished,5054c4e,num_valid_anchors,5335.5,True,20000,10
+BattleZone_tn21bnsz_2000_O,tn21bnsz,finished,dc712d4,num_valid_anchors,6100,True,40000,2000
+Asterix_sp5rg3a8_10_O,sp5rg3a8,finished,5054c4e,num_valid_anchors,577.5,True,20000,10
+Alien_f5q3kxjz_10_O,f5q3kxjz,finished,5054c4e,num_valid_anchors,1359.5,True,20000,10
+BattleZone_qjoruu8r_2010_O,qjoruu8r,running,dc712d4,num_valid_anchors,N/A,True,20000,2010
+Assault_hskejlrb_10_O,hskejlrb,finished,5054c4e,num_valid_anchors,731.8,True,20000,10
+ChopperCommand_x1vytybr_10_O,x1vytybr,finished,5054c4e,num_valid_anchors,1740,True,20000,10
+Gopher_uk4c827s_1_O,uk4c827s,running,5054c4e,num_valid_anchors,N/A,True,60000,1
+Gopher_sfowcdc7_10_O,sfowcdc7,running,5054c4e,num_valid_anchors,N/A,True,60000,10
+Qbert_37vp296n_2000_O,37vp296n,running,dc712d4,num_valid_anchors,N/A,True,55000,2000

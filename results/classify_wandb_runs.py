@@ -24,7 +24,10 @@ def get_logic_for_commit(commit_hash):
         code = result.stdout
         
         # 코드 내용에 따른 분류
-        if "random_batch_size = imagine_batch_size - num_valid_anchors" in code:
+        # 최신 코드의 경우 num_valid_anchors와 retrieved_count 조건이 모두 포함될 수 있으므로, 두 개가 다 있을 땐 num_valid_anchors로 분류
+        if "random_batch_size = max(0, imagine_batch_size - retrieved_count)" in code and "random_batch_size = max(0, imagine_batch_size - num_valid_anchors)" in code:
+            return "num_valid_anchors"
+        elif "random_batch_size = imagine_batch_size - num_valid_anchors" in code or "random_batch_size = max(0, imagine_batch_size - num_valid_anchors)" in code:
             return "num_valid_anchors"
         elif "random_batch_size = max(0, imagine_batch_size - retrieved_count)" in code:
             return "retrieved_count (with max)"
@@ -100,6 +103,15 @@ def main():
             warmup_steps = w_steps if w_steps is not None else 'N/A'
             
         seed = get_config_val(run.config, 'seed')
+        if seed is None or seed == 0:
+            # 설정 파일에 제대로 저장되지 않은 경우 런 이름에서 유추
+            # 이름 형식: {env}_{id}_{seed}_{O/X} 혹은 {env}_{id}_{O/X}
+            parts = run.name.split('_')
+            if len(parts) >= 4 and parts[-1] in ['O', 'X']:
+                try:
+                    seed = int(parts[-2])
+                except ValueError:
+                    pass
         seed = seed if seed is not None else 'N/A'
         
         results.append({

@@ -15,6 +15,8 @@ def main():
         
         # Extract seed
         seed = str(row['Seed'])
+        if seed.endswith('.0'):
+            seed = seed[:-2]
         if seed == 'N/A' or seed == 'nan' or seed == 'None':
             # Try to extract from Run Name (e.g., Amidar_f05wv0rj_2000_X)
             if len(parts) >= 3 and parts[2].isdigit():
@@ -66,6 +68,22 @@ def main():
         })
 
     parsed_df = pd.DataFrame(data)
+
+    # Resolve overlapping runs (same Game, Config, Seed) by taking the highest Eval Return
+    parsed_df['Numeric Return'] = pd.to_numeric(parsed_df['Eval Return'], errors='coerce')
+    parsed_df = parsed_df.sort_values(by=['Game', 'Config', 'Seed', 'Numeric Return'], ascending=[True, True, True, False])
+    
+    duplicates = parsed_df[parsed_df.duplicated(subset=['Game', 'Config', 'Seed'], keep=False)]
+    if not duplicates.empty:
+        print("WARNING: Found multiple rewards for the same Game, Config, and Seed. Selecting the highest reward:")
+        for name, group in duplicates.groupby(['Game', 'Config', 'Seed']):
+            returns = group['Eval Return'].tolist()
+            warmups = group['Warmup Steps'].tolist()
+            print(f"  - Game: {name[0]}, Config: {name[1]}, Seed: {name[2]}")
+            print(f"    Available: Returns {returns} with Warmups {warmups} -> Chosen: Return {returns[0]} (Warmup {warmups[0]})")
+            
+    parsed_df = parsed_df.drop_duplicates(subset=['Game', 'Config', 'Seed'], keep='first')
+    parsed_df = parsed_df.reset_index(drop=True)
 
     # Process warmup steps per (Game, Config)
     final_configs = []
