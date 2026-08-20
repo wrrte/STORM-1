@@ -200,6 +200,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.use_pca = True
     conf.JointTrainAgent.Retrieval.max_pca_samples = 10000
     conf.JointTrainAgent.Retrieval.warmup_steps = 5000
+    conf.JointTrainAgent.Retrieval.min_warmup_steps = 0
     conf.JointTrainAgent.Retrieval.threshold = 1.0
     conf.JointTrainAgent.Retrieval.z_score_threshold = 2.0
     conf.JointTrainAgent.Retrieval.ema_alpha = 0.01

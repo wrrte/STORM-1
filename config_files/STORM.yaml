@@ -24,7 +24,7 @@ JointTrainAgent:
 
   Retrieval:
     enable: True
-    batch_size_reduction: "anchors" # "anchors" or "retrieved"
+    batch_size_reduction: "retrieved" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
     threshold: 1.0
     z_score_threshold: 3.5
@@ -33,7 +33,8 @@ JointTrainAgent:
     hash_sample_mode: "probs"
     use_pca: True
     max_pca_samples: 100000
-    warmup_steps: 20000
+    warmup_steps: -1
+    min_warmup_steps: 5000
     ema_alpha: 0.01
     max_bucket_size: 1000000000
     max_anchors: 16
