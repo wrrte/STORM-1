@@ -166,7 +166,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   imagine_context_length, imagine_batch_length,
                                   save_every_steps, seed, logger,
                                   resume_step=0, resume_last_rebuild_step=None,
-                                  warmup_finished_resume=False, episode_rewards_resume=None):
+                                  warmup_finished_resume=False, episode_rewards_resume=None,
+                                  dynamic_warmup_met_step_resume=-1):
     # create ckpt dir
     os.makedirs(f"ckpt/{args.n}", exist_ok=True)
 
@@ -182,6 +183,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     context_action = deque(maxlen=16)
     
     warmup_finished = warmup_finished_resume if resume_step > 0 else False
+    dynamic_warmup_met_step = dynamic_warmup_met_step_resume if resume_step > 0 else -1
     episode_rewards = deque(episode_rewards_resume, maxlen=200) if resume_step > 0 and episode_rewards_resume else deque(maxlen=200)
     
     # retrieval setup
@@ -282,7 +284,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
 
         if save_requested and done_flag.any():
             ckpt_dir = f"ckpt/{args.n}/resume_ckpt_{total_steps}"
-            save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, list(episode_rewards))
+            save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, list(episode_rewards), dynamic_warmup_met_step)
             save_requested = False
         # <<< checkpoint signal detection
 
@@ -290,14 +292,25 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         
         warmup_steps_config = getattr(retrieval_config, "warmup_steps", 5000)
         min_warmup_steps = getattr(retrieval_config, "min_warmup_steps", 0)
+        dynamic_warmup_delay_steps = getattr(retrieval_config, "dynamic_warmup_delay_steps", 4000)
+        max_warmup_steps = getattr(retrieval_config, "max_warmup_steps", 80000)
         
         if warmup_steps_config == -1:
-            if not warmup_finished and len(episode_rewards) > 0 and (total_steps * num_envs >= min_warmup_steps):
-                if check_dynamic_warmup(episode_rewards):
+            current_total_steps = total_steps * num_envs
+            if not warmup_finished and current_total_steps >= max_warmup_steps:
+                warmup_finished = True
+                logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
+                print(colorama.Fore.YELLOW + f"Max warmup steps reached at step {current_total_steps}!" + colorama.Style.RESET_ALL)
+            elif not warmup_finished and current_total_steps >= min_warmup_steps:
+                if dynamic_warmup_met_step == -1 and len(episode_rewards) > 0 and check_dynamic_warmup(episode_rewards):
+                    dynamic_warmup_met_step = current_total_steps
+                    print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps}, waiting {dynamic_warmup_delay_steps} steps..." + colorama.Style.RESET_ALL)
+                
+                if dynamic_warmup_met_step != -1 and current_total_steps >= dynamic_warmup_met_step + dynamic_warmup_delay_steps:
                     warmup_finished = True
-                    logger.log("Retrieval/warmup_ended_at_step", total_steps * num_envs)
-                    print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {total_steps * num_envs}!" + colorama.Style.RESET_ALL)
-            is_retrieval_warmup = not warmup_finished or (total_steps * num_envs < min_warmup_steps)
+                    logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
+                    print(colorama.Fore.YELLOW + f"Dynamic warmup delay finished at step {current_total_steps}!" + colorama.Style.RESET_ALL)
+            is_retrieval_warmup = not warmup_finished
         else:
             is_retrieval_warmup = (total_steps * num_envs) < warmup_steps_config
 
@@ -429,7 +442,7 @@ def build_agent(conf, action_dim):
     ).cuda()
 
 
-def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, episode_rewards_list):
+def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, episode_rewards_list, dynamic_warmup_met_step=-1):
     """Save all training state for resume."""
     os.makedirs(ckpt_dir, exist_ok=True)
 
@@ -446,6 +459,7 @@ def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_step
         'logger_tag_step': copy.deepcopy(logger.tag_step),
         'last_rebuild_step': last_rebuild_step,
         'warmup_finished': warmup_finished,
+        'dynamic_warmup_met_step': dynamic_warmup_met_step,
         'episode_rewards': episode_rewards_list,
         'random_states': {
             'torch': torch.random.get_rng_state(),
@@ -488,9 +502,10 @@ def load_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer):
     logger_tag_step = training_state.get('logger_tag_step', {})
     last_rebuild_step = training_state.get('last_rebuild_step', 0)
     warmup_finished = training_state.get('warmup_finished', False)
+    dynamic_warmup_met_step = training_state.get('dynamic_warmup_met_step', -1)
     episode_rewards = training_state.get('episode_rewards', [])
 
-    return resume_step, logger_tag_step, last_rebuild_step, warmup_finished, episode_rewards
+    return resume_step, logger_tag_step, last_rebuild_step, warmup_finished, episode_rewards, dynamic_warmup_met_step
 
 
 if __name__ == "__main__":
@@ -555,10 +570,11 @@ if __name__ == "__main__":
         resume_step = 0
         resume_last_rebuild_step = None
         warmup_finished_resume = False
+        dynamic_warmup_met_step_resume = -1
         episode_rewards_resume = []
         if args.resume_from:
             print(colorama.Fore.CYAN + f"Resuming from checkpoint: {args.resume_from}" + colorama.Style.RESET_ALL)
-            resume_step, logger_tag_step, resume_last_rebuild_step, warmup_finished_resume, episode_rewards_resume = load_full_checkpoint(
+            resume_step, logger_tag_step, resume_last_rebuild_step, warmup_finished_resume, episode_rewards_resume, dynamic_warmup_met_step_resume = load_full_checkpoint(
                 args.resume_from, world_model, agent, replay_buffer
             )
             logger.tag_step = logger_tag_step
@@ -588,7 +604,8 @@ if __name__ == "__main__":
             resume_step=resume_step,
             resume_last_rebuild_step=resume_last_rebuild_step,
             warmup_finished_resume=warmup_finished_resume,
-            episode_rewards_resume=episode_rewards_resume
+            episode_rewards_resume=episode_rewards_resume,
+            dynamic_warmup_met_step_resume=dynamic_warmup_met_step_resume
         )
 
         print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
