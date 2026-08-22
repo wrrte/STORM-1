@@ -1,0 +1,54 @@
+{
+  "task": "diver_count",
+  "description": "하단 잠수부 개수 분류 (0~6)",
+  "run_name": "Seaquest-life_done-wm_2L512D8H-100k-seed1_X",
+  "step": 100000,
+  "sample_mode": "mode",
+  "overall_accuracy": 99.6039067657464,
+  "best_val_accuracy": 98.04485823106221,
+  "total_frames": 59077,
+  "per_class": {
+    "0": {
+      "total": 39767,
+      "correct": 39724,
+      "accuracy": 99.89187014358639
+    },
+    "1": {
+      "total": 17003,
+      "correct": 16893,
+      "accuracy": 99.35305534317473
+    },
+    "2": {
+      "total": 1374,
+      "correct": 1323,
+      "accuracy": 96.2882096069869
+    },
+    "3": {
+      "total": 260,
+      "correct": 253,
+      "accuracy": 97.3076923076923
+    },
+    "4": {
+      "total": 146,
+      "correct": 142,
+      "accuracy": 97.26027397260275
+    },
+    "5": {
+      "total": 417,
+      "correct": 405,
+      "accuracy": 97.12230215827338
+    },
+    "6": {
+      "total": 110,
+      "correct": 103,
+      "accuracy": 93.63636363636364
+    }
+  },
+  "hyperparams": {
+    "hidden_dim": 256,
+    "epochs": 50,
+    "lr": 0.001,
+    "batch_size": 256,
+    "val_ratio": 0.2
+  }
+}
