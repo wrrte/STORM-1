@@ -1,3 +1,14 @@
+python -u train.py -n "Frostbite-life_done-wm_2L512D8H-100k-seed10" -seed 10 -config_path "config_files/STORM.yaml" -env_name "ALE/Frostbite-v5" -trajectory_path "D_TRAJ/Frostbite.pkl" JointTrainAgent.Retrieval.enable True
+python -u train.py -n "Frostbite-life_done-wm_2L512D8H-100k-seed710" -seed 710 -config_path "config_files/STORM.yaml" -env_name "ALE/Frostbite-v5" -trajectory_path "D_TRAJ/Frostbite.pkl" JointTrainAgent.Retrieval.enable True
+python -u train.py -n "Frostbite-life_done-wm_2L512D8H-100k-seed3710" -seed 3710 -config_path "config_files/STORM.yaml" -env_name "ALE/Frostbite-v5" -trajectory_path "D_TRAJ/Frostbite.pkl" JointTrainAgent.Retrieval.enable True
+
+python -u train.py -n "Qbert-life_done-wm_2L512D8H-100k-seed10" -seed 10 -config_path "config_files/STORM.yaml" -env_name "ALE/Qbert-v5" -trajectory_path "D_TRAJ/Qbert.pkl" JointTrainAgent.Retrieval.enable True
+python -u train.py -n "Qbert-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Qbert-v5" -trajectory_path "D_TRAJ/Qbert.pkl" JointTrainAgent.Retrieval.enable True
+python -u train.py -n "Qbert-life_done-wm_2L512D8H-100k-seed3710" -seed 3710 -config_path "config_files/STORM.yaml" -env_name "ALE/Qbert-v5" -trajectory_path "D_TRAJ/Qbert.pkl" JointTrainAgent.Retrieval.enable True
+
+
+
+
 python -u train.py -n "Alien-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Alien-v5" -trajectory_path "D_TRAJ/Alien.pkl" JointTrainAgent.Retrieval.enable True
 
 python -u train.py -n "Amidar-life_done-wm_2L512D8H-100k-seed1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Amidar-v5" -trajectory_path "D_TRAJ/Amidar.pkl" JointTrainAgent.Retrieval.enable True

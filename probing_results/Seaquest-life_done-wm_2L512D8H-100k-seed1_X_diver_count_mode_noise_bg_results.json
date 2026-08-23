@@ -4,12 +4,12 @@
   "run_name": "Seaquest-life_done-wm_2L512D8H-100k-seed1_X",
   "step": 100000,
   "sample_mode": "mode",
-  "overall_accuracy": 99.52265687154053,
-  "best_val_accuracy": 97.67245027507406,
+  "overall_accuracy": 68.05694263418928,
+  "best_val_accuracy": 67.8628861616589,
   "total_frames": 59077,
   "hyperparams": {
     "hidden_dim": 256,
-    "epochs": 50,
+    "epochs": 200,
     "lr": 0.005,
     "batch_size": 4096,
     "val_ratio": 0.2
@@ -17,38 +17,38 @@
   "per_class": {
     "0": {
       "total": 39767,
-      "correct": 39695,
-      "accuracy": 99.8189453567028
+      "correct": 38535,
+      "accuracy": 96.90195388135892
     },
     "1": {
       "total": 17003,
-      "correct": 16892,
-      "accuracy": 99.34717402811269
+      "correct": 1671,
+      "accuracy": 9.827677468681998
     },
     "2": {
       "total": 1374,
-      "correct": 1316,
-      "accuracy": 95.7787481804949
+      "correct": 0,
+      "accuracy": 0.0
     },
     "3": {
       "total": 260,
-      "correct": 248,
-      "accuracy": 95.38461538461539
+      "correct": 0,
+      "accuracy": 0.0
     },
     "4": {
       "total": 146,
-      "correct": 140,
-      "accuracy": 95.89041095890411
+      "correct": 0,
+      "accuracy": 0.0
     },
     "5": {
       "total": 417,
-      "correct": 404,
-      "accuracy": 96.88249400479616
+      "correct": 0,
+      "accuracy": 0.0
     },
     "6": {
       "total": 110,
-      "correct": 100,
-      "accuracy": 90.9090909090909
+      "correct": 0,
+      "accuracy": 0.0
     }
   }
 }

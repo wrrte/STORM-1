@@ -6,7 +6,7 @@ START_SEED=10
 # Original games list from the training scripts
 # Alien Amidar Assault Asterix BankHeist BattleZone Boxing Breakout ChopperCommand CrazyClimber DemonAttack Frostbite Gopher Hero JamesBond Kangaroo Krull KungFuMaster MsPacman Pong PrivateEye Qbert RoadRunner Seaquest UpNDown
 games=(
-    Alien Amidar Assault Asterix BankHeist BattleZone Boxing Breakout ChopperCommand CrazyClimber DemonAttack Frostbite Gopher Hero JamesBond Kangaroo Krull KungFuMaster MsPacman Pong PrivateEye Qbert RoadRunner Seaquest UpNDown
+    Frostbite Qbert
 )
 
 echo "Populating $QUEUE_FILE with default games..."

@@ -1,0 +1,104 @@
+{
+  "task": "frostbite_igloo",
+  "description": "Frostbite 이글루 단계 분류 (0~16)",
+  "run_name": "Frostbite-life_done-wm_2L512D8H-100k-seed3710",
+  "step": 100000,
+  "sample_mode": "mode",
+  "overall_accuracy": 27.72384034519957,
+  "best_val_accuracy": 27.56756756756757,
+  "total_frames": 1854,
+  "hyperparams": {
+    "hidden_dim": 256,
+    "epochs": 50,
+    "lr": 0.005,
+    "batch_size": 256,
+    "val_ratio": 0.2
+  },
+  "per_class": {
+    "0": {
+      "total": 153,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "1": {
+      "total": 26,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "2": {
+      "total": 25,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "3": {
+      "total": 28,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "4": {
+      "total": 77,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "5": {
+      "total": 54,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "6": {
+      "total": 159,
+      "correct": 1,
+      "accuracy": 0.6289308176100629
+    },
+    "7": {
+      "total": 377,
+      "correct": 285,
+      "accuracy": 75.59681697612731
+    },
+    "8": {
+      "total": 95,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "9": {
+      "total": 91,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "10": {
+      "total": 121,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "11": {
+      "total": 120,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "12": {
+      "total": 47,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "13": {
+      "total": 89,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "14": {
+      "total": 28,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "15": {
+      "total": 70,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "16": {
+      "total": 294,
+      "correct": 228,
+      "accuracy": 77.55102040816327
+    }
+  }
+}

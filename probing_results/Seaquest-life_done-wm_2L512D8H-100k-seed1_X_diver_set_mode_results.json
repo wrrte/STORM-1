@@ -1,0 +1,17 @@
+{
+  "task": "diver_set",
+  "description": "다중 잠수부 집합 예측 (Bipartite Matching)",
+  "run_name": "Seaquest-life_done-wm_2L512D8H-100k-seed1_X",
+  "step": 100000,
+  "sample_mode": "mode",
+  "overall_accuracy": 12.443517193649754,
+  "best_val_accuracy": 14.204481239496426,
+  "total_frames": 59077,
+  "hyperparams": {
+    "hidden_dim": 256,
+    "epochs": 50,
+    "lr": 0.005,
+    "batch_size": 4096,
+    "val_ratio": 0.2
+  }
+}

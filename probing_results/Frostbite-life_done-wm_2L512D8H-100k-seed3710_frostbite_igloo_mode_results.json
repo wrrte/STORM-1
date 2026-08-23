@@ -1,0 +1,104 @@
+{
+  "task": "frostbite_igloo",
+  "description": "Frostbite 이글루 단계 분류 (0~16)",
+  "run_name": "Frostbite-life_done-wm_2L512D8H-100k-seed3710",
+  "step": 100000,
+  "sample_mode": "mode",
+  "overall_accuracy": 99.19093851132686,
+  "best_val_accuracy": 96.75675675675676,
+  "total_frames": 1854,
+  "hyperparams": {
+    "hidden_dim": 256,
+    "epochs": 50,
+    "lr": 0.005,
+    "batch_size": 256,
+    "val_ratio": 0.2
+  },
+  "per_class": {
+    "0": {
+      "total": 153,
+      "correct": 152,
+      "accuracy": 99.34640522875817
+    },
+    "1": {
+      "total": 26,
+      "correct": 25,
+      "accuracy": 96.15384615384616
+    },
+    "2": {
+      "total": 25,
+      "correct": 23,
+      "accuracy": 92.0
+    },
+    "3": {
+      "total": 28,
+      "correct": 28,
+      "accuracy": 100.0
+    },
+    "4": {
+      "total": 77,
+      "correct": 76,
+      "accuracy": 98.7012987012987
+    },
+    "5": {
+      "total": 54,
+      "correct": 54,
+      "accuracy": 100.0
+    },
+    "6": {
+      "total": 159,
+      "correct": 159,
+      "accuracy": 100.0
+    },
+    "7": {
+      "total": 377,
+      "correct": 376,
+      "accuracy": 99.73474801061008
+    },
+    "8": {
+      "total": 95,
+      "correct": 94,
+      "accuracy": 98.94736842105263
+    },
+    "9": {
+      "total": 91,
+      "correct": 90,
+      "accuracy": 98.9010989010989
+    },
+    "10": {
+      "total": 121,
+      "correct": 121,
+      "accuracy": 100.0
+    },
+    "11": {
+      "total": 120,
+      "correct": 118,
+      "accuracy": 98.33333333333333
+    },
+    "12": {
+      "total": 47,
+      "correct": 46,
+      "accuracy": 97.87234042553192
+    },
+    "13": {
+      "total": 89,
+      "correct": 87,
+      "accuracy": 97.75280898876404
+    },
+    "14": {
+      "total": 28,
+      "correct": 26,
+      "accuracy": 92.85714285714286
+    },
+    "15": {
+      "total": 70,
+      "correct": 70,
+      "accuracy": 100.0
+    },
+    "16": {
+      "total": 294,
+      "correct": 294,
+      "accuracy": 100.0
+    }
+  }
+}
