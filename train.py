@@ -292,7 +292,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         
         warmup_steps_config = getattr(retrieval_config, "warmup_steps", 5000)
         min_warmup_steps = getattr(retrieval_config, "min_warmup_steps", 0)
-        dynamic_warmup_delay_steps = getattr(retrieval_config, "dynamic_warmup_delay_steps", 4000)
+        dynamic_warmup_target_steps = getattr(retrieval_config, "dynamic_warmup_target_steps", 68500)
         max_warmup_steps = getattr(retrieval_config, "max_warmup_steps", 80000)
         
         if warmup_steps_config == -1:
@@ -304,12 +304,16 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             elif not warmup_finished and current_total_steps >= min_warmup_steps:
                 if dynamic_warmup_met_step == -1 and len(episode_rewards) > 0 and check_dynamic_warmup(episode_rewards):
                     dynamic_warmup_met_step = current_total_steps
-                    print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps}, waiting {dynamic_warmup_delay_steps} steps..." + colorama.Style.RESET_ALL)
+                    if current_total_steps < dynamic_warmup_target_steps:
+                        wait_steps = dynamic_warmup_target_steps - current_total_steps
+                        print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps}, waiting {wait_steps} steps until target {dynamic_warmup_target_steps}..." + colorama.Style.RESET_ALL)
+                    else:
+                        print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps} (>= target {dynamic_warmup_target_steps}), ending warmup immediately." + colorama.Style.RESET_ALL)
                 
-                if dynamic_warmup_met_step != -1 and current_total_steps >= dynamic_warmup_met_step + dynamic_warmup_delay_steps:
+                if dynamic_warmup_met_step != -1 and current_total_steps >= max(dynamic_warmup_met_step, dynamic_warmup_target_steps):
                     warmup_finished = True
                     logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
-                    print(colorama.Fore.YELLOW + f"Dynamic warmup delay finished at step {current_total_steps}!" + colorama.Style.RESET_ALL)
+                    print(colorama.Fore.YELLOW + f"Dynamic warmup finished at step {current_total_steps}!" + colorama.Style.RESET_ALL)
             is_retrieval_warmup = not warmup_finished
         else:
             is_retrieval_warmup = (total_steps * num_envs) < warmup_steps_config
