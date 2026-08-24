@@ -35,8 +35,8 @@ JointTrainAgent:
     max_pca_samples: 100000
     warmup_steps: -1
     min_warmup_steps: 5000
-    dynamic_warmup_target_steps: 45000
-    max_warmup_steps: 80000
+    dynamic_warmup_target_steps: 50000
+    max_warmup_steps: 90000
     ema_alpha: 0.01
     max_bucket_size: 1000000000
     max_anchors: 16
