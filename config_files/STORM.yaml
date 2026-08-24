@@ -34,7 +34,7 @@ JointTrainAgent:
     use_pca: True
     max_pca_samples: 100000
     warmup_steps: -1
-    min_warmup_steps: 1000
+    min_warmup_steps: 5000
     dynamic_warmup_target_steps: 45000
     max_warmup_steps: 80000
     ema_alpha: 0.01
