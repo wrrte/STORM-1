@@ -190,6 +190,10 @@ def load_config(config_path):
     conf.JointTrainAgent.SaveEverySteps = 0
     conf.JointTrainAgent.UseDemonstration = False
     
+    conf.JointTrainAgent.EvalMode = "final_only"
+    conf.JointTrainAgent.EvalEverySteps = 25000
+    conf.JointTrainAgent.EvalEpisodes = 20
+    
     conf.JointTrainAgent.Retrieval = CN()
     conf.JointTrainAgent.Retrieval.enable = False
     conf.JointTrainAgent.Retrieval.batch_size_reduction = "anchors"

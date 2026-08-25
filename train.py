@@ -165,6 +165,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   imagine_batch_size, imagine_demonstration_batch_size,
                                   imagine_context_length, imagine_batch_length,
                                   save_every_steps, seed, logger,
+                                  eval_mode="final_only", eval_every_steps=25000, eval_episodes=20,
                                   resume_step=0, resume_last_rebuild_step=None,
                                   warmup_finished_resume=False, episode_rewards_resume=None,
                                   dynamic_warmup_met_step_resume=-1):
@@ -419,6 +420,23 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             torch.save(world_model.state_dict(), f"ckpt/{args.n}/world_model_{total_steps}.pth")
             torch.save(agent.state_dict(), f"ckpt/{args.n}/agent_{total_steps}.pth")
 
+        # intermediate evaluation
+        if eval_mode == "active" and total_steps > 0 and total_steps % (eval_every_steps//num_envs) == 0:
+            print(colorama.Fore.GREEN + f"Intermediate evaluation at total steps {total_steps}..." + colorama.Style.RESET_ALL)
+            import eval
+            episode_avg_return, individual_returns = eval.eval_episodes(
+                num_episode=eval_episodes,
+                env_name=env_name,
+                num_envs=min(5, eval_episodes),
+                max_steps=max_steps,
+                image_size=image_size,
+                world_model=world_model,
+                agent=agent
+            )
+            logger.log("eval/episode_avg_return", episode_avg_return)
+            for i, ret in enumerate(individual_returns):
+                logger.log(f"eval/episode_return_{i}", ret)
+
         # flush all buffered wandb metrics for this step
         logger.flush_wandb()
 
@@ -605,6 +623,9 @@ if __name__ == "__main__":
             save_every_steps=conf.JointTrainAgent.SaveEverySteps,
             seed=args.seed,
             logger=logger,
+            eval_mode=conf.JointTrainAgent.EvalMode,
+            eval_every_steps=conf.JointTrainAgent.EvalEverySteps,
+            eval_episodes=conf.JointTrainAgent.EvalEpisodes,
             resume_step=resume_step,
             resume_last_rebuild_step=resume_last_rebuild_step,
             warmup_finished_resume=warmup_finished_resume,
@@ -612,33 +633,36 @@ if __name__ == "__main__":
             dynamic_warmup_met_step_resume=dynamic_warmup_met_step_resume
         )
 
-        print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
-        import eval
-        episode_avg_return, individual_returns = eval.eval_episodes(
-            num_episode=20,
-            env_name=args.env_name,
-            num_envs=5,
-            max_steps=conf.JointTrainAgent.SampleMaxSteps,
-            image_size=conf.BasicSettings.ImageSize,
-            world_model=world_model,
-            agent=agent
-        )
+        if conf.JointTrainAgent.EvalMode in ["active", "final_only"]:
+            print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
+            import eval
+            episode_avg_return, individual_returns = eval.eval_episodes(
+                num_episode=conf.JointTrainAgent.EvalEpisodes,
+                env_name=args.env_name,
+                num_envs=min(5, conf.JointTrainAgent.EvalEpisodes),
+                max_steps=conf.JointTrainAgent.SampleMaxSteps,
+                image_size=conf.BasicSettings.ImageSize,
+                world_model=world_model,
+                agent=agent
+            )
 
-        env_base = args.env_name.split('/')[1].split('-')[0]
-        baseline_score_avg = 0.0
-        try:
-            with open("results/storm.json", "r") as f:
-                storm_results = json.load(f)
-                if env_base in storm_results:
-                    baseline_score_avg = float(np.mean(storm_results[env_base]))
-        except Exception as e:
-            print(f"Failed to load baseline scores for {env_base}: {e}")
+            env_base = args.env_name.split('/')[1].split('-')[0]
+            baseline_score_avg = 0.0
+            try:
+                with open("results/storm.json", "r") as f:
+                    storm_results = json.load(f)
+                    if env_base in storm_results:
+                        baseline_score_avg = float(np.mean(storm_results[env_base]))
+            except Exception as e:
+                print(f"Failed to load baseline scores for {env_base}: {e}")
 
-        logger.log("eval/baseline_score_avg", baseline_score_avg)
-        logger.log("eval/episode_avg_return", episode_avg_return)
-        for i, ret in enumerate(individual_returns):
-            logger.log(f"eval/episode_return_{i}", ret)
-        logger.flush_wandb()
+            logger.log("eval/baseline_score_avg", baseline_score_avg)
+            logger.log("eval/episode_avg_return", episode_avg_return)
+            for i, ret in enumerate(individual_returns):
+                logger.log(f"eval/episode_return_{i}", ret)
+            logger.flush_wandb()
+        else:
+            print(colorama.Fore.YELLOW + f"Skipping final evaluation because EvalMode is {conf.JointTrainAgent.EvalMode}" + colorama.Style.RESET_ALL)
 
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")

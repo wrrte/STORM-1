@@ -22,6 +22,10 @@ JointTrainAgent:
   UseDemonstration: False
   SaveEverySteps: 2500
 
+  EvalMode: "final_only" # "active" for periodic, "inactive" for none, "final_only" for end only
+  EvalEverySteps: 2500
+  EvalEpisodes: 20
+
   Retrieval:
     enable: True
     batch_size_reduction: "retrieved" # "anchors" or "retrieved"
