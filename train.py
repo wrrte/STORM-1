@@ -556,14 +556,14 @@ if __name__ == "__main__":
     if hasattr(conf, "JointTrainAgent") and hasattr(conf.JointTrainAgent, "Retrieval"):
         args.n += "_O" if conf.JointTrainAgent.Retrieval.enable else "_X"
 
-    # EvalMode가 active인 경우 결정론적(deterministic) 환경 강제 설정
-    if conf.JointTrainAgent.EvalMode == "active":
-        print(colorama.Fore.CYAN + "EvalMode is active. Enabling deterministic algorithms and disabling TF32 for reproducibility." + colorama.Style.RESET_ALL)
-        import os
-        os.environ['CUBLAS_WORKSPACE_CONFIG'] = ":4096:8"
-        torch.use_deterministic_algorithms(True)
-        torch.backends.cuda.matmul.allow_tf32 = False
-        torch.backends.cudnn.allow_tf32 = False
+    # # EvalMode가 active인 경우 결정론적(deterministic) 환경 강제 설정
+    # if conf.JointTrainAgent.EvalMode == "active":
+    #     print(colorama.Fore.CYAN + "EvalMode is active. Enabling deterministic algorithms and disabling TF32 for reproducibility." + colorama.Style.RESET_ALL)
+    #     import os
+    #     os.environ['CUBLAS_WORKSPACE_CONFIG'] = ":4096:8"
+    #     torch.use_deterministic_algorithms(True)
+    #     torch.backends.cuda.matmul.allow_tf32 = False
+    #     torch.backends.cudnn.allow_tf32 = False
 
     # set seed
     seed_np_torch(seed=args.seed)
