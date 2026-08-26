@@ -24,7 +24,7 @@ JointTrainAgent:
 
   EvalMode: "final_only" # "active" for periodic, "inactive" for none, "final_only" for end only
   EvalEverySteps: 2500
-  EvalStartStep: 0
+  EvalStartStep: 50000
   EvalEpisodes: 20
 
   Retrieval:
@@ -38,9 +38,9 @@ JointTrainAgent:
     hash_sample_mode: "probs"
     use_pca: True
     max_pca_samples: 100000
-    warmup_steps: 50000
+    warmup_steps: -1
     min_warmup_steps: 5000
-    dynamic_warmup_target_steps: 50000
+    dynamic_warmup_target_steps: 20000
     max_warmup_steps: 90000
     ema_alpha: 0.01
     max_bucket_size: 1000000000
