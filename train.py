@@ -165,7 +165,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   imagine_batch_size, imagine_demonstration_batch_size,
                                   imagine_context_length, imagine_batch_length,
                                   save_every_steps, seed, logger,
-                                  eval_mode="final_only", eval_every_steps=25000, eval_episodes=20,
+                                  eval_mode="final_only", eval_every_steps=25000, eval_episodes=20, eval_start_step=0,
                                   resume_step=0, resume_last_rebuild_step=None,
                                   warmup_finished_resume=False, episode_rewards_resume=None,
                                   dynamic_warmup_met_step_resume=-1):
@@ -421,7 +421,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             torch.save(agent.state_dict(), f"ckpt/{args.n}/agent_{total_steps}.pth")
 
         # intermediate evaluation
-        if eval_mode == "active" and total_steps > 0 and total_steps % (eval_every_steps//num_envs) == 0:
+        if eval_mode == "active" and (total_steps * num_envs) >= eval_start_step and total_steps > 0 and (total_steps * num_envs - eval_start_step) % eval_every_steps == 0:
             print(colorama.Fore.GREEN + f"Intermediate evaluation at total steps {total_steps}..." + colorama.Style.RESET_ALL)
             import eval
             episode_avg_return, individual_returns = eval.eval_episodes(
@@ -626,6 +626,7 @@ if __name__ == "__main__":
             eval_mode=conf.JointTrainAgent.EvalMode,
             eval_every_steps=conf.JointTrainAgent.EvalEverySteps,
             eval_episodes=conf.JointTrainAgent.EvalEpisodes,
+            eval_start_step=getattr(conf.JointTrainAgent, 'EvalStartStep', 0),
             resume_step=resume_step,
             resume_last_rebuild_step=resume_last_rebuild_step,
             warmup_finished_resume=warmup_finished_resume,

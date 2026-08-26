@@ -193,6 +193,7 @@ def load_config(config_path):
     conf.JointTrainAgent.EvalMode = "final_only"
     conf.JointTrainAgent.EvalEverySteps = 25000
     conf.JointTrainAgent.EvalEpisodes = 20
+    conf.JointTrainAgent.EvalStartStep = 0
     
     conf.JointTrainAgent.Retrieval = CN()
     conf.JointTrainAgent.Retrieval.enable = False
