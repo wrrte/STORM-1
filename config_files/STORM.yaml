@@ -38,7 +38,7 @@ JointTrainAgent:
     hash_sample_mode: "probs"
     use_pca: True
     max_pca_samples: 100000
-    warmup_steps: 60000
+    warmup_steps: 40000
     min_warmup_steps: 5000
     dynamic_warmup_target_steps: 20000
     max_warmup_steps: 90000
