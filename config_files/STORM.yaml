@@ -28,7 +28,7 @@ JointTrainAgent:
   EvalEpisodes: 20
 
   Retrieval:
-    enable: True
+    enable: False
     batch_size_reduction: "retrieved" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
     threshold: 1.0
@@ -38,7 +38,7 @@ JointTrainAgent:
     hash_sample_mode: "probs"
     use_pca: True
     max_pca_samples: 100000
-    warmup_steps: 40000
+    warmup_steps: 50000
     min_warmup_steps: 5000
     dynamic_warmup_target_steps: 20000
     max_warmup_steps: 90000

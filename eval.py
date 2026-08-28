@@ -113,6 +113,8 @@ if __name__ == "__main__":
     parser.add_argument("-config_path", type=str, required=True)
     parser.add_argument("-env_name", type=str, required=True)
     parser.add_argument("-run_name", type=str, required=True)
+    parser.add_argument("-eval_all", action="store_true", help="Evaluate all checkpoints")
+    parser.add_argument("-reverse", action="store_true", help="Evaluate checkpoints in reverse order (latest first)")
     args = parser.parse_args()
     conf = load_config(args.config_path)
     print(colorama.Fore.RED + str(args) + colorama.Style.RESET_ALL)
@@ -133,8 +135,23 @@ if __name__ == "__main__":
     pathes = glob.glob(f"{root_path}/world_model_*.pth")
     steps = [int(path.split("_")[-1].split(".")[0]) for path in pathes]
     steps.sort()
-    steps = steps[-1:]
+    if not args.eval_all:
+        steps = steps[-1:]
+    
+    if args.reverse:
+        steps.reverse()
+
     print(steps)
+
+    import datetime
+    timestamp = datetime.datetime.now().strftime("%Y%m%d_%H%M%S")
+    os.makedirs("eval_result", exist_ok=True)
+    csv_path = f"eval_result/{args.run_name}_{timestamp}.csv"
+    print(colorama.Fore.GREEN + f"Results will be saved to: {csv_path}" + colorama.Style.RESET_ALL)
+
+    with open(csv_path, "w") as fout:
+        fout.write("step, episode_avg_return\n")
+
     results = []
     for step in tqdm(steps):
         world_model.load_state_dict(torch.load(f"{root_path}/world_model_{step}.pth"))
@@ -150,7 +167,5 @@ if __name__ == "__main__":
             agent=agent
         )
         results.append([step, episode_avg_return])
-    with open(f"eval_result/{args.run_name}.csv", "w") as fout:
-        fout.write("step, episode_avg_return\n")
-        for step, episode_avg_return in results:
+        with open(csv_path, "a") as fout:
             fout.write(f"{step},{episode_avg_return}\n")
