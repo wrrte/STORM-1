@@ -115,6 +115,8 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
         
         if batch_reduction_mode == "retrieved":
             random_batch_size = max(0, imagine_batch_size - retrieved_count)
+        elif batch_reduction_mode == "half":
+            random_batch_size = max(0, imagine_batch_size - (retrieved_count+num_valid_anchors)//2)
         else:
             random_batch_size = max(0, imagine_batch_size - num_valid_anchors)
     else:
