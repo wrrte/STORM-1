@@ -29,10 +29,10 @@ JointTrainAgent:
 
   Retrieval:
     enable: False
-    batch_size_reduction: "half" # "anchors" or "retrieved"
+    batch_size_reduction: "retrieved" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
     threshold: 1.0
-    z_score_threshold: 3.5
+    z_score_threshold: 3.4
     anchor_offset: -2 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 
     hash_bits: 10
     hash_sample_mode: "probs"

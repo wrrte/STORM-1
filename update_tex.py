@@ -144,7 +144,7 @@ def main():
     for game in games:
         game_df = df[df['Game'] == game]
         c1_row = game_df[game_df['Config'].astype(str) == 'Retrieval 미사용']
-        c2_row = game_df[game_df['Config'].astype(str) == '최신 기법 (EMA 분산 수정) - Warmup: 50000']
+        c2_row = game_df[game_df['Config'].astype(str) == 'Warmup: 50000, BSR: retrieved']
         
         if c1_row.empty or c2_row.empty:
             continue
