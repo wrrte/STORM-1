@@ -71,9 +71,8 @@ def format_table(tex_file_path):
                 row_label = parts[0].strip()
                 is_lower_better = "Optimality Gap" in row_label
                 
-                # We compare Index 4 (target: 1) against Index 3 (Retrieval 미사용)
-                # And we compare Index 5 (target: 16) against Index 3 (Retrieval 미사용)
-                for base_idx, ours_idx in [(3, 4), (3, 5)]:
+                # We compare Index 4 (target: 1), Index 5 (target: 4), Index 6 (target: 16) against Index 3 (Retrieval 미사용)
+                for base_idx, ours_idx in [(3, 4), (3, 5), (3, 6)]:
                     base_str = parts[base_idx].strip()
                     ours_str = parts[ours_idx].replace(r'\\', '').replace('\n', '').strip()
                     
@@ -146,10 +145,12 @@ def main():
         game_df = df[df['Game'] == game]
         c_none_row = game_df[game_df['Config'].astype(str) == 'Retrieval 미사용']
         c_1_row = game_df[game_df['Config'].astype(str) == 'target: 1']
+        c_4_row = game_df[game_df['Config'].astype(str) == 'target: 4']
         c_16_row = game_df[game_df['Config'].astype(str) == 'target: 16']
         
         c_none = c_none_row.iloc[0].to_dict() if not c_none_row.empty else {}
         c_1 = c_1_row.iloc[0].to_dict() if not c_1_row.empty else {}
+        c_4 = c_4_row.iloc[0].to_dict() if not c_4_row.empty else {}
         c_16 = c_16_row.iloc[0].to_dict() if not c_16_row.empty else {}
         
         seeds = [c for c in df.columns if str(c).strip().isdigit()]
@@ -167,8 +168,15 @@ def main():
             for s in seeds:
                 if s in c_1 and s in c_16 and not np.isnan(parse_val(c_1[s])) and not np.isnan(parse_val(c_16[s])):
                     valid_1_16.append(s)
+                    
+        # 3. target: 4 vs target: 16 공통 시드
+        valid_4_16 = []
+        if c_4 and c_16:
+            for s in seeds:
+                if s in c_4 and s in c_16 and not np.isnan(parse_val(c_4[s])) and not np.isnan(parse_val(c_16[s])):
+                    valid_4_16.append(s)
                 
-        if not valid_none_16 and not valid_1_16:
+        if not valid_none_16 and not valid_1_16 and not valid_4_16:
             continue
             
         # 평균 계산
@@ -178,25 +186,33 @@ def main():
         score_16_1 = np.mean([parse_val(c_16[s]) for s in valid_1_16]) if valid_1_16 else np.nan
         score_1 = np.mean([parse_val(c_1[s]) for s in valid_1_16]) if valid_1_16 else np.nan
         
+        score_16_4 = np.mean([parse_val(c_16[s]) for s in valid_4_16]) if valid_4_16 else np.nan
+        score_4 = np.mean([parse_val(c_4[s]) for s in valid_4_16]) if valid_4_16 else np.nan
+        
         # 기준이 되는 target: 16 점수 선택
-        if len(valid_1_16) > len(valid_none_16):
-            base_16 = score_16_1
-        elif len(valid_none_16) >= len(valid_1_16) and len(valid_none_16) > 0:
-            base_16 = score_16_none
-        else:
+        max_len = max(len(valid_none_16), len(valid_1_16), len(valid_4_16))
+        if max_len == 0:
             base_16 = np.nan
+        elif max_len == len(valid_none_16) and len(valid_none_16) > 0:
+            base_16 = score_16_none
+        elif max_len == len(valid_1_16) and len(valid_1_16) > 0:
+            base_16 = score_16_1
+        else:
+            base_16 = score_16_4
             
         # 차이 계산
         diff_none_16 = score_16_none - score_none if valid_none_16 else np.nan
         diff_1_16 = score_16_1 - score_1 if valid_1_16 else np.nan
+        diff_4_16 = score_16_4 - score_4 if valid_4_16 else np.nan
         
         # 절대 점수 도출
         final_16 = base_16
         final_none = base_16 - diff_none_16 if not np.isnan(diff_none_16) else np.nan
         final_1 = base_16 - diff_1_16 if not np.isnan(diff_1_16) else np.nan
+        final_4 = base_16 - diff_4_16 if not np.isnan(diff_4_16) else np.nan
         
-        results[game] = (format_val(final_none), format_val(final_1), format_val(final_16))
-        print(f"[{game}] Seeds(None-16: {len(valid_none_16)}, 1-16: {len(valid_1_16)}) -> None: {results[game][0]}, t:1: {results[game][1]}, t:16: {results[game][2]}")
+        results[game] = (format_val(final_none), format_val(final_1), format_val(final_4), format_val(final_16))
+        print(f"[{game}] Seeds(None-16: {len(valid_none_16)}, 1-16: {len(valid_1_16)}, 4-16: {len(valid_4_16)}) -> None: {results[game][0]}, t:1: {results[game][1]}, t:4: {results[game][2]}, t:16: {results[game][3]}")
 
     tex_path = '../iclr2027_conference.tex'
     if not os.path.exists(tex_path):
@@ -206,7 +222,7 @@ def main():
     with open(tex_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
         
-    hns_dict = {3: [], 4: [], 5: []}
+    hns_dict = {3: [], 4: [], 5: [], 6: []}
     
     # Pass 1: update data rows and calculate HNS
     for i, line in enumerate(lines):
@@ -222,15 +238,17 @@ def main():
             parts = line.split('&')
             if len(parts) >= 9:
                 if game_name in results:
-                    # 표의 3, 4, 5번 인덱스 위치(각각 STORM, STORM+ours, DRAMA)에 결과를 넣습니다.
+                    # 표의 3, 4, 5, 6번 인덱스 위치에 결과를 넣습니다.
                     parts[3] = f" {results[game_name][0]} "
                     parts[4] = f" {results[game_name][1]} "
                     parts[5] = f" {results[game_name][2]} "
+                    parts[6] = f" {results[game_name][3]} "
                 else:
                     # Clear out old ghost values to ensure accurate counting
                     parts[3] = " - "
                     parts[4] = " - "
                     parts[5] = " - "
+                    parts[6] = " - "
                 
                 lines[i] = '&'.join(parts)
                 
@@ -240,8 +258,8 @@ def main():
                 if rand_val is not None and hum_val is not None and (hum_val - rand_val) != 0:
                     denominator = hum_val - rand_val
                     
-                    # 교집합: 3, 4, 5번 열 모두 점수가 존재할 때만 지표 계산에 포함
-                    scores = [extract_float(parts[col]) for col in range(3, 6)]
+                    # 교집합: 3, 4, 5, 6번 열 모두 점수가 존재할 때만 지표 계산에 포함
+                    scores = [extract_float(parts[col]) for col in range(3, 7)]
                     if all(s is not None for s in scores):
                         for idx, score in enumerate(scores):
                             col = 3 + idx
@@ -257,7 +275,7 @@ def main():
         'Optimality Gap': {}
     }
     
-    for col in range(3, 6):
+    for col in range(3, 7):
         arr = hns_dict[col]
         if len(arr) > 0:
             metrics_res['#Superhuman'][col] = sum(1 for x in arr if x > 1.0)
@@ -286,7 +304,7 @@ def main():
         if metric_key:
             parts = line.split('&')
             if len(parts) >= 9:
-                for col in range(3, 6):
+                for col in range(3, 7):
                     val = metrics_res[metric_key][col]
                     if val is not None:
                         if metric_key == '#Superhuman':
@@ -302,10 +320,10 @@ def main():
     with open(tex_path, 'w', encoding='utf-8') as f:
         f.writelines(lines)
         
-    print(f"\nSuccessfully updated {tex_path} with 3 configurations!")
+    print(f"\nSuccessfully updated {tex_path} with 4 configurations!")
     
     format_table(tex_path)
-    print("Table formatting complete! target 1 and target 16 are colored/bolded relative to Retrieval 미사용.")
+    print("Table formatting complete! target 1, target 4 and target 16 are colored/bolded relative to Retrieval 미사용.")
 
 if __name__ == '__main__':
     main()
