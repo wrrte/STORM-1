@@ -1,8 +1,8 @@
 #!/bin/bash
 export CUDA_VISIBLE_DEVICES=7
 
-# Get GPU Name
-GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader -i $CUDA_VISIBLE_DEVICES)
+# Get GPU Name (Physical GPU 8 is mapped to CUDA device 7)
+GPU_NAME=$(nvidia-smi --query-gpu=name --format=csv,noheader -i 7)
 
 # Decide queue file based on GPU name
 if echo "$GPU_NAME" | grep -qi "A6000"; then
