@@ -46,8 +46,8 @@ JointTrainAgent:
     max_bucket_size: 1000000000
     max_anchors: 16
     multiplier: 8
-    target: 8
-    anchor_weight: 0.3
+    target: 12
+    anchor_weight: 0.2
     max_contexts: 256
     global_rebuild_enable: True
     global_rebuild_threshold: 0.06
