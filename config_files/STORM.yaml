@@ -50,7 +50,7 @@ JointTrainAgent:
     anchor_weight: 0.12
     max_contexts: 256
     global_rebuild_enable: True
-    global_rebuild_threshold: 0.06
+    global_rebuild_threshold: 0.12
     global_rebuild_cooldown: 2000
 
 Models:
