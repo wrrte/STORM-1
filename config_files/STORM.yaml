@@ -47,7 +47,7 @@ JointTrainAgent:
     max_anchors: 16
     multiplier: 8
     target: 12
-    anchor_weight: 0.2
+    anchor_weight: 0.12
     max_contexts: 256
     global_rebuild_enable: True
     global_rebuild_threshold: 0.06
