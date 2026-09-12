@@ -45,12 +45,12 @@ JointTrainAgent:
     ema_alpha: 0.01
     max_bucket_size: 1000000000
     max_anchors: 16
-    multiplier: 8
-    target: 12
-    anchor_weight: 0.12
+    multiplier: 16
+    target: 16
+    anchor_weight: 0.0625
     max_contexts: 256
     global_rebuild_enable: True
-    global_rebuild_threshold: 0.12
+    global_rebuild_threshold: 0.06
     global_rebuild_cooldown: 2000
 
 Models:
