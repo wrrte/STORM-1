@@ -3,6 +3,9 @@ import numpy as np
 import re
 import os
 
+# Set to True to clear all score cells before writing updated values.
+RESET_TABLE_VALUES = True
+
 def parse_val(val):
     val = str(val).strip()
     if val == '' or val == 'nan' or val == 'N/A':
@@ -128,6 +131,34 @@ def format_table(tex_file_path):
         f.writelines(new_lines)
 
 
+def reset_table_values(lines):
+    """Replace all game and summary metric values with '-' in the main table."""
+    in_table = False
+    table_header_found = False
+
+    for i, line in enumerate(lines):
+        if r'\begin{tabular}{lrrrrrrrr}' in line:
+            table_header_found = True
+            continue
+
+        if table_header_found and r'\midrule' in line:
+            in_table = True
+            continue
+
+        if in_table and r'\bottomrule' in line:
+            break
+
+        if in_table and '&' in line:
+            parts = line.split('&')
+            if len(parts) >= 9:
+                for col in range(3, 9):
+                    parts[col] = ' - '
+                parts[8] += r' \\' + '\n'
+                lines[i] = '&'.join(parts)
+
+    return lines
+
+
 def main():
     excel_path = 'converted_results.xlsx'
     if not os.path.exists(excel_path):
@@ -176,11 +207,16 @@ def main():
 
     with open(tex_path, 'r', encoding='utf-8') as f:
         lines = f.readlines()
+
+    original_lines = lines.copy()
+    if RESET_TABLE_VALUES:
+        lines = reset_table_values(lines)
         
     hns_dict = {3: [], 4: [], 5: [], 6: [], 7: [], 8: []}
     
-    # Pass 1: update data rows and calculate HNS
-    for i, line in enumerate(lines):
+    # Pass 1: update data rows and calculate HNS. Use the original table values
+    # so resetting the output does not discard the inputs for the metrics.
+    for i, line in enumerate(original_lines):
         if line.strip().startswith(r'\#') or line.strip().startswith('Mean') or line.strip().startswith('Median') or line.strip().startswith('IQM') or line.strip().startswith('Optimality'):
             continue
             
@@ -192,11 +228,12 @@ def main():
                 
             parts = line.split('&')
             if len(parts) >= 9:
+                output_parts = lines[i].split('&') if RESET_TABLE_VALUES else parts.copy()
                 if game_name in results:
-                    parts[3] = f" {results[game_name][0]} "
-                    parts[4] = f" {results[game_name][1]} "
+                    output_parts[3] = f" {results[game_name][0]} "
+                    output_parts[4] = f" {results[game_name][1]} "
                 
-                lines[i] = '&'.join(parts)
+                lines[i] = '&'.join(output_parts)
                 
                 rand_val = extract_float(parts[1])
                 hum_val = extract_float(parts[2])
