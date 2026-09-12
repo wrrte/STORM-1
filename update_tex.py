@@ -177,7 +177,7 @@ def main():
     for game in games:
         game_df = df[df['Game'] == game]
         c1_row = game_df[game_df['Config'].astype(str) == 'Retrieval 미사용']
-        c2_row = game_df[game_df['Config'].astype(str) == 'target: 12 (anchor: 0.12)']
+        c2_row = game_df[game_df['Config'].astype(str) == 'target: 16 (anchor 미설정)']
         
         if c1_row.empty or c2_row.empty:
             continue
