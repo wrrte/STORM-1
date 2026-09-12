@@ -7,11 +7,13 @@ def parse_val(val):
     val = str(val).strip()
     if val == '' or val == 'nan' or val == 'N/A':
         return np.nan
-    if '(' in val:
-        val = val.split('(')[0].strip()
+
+    # convert_csv_to_excel.py stores duplicate runs newest-first in one cell.
+    # Use the first entry, which is therefore the latest result.
+    val = val.split(',')[0].split('(')[0].strip()
     try:
         return float(val)
-    except:
+    except (TypeError, ValueError):
         return np.nan
 
 def format_val(val):
@@ -143,8 +145,8 @@ def main():
     
     for game in games:
         game_df = df[df['Game'] == game]
-        c1_row = game_df[game_df['Config'].astype(str) == 'target: 1']
-        c2_row = game_df[game_df['Config'].astype(str) == 'target: 16']
+        c1_row = game_df[game_df['Config'].astype(str) == 'Retrieval 미사용']
+        c2_row = game_df[game_df['Config'].astype(str) == 'target: 12 (anchor: 0.12)']
         
         if c1_row.empty or c2_row.empty:
             continue
