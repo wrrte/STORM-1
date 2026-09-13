@@ -26,6 +26,10 @@ from sub_models.world_models import WorldModel, MSELoss
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from retrieval import RetrievalContextManager
+from training_branches import (
+    capture_rng_state, launch_training_branches, parse_retrieval_mode, save_final_models,
+    restore_rng_state, split_retrieval_override,
+)
 import pandas as pd
 
 def check_dynamic_warmup(episode_rewards, window_size=20, multiplier=2.6):
@@ -122,16 +126,20 @@ def world_model_imagine_data(replay_buffer: ReplayBuffer,
     else:
         random_batch_size = imagine_batch_size
             
-    sample_obs, sample_action, sample_reward, sample_termination, _, _ = replay_buffer.sample(
-        random_batch_size, imagine_demonstration_batch_size, imagine_context_length)
-        
-    batch_weights = torch.ones(random_batch_size, device="cuda", dtype=torch.float32)
+    if random_batch_size > 0 or imagine_demonstration_batch_size > 0:
+        sample_obs, sample_action, _, _, _, _ = replay_buffer.sample(
+            random_batch_size, imagine_demonstration_batch_size, imagine_context_length)
+        batch_weights = torch.ones(sample_obs.shape[0], device=sample_obs.device, dtype=torch.float32)
+    else:
+        # Retrieval may consume the entire imagination batch.
+        sample_obs, sample_action = ret_obs[:0], ret_action[:0]
+        batch_weights = torch.empty(0, device=ret_obs.device, dtype=torch.float32)
         
     if retrieved_count > 0:
         sample_obs = torch.cat([sample_obs, ret_obs], dim=0)
         sample_action = torch.cat([sample_action, ret_action], dim=0)
         
-        ret_weights = torch.tensor(retrieved_weights, device="cuda", dtype=torch.float32)
+        ret_weights = torch.tensor(retrieved_weights, device=sample_obs.device, dtype=torch.float32)
         batch_weights = torch.cat([batch_weights, ret_weights], dim=0)
         
         logger.log("Retrieval/retrieved_contexts", retrieved_count)
@@ -170,13 +178,16 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   eval_mode="final_only", eval_every_steps=25000, eval_episodes=20, eval_start_step=0,
                                   resume_step=0, resume_last_rebuild_step=None,
                                   warmup_finished_resume=False, episode_rewards_resume=None,
-                                  dynamic_warmup_met_step_resume=-1):
+                                  dynamic_warmup_met_step_resume=-1,
+                                  retrieval_state_resume=None, rng_state_resume=None,
+                                  branch_commands=None):
     # create ckpt dir
     os.makedirs(f"ckpt/{args.n}", exist_ok=True)
 
     # build vec env, not useful in the Atari100k setting
     # but when the max_steps is large, you can use parallel envs to speed up
     vec_env = build_vec_env(env_name, image_size, num_envs=num_envs, seed=seed)
+    vec_env.action_space.seed(seed)
     print("Current env: " + colorama.Fore.YELLOW + f"{env_name}" + colorama.Style.RESET_ALL)
 
     # reset envs and variables
@@ -185,12 +196,13 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     context_obs = deque(maxlen=16)
     context_action = deque(maxlen=16)
     
-    warmup_finished = warmup_finished_resume if resume_step > 0 else False
-    dynamic_warmup_met_step = dynamic_warmup_met_step_resume if resume_step > 0 else -1
-    episode_rewards = deque(episode_rewards_resume, maxlen=200) if resume_step > 0 and episode_rewards_resume else deque(maxlen=200)
+    warmup_finished = warmup_finished_resume
+    dynamic_warmup_met_step = dynamic_warmup_met_step_resume
+    episode_rewards = deque(episode_rewards_resume or [], maxlen=200)
     
     # retrieval setup
-    retrieval_config = getattr(conf.JointTrainAgent, 'Retrieval', {})
+    retrieval_config = conf.JointTrainAgent.Retrieval.clone()
+    retrieval_config.defrost()
     if hasattr(retrieval_config, 'update'): # if it's a dict or omegaconf
         retrieval_config['context_length'] = imagine_context_length
     else: # if it's omegaconf DictConfig, we can set attribute
@@ -198,10 +210,12 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         
     latent_dim = 32 * 32 # CategoricalDim * ClassDim for hashing only the single-frame latent
     retrieval_manager = RetrievalContextManager(num_envs=num_envs, config=retrieval_config, latent_dim=latent_dim)
+    if retrieval_state_resume is not None:
+        retrieval_manager.load_state_dict(retrieval_state_resume)
     is_first_step = np.ones(num_envs, dtype=bool)
 
     # Rebuild retrieval hash buckets if resuming with retrieval enabled
-    if resume_step > 0 and retrieval_manager.enabled and replay_buffer.ready():
+    if resume_step > 0 and retrieval_state_resume is None and retrieval_manager.enabled and replay_buffer.ready():
         print(colorama.Fore.CYAN + "Rebuilding retrieval hash buckets from replay buffer..." + colorama.Style.RESET_ALL)
         retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
 
@@ -215,8 +229,65 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     save_requested = False
     signal_path = f"ckpt/{args.n}/SAVE_SIGNAL"
 
+    # Constructors, environment resets, and optional index rebuilds may consume
+    # randomness. Restore last, so both branches start with the identical state.
+    if rng_state_resume is not None:
+        restore_rng_state(rng_state_resume)
+
     # sample and train
     for total_steps in tqdm(range(resume_step, max_steps//num_envs)):
+        warmup_steps_config = getattr(retrieval_config, "warmup_steps", 5000)
+        min_warmup_steps = getattr(retrieval_config, "min_warmup_steps", 0)
+        dynamic_warmup_target_steps = getattr(retrieval_config, "dynamic_warmup_target_steps", 68500)
+        max_warmup_steps = getattr(retrieval_config, "max_warmup_steps", 80000)
+
+        if warmup_steps_config == -1:
+            current_total_steps = total_steps * num_envs
+            if not warmup_finished and current_total_steps >= max_warmup_steps:
+                warmup_finished = True
+                logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
+                print(colorama.Fore.YELLOW + f"Max warmup steps reached at step {current_total_steps}!" + colorama.Style.RESET_ALL)
+            elif not warmup_finished and current_total_steps >= min_warmup_steps:
+                if dynamic_warmup_met_step == -1 and len(episode_rewards) > 0 and check_dynamic_warmup(episode_rewards):
+                    dynamic_warmup_met_step = current_total_steps
+                    if current_total_steps < dynamic_warmup_target_steps:
+                        wait_steps = dynamic_warmup_target_steps - current_total_steps
+                        print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps}, waiting {wait_steps} steps until target {dynamic_warmup_target_steps}..." + colorama.Style.RESET_ALL)
+                    else:
+                        print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps} (>= target {dynamic_warmup_target_steps}), ending warmup immediately." + colorama.Style.RESET_ALL)
+
+                if dynamic_warmup_met_step != -1 and current_total_steps >= max(dynamic_warmup_met_step, dynamic_warmup_target_steps):
+                    warmup_finished = True
+                    logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
+                    print(colorama.Fore.YELLOW + f"Dynamic warmup finished at step {current_total_steps}!" + colorama.Style.RESET_ALL)
+            is_retrieval_warmup = not warmup_finished
+        else:
+            is_retrieval_warmup = (total_steps * num_envs) < warmup_steps_config
+
+        if branch_commands is not None and not is_retrieval_warmup:
+            # Both branches restart the environment/context at this boundary.
+            # Mark the interrupted episode so replay never bootstraps across it.
+            if len(replay_buffer):
+                replay_buffer.termination_buffer[replay_buffer.last_pointer] = 1
+            ckpt_dir = os.path.abspath(f"ckpt/{args.n}/shared_warmup_{total_steps}")
+            logger.flush_wandb()
+            save_full_checkpoint(
+                ckpt_dir, world_model, agent, replay_buffer, total_steps, logger,
+                last_rebuild_step, True, list(episode_rewards), dynamic_warmup_met_step,
+                retrieval_manager=retrieval_manager, shared_warmup=True,
+            )
+            vec_env.close()
+            logger.writer.close()
+            import wandb
+            wandb.finish()
+            enabled_command, disabled_command = branch_commands
+            launch_training_branches(
+                ckpt_dir,
+                enabled_command + ["--resume_from", ckpt_dir],
+                disabled_command + ["--resume_from", ckpt_dir],
+            )
+            raise RuntimeError("The branch supervisor unexpectedly returned")
+
         # sample part >>>
         if replay_buffer.ready():
             world_model.eval()
@@ -285,42 +356,10 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 pass
             print(colorama.Fore.CYAN + f"[Step {total_steps}] Save signal detected! Will save full checkpoint at next episode termination." + colorama.Style.RESET_ALL)
 
-        if save_requested and done_flag.any():
-            ckpt_dir = f"ckpt/{args.n}/resume_ckpt_{total_steps}"
-            save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, list(episode_rewards), dynamic_warmup_met_step)
-            save_requested = False
         # <<< checkpoint signal detection
 
         # train world model part >>>
         
-        warmup_steps_config = getattr(retrieval_config, "warmup_steps", 5000)
-        min_warmup_steps = getattr(retrieval_config, "min_warmup_steps", 0)
-        dynamic_warmup_target_steps = getattr(retrieval_config, "dynamic_warmup_target_steps", 68500)
-        max_warmup_steps = getattr(retrieval_config, "max_warmup_steps", 80000)
-        
-        if warmup_steps_config == -1:
-            current_total_steps = total_steps * num_envs
-            if not warmup_finished and current_total_steps >= max_warmup_steps:
-                warmup_finished = True
-                logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
-                print(colorama.Fore.YELLOW + f"Max warmup steps reached at step {current_total_steps}!" + colorama.Style.RESET_ALL)
-            elif not warmup_finished and current_total_steps >= min_warmup_steps:
-                if dynamic_warmup_met_step == -1 and len(episode_rewards) > 0 and check_dynamic_warmup(episode_rewards):
-                    dynamic_warmup_met_step = current_total_steps
-                    if current_total_steps < dynamic_warmup_target_steps:
-                        wait_steps = dynamic_warmup_target_steps - current_total_steps
-                        print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps}, waiting {wait_steps} steps until target {dynamic_warmup_target_steps}..." + colorama.Style.RESET_ALL)
-                    else:
-                        print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps} (>= target {dynamic_warmup_target_steps}), ending warmup immediately." + colorama.Style.RESET_ALL)
-                
-                if dynamic_warmup_met_step != -1 and current_total_steps >= max(dynamic_warmup_met_step, dynamic_warmup_target_steps):
-                    warmup_finished = True
-                    logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
-                    print(colorama.Fore.YELLOW + f"Dynamic warmup finished at step {current_total_steps}!" + colorama.Style.RESET_ALL)
-            is_retrieval_warmup = not warmup_finished
-        else:
-            is_retrieval_warmup = (total_steps * num_envs) < warmup_steps_config
-
         if replay_buffer.ready() and total_steps % (train_dynamics_every_steps//num_envs) == 0:
 
             num_trig = train_world_model_step(
@@ -442,6 +481,17 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         # flush all buffered wandb metrics for this step
         logger.flush_wandb()
 
+        if save_requested and done_flag.any():
+            # Resume starts at the next collection/update iteration.
+            next_step = total_steps + 1
+            ckpt_dir = f"ckpt/{args.n}/resume_ckpt_{next_step}"
+            save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, next_step, logger, last_rebuild_step, warmup_finished, list(episode_rewards), dynamic_warmup_met_step, retrieval_manager=retrieval_manager)
+            save_requested = False
+
+    vec_env.close()
+    if branch_commands is None:
+        save_final_models(f"ckpt/{args.n}", world_model, agent, max_steps // num_envs)
+
 
 def build_world_model(conf, action_dim):
     return WorldModel(
@@ -466,7 +516,7 @@ def build_agent(conf, action_dim):
     ).cuda()
 
 
-def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, episode_rewards_list, dynamic_warmup_met_step=-1):
+def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, episode_rewards_list, dynamic_warmup_met_step=-1, retrieval_manager=None, shared_warmup=False):
     """Save all training state for resume."""
     os.makedirs(ckpt_dir, exist_ok=True)
 
@@ -485,12 +535,10 @@ def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_step
         'warmup_finished': warmup_finished,
         'dynamic_warmup_met_step': dynamic_warmup_met_step,
         'episode_rewards': episode_rewards_list,
-        'random_states': {
-            'torch': torch.random.get_rng_state(),
-            'cuda': torch.cuda.get_rng_state(),
-            'numpy': np.random.get_state(),
-            'python': random.getstate(),
-        },
+        'random_states': capture_rng_state(),
+        'retrieval_state': retrieval_manager.state_dict() if retrieval_manager is not None else None,
+        'shared_warmup': shared_warmup,
+        'shared_warmup_logdir': os.path.abspath(f"runs/{args.n}") if shared_warmup else None,
     }
 
     torch.save(training_state, os.path.join(ckpt_dir, 'training_state.pt'))
@@ -501,7 +549,7 @@ def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_step
 
 def load_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer):
     """Load all training state for resume."""
-    training_state = torch.load(os.path.join(ckpt_dir, 'training_state.pt'), map_location='cuda', weights_only=False)
+    training_state = torch.load(os.path.join(ckpt_dir, 'training_state.pt'), map_location='cpu', weights_only=False)
 
     world_model.load_state_dict(training_state['world_model_state_dict'])
     agent.load_state_dict(training_state['agent_state_dict'])
@@ -512,15 +560,16 @@ def load_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer):
 
     agent.lowerbound_ema.scalar = training_state['agent_lowerbound_ema_scalar']
     agent.upperbound_ema.scalar = training_state['agent_upperbound_ema_scalar']
+    if isinstance(agent.lowerbound_ema.scalar, torch.Tensor):
+        agent.lowerbound_ema.scalar = agent.lowerbound_ema.scalar.cuda()
+    if isinstance(agent.upperbound_ema.scalar, torch.Tensor):
+        agent.upperbound_ema.scalar = agent.upperbound_ema.scalar.cuda()
 
     replay_buffer.load_state(ckpt_dir)
 
-    # Restore random states (RNG tensors must be on CPU for set_rng_state)
+    # Restored again after environment and retrieval construction in the loop.
     random_states = training_state['random_states']
-    torch.random.set_rng_state(random_states['torch'].cpu())
-    torch.cuda.set_rng_state(random_states['cuda'].cpu())
-    np.random.set_state(random_states['numpy'])
-    random.setstate(random_states['python'])
+    restore_rng_state(random_states)
 
     resume_step = training_state['total_steps']
     logger_tag_step = training_state.get('logger_tag_step', {})
@@ -529,7 +578,10 @@ def load_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer):
     dynamic_warmup_met_step = training_state.get('dynamic_warmup_met_step', -1)
     episode_rewards = training_state.get('episode_rewards', [])
 
-    return resume_step, logger_tag_step, last_rebuild_step, warmup_finished, episode_rewards, dynamic_warmup_met_step
+    return (resume_step, logger_tag_step, last_rebuild_step, warmup_finished,
+            episode_rewards, dynamic_warmup_met_step,
+            training_state.get('retrieval_state'), random_states,
+            training_state.get('shared_warmup_logdir'))
 
 
 if __name__ == "__main__":
@@ -547,16 +599,39 @@ if __name__ == "__main__":
     parser.add_argument("-env_name", type=str, required=True)
     parser.add_argument("-trajectory_path", type=str, required=True)
     parser.add_argument("--resume_from", type=str, default=None, help="Path to resume checkpoint directory")
+    parser.add_argument("--branch_mode", choices=("true", "false"), default=None, help=argparse.SUPPRESS)
     args, extra_args = parser.parse_known_args()
     conf = load_config(args.config_path)
-    if extra_args:
-        conf.defrost()
-        conf.merge_from_list(extra_args)
-        conf.freeze()
+    remaining_overrides, retrieval_override = split_retrieval_override(
+        extra_args, "JointTrainAgent.Retrieval.enable")
+    conf.defrost()
+    if remaining_overrides:
+        conf.merge_from_list(remaining_overrides)
+    retrieval_mode = parse_retrieval_mode(
+        retrieval_override if retrieval_override is not None else conf.JointTrainAgent.Retrieval.enable)
+    if args.branch_mode is not None:
+        retrieval_mode = parse_retrieval_mode(args.branch_mode)
+    conf.JointTrainAgent.Retrieval.enable = retrieval_mode
+    conf.freeze()
     print(colorama.Fore.RED + str(args) + " extra: " + str(extra_args) + colorama.Style.RESET_ALL)
 
-    if hasattr(conf, "JointTrainAgent") and hasattr(conf.JointTrainAgent, "Retrieval"):
-        args.n += "_O" if conf.JointTrainAgent.Retrieval.enable else "_X"
+    branch_commands = None
+    if retrieval_mode == "Both":
+        warmup_steps = conf.JointTrainAgent.Retrieval.warmup_steps
+        if warmup_steps < -1 or warmup_steps >= conf.JointTrainAgent.SampleMaxSteps:
+            raise ValueError("Both requires -1 (dynamic) or 0 <= Retrieval.warmup_steps < SampleMaxSteps")
+        common_command = [
+            sys.executable, os.path.abspath(__file__),
+            "-n", args.n, "-seed", str(args.seed),
+            "-config_path", os.path.abspath(f"runs/{args.n}_Both/config.yaml"),
+            "-env_name", args.env_name,
+            "-trajectory_path", os.path.abspath(args.trajectory_path),
+        ] + extra_args
+        branch_commands = (common_command + ["--branch_mode", "true"],
+                           common_command + ["--branch_mode", "false"])
+        args.n += "_Both"
+    else:
+        args.n += "_O" if retrieval_mode else "_X"
 
     # # EvalMode가 active인 경우 결정론적(deterministic) 환경 강제 설정
     # if conf.JointTrainAgent.EvalMode == "active":
@@ -571,14 +646,16 @@ if __name__ == "__main__":
     seed_np_torch(seed=args.seed)
     # tensorboard writer
     logger = Logger(path=f"runs/{args.n}", config=conf, seed=args.seed)
-    # copy config file
-    shutil.copy(args.config_path, f"runs/{args.n}/config.yaml")
+    # Save the effective config, including branch mode and CLI overrides.
+    with open(f"runs/{args.n}/config.yaml", "w") as config_file:
+        config_file.write(conf.dump())
 
     # distinguish between tasks, other debugging options are removed for simplicity
     if conf.Task == "JointTrainAgent":
         # getting action_dim with dummy env
         dummy_env = build_single_env(args.env_name, conf.BasicSettings.ImageSize, seed=0)
         action_dim = dummy_env.action_space.n
+        dummy_env.close()
 
         # build world model and agent
         world_model = build_world_model(conf, action_dim)
@@ -604,12 +681,22 @@ if __name__ == "__main__":
         warmup_finished_resume = False
         dynamic_warmup_met_step_resume = -1
         episode_rewards_resume = []
+        retrieval_state_resume = None
+        rng_state_resume = None
         if args.resume_from:
             print(colorama.Fore.CYAN + f"Resuming from checkpoint: {args.resume_from}" + colorama.Style.RESET_ALL)
-            resume_step, logger_tag_step, resume_last_rebuild_step, warmup_finished_resume, episode_rewards_resume, dynamic_warmup_met_step_resume = load_full_checkpoint(
+            (resume_step, logger_tag_step, resume_last_rebuild_step,
+             warmup_finished_resume, episode_rewards_resume, dynamic_warmup_met_step_resume,
+             retrieval_state_resume, rng_state_resume, shared_warmup_logdir) = load_full_checkpoint(
                 args.resume_from, world_model, agent, replay_buffer
             )
             logger.tag_step = logger_tag_step
+            if shared_warmup_logdir:
+                with open(f"runs/{args.n}/shared_warmup.json", "w") as shared_info:
+                    json.dump({"checkpoint_dir": os.path.abspath(args.resume_from),
+                               "warmup_logdir": shared_warmup_logdir,
+                               "resume_step": resume_step,
+                               "environment_reset_at_branch": True}, shared_info, indent=2)
             print(colorama.Fore.CYAN + f"Resumed from step {resume_step}, replay buffer length: {len(replay_buffer)}" + colorama.Style.RESET_ALL)
 
         # train
@@ -641,8 +728,14 @@ if __name__ == "__main__":
             resume_last_rebuild_step=resume_last_rebuild_step,
             warmup_finished_resume=warmup_finished_resume,
             episode_rewards_resume=episode_rewards_resume,
-            dynamic_warmup_met_step_resume=dynamic_warmup_met_step_resume
+            dynamic_warmup_met_step_resume=dynamic_warmup_met_step_resume,
+            retrieval_state_resume=retrieval_state_resume,
+            rng_state_resume=rng_state_resume,
+            branch_commands=branch_commands,
         )
+
+        if branch_commands is not None:
+            raise RuntimeError("Dynamic retrieval warmup did not finish before SampleMaxSteps; no branches were started")
 
         if conf.JointTrainAgent.EvalMode in ["active", "final_only"]:
             print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
@@ -677,3 +770,9 @@ if __name__ == "__main__":
 
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")
+
+    # A sequential Both run starts True only after False's logs have been flushed.
+    logger.flush_wandb()
+    logger.writer.close()
+    import wandb
+    wandb.finish()
