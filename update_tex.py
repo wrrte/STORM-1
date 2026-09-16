@@ -1,170 +1,208 @@
-import pandas as pd
-import numpy as np
+import argparse
 import re
-import os
+from decimal import Decimal
+from pathlib import Path
 
-# Set to True to clear all score cells before writing updated values.
+import numpy as np
+import pandas as pd
+
+# Reset only this method's score and delta cells before updating.
 RESET_TABLE_VALUES = True
+BASE_COLUMN = 3
+OURS_COLUMN = 4
+DELTA_COLUMN = 5
 
-def parse_val(val):
-    val = str(val).strip()
-    if val == '' or val == 'nan' or val == 'N/A':
+
+def parse_val(value):
+    value = str(value).strip()
+    if value.lower() in {"", "nan", "n/a", "na", "none", "running"}:
         return np.nan
-
-    # convert_csv_to_excel.py stores duplicate runs newest-first in one cell.
-    # Use the first entry, which is therefore the latest result.
-    val = val.split(',')[0].split('(')[0].strip()
+    value = value.split(",")[0].split("(")[0].strip()
     try:
-        return float(val)
+        return float(value)
     except (TypeError, ValueError):
         return np.nan
 
-def format_val(val):
-    if np.isnan(val): return "-"
-    if val.is_integer():
-        return str(int(val))
-    return f"{val:.1f}"
 
-def extract_float(s):
-    match = re.search(r'-?\d+\.?\d*', str(s).replace(',', ''))
-    if match:
-        return float(match.group(0))
-    return None
+def format_val(value):
+    if np.isnan(value):
+        return "-"
+    if value.is_integer():
+        return str(int(value))
+    return f"{value:.1f}"
 
-def calc_iqm(arr):
-    if not arr: return np.nan
-    arr = np.sort(arr)
-    n = len(arr)
-    low = int(n * 0.25)
-    high = n - low
-    trimmed = arr[low:high]
-    return np.mean(trimmed) if len(trimmed) > 0 else np.nan
 
-def format_table(tex_file_path):
-    with open(tex_file_path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
+def extract_float(value):
+    match = re.search(r"-?\d+\.?\d*", str(value).replace(",", ""))
+    return float(match.group(0)) if match else None
 
-    def extract_number_str(cell_str):
-        match = re.search(r'-?\d+\.?\d*', cell_str)
-        if match:
-            return match.group(0)
-        return None
 
-    new_lines = []
-    in_table = False
-    table_header_found = False
+def calc_iqm(values):
+    if not values:
+        return np.nan
+    values = np.sort(values)
+    trim = int(len(values) * 0.25)
+    trimmed = values[trim:len(values) - trim]
+    return np.mean(trimmed) if len(trimmed) else np.nan
 
-    for line in lines:
-        if r'\begin{tabular}{lrrrrrrrr}' in line:
-            table_header_found = True
-            new_lines.append(line)
+
+def main_table_rows(lines):
+    """Return only data rows belonging to tab:main_performance."""
+    label_index = next(
+        (index for index, line in enumerate(lines) if r"\label{tab:main_performance}" in line
+         and not line.lstrip().startswith("%")),
+        None,
+    )
+    if label_index is None:
+        raise ValueError("Could not find tab:main_performance.")
+
+    expected_header = [
+        "Game", "Random", "Human", "STORM", "STORM+ours", r"$\Delta$",
+        "DRAMA", "DRAMA+ours", r"$\Delta$",
+    ]
+    rows = []
+    header_found = False
+    for index in range(label_index + 1, len(lines)):
+        line = lines[index]
+        if line.lstrip().startswith("%"):
             continue
-        
-        if table_header_found and r'\midrule' in line:
-            in_table = True
-            new_lines.append(line)
-            continue
-        
-        if in_table and r'\bottomrule' in line:
-            in_table = False
-            new_lines.append(line)
-            continue
-            
-        if in_table and '&' in line:
-            parts = line.split('&')
-            if len(parts) >= 9:
-                row_label = parts[0].strip()
-                is_lower_better = "Optimality Gap" in row_label
-                
-                # Columns 3,5,7 are Base. Columns 4,6,8 are +ours. (0-indexed)
-                for base_idx, ours_idx in [(3, 4), (5, 6), (7, 8)]:
-                    base_str = parts[base_idx].strip()
-                    ours_str = parts[ours_idx].replace(r'\\', '').replace('\n', '').strip()
-                    
-                    base_num_str = extract_number_str(base_str)
-                    ours_num_str = extract_number_str(ours_str)
-                    
-                    if base_num_str is not None and ours_num_str is not None:
-                        base_val = float(base_num_str)
-                        ours_val = float(ours_num_str)
-                        
-                        if base_val == 0:
-                            if ours_val > 0: diff_pct = float('inf')
-                            elif ours_val < 0: diff_pct = float('-inf')
-                            else: diff_pct = 0.0
-                        else:
-                            diff_pct = ((ours_val - base_val) / abs(base_val)) * 100
-                            
-                        # Determine color
-                        if is_lower_better:
-                            if diff_pct < 0: color = "blue"
-                            elif diff_pct > 0: color = "red"
-                            else: color = "black"
-                        else:
-                            if diff_pct > 0: color = "blue"
-                            elif diff_pct < 0: color = "red"
-                            else: color = "black"
-                            
-                        # Color and bold the number itself
-                        if color != "black":
-                            if abs(diff_pct) >= 15.0:
-                                formatted_ours = f"\\textcolor{{{color}}}{{\\textbf{{{ours_num_str}}}}}"
-                            else:
-                                formatted_ours = f"\\textcolor{{{color}}}{{{ours_num_str}}}"
-                        else:
-                            formatted_ours = ours_num_str
-                            
-                        # Maintain newline and \\ for the last column
-                        if ours_idx == 8:
-                            parts[ours_idx] = f" {formatted_ours} \\\\\n"
-                        else:
-                            parts[ours_idx] = f" {formatted_ours} "
-                
-                new_line = "&".join(parts)
-                new_lines.append(new_line)
-            else:
-                new_lines.append(line)
-        else:
-            new_lines.append(line)
-
-    with open(tex_file_path, 'w', encoding='utf-8') as f:
-        f.writelines(new_lines)
-
-
-def reset_table_values(lines):
-    """Replace all game and summary metric values with '-' in the main table."""
-    in_table = False
-    table_header_found = False
-
-    for i, line in enumerate(lines):
-        if r'\begin{tabular}{lrrrrrrrr}' in line:
-            table_header_found = True
-            continue
-
-        if table_header_found and r'\midrule' in line:
-            in_table = True
-            continue
-
-        if in_table and r'\bottomrule' in line:
+        if any(marker in line for marker in (r"\bottomrule", r"\end{tabular}", r"\end{table}")):
+            if header_found:
+                return rows
             break
+        if "&" not in line:
+            continue
+        body, separator, tail = line.partition(r"\\")
+        parts = body.split("&")
+        if parts[0].strip() == "Game":
+            if [part.strip() for part in parts] != expected_header:
+                raise ValueError("Unexpected column layout in tab:main_performance.")
+            header_found = True
+        elif header_found:
+            if len(parts) != len(expected_header) or not separator:
+                raise ValueError(f"Malformed main performance row at line {index + 1}.")
+            rows.append((index, parts, separator + tail))
 
-        if in_table and '&' in line:
-            parts = line.split('&')
-            if len(parts) >= 9:
-                for col in range(3, 9):
-                    parts[col] = ' - '
-                parts[8] += r' \\' + '\n'
-                lines[i] = '&'.join(parts)
+    raise ValueError("Could not find the main performance table header and end.")
 
+
+def number_text(cell):
+    # Remove color specifications before extracting numbers (e.g. green!50!black).
+    cell = re.sub(r"\\textcolor\{[^{}]*\}", "", cell)
+    match = re.search(r"[+-]?\d+(?:\.\d+)?", cell.replace(",", ""))
+    return match.group(0) if match else None
+
+
+def metric_name(label):
+    label = label.strip().lstrip("\\")
+    return next(
+        (name for name in ("#Superhuman", "Mean", "Median", "IQM", "Optimality Gap")
+         if label.startswith(name)),
+        None,
+    )
+
+
+def format_delta(base_text, ours_text, metric):
+    if base_text is None or ours_text is None:
+        return "-"
+    # Subtract displayed decimal values exactly so delta agrees with the table.
+    delta = Decimal(ours_text) - Decimal(base_text)
+    if metric and metric != "#Superhuman":
+        text = f"{delta:.3f}"
+    else:
+        text = format(delta, "f")
+        if "." in text:
+            text = text.rstrip("0").rstrip(".")
+    if delta == 0:
+        return text.lstrip("-")
+    if delta > 0:
+        text = "+" + text
+    # The color reflects the sign, including for Optimality Gap.
+    color = "green" if delta > 0 else "red"
+    return f"\\textcolor{{{color}}}{{{text}}}"
+
+
+def reset_values(lines):
+    """Clear only this method's baseline, +ours, and delta cells."""
+    for index, parts, ending in main_table_rows(lines):
+        for column in (BASE_COLUMN, OURS_COLUMN, DELTA_COLUMN):
+            parts[column] = " - "
+        lines[index] = "&".join(parts) + ending
     return lines
 
 
-def main():
-    excel_path = 'converted_results.xlsx'
-    if not os.path.exists(excel_path):
-        print(f"Error: {excel_path} not found.")
-        return
-        
+def format_values(lines):
+    for index, parts, ending in main_table_rows(lines):
+        base_text = number_text(parts[BASE_COLUMN])
+        ours_text = number_text(parts[OURS_COLUMN])
+        parts[OURS_COLUMN] = f" {ours_text if ours_text is not None else '-'} "
+        delta = format_delta(base_text, ours_text, metric_name(parts[0]))
+        parts[DELTA_COLUMN] = f" {delta} "
+        lines[index] = "&".join(parts) + ending
+    return lines
+
+
+def update_table(lines, results, reset=True):
+    lines = reset_values(lines.copy()) if reset else lines.copy()
+    hns_values = {BASE_COLUMN: [], OURS_COLUMN: []}
+    for index, parts, ending in main_table_rows(lines):
+        if metric_name(parts[0]):
+            continue
+        game = parts[0].strip()
+        if game in results:
+            parts[BASE_COLUMN] = f" {results[game][0]} "
+            parts[OURS_COLUMN] = f" {results[game][1]} "
+        lines[index] = "&".join(parts) + ending
+
+        random_value = extract_float(parts[1])
+        human_value = extract_float(parts[2])
+        if random_value is None or human_value is None or human_value == random_value:
+            continue
+        # Use the updated scores, never the previous table or delta columns.
+        for column in (BASE_COLUMN, OURS_COLUMN):
+            score_text = number_text(parts[column])
+            if score_text is not None:
+                hns_values[column].append(
+                    (float(score_text) - random_value) / (human_value - random_value)
+                )
+
+    metrics = {"#Superhuman": {}, "Mean": {}, "Median": {}, "IQM": {}, "Optimality Gap": {}}
+    for column, values in hns_values.items():
+        metrics["#Superhuman"][column] = sum(value > 1.0 for value in values) if values else np.nan
+        metrics["Mean"][column] = np.mean(values) if values else np.nan
+        metrics["Median"][column] = np.median(values) if values else np.nan
+        metrics["IQM"][column] = calc_iqm(values)
+        metrics["Optimality Gap"][column] = (
+            np.mean([max(0.0, 1.0 - value) for value in values]) if values else np.nan
+        )
+
+    for index, parts, ending in main_table_rows(lines):
+        metric = metric_name(parts[0])
+        if metric is None:
+            continue
+        for column in (BASE_COLUMN, OURS_COLUMN):
+            value = metrics[metric][column]
+            formatted = "-" if np.isnan(value) else (
+                str(int(value)) if metric == "#Superhuman" else f"{value:.3f}"
+            )
+            parts[column] = f" {formatted} "
+        lines[index] = "&".join(parts) + ending
+
+    return format_values(lines)
+
+
+def reset_table_values(lines):
+    return reset_values(lines)
+
+
+def format_table(tex_path):
+    with open(tex_path, encoding="utf-8") as tex_file:
+        lines = format_values(tex_file.readlines())
+    with open(tex_path, "w", encoding="utf-8") as tex_file:
+        tex_file.writelines(lines)
+
+
+def load_results(excel_path):
     df = pd.read_excel(excel_path, sheet_name='Results', index_col=[0, 1])
     df = df.reset_index()
     
@@ -199,114 +237,31 @@ def main():
             v2_mean = np.mean([parse_val(c2[s]) for s in valid_seeds])
             results[game] = (format_val(v1_mean), format_val(v2_mean))
             print(f"[{game}] Common seeds: {valid_seeds} -> STORM: {results[game][0]}, STORM+ours: {results[game][1]}")
+    return results
 
-    tex_path = '../iclr2027_conference.tex'
-    if not os.path.exists(tex_path):
-        print(f"Error: {tex_path} not found.")
-        return
 
-    with open(tex_path, 'r', encoding='utf-8') as f:
-        lines = f.readlines()
+def main():
+    parser = argparse.ArgumentParser(
+        description="Update STORM scores and deltas in the main performance table."
+    )
+    script_dir = Path(__file__).resolve().parent
+    parser.add_argument("--excel", type=Path, default=script_dir / "converted_results.xlsx")
+    parser.add_argument("--tex", type=Path, default=script_dir.parent / "iclr2027_conference.tex")
+    args = parser.parse_args()
 
-    original_lines = lines.copy()
-    if RESET_TABLE_VALUES:
-        lines = reset_table_values(lines)
-        
-    hns_dict = {3: [], 4: [], 5: [], 6: [], 7: [], 8: []}
-    
-    # Pass 1: update data rows and calculate HNS. Use the original table values
-    # so resetting the output does not discard the inputs for the metrics.
-    for i, line in enumerate(original_lines):
-        if line.strip().startswith(r'\#') or line.strip().startswith('Mean') or line.strip().startswith('Median') or line.strip().startswith('IQM') or line.strip().startswith('Optimality'):
-            continue
-            
-        match = re.match(r'^([A-Za-z]+)\s*&', line)
-        if match:
-            game_name = match.group(1)
-            if game_name == 'Game':
-                continue
-                
-            parts = line.split('&')
-            if len(parts) >= 9:
-                output_parts = lines[i].split('&') if RESET_TABLE_VALUES else parts.copy()
-                if game_name in results:
-                    output_parts[3] = f" {results[game_name][0]} "
-                    output_parts[4] = f" {results[game_name][1]} "
-                
-                lines[i] = '&'.join(output_parts)
-                
-                rand_val = extract_float(parts[1])
-                hum_val = extract_float(parts[2])
-                
-                if rand_val is not None and hum_val is not None and (hum_val - rand_val) != 0:
-                    denominator = hum_val - rand_val
-                    for col in range(3, 9):
-                        score = extract_float(parts[col])
-                        if score is not None:
-                            hns = (score - rand_val) / denominator
-                            hns_dict[col].append(hns)
-                            
-    # Calculate metrics
-    metrics_res = {
-        '#Superhuman': {},
-        'Mean': {},
-        'Median': {},
-        'IQM': {},
-        'Optimality Gap': {}
-    }
-    
-    for col in range(3, 9):
-        arr = hns_dict[col]
-        if len(arr) > 0:
-            metrics_res['#Superhuman'][col] = sum(1 for x in arr if x > 1.0)
-            metrics_res['Mean'][col] = np.mean(arr)
-            metrics_res['Median'][col] = np.median(arr)
-            metrics_res['IQM'][col] = calc_iqm(arr)
-            metrics_res['Optimality Gap'][col] = np.mean([max(0.0, 1.0 - x) for x in arr])
-        else:
-            for k in metrics_res:
-                metrics_res[k][col] = None
-                
-    # Pass 2: Write metrics to table
-    for i, line in enumerate(lines):
-        metric_key = None
-        if line.strip().startswith(r'\#Superhuman'):
-            metric_key = '#Superhuman'
-        elif line.strip().startswith('Mean'):
-            metric_key = 'Mean'
-        elif line.strip().startswith('Median'):
-            metric_key = 'Median'
-        elif line.strip().startswith('IQM'):
-            metric_key = 'IQM'
-        elif line.strip().startswith('Optimality Gap'):
-            metric_key = 'Optimality Gap'
-            
-        if metric_key:
-            parts = line.split('&')
-            if len(parts) >= 9:
-                for col in range(3, 9):
-                    val = metrics_res[metric_key][col]
-                    if val is not None:
-                        if metric_key == '#Superhuman':
-                            formatted = f" {int(val)} "
-                        else:
-                            formatted = f" {val:.3f} "
-                    else:
-                        formatted = " - "
-                        
-                    if col == 8:
-                        parts[col] = formatted + " \\\\\n"
-                    else:
-                        parts[col] = formatted + " "
-                lines[i] = '&'.join(parts)
+    if not args.excel.exists():
+        raise FileNotFoundError(f"Excel file not found: {args.excel}")
+    if not args.tex.exists():
+        raise FileNotFoundError(f"TeX file not found: {args.tex}")
 
-    with open(tex_path, 'w', encoding='utf-8') as f:
-        f.writelines(lines)
-        
-    print(f"\nSuccessfully updated {tex_path} with matching seed averages and calculated metrics!")
-    
-    format_table(tex_path)
-    print("Table formatting complete! Only the scores are colored/bolded now.")
+    results = load_results(args.excel)
+    with args.tex.open(encoding="utf-8") as tex_file:
+        lines = tex_file.readlines()
+    lines = update_table(lines, results, reset=RESET_TABLE_VALUES)
+    with args.tex.open("w", encoding="utf-8") as tex_file:
+        tex_file.writelines(lines)
+    print(f"Successfully updated {args.tex} with STORM scores, metrics, and deltas.")
 
-if __name__ == '__main__':
+
+if __name__ == "__main__":
     main()
