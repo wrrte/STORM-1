@@ -20,10 +20,10 @@ JointTrainAgent:
   TrainDynamicsEverySteps: 1
   TrainAgentEverySteps: 1
   UseDemonstration: False
-  SaveEverySteps: 2500
+  SaveEverySteps: 50000
 
   EvalMode: "final_only" # "active" for periodic, "inactive" for none, "final_only" for end only
-  EvalEverySteps: 2500
+  EvalEverySteps: 50000
   EvalStartStep: 0
   EvalEpisodes: 20
 

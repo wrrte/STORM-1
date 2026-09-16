@@ -1,0 +1,61 @@
+{
+  "task": "diver_count",
+  "description": "하단 잠수부 개수 분류 (0~6)",
+  "run_name": "Seaquest-life_done-wm_2L512D8H-100k-seed1_X",
+  "step": 100000,
+  "sample_mode": "mode",
+  "seed": 42,
+  "data_path": "probing_data/Seaquest-life_done-wm_2L512D8H-100k-seed1_X_probing.npz",
+  "demo_path": "probing_data/Seaquest_20260822_133245.npz",
+  "noise_strength": 0.8,
+  "noise_seed": 42,
+  "noise_method": "background_blend_uniform_uint8",
+  "noise_applied_to": "train_validation_and_full_dataset_evaluation",
+  "overall_accuracy": 69.34678470470742,
+  "best_val_accuracy": 69.21709691070673,
+  "total_frames": 59077,
+  "hyperparams": {
+    "hidden_dim": 256,
+    "epochs": 50,
+    "lr": 0.005,
+    "batch_size": 4096,
+    "val_ratio": 0.2
+  },
+  "per_class": {
+    "0": {
+      "total": 39767,
+      "correct": 37154,
+      "accuracy": 93.42922523700555
+    },
+    "1": {
+      "total": 17003,
+      "correct": 3814,
+      "accuracy": 22.43133564665059
+    },
+    "2": {
+      "total": 1374,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "3": {
+      "total": 260,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "4": {
+      "total": 146,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "5": {
+      "total": 417,
+      "correct": 0,
+      "accuracy": 0.0
+    },
+    "6": {
+      "total": 110,
+      "correct": 0,
+      "accuracy": 0.0
+    }
+  }
+}
