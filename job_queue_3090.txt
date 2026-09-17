@@ -1,7 +1,19 @@
 
 python -u train.py -n "BankHeist-life_done-wm_2L512D8H-100k-seed2010" -seed 2010 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "D_TRAJ/BankHeist.pkl" JointTrainAgent.Retrieval.enable True
 
+python -u train.py -n "RoadRunner-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/RoadRunner-v5" -trajectory_path "D_TRAJ/RoadRunner.pkl"
 
+python -u train.py -n "Seaquest-life_done-wm_2L512D8H-100k-seed2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Seaquest-v5" -trajectory_path "D_TRAJ/Seaquest.pkl"
+
+python -u train.py -n "PrivateEye-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/PrivateEye-v5" -trajectory_path "D_TRAJ/PrivateEye.pkl"
+
+python -u train.py -n "MsPacman-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/MsPacman-v5" -trajectory_path "D_TRAJ/MsPacman.pkl"
+
+python -u train.py -n "Jamesbond-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl"
+
+python -u train.py -n "Jamesbond-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl"
+
+python -u train.py -n "Freeway-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Freeway-v5" -trajectory_path "D_TRAJ/Freeway.pkl" JointTrainAgent.UseDemonstration True
 
 
 
