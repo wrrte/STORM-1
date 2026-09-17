@@ -221,6 +221,8 @@ def load_results(excel_path):
     
     df.rename(columns={df.columns[0]: 'Game', df.columns[1]: 'Config'}, inplace=True)
     df['Game'] = df['Game'].ffill()
+    # The Excel game cell also contains Random/Human reference scores below its name.
+    df['Game'] = df['Game'].astype(str).str.split('\n').str[0].str.strip()
     
     games = df['Game'].unique()
     results = {}

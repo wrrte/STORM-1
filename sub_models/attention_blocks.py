@@ -3,6 +3,7 @@ import torch.nn as nn
 import torch.nn.functional as F
 import numpy as np
 from einops import rearrange, repeat
+from sub_models.precision import get_amp_dtype
 
 
 def get_subsequent_mask(seq):
@@ -32,12 +33,15 @@ class ScaledDotProductAttention(nn.Module):
         super().__init__()
         self.temperature = temperature
         self.dropout = nn.Dropout(attn_dropout)
+        self.use_titan_fp16 = get_amp_dtype() == torch.float16
 
     def forward(self, q, k, v, mask=None):
         attn = torch.matmul(q / self.temperature, k.transpose(2, 3))
 
         if mask is not None:
-            attn = attn.masked_fill(mask == 0, -1e9)
+            # Only TITAN RTX's FP16 path needs a representable mask value.
+            mask_value = -6e4 if self.use_titan_fp16 and attn.dtype == torch.float16 else -1e9
+            attn = attn.masked_fill(mask == 0, mask_value)
 
         attn = self.dropout(F.softmax(attn, dim=-1))
         output = torch.matmul(attn, v)

@@ -75,7 +75,8 @@ To reproduce the speed metrics mentioned in the paper, please consider the follo
 
 ## Troubleshooting
 ### Mixed precision on other devices
-- Our experiments used bfloat16 to accelerate training. To train on devices that do not support bfloat16, such as the NVIDIA V100, you need to change `torch.bfloat16` to `torch.float16` in both `agents.py` and `sub_models/world_models.py`. Additionally, modify the line `attn = attn.masked_fill(mask == 0, -1e9)` to `attn = attn.masked_fill(mask == 0, -6e4)` to prevent overflow.
+- Our experiments used bfloat16 to accelerate training. On **NVIDIA TITAN RTX only**, the current CUDA device is detected automatically and FP16 is used for world-model/agent autocast, imagination buffers, and KV caches. FP16 attention on that GPU uses `-6e4` for masking to prevent overflow. This works with direct `python train.py` commands and the existing worker scripts, respecting `CUDA_VISIBLE_DEVICES`. Other GPUs keep the original BF16 behavior and `-1e9` attention mask; there is no general fallback for older GPUs such as V100. The policy is defined in `sub_models/precision.py`.
+- Restart the training process to apply precision changes; an already-running process keeps its loaded code. The existing `init_imagine_buffer: ...@torch.float16` message confirms the TITAN RTX path. Model/checkpoint tensor formats and optimizer settings are unchanged.
 - On devices like the NVIDIA A100, using bfloat16 may slow down the training. In this case, you can toggle the `self.use_amp = True` option in both `agents.py` and `sub_models/world_models.py`.
 
 ### Windows and WSL
