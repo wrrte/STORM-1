@@ -9,6 +9,8 @@ if echo "$GPU_NAME" | grep -qi "A6000"; then
     QUEUE_SUFFIX="A6000"
 elif echo "$GPU_NAME" | grep -qi "3090"; then
     QUEUE_SUFFIX="3090"
+elif echo "$GPU_NAME" | grep -qi "TITAN RTX"; then
+    QUEUE_SUFFIX="titan"
 elif echo "$GPU_NAME" | grep -qi "Blackwell" && echo "$GPU_NAME" | grep -qi "6000"; then
     QUEUE_SUFFIX="pro6k"
 else
