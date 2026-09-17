@@ -1,2 +1,8 @@
 
-python -u train.py -n "Krull-myserver-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl"
+python -u train.py -n "BankHeist-life_done-wm_2L512D8H-100k-seed2010" -seed 2010 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "D_TRAJ/BankHeist.pkl" JointTrainAgent.Retrieval.enable True
+
+
+
+
+
+
