@@ -7,7 +7,6 @@ venv/
 5_train.sh
 6_train.sh
 populate_queue.sh
-results/
 converted_results.xlsx
 wandb_runs_classification.csv
 Miniconda3-latest-Linux-x86_64.sh

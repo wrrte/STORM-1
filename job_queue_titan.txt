@@ -1,9 +1,2 @@
-python -u train.py -n "Gopher-myserver-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl"
-
-python -u train.py -n "BankHeist-myserver-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "D_TRAJ/BankHeist.pkl"
-
-python -u train.py -n "Seaquest-myserver-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Seaquest-v5" -trajectory_path "D_TRAJ/Seaquest.pkl"
-
 python -u train.py -n "PrivateEye-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/PrivateEye-v5" -trajectory_path "D_TRAJ/PrivateEye.pkl"
-
 python -u train.py -n "Jamesbond-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl"
