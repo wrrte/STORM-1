@@ -1,0 +1,27 @@
+Game,Retrieval 미사용,target: 1 (anchor 미설정),target: 12 (anchor: 0.12),target: 12 (anchor: 0.2),target: 16 (anchor 미설정),target: 16 (anchor: 0.4),target: 4 (anchor 미설정),target: 8 (anchor: 0.3)
+Alien,6,4,3,4,5,3,4,3
+Amidar,6,4,2,3,4,4,5,4
+Assault,6,4,0,2,2,2,4,3
+Asterix,5,2,0,0,2,0,4,2
+BankHeist,6,0,0,0,1,0,4,3
+BattleZone,6,5,5,5,6,5,5,5
+Boxing,5,1,0,0,2,0,4,1
+Breakout,5,2,0,0,3,0,4,0
+ChopperCommand,5,1,0,0,3,0,3,0
+CrazyClimber,5,0,0,0,3,0,4,0
+DemonAttack,5,0,0,0,2,0,4,0
+Freeway,1,0,0,0,0,0,0,0
+Frostbite,5,5,5,5,5,5,5,5
+Gopher,5,0,0,0,2,0,5,0
+Hero,4,0,0,0,3,0,6,0
+Jamesbond,1,0,0,0,0,0,3,0
+Kangaroo,3,0,0,0,2,0,2,0
+Krull,5,2,5,5,3,5,3,5
+KungFuMaster,3,0,0,0,2,0,2,0
+MsPacman,2,0,0,0,0,0,3,0
+Pong,2,0,0,0,1,0,2,0
+PrivateEye,0,0,0,0,0,0,0,0
+Qbert,5,4,4,5,5,5,4,5
+RoadRunner,0,0,0,0,0,0,1,0
+Seaquest,1,0,0,0,0,0,0,0
+UpNDown,5,3,5,5,3,5,3,5

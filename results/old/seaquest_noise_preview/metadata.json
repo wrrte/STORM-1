@@ -1,0 +1,45 @@
+{
+  "data": "/media/storage_data/ai2lab/choemj/STORM/probing_data/Seaquest_20260822_133245.npz",
+  "sources": [
+    {
+      "diver_count_ram": 0,
+      "frame_index": 661
+    },
+    {
+      "diver_count_ram": 1,
+      "frame_index": 761
+    },
+    {
+      "diver_count_ram": 2,
+      "frame_index": 842
+    },
+    {
+      "diver_count_ram": 3,
+      "frame_index": 239
+    },
+    {
+      "diver_count_ram": 4,
+      "frame_index": 489
+    },
+    {
+      "diver_count_ram": 5,
+      "frame_index": 1044
+    },
+    {
+      "diver_count_ram": 6,
+      "frame_index": 1293
+    }
+  ],
+  "strengths": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "seed": 42,
+  "preserved_region": "obs[:, 53:57, 18:46, :]",
+  "noise_function": "train_probing_mlp.inject_background_noise",
+  "selection": "One real observation per RAM count; backgrounds may differ between rows",
+  "display": "Raw images are 64x64; comparison uses 4x nearest-neighbor enlargement"
+}

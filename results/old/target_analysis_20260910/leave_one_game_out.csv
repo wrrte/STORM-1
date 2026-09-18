@@ -1,0 +1,85 @@
+omitted,reference,metric,delta
+Alien,Retrieval 미사용,Mean,-0.03906616345952396
+Alien,target: 1 (anchor 미설정),Mean,-0.07306311214951855
+Alien,Retrieval 미사용,Median,0.018490416313637736
+Alien,target: 1 (anchor 미설정),Median,0.01616764118294911
+Alien,Retrieval 미사용,IQM_game_workbook,0.02625972950958333
+Alien,target: 1 (anchor 미설정),IQM_game_workbook,0.009459885114233069
+Alien,Retrieval 미사용,Gap_game_workbook,-0.018427981739539412
+Alien,target: 1 (anchor 미설정),Gap_game_workbook,-0.005742508459380735
+Alien,Retrieval 미사용,IQM_run_equal_game,0.017213429039485917
+Alien,target: 1 (anchor 미설정),IQM_run_equal_game,0.015568449470196477
+Alien,Retrieval 미사용,Gap_run_equal_game,-0.0184279817395393
+Alien,target: 1 (anchor 미설정),Gap_run_equal_game,-0.005742508459380735
+Amidar,Retrieval 미사용,Mean,-0.04092970149764019
+Amidar,target: 1 (anchor 미설정),Mean,-0.07302238755402102
+Amidar,Retrieval 미사용,Median,0.018490416313637736
+Amidar,target: 1 (anchor 미설정),Median,0.01616764118294911
+Amidar,Retrieval 미사용,IQM_game_workbook,0.02625972950958333
+Amidar,target: 1 (anchor 미설정),IQM_game_workbook,0.009459885114233069
+Amidar,Retrieval 미사용,Gap_game_workbook,-0.01656444370142307
+Amidar,target: 1 (anchor 미설정),Gap_game_workbook,-0.005783233054878156
+Amidar,Retrieval 미사용,IQM_run_equal_game,0.01644289657385828
+Amidar,target: 1 (anchor 미설정),IQM_run_equal_game,0.012875916999014081
+Amidar,Retrieval 미사용,Gap_run_equal_game,-0.01656444370142296
+Amidar,target: 1 (anchor 미설정),Gap_run_equal_game,-0.005783233054878045
+BattleZone,Retrieval 미사용,Mean,-0.038141864844503104
+BattleZone,target: 1 (anchor 미설정),Mean,-0.07975975177793093
+BattleZone,Retrieval 미사용,Median,0.03552801551129642
+BattleZone,target: 1 (anchor 미설정),Median,0.015952094792585803
+BattleZone,Retrieval 미사용,IQM_game_workbook,0.02764617743211456
+BattleZone,target: 1 (anchor 미설정),IQM_game_workbook,-0.0005850743283856152
+BattleZone,Retrieval 미사용,Gap_game_workbook,-0.01935228035456038
+BattleZone,target: 1 (anchor 미설정),Gap_game_workbook,0.0009541311690316467
+BattleZone,Retrieval 미사용,IQM_run_equal_game,0.022576360811656926
+BattleZone,target: 1 (anchor 미설정),IQM_run_equal_game,0.005799995804076974
+BattleZone,Retrieval 미사용,Gap_run_equal_game,-0.01935228035456016
+BattleZone,target: 1 (anchor 미설정),Gap_run_equal_game,0.0009541311690317578
+Frostbite,Retrieval 미사용,Mean,-0.047538361853766364
+Frostbite,target: 1 (anchor 미설정),Mean,-0.068402411708954
+Frostbite,Retrieval 미사용,Median,0.0058395516777390855
+Frostbite,target: 1 (anchor 미설정),Median,0.030581490574826953
+Frostbite,Retrieval 미사용,IQM_game_workbook,0.01355143191821967
+Frostbite,target: 1 (anchor 미설정),IQM_game_workbook,0.01645093577507975
+Frostbite,Retrieval 미사용,Gap_game_workbook,-0.009955783345297009
+Frostbite,target: 1 (anchor 미설정),Gap_game_workbook,-0.010403208899945282
+Frostbite,Retrieval 미사용,IQM_run_equal_game,0.0032496374036844744
+Frostbite,target: 1 (anchor 미설정),IQM_run_equal_game,0.015832711523037446
+Frostbite,Retrieval 미사용,Gap_run_equal_game,-0.009955783345296898
+Frostbite,target: 1 (anchor 미설정),Gap_run_equal_game,-0.010403208899945171
+Krull,Retrieval 미사용,Mean,0.0174859391012403
+Krull,target: 1 (anchor 미설정),Mean,0.005219151438103475
+Krull,Retrieval 미사용,Median,0.0058395516777390855
+Krull,target: 1 (anchor 미설정),Median,0.030581490574826953
+Krull,Retrieval 미사용,IQM_game_workbook,0.01355143191821967
+Krull,target: 1 (anchor 미설정),IQM_game_workbook,0.01645093577507975
+Krull,Retrieval 미사용,Gap_game_workbook,-0.0174859391012403
+Krull,target: 1 (anchor 미설정),Gap_game_workbook,-0.005219151438103364
+Krull,Retrieval 미사용,IQM_run_equal_game,0.0025841518930975194
+Krull,target: 1 (anchor 미설정),IQM_run_equal_game,0.014547654259307763
+Krull,Retrieval 미사용,Gap_run_equal_game,-0.017485939101240078
+Krull,target: 1 (anchor 미설정),Gap_run_equal_game,-0.005219151438103475
+Qbert,Retrieval 미사용,Mean,-0.043821064577056035
+Qbert,target: 1 (anchor 미설정),Mean,-0.0776070167552696
+Qbert,Retrieval 미사용,Median,0.018490416313637736
+Qbert,target: 1 (anchor 미설정),Median,0.02241029986056986
+Qbert,Retrieval 미사용,IQM_game_workbook,0.01912737783328522
+Qbert,target: 1 (anchor 미설정),IQM_game_workbook,0.0026440282056063857
+Qbert,Retrieval 미사용,Gap_game_workbook,-0.01367308062200745
+Qbert,target: 1 (anchor 미설정),Gap_game_workbook,-0.0011986038536296872
+Qbert,Retrieval 미사용,IQM_run_equal_game,0.009469387176976374
+Qbert,target: 1 (anchor 미설정),IQM_run_equal_game,0.007461391754235436
+Qbert,Retrieval 미사용,Gap_run_equal_game,-0.013673080622007117
+Qbert,target: 1 (anchor 미설정),Gap_run_equal_game,-0.0011986038536295762
+UpNDown,Retrieval 미사용,Mean,-0.04803801945568886
+UpNDown,target: 1 (anchor 미설정),Mean,-0.07488328651718379
+UpNDown,Retrieval 미사용,Median,0.0058395516777390855
+UpNDown,target: 1 (anchor 미설정),Median,0.030581490574826953
+UpNDown,Retrieval 미사용,IQM_game_workbook,0.012801945515335894
+UpNDown,target: 1 (anchor 미설정),IQM_game_workbook,0.006729623562734988
+UpNDown,Retrieval 미사용,Gap_game_workbook,-0.0094561257433744
+UpNDown,target: 1 (anchor 미설정),Gap_game_workbook,-0.003922334091715274
+UpNDown,Retrieval 미사용,IQM_run_equal_game,0.006977395907291184
+UpNDown,target: 1 (anchor 미설정),IQM_run_equal_game,0.017944352523608653
+UpNDown,Retrieval 미사용,Gap_run_equal_game,-0.009456125743374288
+UpNDown,target: 1 (anchor 미설정),Gap_run_equal_game,-0.003922334091715385

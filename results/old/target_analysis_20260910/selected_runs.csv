@@ -1,0 +1,421 @@
+Game,Config,Seed,Eval Return,Created At,Run ID,Run Name,Target,Anchor Weight,Hash Bits,Warmup Steps,Calculated Warmup Steps,Source,Candidate Count
+Alien,Retrieval 미사용,1,1142.0,2026-08-13T20:34:46+00:00,s9hi31ki,Alien_s9hi31ki_1_X,,,10.0,,,CSV,1
+Alien,Retrieval 미사용,2000,688.5,2026-08-12T11:26:06+00:00,tspqrlhz,Alien_tspqrlhz_2000_X,,,10.0,,,CSV,1
+Alien,Retrieval 미사용,2010,817.0,2026-08-16T03:20:35+00:00,22rpl8xp,Alien_22rpl8xp_2010_X,,,10.0,,,CSV,1
+Alien,Retrieval 미사용,5090,842.5,2026-08-15T02:23:14+00:00,ivw80t9d,Alien_ivw80t9d_5090_X,,,10.0,,,CSV,1
+Alien,Retrieval 미사용,6000,1219.0,2026-09-02T21:47:32+00:00,ic6akv9r,Alien_ic6akv9r_6000_X,,,9.0,,,CSV,4
+Alien,Retrieval 미사용,6010,1177.5,2026-09-02T23:59:53+00:00,ch07udam,Alien_ch07udam_6010_X,,,9.0,,,CSV,4
+Alien,target: 1 (anchor 미설정),1,1151.0,2026-09-03T13:57:06+00:00,3810f6xi,Alien_3810f6xi_1_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Alien,target: 1 (anchor 미설정),2000,641.0,2026-09-03T21:18:33+00:00,ts6fn9ut,Alien_ts6fn9ut_2000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Alien,target: 1 (anchor 미설정),6000,1303.5,2026-09-03T15:19:42+00:00,jkskja9j,Alien_jkskja9j_6000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Alien,target: 1 (anchor 미설정),6010,1032.0,2026-09-03T17:52:24+00:00,7lc9bxth,Alien_7lc9bxth_6010_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Alien,target: 12 (anchor: 0.12),1,1330.5,2026-09-10T00:32:41+00:00,vrz37gzy,Alien_vrz37gzy_1_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Alien,target: 12 (anchor: 0.12),6000,1000.0,2026-09-09T22:47:07+00:00,lc9f195n,Alien_lc9f195n_6000_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Alien,target: 12 (anchor: 0.12),6010,1091.0,2026-09-09T22:18:16+00:00,wkt6jba1,Alien_wkt6jba1_6010_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Alien,target: 12 (anchor: 0.2),1,1116.5,2026-09-09T07:28:48+00:00,fzue8cpx,Alien_fzue8cpx_1_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Alien,target: 12 (anchor: 0.2),2000,668.5,2026-09-09T07:03:41+00:00,mzhr12q6,Alien_mzhr12q6_2000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Alien,target: 12 (anchor: 0.2),6000,1212.0,2026-09-09T01:42:24+00:00,t8fjbqcy,Alien_t8fjbqcy_6000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Alien,target: 12 (anchor: 0.2),6010,1109.0,2026-09-09T01:28:04+00:00,s356pymr,Alien_s356pymr_6010_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Alien,target: 16 (anchor 미설정),1,1153.0,2026-09-02T21:08:00+00:00,koqbgsvp,Alien_koqbgsvp_1_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Alien,target: 16 (anchor 미설정),2000,743.5,2026-08-25T15:23:04+00:00,6canyrhp,Alien_6canyrhp_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Alien,target: 16 (anchor 미설정),5090,864.0,2026-08-25T13:24:51+00:00,c3ncma1f,Alien_c3ncma1f_5090_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Alien,target: 16 (anchor 미설정),6000,1400.0,2026-08-29T05:49:29+00:00,gnk3r4hj,Alien_gnk3r4hj_6000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Alien,target: 16 (anchor 미설정),6010,938.0,2026-08-29T10:10:10+00:00,i1tixf0v,Alien_i1tixf0v_6010_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Alien,target: 16 (anchor: 0.4),2000,697.5,2026-09-06T20:25:13+00:00,vm5gvx9f,Alien_vm5gvx9f_2000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Alien,target: 16 (anchor: 0.4),6000,1525.5,2026-09-07T02:08:29+00:00,e66fzu94,Alien_e66fzu94_6000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Alien,target: 16 (anchor: 0.4),6010,1003.0,2026-09-07T01:40:28+00:00,p3lfwv2c,Alien_p3lfwv2c_6010_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Alien,target: 4 (anchor 미설정),1,1119.0,2026-09-04T10:01:24+00:00,2vcgxgdx,Alien_2vcgxgdx_1_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Alien,target: 4 (anchor 미설정),2000,682.0,2026-09-04T21:40:22+00:00,9p4hlkr3,Alien_9p4hlkr3_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Alien,target: 4 (anchor 미설정),6000,1042.0,2026-09-04T11:56:27+00:00,mait1mtk,Alien_mait1mtk_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Alien,target: 4 (anchor 미설정),6010,850.5,2026-09-04T14:32:46+00:00,ifxnbtaw,Alien_ifxnbtaw_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Alien,target: 8 (anchor: 0.3),2000,617.5,2026-09-08T01:38:40+00:00,i5byjfm0,Alien_i5byjfm0_2000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Alien,target: 8 (anchor: 0.3),6000,1234.5,2026-09-07T22:35:11+00:00,sbaidbrj,Alien_sbaidbrj_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Alien,target: 8 (anchor: 0.3),6010,1012.0,2026-09-07T17:57:19+00:00,8bdmrj5n,Alien_8bdmrj5n_6010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Amidar,Retrieval 미사용,1,194.95,2026-08-28T07:58:09+00:00,rzvmg6ep,Amidar_rzvmg6ep_1_X,,,10.0,,,CSV,1
+Amidar,Retrieval 미사용,2000,177.55,2026-08-12T11:24:05+00:00,e4lm7iap,Amidar_e4lm7iap_2000_X,,,10.0,,,CSV,1
+Amidar,Retrieval 미사용,5090,204.85,2026-08-14T09:26:39+00:00,towr6pad,Amidar_towr6pad_5090_X,,,10.0,,,CSV,1
+Amidar,Retrieval 미사용,6000,130.8,2026-09-03T00:16:39+00:00,4hmr7n97,Amidar_4hmr7n97_6000_X,,,9.0,,,CSV,4
+Amidar,Retrieval 미사용,6010,255.8,2026-09-03T02:43:41+00:00,4kbze0v9,Amidar_4kbze0v9_6010_X,,,9.0,,,CSV,3
+Amidar,Retrieval 미사용,6020,316.65,2026-09-03T02:47:00+00:00,2p8az3jj,Amidar_2p8az3jj_6020_X,,,9.0,,,CSV,3
+Amidar,target: 1 (anchor 미설정),1,144.6,2026-09-03T14:51:15+00:00,zl4mdqxb,Amidar_zl4mdqxb_1_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Amidar,target: 1 (anchor 미설정),6000,211.7,2026-09-03T17:52:56+00:00,jbm316dm,Amidar_jbm316dm_6000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Amidar,target: 1 (anchor 미설정),6010,124.75,2026-09-03T20:22:34+00:00,rxipad36,Amidar_rxipad36_6010_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Amidar,target: 1 (anchor 미설정),6020,159.3,2026-09-03T20:25:20+00:00,ginz9ksm,Amidar_ginz9ksm_6020_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Amidar,target: 12 (anchor: 0.12),1,157.75,2026-09-10T02:47:35+00:00,6wzftqu5,Amidar_6wzftqu5_1_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 12 (anchor: 0.12),6000,186.95,2026-09-09T22:56:09+00:00,fyg43j9z,Amidar_fyg43j9z_6000_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 12 (anchor: 0.2),6000,134.55,2026-09-09T01:43:44+00:00,10o1sefh,Amidar_10o1sefh_6000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 12 (anchor: 0.2),6010,185.1,2026-09-09T06:50:00+00:00,qnyrcvf5,Amidar_qnyrcvf5_6010_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 12 (anchor: 0.2),6020,220.0,2026-09-09T06:40:14+00:00,iknjvogz,Amidar_iknjvogz_6020_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 16 (anchor 미설정),1,107.3,2026-09-02T21:34:51+00:00,82by942d,Amidar_82by942d_1_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Amidar,target: 16 (anchor 미설정),2000,129.4,2026-08-28T06:36:55+00:00,9e32wvx1,Amidar_9e32wvx1_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 16 (anchor 미설정),5090,147.8,2026-08-25T22:19:29+00:00,kyeonn2o,Amidar_kyeonn2o_5090_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 16 (anchor 미설정),6000,155.25,2026-08-29T11:10:11+00:00,o3f8dl63,Amidar_o3f8dl63_6000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 16 (anchor: 0.4),2000,201.1,2026-09-07T03:54:42+00:00,e61pscw7,Amidar_e61pscw7_2000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 16 (anchor: 0.4),6000,170.25,2026-09-07T02:14:55+00:00,562wpxju,Amidar_562wpxju_6000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 16 (anchor: 0.4),6010,252.95,2026-09-07T06:54:41+00:00,mxb2s2v5,Amidar_mxb2s2v5_6010_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 16 (anchor: 0.4),6020,173.25,2026-09-07T02:15:31+00:00,hgi1cgq8,Amidar_hgi1cgq8_6020_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 4 (anchor 미설정),1,127.0,2026-09-04T11:24:56+00:00,tj7lde7m,Amidar_tj7lde7m_1_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 4 (anchor 미설정),2000,148.9,2026-09-05T22:03:03+00:00,wlmoa8jf,Amidar_wlmoa8jf_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 4 (anchor 미설정),6000,187.75,2026-09-04T14:37:10+00:00,ekj5imtv,Amidar_ekj5imtv_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 4 (anchor 미설정),6010,196.55,2026-09-04T17:02:33+00:00,jdwldqmc,Amidar_jdwldqmc_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 4 (anchor 미설정),6020,266.55,2026-09-04T17:08:58+00:00,zp9s9g3s,Amidar_zp9s9g3s_6020_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 8 (anchor: 0.3),2000,173.0,2026-09-08T08:54:54+00:00,nfwlttgg,Amidar_nfwlttgg_2000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 8 (anchor: 0.3),6000,173.05,2026-09-07T23:06:36+00:00,r5q59l20,Amidar_r5q59l20_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 8 (anchor: 0.3),6010,179.2,2026-09-07T23:15:26+00:00,mh50pvad,Amidar_mh50pvad_6010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Amidar,target: 8 (anchor: 0.3),6020,251.45,2026-09-07T23:11:55+00:00,cpurdalh,Amidar_cpurdalh_6020_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Assault,Retrieval 미사용,1,705.0,2026-08-13T23:16:58+00:00,0i5yuas8,Assault_0i5yuas8_1_X,,,10.0,,,CSV,1
+Assault,Retrieval 미사용,2000,620.4,2026-08-12T18:15:20+00:00,44x6n4yp,Assault_44x6n4yp_2000_X,,,10.0,,,CSV,1
+Assault,Retrieval 미사용,2010,605.8,2026-08-16T10:11:14+00:00,ckrlgqy9,Assault_ckrlgqy9_2010_X,,,10.0,,,CSV,1
+Assault,Retrieval 미사용,5090,662.4,2026-08-15T15:08:39+00:00,xqlr76ij,Assault_xqlr76ij_5090_X,,,10.0,,,CSV,1
+Assault,Retrieval 미사용,6000,1126.55,2026-08-31T01:00:21+00:00,9b7jnb8w,Assault_9b7jnb8w_6000_X,,,10.0,,,CSV,1
+Assault,Retrieval 미사용,6010,832.5,2026-09-06T15:51:38+00:00,bh0bw8i3,Assault_bh0bw8i3_6010_X,,,10.0,,,CSV,1
+Assault,target: 1 (anchor 미설정),1,740.75,2026-09-03T16:37:01+00:00,e6itftuv,Assault_e6itftuv_1_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Assault,target: 1 (anchor 미설정),2000,693.3,2026-09-03T23:48:23+00:00,d0c7w16z,Assault_d0c7w16z_2000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Assault,target: 1 (anchor 미설정),6000,1033.7,2026-09-03T22:55:34+00:00,piki59lv,Assault_piki59lv_6000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Assault,target: 1 (anchor 미설정),6010,867.85,2026-09-03T22:58:32+00:00,holuktxi,Assault_holuktxi_6010_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Assault,target: 12 (anchor: 0.2),6000,940.5,2026-09-09T06:56:22+00:00,fsr2yxo4,Assault_fsr2yxo4_6000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Assault,target: 12 (anchor: 0.2),6010,772.55,2026-09-09T06:57:27+00:00,8iwa63d0,Assault_8iwa63d0_6010_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Assault,target: 16 (anchor 미설정),1,729.2,2026-09-02T23:54:24+00:00,ubtaj9sj,Assault_ubtaj9sj_1_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Assault,target: 16 (anchor 미설정),2000,666.55,2026-08-25T15:28:19+00:00,ik8yz2lw,Assault_ik8yz2lw_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Assault,target: 16 (anchor: 0.4),2000,652.45,2026-09-07T03:19:39+00:00,pvowjm0v,Assault_pvowjm0v_2000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Assault,target: 16 (anchor: 0.4),6000,936.3,2026-09-07T07:20:38+00:00,1n4c65xw,Assault_1n4c65xw_6000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Assault,target: 4 (anchor 미설정),1,690.3,2026-09-04T12:45:20+00:00,2gdrofw8,Assault_2gdrofw8_1_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Assault,target: 4 (anchor 미설정),2000,675.45,2026-09-05T00:18:20+00:00,3obboump,Assault_3obboump_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Assault,target: 4 (anchor 미설정),6000,784.6,2026-09-04T19:40:30+00:00,7nhwcqlf,Assault_7nhwcqlf_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Assault,target: 4 (anchor 미설정),6010,733.4,2026-09-04T19:46:05+00:00,qoh8h7k3,Assault_qoh8h7k3_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Assault,target: 8 (anchor: 0.3),2000,688.65,2026-09-08T08:45:39+00:00,b0rphe0o,Assault_b0rphe0o_2000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Assault,target: 8 (anchor: 0.3),6000,1020.4,2026-09-08T03:45:50+00:00,5z8y7yf8,Assault_5z8y7yf8_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Assault,target: 8 (anchor: 0.3),6010,791.45,2026-09-08T04:16:48+00:00,x74eqqom,Assault_x74eqqom_6010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Asterix,Retrieval 미사용,1,515.0,2026-08-12T23:18:15+00:00,9vuw278h,Asterix_9vuw278h_1_X,,,10.0,,,CSV,1
+Asterix,Retrieval 미사용,10,530.0,2026-08-28T09:30:09+00:00,1jd8nkls,Asterix_1jd8nkls_10_X,,,10.0,,,CSV,1
+Asterix,Retrieval 미사용,3710,562.5,2026-08-28T10:36:48+00:00,0594ds6t,Asterix_0594ds6t_3710_X,,,10.0,,,CSV,1
+Asterix,Retrieval 미사용,6000,942.5,2026-09-06T16:21:45+00:00,w9ywq1kc,Asterix_w9ywq1kc_6000_X,,,10.0,,,CSV,1
+Asterix,Retrieval 미사용,6010,675.0,2026-09-06T16:14:42+00:00,e3ypvw05,Asterix_e3ypvw05_6010_X,,,10.0,,,CSV,1
+Asterix,target: 1 (anchor 미설정),10,467.5,2026-09-03T17:32:10+00:00,h7aofkuv,Asterix_h7aofkuv_10_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Asterix,target: 1 (anchor 미설정),3710,677.5,2026-09-03T19:16:44+00:00,toxgeo04,Asterix_toxgeo04_3710_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Asterix,target: 16 (anchor 미설정),10,567.5,2026-09-03T00:29:04+00:00,pp9azut3,Asterix_pp9azut3_10_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Asterix,target: 16 (anchor 미설정),3710,560.0,2026-09-03T02:54:08+00:00,cw88m4aj,Asterix_cw88m4aj_3710_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Asterix,target: 4 (anchor 미설정),10,640.0,2026-09-04T14:07:34+00:00,16tpcrn0,Asterix_16tpcrn0_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Asterix,target: 4 (anchor 미설정),3710,760.0,2026-09-04T15:34:34+00:00,k4o02nt6,Asterix_k4o02nt6_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Asterix,target: 4 (anchor 미설정),6000,1205.0,2026-09-04T22:10:15+00:00,6c7rqdbx,Asterix_6c7rqdbx_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Asterix,target: 4 (anchor 미설정),6010,562.5,2026-09-04T22:20:53+00:00,2kxjhcda,Asterix_2kxjhcda_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Asterix,target: 8 (anchor: 0.3),6000,1117.5,2026-09-08T04:27:36+00:00,u23lzqcr,Asterix_u23lzqcr_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Asterix,target: 8 (anchor: 0.3),6010,640.0,2026-09-08T04:25:01+00:00,9e761ead,Asterix_9e761ead_6010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+BankHeist,Retrieval 미사용,2000,163.0,2026-08-12T18:16:09+00:00,d14nb2bu,BankHeist_d14nb2bu_2000_X,,,10.0,,,CSV,1
+BankHeist,Retrieval 미사용,2010,699.0,2026-08-16T11:15:06+00:00,innwmwhh,BankHeist_innwmwhh_2010_X,,,10.0,,,CSV,1
+BankHeist,Retrieval 미사용,5090,521.0,2026-08-16T05:08:53+00:00,ab41ct6i,BankHeist_ab41ct6i_5090_X,,,10.0,,,CSV,1
+BankHeist,Retrieval 미사용,6000,246.0,2026-09-06T21:17:53+00:00,pv677rc8,BankHeist_pv677rc8_6000_X,,,10.0,,,CSV,1
+BankHeist,Retrieval 미사용,6010,170.0,2026-09-06T21:08:24+00:00,crlhbzlo,BankHeist_crlhbzlo_6010_X,,,10.0,,,CSV,1
+BankHeist,Retrieval 미사용,6020,677.0,2026-09-06T20:43:44+00:00,e0228fk7,BankHeist_e0228fk7_6020_X,,,10.0,,,CSV,1
+BankHeist,target: 16 (anchor 미설정),2000,169.5,2026-08-25T22:40:25+00:00,ceqgjdng,BankHeist_ceqgjdng_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+BankHeist,target: 4 (anchor 미설정),2000,175.5,2026-09-05T05:24:47+00:00,u7vboryf,BankHeist_u7vboryf_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BankHeist,target: 4 (anchor 미설정),6000,619.5,2026-09-05T00:58:14+00:00,mkpw1wga,BankHeist_mkpw1wga_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BankHeist,target: 4 (anchor 미설정),6010,173.5,2026-09-05T00:58:18+00:00,3cie3f5l,BankHeist_3cie3f5l_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BankHeist,target: 4 (anchor 미설정),6020,348.0,2026-09-05T03:25:49+00:00,ip2ptxm8,BankHeist_ip2ptxm8_6020_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BankHeist,target: 8 (anchor: 0.3),6000,331.0,2026-09-08T09:37:01+00:00,myy02w4i,BankHeist_myy02w4i_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+BankHeist,target: 8 (anchor: 0.3),6010,174.0,2026-09-08T09:30:26+00:00,kpevxlgj,BankHeist_kpevxlgj_6010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+BankHeist,target: 8 (anchor: 0.3),6020,565.0,2026-09-08T09:05:11+00:00,2h0rirrb,BankHeist_2h0rirrb_6020_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+BattleZone,Retrieval 미사용,2000,5300.0,2026-08-13T00:54:50+00:00,z3zh8ezk,BattleZone_z3zh8ezk_2000_X,,,10.0,,,CSV,1
+BattleZone,Retrieval 미사용,2010,15900.0,2026-08-16T16:54:59+00:00,qzxk63jj,BattleZone_qzxk63jj_2010_X,,,10.0,,,CSV,1
+BattleZone,Retrieval 미사용,5090,9650.0,2026-08-16T14:57:46+00:00,c42aw4v3,BattleZone_c42aw4v3_5090_X,,,10.0,,,CSV,1
+BattleZone,Retrieval 미사용,6000,14700.0,2026-09-02T19:03:59+00:00,xaiue9rv,BattleZone_xaiue9rv_6000_X,,,9.0,,,CSV,5
+BattleZone,Retrieval 미사용,6010,8200.0,2026-09-02T19:20:27+00:00,0tro6v7m,BattleZone_0tro6v7m_6010_X,,,9.0,,,CSV,5
+BattleZone,Retrieval 미사용,6020,8050.0,2026-09-02T21:45:42+00:00,29ut9qq4,BattleZone_29ut9qq4_6020_X,,,9.0,,,CSV,5
+BattleZone,target: 1 (anchor 미설정),2000,5550.0,2026-09-03T05:11:55+00:00,co5yu3w3,BattleZone_co5yu3w3_2000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+BattleZone,target: 1 (anchor 미설정),2010,13900.0,2026-09-03T07:07:06+00:00,00jmh25e,BattleZone_00jmh25e_2010_O,1.0,,11.0,50000.0,50000.0,CSV,1
+BattleZone,target: 1 (anchor 미설정),6000,10950.0,2026-09-03T12:44:45+00:00,cnv22oap,BattleZone_cnv22oap_6000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+BattleZone,target: 1 (anchor 미설정),6010,5900.0,2026-09-03T12:45:29+00:00,yrq4azxd,BattleZone_yrq4azxd_6010_O,1.0,,11.0,50000.0,50000.0,CSV,1
+BattleZone,target: 1 (anchor 미설정),6020,7450.0,2026-09-03T15:18:56+00:00,tmr7bbn5,BattleZone_tmr7bbn5_6020_O,1.0,,11.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.12),2000,8400.0,2026-09-09T14:35:02+00:00,yubzlc1w,BattleZone_yubzlc1w_2000_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.12),2010,13500.0,2026-09-09T14:21:54+00:00,aoorfszu,BattleZone_aoorfszu_2010_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.12),6000,14600.0,2026-09-09T12:18:46+00:00,0tp716hl,BattleZone_0tp716hl_6000_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.12),6010,6000.0,2026-09-09T12:01:30+00:00,r5kfniy0,BattleZone_r5kfniy0_6010_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.12),6020,7700.0,2026-09-09T11:48:56+00:00,z9734by2,BattleZone_z9734by2_6020_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.2),2000,9250.0,2026-09-08T16:16:03+00:00,3qcognge,BattleZone_3qcognge_2000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.2),2010,11950.0,2026-09-08T16:08:50+00:00,fkl7ofo3,BattleZone_fkl7ofo3_2010_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.2),6000,10700.0,2026-09-08T15:05:10+00:00,ufx68cm8,BattleZone_ufx68cm8_6000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.2),6010,10550.0,2026-09-08T15:05:09+00:00,uv9q1pne,BattleZone_uv9q1pne_6010_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 12 (anchor: 0.2),6020,6150.0,2026-09-08T15:05:07+00:00,pqadey01,BattleZone_pqadey01_6020_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor 미설정),2000,5750.0,2026-09-02T12:08:33+00:00,ud21wvr5,BattleZone_ud21wvr5_2000_O,16.0,,9.0,50000.0,50000.0,CSV,2
+BattleZone,target: 16 (anchor 미설정),2010,13650.0,2026-09-02T13:54:45+00:00,vhhedzfs,BattleZone_vhhedzfs_2010_O,16.0,,9.0,50000.0,50000.0,CSV,2
+BattleZone,target: 16 (anchor 미설정),5090,13050.0,2026-08-25T01:32:56+00:00,p81hm0xr,BattleZone_p81hm0xr_5090_O,16.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor 미설정),6000,14350.0,2026-08-28T23:53:55+00:00,lssk1135,BattleZone_lssk1135_6000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor 미설정),6010,5650.0,2026-08-29T00:33:15+00:00,m3fx9gdn,BattleZone_m3fx9gdn_6010_O,16.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor 미설정),6020,10850.0,2026-08-29T05:00:28+00:00,7ejjjrg1,BattleZone_7ejjjrg1_6020_O,16.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor: 0.4),2000,12400.0,2026-09-06T05:24:29+00:00,worr06cx,BattleZone_worr06cx_2000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor: 0.4),2010,12750.0,2026-09-06T05:24:26+00:00,9x6zxjh5,BattleZone_9x6zxjh5_2010_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor: 0.4),6000,9300.0,2026-09-06T05:32:58+00:00,bcp6aceb,BattleZone_bcp6aceb_6000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor: 0.4),6010,9500.0,2026-09-06T05:24:13+00:00,uchbpd6m,BattleZone_uchbpd6m_6010_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 16 (anchor: 0.4),6020,5500.0,2026-09-06T05:24:01+00:00,g4pz4opw,BattleZone_g4pz4opw_6020_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 4 (anchor 미설정),2000,10050.0,2026-09-04T04:26:04+00:00,pt5aobcs,BattleZone_pt5aobcs_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 4 (anchor 미설정),2010,12000.0,2026-09-04T07:13:51+00:00,wr7d60ed,BattleZone_wr7d60ed_2010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 4 (anchor 미설정),6000,12750.0,2026-09-04T09:23:36+00:00,qjxrwb4c,BattleZone_qjxrwb4c_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 4 (anchor 미설정),6010,7350.0,2026-09-04T09:24:23+00:00,t64tsjty,BattleZone_t64tsjty_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 4 (anchor 미설정),6020,6850.0,2026-09-04T11:52:58+00:00,q8f0u669,BattleZone_q8f0u669_6020_O,4.0,,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 8 (anchor: 0.3),2000,7600.0,2026-09-07T11:08:38+00:00,b63y8xzf,BattleZone_b63y8xzf_2000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 8 (anchor: 0.3),2010,14650.0,2026-09-07T10:52:24+00:00,4kscxnem,BattleZone_4kscxnem_2010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 8 (anchor: 0.3),6000,8100.0,2026-09-07T12:08:40+00:00,q2elmbiq,BattleZone_q2elmbiq_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 8 (anchor: 0.3),6010,5850.0,2026-09-07T07:32:10+00:00,4pmjw5rd,BattleZone_4pmjw5rd_6010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+BattleZone,target: 8 (anchor: 0.3),6020,5450.0,2026-09-07T07:31:57+00:00,cji89610,BattleZone_cji89610_6020_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Boxing,Retrieval 미사용,10,68.6,2026-08-28T12:15:39+00:00,184vzsq3,Boxing_184vzsq3_10_X,,,10.0,,,CSV,1
+Boxing,Retrieval 미사용,2000,81.0,2026-08-13T01:09:53+00:00,u1xxt1sd,Boxing_u1xxt1sd_2000_X,,,10.0,,,CSV,1
+Boxing,Retrieval 미사용,3710,73.8,2026-09-08T02:33:28+00:00,yd9o7wm7,Boxing_yd9o7wm7_3710_X,,,10.0,,,CSV,1
+Boxing,Retrieval 미사용,5090,88.6,2026-08-16T22:02:46+00:00,53feow6p,Boxing_53feow6p_5090_X,,,10.0,,,CSV,1
+Boxing,Retrieval 미사용,6000,70.4,2026-09-06T21:18:44+00:00,gfyn8hz0,Boxing_gfyn8hz0_6000_X,,,10.0,,,CSV,1
+Boxing,target: 1 (anchor 미설정),10,74.85,2026-09-03T20:13:21+00:00,zsaukhwx,Boxing_zsaukhwx_10_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Boxing,target: 16 (anchor 미설정),10,70.2,2026-09-03T03:32:42+00:00,mzfiir0p,Boxing_mzfiir0p_10_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Boxing,target: 16 (anchor 미설정),2000,78.5,2026-08-28T14:15:43+00:00,ut7qlpz8,Boxing_ut7qlpz8_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Boxing,target: 4 (anchor 미설정),10,76.95,2026-09-04T16:53:26+00:00,2q3ainje,Boxing_2q3ainje_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Boxing,target: 4 (anchor 미설정),6000,61.15,2026-09-05T03:33:05+00:00,1vuh79ui,Boxing_1vuh79ui_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Boxing,target: 4 (anchor 미설정),6010,78.7,2026-09-05T06:10:35+00:00,ehhbcq9i,Boxing_ehhbcq9i_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Boxing,target: 4 (anchor 미설정),6020,84.0,2026-09-05T06:12:16+00:00,0jxxy2ck,Boxing_0jxxy2ck_6020_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Boxing,target: 8 (anchor: 0.3),6000,71.3,2026-09-08T09:44:23+00:00,w6hibnzx,Boxing_w6hibnzx_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Breakout,Retrieval 미사용,2,14.35,2026-09-08T05:14:55+00:00,99zpfdl7,Breakout_99zpfdl7_2_X,,,10.0,,,CSV,1
+Breakout,Retrieval 미사용,10,11.4,2026-08-28T13:14:22+00:00,km8e9105,Breakout_km8e9105_10_X,,,10.0,,,CSV,1
+Breakout,Retrieval 미사용,710,9.6,2026-09-08T02:56:44+00:00,xx5eupnm,Breakout_xx5eupnm_710_X,,,10.0,,,CSV,1
+Breakout,Retrieval 미사용,2000,9.8,2026-08-13T07:35:11+00:00,qilmuxin,Breakout_qilmuxin_2000_X,,,10.0,,,CSV,1
+Breakout,Retrieval 미사용,3710,14.0,2026-08-28T15:01:44+00:00,21dfi122,Breakout_21dfi122_3710_X,,,10.0,,,CSV,1
+Breakout,target: 1 (anchor 미설정),10,12.1,2026-09-03T21:55:23+00:00,ix0b33ni,Breakout_ix0b33ni_10_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Breakout,target: 1 (anchor 미설정),3710,15.6,2026-09-03T22:55:26+00:00,hkojwxtr,Breakout_hkojwxtr_3710_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Breakout,target: 16 (anchor 미설정),10,12.7,2026-08-25T18:11:59+00:00,25pg963s,Breakout_25pg963s_10_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Breakout,target: 16 (anchor 미설정),2000,9.3,2026-08-28T14:20:07+00:00,4pm5b0eb,Breakout_4pm5b0eb_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Breakout,target: 16 (anchor 미설정),3710,15.1,2026-08-25T18:15:08+00:00,jzgh0p3a,Breakout_jzgh0p3a_3710_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Breakout,target: 4 (anchor 미설정),10,10.65,2026-09-04T18:20:44+00:00,lu0fnh60,Breakout_lu0fnh60_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Breakout,target: 4 (anchor 미설정),3710,13.35,2026-09-04T19:39:32+00:00,po5gth3a,Breakout_po5gth3a_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Breakout,target: 4 (anchor 미설정),6000,12.95,2026-09-05T08:38:59+00:00,70qjdrf7,Breakout_70qjdrf7_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Breakout,target: 4 (anchor 미설정),6010,9.6,2026-09-05T08:51:32+00:00,34s1gwow,Breakout_34s1gwow_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+ChopperCommand,Retrieval 미사용,2,1530.0,2026-09-08T05:46:55+00:00,aa8agtws,ChopperCommand_aa8agtws_2_X,,,10.0,,,CSV,1
+ChopperCommand,Retrieval 미사용,10,1960.0,2026-08-11T15:57:04+00:00,ti2d8k6i,ChopperCommand_ti2d8k6i_10_X,,,10.0,,,CSV,1
+ChopperCommand,Retrieval 미사용,710,1980.0,2026-08-28T15:51:42+00:00,sz253i2k,ChopperCommand_sz253i2k_710_X,,,10.0,,,CSV,1
+ChopperCommand,Retrieval 미사용,2000,1470.0,2026-08-18T21:27:56+00:00,gx5i2iyc,ChopperCommand_gx5i2iyc_2000_X,,,10.0,,,CSV,1
+ChopperCommand,Retrieval 미사용,3710,1345.0,2026-08-28T17:39:29+00:00,5ih832yt,ChopperCommand_5ih832yt_3710_X,,,10.0,,,CSV,1
+ChopperCommand,target: 1 (anchor 미설정),710,1360.0,2026-09-04T00:34:10+00:00,as286v3o,ChopperCommand_as286v3o_710_O,1.0,,11.0,50000.0,50000.0,CSV,1
+ChopperCommand,target: 16 (anchor 미설정),710,970.0,2026-08-25T21:03:28+00:00,6rblogus,ChopperCommand_6rblogus_710_O,16.0,,10.0,50000.0,50000.0,CSV,1
+ChopperCommand,target: 16 (anchor 미설정),2000,1260.0,2026-08-28T22:09:24+00:00,nh0sgtk0,ChopperCommand_nh0sgtk0_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+ChopperCommand,target: 16 (anchor 미설정),3710,1445.0,2026-08-25T21:12:53+00:00,fhlq8r7s,ChopperCommand_fhlq8r7s_3710_O,16.0,,10.0,50000.0,50000.0,CSV,1
+ChopperCommand,target: 4 (anchor 미설정),710,1675.0,2026-09-04T21:06:42+00:00,nl82qf67,ChopperCommand_nl82qf67_710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+ChopperCommand,target: 4 (anchor 미설정),3710,1540.0,2026-09-04T22:24:03+00:00,tvlw910l,ChopperCommand_tvlw910l_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+ChopperCommand,target: 4 (anchor 미설정),6000,1515.0,2026-09-05T11:26:16+00:00,71h5hbmr,ChopperCommand_71h5hbmr_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+CrazyClimber,Retrieval 미사용,2,63125.0,2026-09-08T08:30:01+00:00,8muy8hjz,CrazyClimber_8muy8hjz_2_X,,,10.0,,,CSV,1
+CrazyClimber,Retrieval 미사용,10,46620.0,2026-08-28T18:35:44+00:00,7yhsfsa7,CrazyClimber_7yhsfsa7_10_X,,,10.0,,,CSV,1
+CrazyClimber,Retrieval 미사용,710,49810.0,2026-09-08T08:04:25+00:00,my03b615,CrazyClimber_my03b615_710_X,,,10.0,,,CSV,1
+CrazyClimber,Retrieval 미사용,2000,59970.0,2026-08-13T08:03:50+00:00,66u1ib58,CrazyClimber_66u1ib58_2000_X,,,10.0,,,CSV,1
+CrazyClimber,Retrieval 미사용,3710,66125.0,2026-08-28T21:25:28+00:00,sbhhiqzl,CrazyClimber_sbhhiqzl_3710_X,,,10.0,,,CSV,1
+CrazyClimber,target: 16 (anchor 미설정),10,56795.0,2026-08-28T20:17:23+00:00,4ngtu7az,CrazyClimber_4ngtu7az_10_O,16.0,,10.0,50000.0,50000.0,CSV,1
+CrazyClimber,target: 16 (anchor 미설정),2000,63275.0,2026-08-28T22:16:34+00:00,k526n304,CrazyClimber_k526n304_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+CrazyClimber,target: 16 (anchor 미설정),3710,53655.0,2026-08-26T03:20:25+00:00,jaj4v6zz,CrazyClimber_jaj4v6zz_3710_O,16.0,,10.0,50000.0,50000.0,CSV,1
+CrazyClimber,target: 4 (anchor 미설정),10,52235.0,2026-09-04T23:53:36+00:00,kui99qu2,CrazyClimber_kui99qu2_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+CrazyClimber,target: 4 (anchor 미설정),3710,55245.0,2026-09-05T01:08:43+00:00,w071aum0,CrazyClimber_w071aum0_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+CrazyClimber,target: 4 (anchor 미설정),6000,57580.0,2026-09-05T11:29:27+00:00,g60g0k6u,CrazyClimber_g60g0k6u_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+CrazyClimber,target: 4 (anchor 미설정),6010,54185.0,2026-09-05T13:54:29+00:00,ntlaiwdx,CrazyClimber_ntlaiwdx_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+DemonAttack,Retrieval 미사용,10,214.25,2026-09-07T01:16:09+00:00,8205suyf,DemonAttack_8205suyf_10_X,,,10.0,,,CSV,1
+DemonAttack,Retrieval 미사용,710,139.75,2026-09-08T11:15:32+00:00,tanmq190,DemonAttack_tanmq190_710_X,,,10.0,,,CSV,1
+DemonAttack,Retrieval 미사용,2000,171.75,2026-08-15T06:21:10+00:00,wyla6aj7,DemonAttack_wyla6aj7_2000_X,,,10.0,,,CSV,1
+DemonAttack,Retrieval 미사용,3710,200.75,2026-09-08T10:49:18+00:00,su7schqf,DemonAttack_su7schqf_3710_X,,,10.0,,,CSV,1
+DemonAttack,Retrieval 미사용,5090,188.0,2026-08-17T08:47:49+00:00,prcbs56a,DemonAttack_prcbs56a_5090_X,,,10.0,,,CSV,1
+DemonAttack,target: 16 (anchor 미설정),10,150.75,2026-08-28T23:07:07+00:00,6liiyoxb,DemonAttack_6liiyoxb_10_O,16.0,,10.0,50000.0,50000.0,CSV,1
+DemonAttack,target: 16 (anchor 미설정),2000,192.25,2026-08-29T05:39:09+00:00,38jfqwlr,DemonAttack_38jfqwlr_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+DemonAttack,target: 4 (anchor 미설정),10,159.25,2026-09-05T02:39:29+00:00,8cp7cfbx,DemonAttack_8cp7cfbx_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+DemonAttack,target: 4 (anchor 미설정),6000,125.0,2026-09-05T14:02:47+00:00,4r4mkvwm,DemonAttack_4r4mkvwm_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+DemonAttack,target: 4 (anchor 미설정),6010,168.0,2026-09-05T16:34:29+00:00,yh5mfci2,DemonAttack_yh5mfci2_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+DemonAttack,target: 4 (anchor 미설정),6020,216.0,2026-09-05T16:39:57+00:00,cwwm6dkt,DemonAttack_cwwm6dkt_6020_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Freeway,Retrieval 미사용,2000,0.0,2026-08-15T06:45:29+00:00,h39cd3zm,Freeway_h39cd3zm_2000_X,,,10.0,,,CSV,1
+Frostbite,Retrieval 미사용,10,2068.0,2026-08-11T04:36:29+00:00,legacy-frostbite-10,Manual recovery,,,,,,Legacy manual recovery,1
+Frostbite,Retrieval 미사용,710,2270.5,2026-08-12T00:32:22+00:00,xkrcm9jk,Frostbite_xkrcm9jk_710_X,,,10.0,,,CSV,1
+Frostbite,Retrieval 미사용,3710,1904.0,2026-08-11T04:36:35+00:00,legacy-frostbite-3710,Manual recovery,,,,,,Legacy manual recovery,1
+Frostbite,Retrieval 미사용,6000,2408.0,2026-09-02T11:53:44+00:00,a73hf55h,Frostbite_a73hf55h_6000_X,,,9.0,,,CSV,5
+Frostbite,Retrieval 미사용,6010,254.5,2026-09-02T11:55:42+00:00,nf6or5rz,Frostbite_nf6or5rz_6010_X,,,9.0,,,CSV,5
+Frostbite,target: 1 (anchor 미설정),10,2301.0,2026-09-03T05:56:53+00:00,lby3b31o,Frostbite_lby3b31o_10_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Frostbite,target: 1 (anchor 미설정),710,2609.0,2026-09-03T06:33:25+00:00,b6a6mk2q,Frostbite_b6a6mk2q_710_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Frostbite,target: 1 (anchor 미설정),3710,3242.5,2026-09-03T08:36:44+00:00,pzj25g3d,Frostbite_pzj25g3d_3710_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Frostbite,target: 1 (anchor 미설정),6000,2119.5,2026-09-03T05:10:47+00:00,nmi7yn4w,Frostbite_nmi7yn4w_6000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Frostbite,target: 1 (anchor 미설정),6010,261.5,2026-09-03T05:11:08+00:00,ykunnmjg,Frostbite_ykunnmjg_6010_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.12),10,2206.0,2026-09-09T12:34:08+00:00,hjx29ozv,Frostbite_hjx29ozv_10_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.12),710,2601.0,2026-09-09T10:16:42+00:00,f22cjejm,Frostbite_f22cjejm_710_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.12),3710,2233.5,2026-09-09T09:45:58+00:00,rfaijhre,Frostbite_rfaijhre_3710_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.12),6000,2570.5,2026-09-09T17:00:33+00:00,zerremep,Frostbite_zerremep_6000_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.12),6010,258.5,2026-09-09T12:19:20+00:00,5anu1kmg,Frostbite_5anu1kmg_6010_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.2),10,1576.0,2026-09-08T19:16:46+00:00,btyu5vdm,Frostbite_btyu5vdm_10_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.2),710,2399.5,2026-09-08T16:50:36+00:00,76wdl0rf,Frostbite_76wdl0rf_710_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.2),3710,2629.0,2026-09-08T16:20:53+00:00,xztllxed,Frostbite_xztllxed_3710_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.2),6000,2378.5,2026-09-08T20:13:47+00:00,zqsvw9au,Frostbite_zqsvw9au_6000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 12 (anchor: 0.2),6010,257.5,2026-09-08T15:05:12+00:00,grvnrjje,Frostbite_grvnrjje_6010_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 16 (anchor 미설정),10,1959.0,2026-09-02T12:27:45+00:00,it9k6a5h,Frostbite_it9k6a5h_10_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Frostbite,target: 16 (anchor 미설정),710,1713.0,2026-09-02T12:48:29+00:00,9m1o68uw,Frostbite_9m1o68uw_710_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Frostbite,target: 16 (anchor 미설정),3710,2710.0,2026-09-02T15:28:35+00:00,ws5pi2ps,Frostbite_ws5pi2ps_3710_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Frostbite,target: 16 (anchor 미설정),6000,2474.0,2026-08-28T08:27:03+00:00,k103suuy,Frostbite_k103suuy_6000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 16 (anchor 미설정),6010,251.0,2026-08-28T08:27:45+00:00,vdgyhl39,Frostbite_vdgyhl39_6010_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 16 (anchor: 0.4),10,2127.5,2026-09-06T08:07:15+00:00,hmnnb6dt,Frostbite_hmnnb6dt_10_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 16 (anchor: 0.4),710,2493.5,2026-09-06T05:26:47+00:00,hru15nv5,Frostbite_hru15nv5_710_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 16 (anchor: 0.4),3710,2684.0,2026-09-06T05:17:56+00:00,bgs3j37r,Frostbite_bgs3j37r_3710_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 16 (anchor: 0.4),6000,1969.5,2026-09-06T10:37:34+00:00,66aoh95h,Frostbite_66aoh95h_6000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 16 (anchor: 0.4),6010,240.0,2026-09-06T05:34:49+00:00,saezpd09,Frostbite_saezpd09_6010_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 4 (anchor 미설정),10,2614.5,2026-09-04T01:36:30+00:00,3aw2qy1m,Frostbite_3aw2qy1m_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 4 (anchor 미설정),710,2107.0,2026-09-04T03:14:04+00:00,fx9yt267,Frostbite_fx9yt267_710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 4 (anchor 미설정),3710,2895.5,2026-09-04T04:22:29+00:00,3xzn7qnm,Frostbite_3xzn7qnm_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 4 (anchor 미설정),6000,2908.0,2026-09-04T01:25:40+00:00,z2fj3dto,Frostbite_z2fj3dto_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 4 (anchor 미설정),6010,265.5,2026-09-04T01:29:35+00:00,wrieli6l,Frostbite_wrieli6l_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 8 (anchor: 0.3),10,2469.0,2026-09-07T12:05:47+00:00,wzi7a74g,Frostbite_wzi7a74g_10_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 8 (anchor: 0.3),710,1933.5,2026-09-07T09:17:06+00:00,mmtk9ktt,Frostbite_mmtk9ktt_710_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 8 (anchor: 0.3),3710,2873.0,2026-09-07T09:14:21+00:00,vd1nv6gq,Frostbite_vd1nv6gq_3710_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 8 (anchor: 0.3),6000,2673.5,2026-09-07T12:47:32+00:00,d95hgy3u,Frostbite_d95hgy3u_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Frostbite,target: 8 (anchor: 0.3),6010,243.0,2026-09-07T12:41:10+00:00,1oilelbl,Frostbite_1oilelbl_6010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Gopher,Retrieval 미사용,1,5968.0,2026-08-11T19:03:15+00:00,gu3gyrb0,Gopher_gu3gyrb0_1_X,,,10.0,,,CSV,1
+Gopher,Retrieval 미사용,2,3752.0,2026-09-08T14:01:06+00:00,zlgy3908,Gopher_zlgy3908_2_X,,,10.0,,,CSV,1
+Gopher,Retrieval 미사용,10,3275.0,2026-08-12T15:10:12+00:00,kj5xuf12,Gopher_kj5xuf12_10_X,,,10.0,,,CSV,1
+Gopher,Retrieval 미사용,710,3914.0,2026-09-08T13:31:43+00:00,ap3cp0gb,Gopher_ap3cp0gb_710_X,,,10.0,,,CSV,1
+Gopher,Retrieval 미사용,3710,4219.0,2026-09-07T03:54:21+00:00,w9ddyfb4,Gopher_w9ddyfb4_3710_X,,,10.0,,,CSV,1
+Gopher,target: 16 (anchor 미설정),10,3327.0,2026-08-29T00:11:47+00:00,7no95xi5,Gopher_7no95xi5_10_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Gopher,target: 16 (anchor 미설정),3710,3829.0,2026-08-29T02:06:32+00:00,w8pqdyqr,Gopher_w8pqdyqr_3710_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Gopher,target: 4 (anchor 미설정),10,2972.0,2026-09-05T03:52:50+00:00,dtv4tfm2,Gopher_dtv4tfm2_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Gopher,target: 4 (anchor 미설정),3710,5071.0,2026-09-05T05:40:35+00:00,55cqyaw3,Gopher_55cqyaw3_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Gopher,target: 4 (anchor 미설정),6000,1051.0,2026-09-05T19:03:18+00:00,gsvmbdpy,Gopher_gsvmbdpy_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Gopher,target: 4 (anchor 미설정),6010,2234.0,2026-09-05T19:14:21+00:00,ic64hxjj,Gopher_ic64hxjj_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Gopher,target: 4 (anchor 미설정),6020,6449.0,2026-09-05T21:46:14+00:00,t2m6ggbo,Gopher_t2m6ggbo_6020_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Hero,Retrieval 미사용,1,7608.5,2026-08-12T21:29:52+00:00,abdl7rky,Hero_abdl7rky_1_X,,,10.0,,,CSV,1
+Hero,Retrieval 미사용,10,12996.75,2026-08-11T13:10:26+00:00,0g7od2ti,Hero_0g7od2ti_10_X,,,10.0,,,CSV,1
+Hero,Retrieval 미사용,710,13456.25,2026-09-07T04:01:08+00:00,5pfwi81q,Hero_5pfwi81q_710_X,,,10.0,,,CSV,1
+Hero,Retrieval 미사용,3710,13081.0,2026-09-07T06:33:58+00:00,ripirtlv,Hero_ripirtlv_3710_X,,,10.0,,,CSV,1
+Hero,target: 16 (anchor 미설정),10,13251.25,2026-08-29T03:09:18+00:00,asyvz492,Hero_asyvz492_10_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Hero,target: 16 (anchor 미설정),710,13231.5,2026-08-29T05:03:44+00:00,kztho94s,Hero_kztho94s_710_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Hero,target: 16 (anchor 미설정),3710,13325.5,2026-08-29T06:03:29+00:00,w35503nf,Hero_w35503nf_3710_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Hero,target: 4 (anchor 미설정),10,12006.5,2026-09-05T06:39:56+00:00,zagj621b,Hero_zagj621b_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Hero,target: 4 (anchor 미설정),710,12988.75,2026-09-05T08:30:05+00:00,65hprz52,Hero_65hprz52_710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Hero,target: 4 (anchor 미설정),3710,13014.25,2026-09-05T09:35:18+00:00,n2ojqw99,Hero_n2ojqw99_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Hero,target: 4 (anchor 미설정),6000,13259.25,2026-09-05T21:59:56+00:00,yie2utss,Hero_yie2utss_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Hero,target: 4 (anchor 미설정),6010,13452.0,2026-09-06T00:19:41+00:00,zm1prcdi,Hero_zm1prcdi_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Hero,target: 4 (anchor 미설정),6020,13431.25,2026-09-06T00:24:13+00:00,k8ojvqie,Hero_k8ojvqie_6020_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Jamesbond,Retrieval 미사용,1,490.0,2026-08-13T02:54:18+00:00,es6yncsk,Jamesbond_es6yncsk_1_X,,,10.0,,,CSV,1
+Jamesbond,target: 4 (anchor 미설정),10,370.0,2026-09-05T11:18:14+00:00,pud0832v,Jamesbond_pud0832v_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Jamesbond,target: 4 (anchor 미설정),710,412.5,2026-09-05T12:21:59+00:00,dikonkyx,Jamesbond_dikonkyx_710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Jamesbond,target: 4 (anchor 미설정),3710,550.0,2026-09-05T14:05:38+00:00,ybqffj1c,Jamesbond_ybqffj1c_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Kangaroo,Retrieval 미사용,10,1770.0,2026-09-07T06:39:25+00:00,f8f6bg81,Kangaroo_f8f6bg81_10_X,,,10.0,,,CSV,1
+Kangaroo,Retrieval 미사용,2000,1470.0,2026-08-15T13:09:25+00:00,4xumbmww,Kangaroo_4xumbmww_2000_X,,,10.0,,,CSV,1
+Kangaroo,Retrieval 미사용,2010,1730.0,2026-08-16T18:00:39+00:00,8tacn48b,Kangaroo_8tacn48b_2010_X,,,10.0,,,CSV,1
+Kangaroo,target: 16 (anchor 미설정),10,1760.0,2026-08-29T07:57:06+00:00,m3aquidt,Kangaroo_m3aquidt_10_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Kangaroo,target: 16 (anchor 미설정),2000,1590.0,2026-08-25T23:05:43+00:00,vb9yu9sk,Kangaroo_vb9yu9sk_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Kangaroo,target: 4 (anchor 미설정),10,1740.0,2026-09-05T15:08:27+00:00,pdca5ikf,Kangaroo_pdca5ikf_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Kangaroo,target: 4 (anchor 미설정),2000,1520.0,2026-09-05T07:44:18+00:00,17osyjqo,Kangaroo_17osyjqo_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Krull,Retrieval 미사용,10,6202.0,2026-09-06T16:48:59+00:00,w7rex1z4,Krull_w7rex1z4_10_X,,,10.0,,,CSV,1
+Krull,Retrieval 미사용,710,5689.0,2026-09-06T19:26:40+00:00,t3imlrmh,Krull_t3imlrmh_710_X,,,10.0,,,CSV,1
+Krull,Retrieval 미사용,2000,4708.5,2026-08-15T13:31:11+00:00,302gbj88,Krull_302gbj88_2000_X,,,10.0,,,CSV,1
+Krull,Retrieval 미사용,2010,5913.5,2026-08-16T23:40:00+00:00,iyv69dz1,Krull_iyv69dz1_2010_X,,,10.0,,,CSV,1
+Krull,Retrieval 미사용,3710,6107.5,2026-09-06T16:58:15+00:00,zj353rj8,Krull_zj353rj8_3710_X,,,10.0,,,CSV,1
+Krull,target: 1 (anchor 미설정),2000,4851.0,2026-09-03T13:19:19+00:00,6foystrq,Krull_6foystrq_2000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Krull,target: 1 (anchor 미설정),2010,6044.0,2026-09-03T16:00:44+00:00,uk1s6s8x,Krull_uk1s6s8x_2010_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.12),10,7029.5,2026-09-09T18:09:02+00:00,8c4tiai3,Krull_8c4tiai3_10_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.12),710,5384.0,2026-09-09T21:41:30+00:00,6r4782l4,Krull_6r4782l4_710_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.12),2000,4193.5,2026-09-09T21:57:04+00:00,sgj1i3u9,Krull_sgj1i3u9_2000_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.12),2010,5692.0,2026-09-09T21:50:05+00:00,8a6mjck2,Krull_8a6mjck2_2010_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.12),3710,7110.0,2026-09-09T20:59:39+00:00,97qoh322,Krull_97qoh322_3710_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.2),10,6856.0,2026-09-09T01:00:11+00:00,r1trg89u,Krull_r1trg89u_10_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.2),710,6070.5,2026-09-09T04:33:40+00:00,jk5aqccx,Krull_jk5aqccx_710_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.2),2000,4257.5,2026-09-08T23:38:18+00:00,8tjb8z2a,Krull_8tjb8z2a_2000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.2),2010,6495.5,2026-09-08T23:33:35+00:00,7a96ljcx,Krull_7a96ljcx_2010_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Krull,target: 12 (anchor: 0.2),3710,6323.0,2026-09-09T03:53:27+00:00,eae7999i,Krull_eae7999i_3710_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Krull,target: 16 (anchor 미설정),10,6576.5,2026-08-29T09:05:07+00:00,otjw8tfq,Krull_otjw8tfq_10_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Krull,target: 16 (anchor 미설정),2000,5123.0,2026-09-02T21:04:50+00:00,u4lhk97u,Krull_u4lhk97u_2000_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Krull,target: 16 (anchor 미설정),2010,6054.0,2026-09-02T22:53:58+00:00,bt24pjxe,Krull_bt24pjxe_2010_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Krull,target: 16 (anchor: 0.4),10,6858.5,2026-09-06T13:46:19+00:00,8nswiawj,Krull_8nswiawj_10_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Krull,target: 16 (anchor: 0.4),710,5958.0,2026-09-06T22:19:44+00:00,zgszlz75,Krull_zgszlz75_710_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Krull,target: 16 (anchor: 0.4),2000,3667.5,2026-09-06T12:55:57+00:00,yvuqdsg3,Krull_yvuqdsg3_2000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Krull,target: 16 (anchor: 0.4),2010,5893.5,2026-09-06T12:46:39+00:00,g9hwc59t,Krull_g9hwc59t_2010_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Krull,target: 16 (anchor: 0.4),3710,6280.5,2026-09-06T22:04:06+00:00,tn3wop1x,Krull_tn3wop1x_3710_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Krull,target: 4 (anchor 미설정),10,6096.5,2026-09-05T17:04:20+00:00,bel72ams,Krull_bel72ams_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Krull,target: 4 (anchor 미설정),2000,4885.5,2026-09-04T13:20:18+00:00,dknbluul,Krull_dknbluul_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Krull,target: 4 (anchor 미설정),2010,5247.5,2026-09-04T15:48:32+00:00,3meip5qr,Krull_3meip5qr_2010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Krull,target: 8 (anchor: 0.3),10,7436.0,2026-09-07T17:44:03+00:00,jpcwqn68,Krull_jpcwqn68_10_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Krull,target: 8 (anchor: 0.3),710,6586.0,2026-09-07T21:10:34+00:00,ahr2u2hg,Krull_ahr2u2hg_710_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Krull,target: 8 (anchor: 0.3),2000,4314.0,2026-09-07T18:20:14+00:00,p3n0ctby,Krull_p3n0ctby_2000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Krull,target: 8 (anchor: 0.3),2010,5770.0,2026-09-07T18:14:07+00:00,uu0xj5rw,Krull_uu0xj5rw_2010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Krull,target: 8 (anchor: 0.3),3710,5637.0,2026-09-07T20:36:00+00:00,hhnw19y5,Krull_hhnw19y5_3710_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+KungFuMaster,Retrieval 미사용,10,26460.0,2026-09-08T00:12:54+00:00,vcagthyq,KungFuMaster_vcagthyq_10_X,,,10.0,,,CSV,1
+KungFuMaster,Retrieval 미사용,2000,23815.0,2026-08-15T19:56:00+00:00,5v719v97,KungFuMaster_5v719v97_2000_X,,,10.0,,,CSV,1
+KungFuMaster,Retrieval 미사용,2010,20895.0,2026-08-17T00:46:30+00:00,vo2l3l6a,KungFuMaster_vo2l3l6a_2010_X,,,10.0,,,CSV,1
+KungFuMaster,target: 16 (anchor 미설정),10,30110.0,2026-08-29T10:57:27+00:00,z8em68fp,KungFuMaster_z8em68fp_10_O,16.0,,10.0,50000.0,50000.0,CSV,1
+KungFuMaster,target: 16 (anchor 미설정),2000,20245.0,2026-08-26T06:02:20+00:00,fbbwodgs,KungFuMaster_fbbwodgs_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+KungFuMaster,target: 4 (anchor 미설정),10,28085.0,2026-09-05T17:57:55+00:00,oni1rl1n,KungFuMaster_oni1rl1n_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+KungFuMaster,target: 4 (anchor 미설정),2000,21195.0,2026-09-05T13:49:07+00:00,aik6bt4t,KungFuMaster_aik6bt4t_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+MsPacman,Retrieval 미사용,1,1807.5,2026-08-11T21:43:01+00:00,m1aqiq1r,MsPacman_m1aqiq1r_1_X,,,10.0,,,CSV,1
+MsPacman,Retrieval 미사용,10,2007.0,2026-08-12T20:41:07+00:00,f2f1pwux,MsPacman_f2f1pwux_10_X,,,10.0,,,CSV,1
+MsPacman,target: 4 (anchor 미설정),1,1602.5,2026-09-05T20:45:38+00:00,5typ27il,MsPacman_5typ27il_1_O,4.0,,10.0,50000.0,50000.0,CSV,1
+MsPacman,target: 4 (anchor 미설정),10,2583.5,2026-09-05T20:00:14+00:00,uvarucxg,MsPacman_uvarucxg_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+MsPacman,target: 4 (anchor 미설정),3710,2021.5,2026-09-05T22:45:54+00:00,ib1zhd0c,MsPacman_ib1zhd0c_3710_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Pong,Retrieval 미사용,2000,5.7,2026-08-15T20:22:42+00:00,v63zafer,Pong_v63zafer_2000_X,,,10.0,,,CSV,1
+Pong,Retrieval 미사용,2010,13.7,2026-08-17T06:21:18+00:00,mbkdzqfm,Pong_mbkdzqfm_2010_X,,,10.0,,,CSV,1
+Pong,target: 16 (anchor 미설정),2000,9.8,2026-08-26T06:27:12+00:00,0p0mw23k,Pong_0p0mw23k_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Pong,target: 4 (anchor 미설정),10,12.3,2026-09-05T23:28:12+00:00,x0k7i34y,Pong_x0k7i34y_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Pong,target: 4 (anchor 미설정),2000,5.4,2026-09-05T16:20:36+00:00,dekzu94w,Pong_dekzu94w_2000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Qbert,Retrieval 미사용,1,1771.25,2026-08-13T00:08:22+00:00,w1hqiqbo,Qbert_w1hqiqbo_1_X,,,10.0,,,CSV,1
+Qbert,Retrieval 미사용,10,3786.25,2026-08-14T05:38:53+00:00,moln5tny,Qbert_moln5tny_10_X,,,10.0,,,CSV,1
+Qbert,Retrieval 미사용,2000,3193.75,2026-08-17T13:08:34+00:00,9wc68vrt,Qbert_9wc68vrt_2000_X,,,10.0,,,CSV,1
+Qbert,Retrieval 미사용,3710,2940.0,2026-08-28T06:53:30+00:00,xiph2t3p,Qbert_xiph2t3p_3710_X,,,10.0,,,CSV,1
+Qbert,Retrieval 미사용,6000,2642.5,2026-09-02T16:48:46+00:00,khttcftq,Qbert_khttcftq_6000_X,,,9.0,,,CSV,5
+Qbert,target: 1 (anchor 미설정),1,2818.75,2026-09-03T11:18:08+00:00,2gi0no2u,Qbert_2gi0no2u_1_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Qbert,target: 1 (anchor 미설정),10,1918.75,2026-09-03T09:19:09+00:00,ox9latfb,Qbert_ox9latfb_10_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Qbert,target: 1 (anchor 미설정),3710,2553.75,2026-09-03T12:10:25+00:00,7y38q8bu,Qbert_7y38q8bu_3710_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Qbert,target: 1 (anchor 미설정),6000,3782.5,2026-09-03T10:16:15+00:00,ocgw5bmo,Qbert_ocgw5bmo_6000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.12),1,2262.5,2026-09-09T15:55:04+00:00,nufwvhlv,Qbert_nufwvhlv_1_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.12),10,3260.0,2026-09-09T15:23:18+00:00,i1w911p2,Qbert_i1w911p2_10_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.12),3710,3016.25,2026-09-09T13:07:26+00:00,6ayr06bd,Qbert_6ayr06bd_3710_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.12),6000,3817.5,2026-09-09T17:10:15+00:00,se6msdal,Qbert_se6msdal_6000_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.2),1,1712.5,2026-09-08T22:40:11+00:00,5nk7xlos,Qbert_5nk7xlos_1_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.2),10,2776.25,2026-09-08T22:10:49+00:00,70ozowce,Qbert_70ozowce_10_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.2),2000,2857.5,2026-09-09T06:58:57+00:00,57errl31,Qbert_57errl31_2000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.2),3710,2607.5,2026-09-08T19:48:03+00:00,ogyl0txp,Qbert_ogyl0txp_3710_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 12 (anchor: 0.2),6000,3980.0,2026-09-08T20:17:45+00:00,t79rs0h5,Qbert_t79rs0h5_6000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 16 (anchor 미설정),1,1707.5,2026-09-02T18:21:17+00:00,dm4gsvmb,Qbert_dm4gsvmb_1_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Qbert,target: 16 (anchor 미설정),10,1913.75,2026-09-02T15:48:04+00:00,8z1j9quz,Qbert_8z1j9quz_10_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Qbert,target: 16 (anchor 미설정),2000,2608.75,2026-08-29T05:47:57+00:00,x6t8pgi6,Qbert_x6t8pgi6_2000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 16 (anchor 미설정),3710,900.0,2026-09-02T18:43:35+00:00,j4cu2jxc,Qbert_j4cu2jxc_3710_O,16.0,,9.0,50000.0,50000.0,CSV,2
+Qbert,target: 16 (anchor 미설정),6000,2895.0,2026-08-28T19:21:22+00:00,xp0j5gtz,Qbert_xp0j5gtz_6000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 16 (anchor: 0.4),1,2335.0,2026-09-06T11:06:26+00:00,likyq9wu,Qbert_likyq9wu_1_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 16 (anchor: 0.4),10,2205.0,2026-09-06T10:59:44+00:00,ta82zwcr,Qbert_ta82zwcr_10_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 16 (anchor: 0.4),2000,2983.75,2026-09-06T20:03:36+00:00,cy8jxl8t,Qbert_cy8jxl8t_2000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 16 (anchor: 0.4),3710,2226.25,2026-09-06T08:17:46+00:00,gjhharv9,Qbert_gjhharv9_3710_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 16 (anchor: 0.4),6000,3712.5,2026-09-06T10:37:47+00:00,6eos9yad,Qbert_6eos9yad_6000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 4 (anchor 미설정),1,3486.25,2026-09-04T07:16:26+00:00,53tmhdip,Qbert_53tmhdip_1_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 4 (anchor 미설정),10,2887.5,2026-09-04T05:59:03+00:00,e3gc8nbv,Qbert_e3gc8nbv_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 4 (anchor 미설정),3710,2718.75,2026-09-06T01:31:05+00:00,8yv3yf7e,Qbert_8yv3yf7e_3710_O,4.0,,10.0,50000.0,50000.0,CSV,2
+Qbert,target: 4 (anchor 미설정),6000,3366.25,2026-09-04T06:41:48+00:00,8vvg6qrp,Qbert_8vvg6qrp_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 8 (anchor: 0.3),1,2147.5,2026-09-07T14:57:30+00:00,ncy2ckvb,Qbert_ncy2ckvb_1_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 8 (anchor: 0.3),10,3235.0,2026-09-07T14:57:18+00:00,x3gr2gw0,Qbert_x3gr2gw0_10_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 8 (anchor: 0.3),2000,2375.0,2026-09-08T01:31:56+00:00,u24udlzt,Qbert_u24udlzt_2000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 8 (anchor: 0.3),3710,2648.75,2026-09-07T12:05:59+00:00,3sk3f0ou,Qbert_3sk3f0ou_3710_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+Qbert,target: 8 (anchor: 0.3),6000,3032.5,2026-09-07T12:49:27+00:00,0cmidcnw,Qbert_0cmidcnw_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+RoadRunner,target: 4 (anchor 미설정),10,15745.0,2026-09-06T02:17:01+00:00,2d26p8y1,RoadRunner_2d26p8y1_10_O,4.0,,10.0,50000.0,50000.0,CSV,1
+Seaquest,Retrieval 미사용,1,454.0,2026-08-13T20:34:30+00:00,m5jcaa5a,Seaquest_m5jcaa5a_1_X,,,10.0,,,CSV,1
+UpNDown,Retrieval 미사용,1,9044.0,2026-08-13T01:57:21+00:00,d2hkqq0o,UpNDown_d2hkqq0o_1_X,,,10.0,,,CSV,1
+UpNDown,Retrieval 미사용,3710,5849.0,2026-09-06T19:37:43+00:00,9qeudy0o,UpNDown_9qeudy0o_3710_X,,,10.0,,,CSV,1
+UpNDown,Retrieval 미사용,6000,5715.5,2026-09-02T14:05:17+00:00,ij0nfckf,UpNDown_ij0nfckf_6000_X,,,9.0,,,CSV,5
+UpNDown,Retrieval 미사용,6010,6136.5,2026-09-02T14:21:16+00:00,5wyfe3io,UpNDown_5wyfe3io_6010_X,,,9.0,,,CSV,5
+UpNDown,Retrieval 미사용,6020,2709.5,2026-09-02T16:47:10+00:00,g3ztlr29,UpNDown_g3ztlr29_6020_X,,,9.0,,,CSV,5
+UpNDown,target: 1 (anchor 미설정),6000,5670.0,2026-09-03T07:38:12+00:00,swshjz4c,UpNDown_swshjz4c_6000_O,1.0,,11.0,50000.0,50000.0,CSV,1
+UpNDown,target: 1 (anchor 미설정),6010,7178.0,2026-09-03T07:39:25+00:00,gfu9tg3g,UpNDown_gfu9tg3g_6010_O,1.0,,11.0,50000.0,50000.0,CSV,1
+UpNDown,target: 1 (anchor 미설정),6020,3066.0,2026-09-03T10:12:39+00:00,x7uzwomw,UpNDown_x7uzwomw_6020_O,1.0,,11.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.12),1,7455.5,2026-09-09T18:41:12+00:00,gngniyva,UpNDown_gngniyva_1_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.12),3710,6265.5,2026-09-09T23:49:58+00:00,w4p3nwck,UpNDown_w4p3nwck_3710_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.12),6000,5773.0,2026-09-09T22:14:16+00:00,nv1fa3lz,UpNDown_nv1fa3lz_6000_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.12),6010,7571.5,2026-09-09T17:32:51+00:00,yc8bwf3v,UpNDown_yc8bwf3v_6010_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.12),6020,2830.0,2026-09-09T17:27:25+00:00,mom37dox,UpNDown_mom37dox_6020_O,12.0,0.12,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.2),1,11443.0,2026-09-09T01:29:42+00:00,bi06mry4,UpNDown_bi06mry4_1_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.2),3710,6498.0,2026-09-09T06:46:06+00:00,jfm5fg45,UpNDown_jfm5fg45_3710_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.2),6000,5966.5,2026-09-09T01:23:49+00:00,vvj4x06z,UpNDown_vvj4x06z_6000_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.2),6010,5694.5,2026-09-08T20:19:43+00:00,rg6j666n,UpNDown_rg6j666n_6010_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 12 (anchor: 0.2),6020,2656.0,2026-09-08T20:19:01+00:00,md6am2zc,UpNDown_md6am2zc_6020_O,12.0,0.2,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 16 (anchor 미설정),6000,6043.0,2026-08-28T13:25:44+00:00,n9qrg0xz,UpNDown_n9qrg0xz_6000_O,16.0,,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 16 (anchor 미설정),6010,6658.0,2026-08-28T13:48:54+00:00,n7mei9h1,UpNDown_n7mei9h1_6010_O,16.0,,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 16 (anchor 미설정),6020,2974.5,2026-08-28T18:35:01+00:00,ii8y5agx,UpNDown_ii8y5agx_6020_O,16.0,,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 16 (anchor: 0.4),1,6992.5,2026-09-06T13:52:24+00:00,pdl9tqre,UpNDown_pdl9tqre_1_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 16 (anchor: 0.4),3710,6609.0,2026-09-07T00:58:42+00:00,3o3vuyjd,UpNDown_3o3vuyjd_3710_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 16 (anchor: 0.4),6000,5697.5,2026-09-06T15:47:00+00:00,b0jkbwmu,UpNDown_b0jkbwmu_6000_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 16 (anchor: 0.4),6010,6277.0,2026-09-06T10:51:07+00:00,85iu03z8,UpNDown_85iu03z8_6010_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 16 (anchor: 0.4),6020,3092.5,2026-09-06T10:47:52+00:00,od6dz985,UpNDown_od6dz985_6020_O,16.0,0.4,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 4 (anchor 미설정),6000,5422.0,2026-09-04T04:03:11+00:00,mxxube7u,UpNDown_mxxube7u_6000_O,4.0,,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 4 (anchor 미설정),6010,6443.0,2026-09-04T04:03:13+00:00,vc4snhnm,UpNDown_vc4snhnm_6010_O,4.0,,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 4 (anchor 미설정),6020,3493.5,2026-09-04T06:34:00+00:00,0sjs86to,UpNDown_0sjs86to_6020_O,4.0,,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 8 (anchor: 0.3),1,8285.5,2026-09-07T17:57:44+00:00,10h0dasg,UpNDown_10h0dasg_1_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 8 (anchor: 0.3),3710,6405.5,2026-09-07T23:26:08+00:00,pgq5byva,UpNDown_pgq5byva_3710_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 8 (anchor: 0.3),6000,5303.0,2026-09-07T17:56:26+00:00,wyx24xjy,UpNDown_wyx24xjy_6000_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 8 (anchor: 0.3),6010,5784.0,2026-09-07T17:47:44+00:00,xkn56sdn,UpNDown_xkn56sdn_6010_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1
+UpNDown,target: 8 (anchor: 0.3),6020,3049.5,2026-09-07T17:18:49+00:00,ncmupyjk,UpNDown_ncmupyjk_6020_O,8.0,0.3,10.0,50000.0,50000.0,CSV,1

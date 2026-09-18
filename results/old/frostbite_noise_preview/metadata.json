@@ -1,0 +1,39 @@
+{
+  "data": "/media/storage_data/ai2lab/choemj/STORM/probing_data/Frostbite_20260822_201417.npz",
+  "frame_index": 305,
+  "source_ram_stage": 8,
+  "seed": 42,
+  "strengths": [
+    0.0,
+    0.25,
+    0.5,
+    0.75,
+    1.0
+  ],
+  "stages": [
+    0,
+    1,
+    2,
+    3,
+    4,
+    5,
+    6,
+    7,
+    8,
+    9,
+    10,
+    11,
+    12,
+    13,
+    14,
+    15,
+    16
+  ],
+  "template_dir": "/media/storage_data/ai2lab/choemj/STORM/frostbite_igloo_templates",
+  "target_region": "obs[:, 10:17, 42:58, :]",
+  "stage_method": "Template replacement from eval_frostbite_value.py; not performed by probe training itself",
+  "noise_method": "Direct call to train_probing_mlp.inject_background_noise",
+  "noise_seed_policy": "Same seed for each single-frame variant; identical background across stages",
+  "display": "Raw PNGs are 64x64 RGB; contact sheets use 4x nearest-neighbor enlargement",
+  "checks": "Target matches template exactly; background identical across stages; clean background matches source"
+}

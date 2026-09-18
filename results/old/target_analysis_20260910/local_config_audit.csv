@@ -1,0 +1,172 @@
+Run ID,target,anchor_weight,hash_bits,global_rebuild_threshold,max_anchors,anchor_offset,steps,Config
+ubtaj9sj,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+7yhsfsa7,16,,10,0.06,16,-2,102000,Retrieval 미사용
+lby3b31o,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+8muy8hjz,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+2d26p8y1,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+m5jcaa5a,16,,10,0.06,16,-2,102000,Retrieval 미사용
+xiph2t3p,16,,10,0.06,16,-2,102000,Retrieval 미사용
+zsaukhwx,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+xkrcm9jk,16,,10,0.06,16,-2,102000,Retrieval 미사용
+jzgh0p3a,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+ta82zwcr,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+ncy2ckvb,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+fzue8cpx,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+my03b615,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+3xzn7qnm,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+yd9o7wm7,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+0594ds6t,16,,10,0.06,16,-2,102000,Retrieval 미사용
+j4cu2jxc,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+4ngtu7az,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+abdl7rky,16,,10,0.06,16,-2,102000,Retrieval 미사용
+55cqyaw3,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+76wdl0rf,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+7y38q8bu,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+asyvz492,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+gjhharv9,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+ap3cp0gb,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+kztho94s,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+8cp7cfbx,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+5pfwi81q,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+w7rex1z4,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+ti2d8k6i,16,,10,0.06,16,-2,102000,Retrieval 미사용
+sbhhiqzl,16,,10,0.06,16,-2,102000,Retrieval 미사용
+10h0dasg,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+f22cjejm,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+53tmhdip,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+as286v3o,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+bgs3j37r,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+9vuw278h,16,,10,0.06,16,-2,102000,Retrieval 미사용
+w071aum0,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+zl4mdqxb,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+k4o02nt6,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+6rblogus,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+25pg963s,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+eae7999i,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+hkojwxtr,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+zlgy3908,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+6wzftqu5,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+jpcwqn68,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+21dfi122,16,,10,0.06,16,-2,102000,Retrieval 미사용
+w9ddyfb4,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+pzj25g3d,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+w4p3nwck,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+zgszlz75,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+jfm5fg45,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+2vcgxgdx,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+r1trg89u,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+w1hqiqbo,16,,10,0.06,16,-2,102000,Retrieval 미사용
+toxgeo04,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+s9hi31ki,16,,10,0.06,16,-2,102000,Retrieval 미사용
+es6yncsk,16,,10,0.06,16,-2,102000,Retrieval 미사용
+6ayr06bd,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+m1aqiq1r,16,,10,0.06,16,-2,102000,Retrieval 미사용
+dikonkyx,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+0i5yuas8,16,,10,0.06,16,-2,102000,Retrieval 미사용
+tvlw910l,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+hjx29ozv,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+pp9azut3,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+3o3vuyjd,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+e6itftuv,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+bi06mry4,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+gngniyva,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+kui99qu2,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+e3gc8nbv,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+nl82qf67,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+1jd8nkls,16,,10,0.06,16,-2,102000,Retrieval 미사용
+0g7od2ti,16,,10,0.06,16,-2,102000,Retrieval 미사용
+koqbgsvp,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+z8em68fp,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+fhlq8r7s,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+8c4tiai3,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+jaj4v6zz,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+5nk7xlos,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+3810f6xi,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+nufwvhlv,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+ib1zhd0c,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+82by942d,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+f8f6bg81,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+9m1o68uw,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+5ih832yt,16,,10,0.06,16,-2,102000,Retrieval 미사용
+97qoh322,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+rfaijhre,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+hmnnb6dt,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+pgq5byva,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+w8pqdyqr,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+uvarucxg,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+5typ27il,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+8yv3yf7e,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+zj353rj8,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+3sk3f0ou,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+b6a6mk2q,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+7no95xi5,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+8205suyf,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+aa8agtws,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+xx5eupnm,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+moln5tny,16,,10,0.06,16,-2,102000,Retrieval 미사용
+btyu5vdm,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+f2f1pwux,16,,10,0.06,16,-2,102000,Retrieval 미사용
+ox9latfb,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+pdca5ikf,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+ws5pi2ps,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+tn3wop1x,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+su7schqf,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+i1w911p2,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+16tpcrn0,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+mmtk9ktt,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+pdl9tqre,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+vd1nv6gq,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+gu3gyrb0,16,,10,0.06,16,-2,102000,Retrieval 미사용
+99zpfdl7,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+ahr2u2hg,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+2q3ainje,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+w35503nf,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+zagj621b,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+6liiyoxb,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+tanmq190,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+8nswiawj,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+mzfiir0p,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+65hprz52,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+xztllxed,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+hhnw19y5,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+x3gr2gw0,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+cw88m4aj,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+n2ojqw99,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+x0k7i34y,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+3aw2qy1m,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+rzvmg6ep,16,,10,0.06,16,-2,102000,Retrieval 미사용
+70ozowce,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+hru15nv5,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+po5gth3a,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+jk5aqccx,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+tj7lde7m,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+184vzsq3,16,,10,0.06,16,-2,102000,Retrieval 미사용
+vcagthyq,8,0.3,10,0.06,16,-2,102000,Retrieval 미사용
+wzi7a74g,8,0.3,10,0.06,16,-2,102000,target: 8 (anchor: 0.3)
+bel72ams,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+9qeudy0o,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+ogyl0txp,12,0.2,10,0.06,16,-2,102000,target: 12 (anchor: 0.2)
+dtv4tfm2,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+it9k6a5h,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+ripirtlv,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+km8e9105,16,,10,0.06,16,-2,102000,Retrieval 미사용
+otjw8tfq,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+t3imlrmh,16,0.4,10,0.06,16,-2,102000,Retrieval 미사용
+ix0b33ni,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+2gdrofw8,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+ybqffj1c,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+sz253i2k,16,,10,0.06,16,-2,102000,Retrieval 미사용
+m3aquidt,16,,10,0.06,16,-2,102000,target: 16 (anchor 미설정)
+pud0832v,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+6r4782l4,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+vrz37gzy,12,0.12,10,0.12,16,-2,102000,target: 12 (anchor: 0.12)
+8z1j9quz,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)
+fx9yt267,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+lu0fnh60,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+likyq9wu,16,0.4,10,0.06,16,-2,102000,target: 16 (anchor: 0.4)
+oni1rl1n,4,,10,0.06,16,-2,102000,target: 4 (anchor 미설정)
+h7aofkuv,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+d2hkqq0o,16,,10,0.06,16,-2,102000,Retrieval 미사용
+kj5xuf12,16,,10,0.06,16,-2,102000,Retrieval 미사용
+2gi0no2u,1,,11,0.06,16,-2,102000,target: 1 (anchor 미설정)
+dm4gsvmb,16,,9,0.06,16,-2,102000,target: 16 (anchor 미설정)

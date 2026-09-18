@@ -1,0 +1,81 @@
+{
+  "run": {
+    "run_path": "choemj-kaist/STORM/xwjq84g8",
+    "run_name": "Asterix_xwjq84g8_1_O",
+    "state": "finished",
+    "created_at": "2026-09-11T01:38:43Z",
+    "commit": "fbd79f3490d944d74ee7fc0eb87b1183a159a75a",
+    "training_seed_from_name": 1,
+    "wandb_version": "0.28.1",
+    "config": {
+      "BasicSettings.Seed": 0,
+      "JointTrainAgent.NumEnvs": 1,
+      "JointTrainAgent.SampleMaxSteps": 102000,
+      "JointTrainAgent.BufferWarmUp": 1024,
+      "JointTrainAgent.BufferMaxLength": 100000,
+      "JointTrainAgent.UseDemonstration": false,
+      "JointTrainAgent.EvalMode": "final_only",
+      "JointTrainAgent.EvalEverySteps": 2500,
+      "JointTrainAgent.EvalEpisodes": 20,
+      "JointTrainAgent.EvalStartStep": 0,
+      "JointTrainAgent.Retrieval.enable": true,
+      "JointTrainAgent.Retrieval.target": 12,
+      "JointTrainAgent.Retrieval.anchor_weight": 0.12,
+      "JointTrainAgent.Retrieval.hash_bits": 10,
+      "JointTrainAgent.Retrieval.warmup_steps": 50000,
+      "JointTrainAgent.Retrieval.batch_size_reduction": "retrieved",
+      "JointTrainAgent.Retrieval.z_score_threshold": 3.5
+    },
+    "summary_eval_mean": 577.5,
+    "history_method": "history(x_axis='_step')",
+    "history_requested_samples": 1000000,
+    "history_completeness": "unverified"
+  },
+  "training_episode_count": 267,
+  "history_completeness": "unverified",
+  "training_reward_range": [
+    100,
+    1450
+  ],
+  "training_first_record": {
+    "wandb_step": 0,
+    "episode_return": 400,
+    "episode_length": 327,
+    "replay_buffer_length": 328
+  },
+  "training_last_record": {
+    "wandb_step": 100790,
+    "episode_return": 1100,
+    "episode_length": 464,
+    "replay_buffer_length": 100000
+  },
+  "evaluation_checkpoint_count": 1,
+  "last_evaluation": {
+    "wandb_step": 100979,
+    "logged_mean": 577.5,
+    "episode_count": 20,
+    "recomputed_mean": 577.5,
+    "mean_matches": true,
+    "episode_count_matches_config": true
+  },
+  "expected_eval_episode_count": 20,
+  "training_records_missing_length": 0,
+  "training_records_missing_buffer_length": 0,
+  "notes": [
+    "history() may sample records even with a large samples request; completeness is not yet verified.",
+    "Verify completeness before using the observed training maximum or first-success time in final analyses.",
+    "_step is the W&B logging index, not automatically an environment step.",
+    "Episode length is a duration, not the global training step.",
+    "Buffer length may help recover environment steps only after checking capacity, resume, and demonstration use.",
+    "episode_return_i indexes evaluation episodes; it is not an explicitly recorded evaluation seed.",
+    "Final evaluation must use its actual training budget; do not relabel 102000 as 100000.",
+    "One run tests data access only; across-training-seed comparisons require more runs later."
+  ],
+  "data_available_for": {
+    "training_success_detection_and_best_return": true,
+    "best_training_vs_last_evaluation_gap": true,
+    "last_evaluation_success_fraction": true,
+    "evaluation_trajectory": false,
+    "training_success_repetition": true
+  }
+}

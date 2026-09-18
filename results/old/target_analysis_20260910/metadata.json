@@ -1,0 +1,13 @@
+{
+  "bootstrap_replicates": 50000,
+  "random_seed": 20260910,
+  "unit": "training-run evaluation mean",
+  "sampling": "fixed games, seeds within each game",
+  "interval": "percentile 95%; no correction for candidate selection",
+  "verified": "420 selected runs and all workbook three-way point estimates reproduced",
+  "inputs_sha256": {
+    "/media/storage_data/ai2lab/choemj/STORM/target_comparison.xlsx": "01e34ba4eb620b21b9f1e0013da3f43f49855ae0b90fb79aba34ec3e88e217bc",
+    "/media/storage_data/ai2lab/choemj/STORM/wandb_runs_classification.csv": "00c54f3a33d7a3c19ebad8635bb9732f38496cd7a5ab6867049157dba65cca7a",
+    "/media/storage_data/ai2lab/choemj/iclr2027_conference.tex": "5d0276860eb423017715eec7f6bcfd9a8941c7e2acb86d7424809eaa8d2a7397"
+  }
+}

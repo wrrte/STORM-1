@@ -1,0 +1,154 @@
+{
+  "bootstrap_unit": "episode",
+  "repetitions": 10000,
+  "seed": 2027,
+  "interval_method": "paired cluster percentile 95%",
+  "estimand": "Frame-weighted mean over contexts where both correlations are defined",
+  "undefined_handling": "Constant predictions are undefined; exclude pair for that metric; report counts",
+  "uncertainty_scope": "Context sampling for two fixed checkpoints only",
+  "evaluated_frames": 17424,
+  "evaluated_episodes": 21,
+  "evaluated_blocks": 322,
+  "metrics": {
+    "spearman": {
+      "n": 17424,
+      "clusters": 21,
+      "means": [
+        0.1347765432171401,
+        0.15371871201356999,
+        0.018942168796429872
+      ],
+      "ci95": [
+        [
+          0.10459714302818068,
+          0.16507417727385842
+        ],
+        [
+          0.12635162734035546,
+          0.1820658128128776
+        ],
+        [
+          -0.02304792073464136,
+          0.05863880808301966
+        ]
+      ],
+      "undefined_baseline": 0,
+      "undefined_flash": 0,
+      "excluded_pairs": 0,
+      "baseline": {
+        "mean": 0.1347765432171401,
+        "median": 0.1729000938101322,
+        "q1": -0.4541373852402892,
+        "q3": 0.7778841503838081,
+        "iqr": 1.2320215356240973
+      },
+      "flash": {
+        "mean": 0.15371871201356999,
+        "median": 0.2993867284330168,
+        "q1": -0.3707266823415223,
+        "q3": 0.7118720182833134,
+        "iqr": 1.0825987006248357
+      },
+      "difference": {
+        "mean": 0.018942168796429872,
+        "median": -0.04410893910421654,
+        "q1": -0.2414591845304619,
+        "q3": 0.23367120922285872,
+        "iqr": 0.4751303937533206
+      },
+      "improved_fraction": 0.4255050505050505,
+      "tied_fraction": 0.0001721763085399449,
+      "worsened_fraction": 0.5743227731864096,
+      "baseline_all_defined": {
+        "mean": 0.1347765432171401,
+        "median": 0.1729000938101322,
+        "q1": -0.4541373852402892,
+        "q3": 0.7778841503838081,
+        "iqr": 1.2320215356240973
+      },
+      "flash_all_defined": {
+        "mean": 0.15371871201356999,
+        "median": 0.2993867284330168,
+        "q1": -0.3707266823415223,
+        "q3": 0.7118720182833134,
+        "iqr": 1.0825987006248357
+      },
+      "difference_ci_excludes_zero": false
+    },
+    "kendall": {
+      "n": 17424,
+      "clusters": 21,
+      "means": [
+        0.12005595247181605,
+        0.10572516480916612,
+        -0.014330787662649938
+      ],
+      "ci95": [
+        [
+          0.09406333505526653,
+          0.14592581915317862
+        ],
+        [
+          0.08345333604205256,
+          0.12896902686788184
+        ],
+        [
+          -0.0495013981627717,
+          0.018883990424953517
+        ]
+      ],
+      "undefined_baseline": 0,
+      "undefined_flash": 0,
+      "excluded_pairs": 0,
+      "baseline": {
+        "mean": 0.12005595247181605,
+        "median": 0.10722029246165699,
+        "q1": -0.33974119062513913,
+        "q3": 0.6264106396359443,
+        "iqr": 0.9661518302610834
+      },
+      "flash": {
+        "mean": 0.10572516480916612,
+        "median": 0.19329383326428434,
+        "q1": -0.2887867646439736,
+        "q3": 0.5387490553702247,
+        "iqr": 0.8275358200141982
+      },
+      "difference": {
+        "mean": -0.014330787662649938,
+        "median": -0.06305431583434055,
+        "q1": -0.27550369124295954,
+        "q3": 0.21337024122080217,
+        "iqr": 0.4888739324637617
+      },
+      "improved_fraction": 0.4198232323232323,
+      "tied_fraction": 0.0020087235996326907,
+      "worsened_fraction": 0.578168044077135,
+      "baseline_all_defined": {
+        "mean": 0.12005595247181605,
+        "median": 0.10722029246165699,
+        "q1": -0.33974119062513913,
+        "q3": 0.6264106396359443,
+        "iqr": 0.9661518302610834
+      },
+      "flash_all_defined": {
+        "mean": 0.10572516480916612,
+        "median": 0.19329383326428434,
+        "q1": -0.2887867646439736,
+        "q3": 0.5387490553702247,
+        "iqr": 0.8275358200141982
+      },
+      "difference_ci_excludes_zero": false
+    }
+  },
+  "global_profile_correlations": {
+    "baseline": {
+      "spearman": 1.0,
+      "kendall": 0.9999999999999999
+    },
+    "flash": {
+      "spearman": 0.9705882352941178,
+      "kendall": 0.9117647058823529
+    }
+  }
+}
