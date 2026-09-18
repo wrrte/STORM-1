@@ -11,6 +11,10 @@ RESET_TABLE_VALUES = True
 BASE_COLUMN = 3
 OURS_COLUMN = 4
 DELTA_COLUMN = 5
+EXCLUDED_SEEDS = {
+    "Frostbite": {10},
+    "BankHeist": {6020},
+}
 
 
 def parse_val(value):
@@ -214,8 +218,12 @@ def format_table(tex_path):
         tex_file.writelines(lines)
 
 
-def load_results(excel_path):
-    """Keep both methods' raw scores for the same valid training seeds."""
+def load_results(
+    excel_path,
+    configs=('Retrieval 미사용', 'target: 16 (anchor 미설정)'),
+    method_names=('STORM', 'STORM+ours'),
+):
+    """Keep both methods' raw scores for common, non-excluded training seeds."""
     df = pd.read_excel(excel_path, sheet_name='Results', index_col=[0, 1])
     df = df.reset_index()
     
@@ -229,8 +237,8 @@ def load_results(excel_path):
     
     for game in games:
         game_df = df[df['Game'] == game]
-        c1_row = game_df[game_df['Config'].astype(str) == 'Retrieval 미사용']
-        c2_row = game_df[game_df['Config'].astype(str) == 'target: 16 (anchor 미설정)']
+        c1_row = game_df[game_df['Config'].astype(str) == configs[0]]
+        c2_row = game_df[game_df['Config'].astype(str) == configs[1]]
         
         if c1_row.empty or c2_row.empty:
             continue
@@ -242,6 +250,8 @@ def load_results(excel_path):
         
         valid_seeds = []
         for s in seeds:
+            if int(str(s).strip()) in EXCLUDED_SEEDS.get(game, set()):
+                continue
             v1 = parse_val(c1[s])
             v2 = parse_val(c2[s])
             if not np.isnan(v1) and not np.isnan(v2):
@@ -253,8 +263,8 @@ def load_results(excel_path):
             results[game] = (baseline_scores, ours_scores)
             print(
                 f"[{game}] Common seeds: {valid_seeds} -> "
-                f"STORM: {format_val(np.mean(baseline_scores))}, "
-                f"STORM+ours: {format_val(np.mean(ours_scores))}"
+                f"{method_names[0]}: {format_val(np.mean(baseline_scores))}, "
+                f"{method_names[1]}: {format_val(np.mean(ours_scores))}"
             )
     return results
 
