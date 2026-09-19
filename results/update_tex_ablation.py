@@ -1,6 +1,6 @@
 """Update the neighbor-retrieval ablation table from paired Excel seed scores.
 
-Usage: python STORM/update_tex_ablation.py [--excel PATH] [--tex PATH]
+Usage: python STORM-1/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
 Uses the same exclusions, duplicate-result parsing, and aggregation as update_tex.py.
 Only the marked ablation table is written; main performance scores are untouched.
 """
@@ -91,7 +91,7 @@ def main():
     parser = argparse.ArgumentParser(description=__doc__)
     script_dir = Path(__file__).resolve().parent
     parser.add_argument('--excel', type=Path, default=script_dir / 'converted_results.xlsx')
-    parser.add_argument('--tex', type=Path, default=script_dir.parent / 'iclr2027_conference.tex')
+    parser.add_argument('--tex', type=Path, default=script_dir.parent.parent / 'iclr2027_conference.tex')
     args = parser.parse_args()
 
     document = args.tex.read_text(encoding='utf-8')

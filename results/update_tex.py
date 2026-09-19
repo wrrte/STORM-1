@@ -277,7 +277,7 @@ def main():
     )
     script_dir = Path(__file__).resolve().parent
     parser.add_argument("--excel", type=Path, default=script_dir / "converted_results.xlsx")
-    parser.add_argument("--tex", type=Path, default=script_dir.parent / "iclr2027_conference.tex")
+    parser.add_argument("--tex", type=Path, default=script_dir.parent.parent / "iclr2027_conference.tex")
     args = parser.parse_args()
 
     if not args.excel.exists():

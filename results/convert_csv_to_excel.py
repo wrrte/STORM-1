@@ -46,7 +46,7 @@ HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
 
 def load_excluded_seeds():
     """update_tex.py를 실행하지 않고 현재 EXCLUDED_SEEDS 설정을 읽습니다."""
-    source_path = Path(__file__).resolve().parents[1] / 'update_tex.py'
+    source_path = Path(__file__).resolve().with_name('update_tex.py')
     tree = ast.parse(source_path.read_text(encoding='utf-8'), filename=str(source_path))
     for node in tree.body:
         if isinstance(node, ast.Assign):
@@ -81,7 +81,7 @@ def mark_excluded_seeds(worksheet, pivot_df, start_row, excluded_seeds):
             cell.font = font
             cell.comment = Comment(
                 f'EXCLUDED_SEEDS: {game}, seed {seed}\n'
-                'STORM-1/update_tex.py의 EXCLUDED_SEEDS에 지정되어 '
+                'STORM-1/results/update_tex.py의 EXCLUDED_SEEDS에 지정되어 '
                 'LaTeX 결과 집계에서 제외되는 시드입니다.\n'
                 '취소선은 제외된 시드, 노란색 배경은 실행 중인 run을 뜻합니다.',
                 'STORM',
