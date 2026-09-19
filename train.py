@@ -181,6 +181,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   dynamic_warmup_met_step_resume=-1,
                                   retrieval_state_resume=None, rng_state_resume=None,
                                   branch_commands=None):
+    if branch_commands is not None and num_envs != 1:
+        raise ValueError("Both episode-boundary branching requires NumEnvs=1; parallel environments cannot be paused independently")
+
     # create ckpt dir
     os.makedirs(f"ckpt/{args.n}", exist_ok=True)
 
@@ -195,6 +198,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     current_obs, current_info = vec_env.reset()
     context_obs = deque(maxlen=16)
     context_action = deque(maxlen=16)
+    at_episode_boundary = True  # The freshly reset environment has no unfinished episode.
+    waiting_to_branch = False
     
     warmup_finished = warmup_finished_resume
     dynamic_warmup_met_step = dynamic_warmup_met_step_resume
@@ -264,11 +269,16 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         else:
             is_retrieval_warmup = (total_steps * num_envs) < warmup_steps_config
 
-        if branch_commands is not None and not is_retrieval_warmup:
-            # Both branches restart the environment/context at this boundary.
-            # Mark the interrupted episode so replay never bootstraps across it.
-            if len(replay_buffer):
-                replay_buffer.termination_buffer[replay_buffer.last_pointer] = 1
+        if branch_commands is not None and not is_retrieval_warmup and at_episode_boundary:
+            # The previous iteration collected and trained on the episode's
+            # final transition. Resume at this next step without inventing a
+            # terminal label. Zero warmup can branch before the first action.
+            if retrieval_manager.enabled and replay_buffer.ready():
+                world_model.eval()
+                retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
+                last_rebuild_step = total_steps
+                logger.log("Retrieval/global_rebuild_triggered", 1.0)
+            logger.log("Retrieval/shared_warmup_ended_at_step", total_steps * num_envs)
             ckpt_dir = os.path.abspath(f"ckpt/{args.n}/shared_warmup_{total_steps}")
             logger.flush_wandb()
             save_full_checkpoint(
@@ -287,6 +297,13 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 disabled_command + ["--resume_from", ckpt_dir],
             )
             raise RuntimeError("The branch supervisor unexpectedly returned")
+
+        if branch_commands is not None:
+            if not is_retrieval_warmup and not waiting_to_branch:
+                print(colorama.Fore.YELLOW + f"Warmup target reached at step {total_steps * num_envs}; waiting for the current episode to end before branching." + colorama.Style.RESET_ALL)
+                waiting_to_branch = True
+            # Keep the shared trajectory retrieval-free until the actual split.
+            is_retrieval_warmup = True
 
         # sample part >>>
         if replay_buffer.ready():
@@ -332,6 +349,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         is_first_step = done
 
         done_flag = np.logical_or(done, truncated)
+        at_episode_boundary = bool(done_flag.all())
         if done_flag.any():
             for i in range(num_envs):
                 if done_flag[i]:
@@ -428,7 +446,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 next_train_step = total_steps + train_freq
                 
                 is_just_before_warmup_end = (
-                    is_retrieval_warmup 
+                    branch_commands is None
+                    and is_retrieval_warmup
                     and warmup_steps > buffer_warmup 
                     and (next_train_step * num_envs >= warmup_steps)
                 )
@@ -735,7 +754,7 @@ if __name__ == "__main__":
         )
 
         if branch_commands is not None:
-            raise RuntimeError("Dynamic retrieval warmup did not finish before SampleMaxSteps; no branches were started")
+            raise RuntimeError("Both did not reach an episode boundary after the warmup target and before SampleMaxSteps; no branches were started")
 
         if conf.JointTrainAgent.EvalMode in ["active", "final_only"]:
             print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
@@ -771,7 +790,7 @@ if __name__ == "__main__":
     else:
         raise NotImplementedError(f"Task {conf.Task} not implemented")
 
-    # A sequential Both run starts True only after False's logs have been flushed.
+    # Finish this branch's logs before the supervisor starts the next branch.
     logger.flush_wandb()
     logger.writer.close()
     import wandb

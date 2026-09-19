@@ -1,0 +1,36 @@
+[36mFull checkpoint saved to /tmp/storm-both-audit-wgd7jhlb[0m
+[Retrieval] Global Rebuild completed. Re-hashed 8 frames (PCA: True).
+{
+  "device": "cpu",
+  "amp": false,
+  "torch": "2.14.0.dev20260801+cu130",
+  "checkpoint_roundtrip": "exact: real weights, BN buffers, slow critic, Adam, EMA, replay, CPU RNG",
+  "next_update_with_identical_inputs": "bitwise identical for original and both restored branches",
+  "receiver_enable_flag": "True and False preserved despite shared Both retrieval state",
+  "sample_crosses_forced_terminal": {
+    "observations": [
+      12,
+      13,
+      0,
+      1
+    ],
+    "terminals": [
+      0.0,
+      1.0,
+      0.0,
+      0.0
+    ]
+  },
+  "global_rebuild_advances_torch_rng": true,
+  "video_logging_changes_batchnorm_counts": {
+    "encoder.backbone.1": 1,
+    "encoder.backbone.4": 1,
+    "encoder.backbone.7": 1,
+    "encoder.backbone.10": 1,
+    "image_decoder.backbone.2": 5,
+    "image_decoder.backbone.5": 5,
+    "image_decoder.backbone.8": 5,
+    "image_decoder.backbone.11": 5
+  },
+  "video_logging_advances_torch_rng": true
+}
