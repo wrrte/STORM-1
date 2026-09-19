@@ -1,3 +1,7 @@
+import ast
+from copy import copy
+from pathlib import Path
+
 import pandas as pd
 from openpyxl.comments import Comment
 from openpyxl.styles import Alignment, Border, Side, Font, PatternFill
@@ -38,6 +42,50 @@ REFERENCE_SCORES = {
 PAIRED_MEAN_COLUMN = 'Mean (공통 시드)'
 SCORE_DELTA_COLUMN = 'Δ Score (행별 비교)'
 HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
+
+
+def load_excluded_seeds():
+    """update_tex.py를 실행하지 않고 현재 EXCLUDED_SEEDS 설정을 읽습니다."""
+    source_path = Path(__file__).resolve().parents[1] / 'update_tex.py'
+    tree = ast.parse(source_path.read_text(encoding='utf-8'), filename=str(source_path))
+    for node in tree.body:
+        if isinstance(node, ast.Assign):
+            targets = node.targets
+        elif isinstance(node, ast.AnnAssign):
+            targets = [node.target]
+        else:
+            continue
+        if any(isinstance(target, ast.Name) and target.id == 'EXCLUDED_SEEDS' for target in targets):
+            return ast.literal_eval(node.value)
+    raise ValueError(f'EXCLUDED_SEEDS 설정을 찾을 수 없습니다: {source_path}')
+
+
+def mark_excluded_seeds(worksheet, pivot_df, start_row, excluded_seeds):
+    """점수와 시드 열 이름을 보존하면서 제외된 실험 셀의 서식만 변경합니다."""
+    excluded_fill = PatternFill(fill_type='solid', fgColor='E7E6E6')
+    for row_idx, (game, config) in enumerate(pivot_df.index):
+        if config.startswith('STORM (논문)'):
+            continue
+        for seed in excluded_seeds.get(game, set()):
+            if seed not in pivot_df.columns:
+                continue
+            cell = worksheet.cell(
+                row=start_row + row_idx,
+                column=pivot_df.columns.get_loc(seed) + 3,
+            )
+            font = copy(cell.font)
+            font.strike = True
+            if 'RUNNING' not in str(cell.value):
+                cell.fill = excluded_fill
+                font.color = '808080'
+            cell.font = font
+            cell.comment = Comment(
+                f'EXCLUDED_SEEDS: {game}, seed {seed}\n'
+                'STORM-1/update_tex.py의 EXCLUDED_SEEDS에 지정되어 '
+                'LaTeX 결과 집계에서 제외되는 시드입니다.\n'
+                '취소선은 제외된 시드, 노란색 배경은 실행 중인 run을 뜻합니다.',
+                'STORM',
+            )
 
 
 def parse_score(value):
@@ -97,6 +145,7 @@ def add_paired_baseline_mean(pivot_df):
 
 
 def main():
+    excluded_seeds = load_excluded_seeds()
     # Load CSV
     df = pd.read_csv('wandb_runs_classification.csv')
     if 'State' not in df:
@@ -446,6 +495,8 @@ def main():
                 if 'RUNNING' in str(cell.value):
                     cell.fill = running_fill
                     cell.font = Font(name=cell.font.name, size=16, bold=True, color='9C6500')
+
+        mark_excluded_seeds(worksheet, pivot_df, start_row, excluded_seeds)
                     
         # 2. A, B열 내용에 맞게 열 너비 자동 맞춤
         for col_letter, col_idx in [('A', 1), ('B', 2)]:
