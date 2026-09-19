@@ -135,8 +135,17 @@ def main():
         return val
 
     for run in runs:
-        if run.state in ["running", "killed"]:
+        if run.state == "killed":
             continue
+
+        ret_enable = get_config_val(run.config, 'JointTrainAgent.Retrieval.enable')
+        is_both = (
+            str(ret_enable).strip().lower() == 'both'
+            or str(run.name).lower().endswith('_both')
+        )
+        if is_both and run.state != "running":
+            continue
+        ret_enable = 'Both' if is_both else bool(ret_enable)
             
         # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
         commit_hash = run.commit
@@ -148,9 +157,6 @@ def main():
         logic_type = get_logic_for_commit(commit_hash)
         
         eval_return = run.summary.get('eval/episode_avg_return', 'N/A')
-        
-        ret_enable = get_config_val(run.config, 'JointTrainAgent.Retrieval.enable')
-        ret_enable = bool(ret_enable) if ret_enable is not None else False
         
         warmup_steps = 'N/A'
         calculated_warmup_steps = 'N/A'
@@ -172,14 +178,17 @@ def main():
                 except Exception as e:
                     print(f"[{run.name}] 히스토리에서 warmup steps를 가져오지 못했습니다: {e}")
             
-        # 1. 런 이름에서 시드 추출 우선 시도 (형식: {env}_{id}_{seed}_{O/X})
+        # 1. 런 이름에서 시드 추출 우선 시도 (형식: {env}_{id}_{seed}_{O/X/Both})
         seed = None
         parts = str(run.name).split('_')
-        if len(parts) >= 4 and parts[-1].upper() in ['O', 'X']:
+        if len(parts) >= 4 and parts[-1].upper() in ['O', 'X', 'BOTH']:
             try:
                 seed = int(parts[-2])
             except ValueError:
                 pass
+        elif len(parts) >= 3 and parts[-1].isdigit():
+            # Both 공통 단계의 Logger는 O/X 접미사 없이 이름을 기록합니다.
+            seed = int(parts[-1])
                 
         # 2. 런 이름에서 유추 실패 시 Config에서 읽어오기 ('Seed' 또는 'seed' 확인)
         if seed is None:

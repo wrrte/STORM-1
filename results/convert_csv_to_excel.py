@@ -1,6 +1,6 @@
 import pandas as pd
 from openpyxl.comments import Comment
-from openpyxl.styles import Alignment, Border, Side, Font
+from openpyxl.styles import Alignment, Border, Side, Font, PatternFill
 from openpyxl.utils import get_column_letter
 
 # (Random, Human, STORM 논문) 고정 참조 점수.
@@ -99,6 +99,23 @@ def add_paired_baseline_mean(pivot_df):
 def main():
     # Load CSV
     df = pd.read_csv('wandb_runs_classification.csv')
+    if 'State' not in df:
+        df['State'] = ''
+    df['State'] = df['State'].fillna('').astype(str).str.strip().str.lower()
+
+    # Both의 공통 학습 단계에서는 Retrieval 사용/미사용 양쪽에 진행 상태를 표시합니다.
+    is_both = (
+        df['Retrieval Enable'].astype(str).str.strip().str.lower().eq('both')
+        | df['Run Name'].astype(str).str.lower().str.endswith('_both')
+    )
+    running_both = df[
+        df['State'].eq('running') & is_both
+    ]
+    df = pd.concat([
+        df[~is_both],
+        running_both.assign(**{'Retrieval Enable': False}),
+        running_both.assign(**{'Retrieval Enable': True}),
+    ], ignore_index=True)
 
     # Data extraction
     data = []
@@ -212,6 +229,7 @@ def main():
             'Game': game,
             'Config': config,
             'Seed': seed,
+            'State': row['State'],
             'Eval Return': eval_return,
             'Warmup Steps': calculated_warmup_steps,
             'Hash Bits': h_bits,
@@ -223,6 +241,7 @@ def main():
         'Game': 'Frostbite',
         'Config': 'Retrieval 미사용',
         'Seed': 10,
+        'State': 'finished',
         'Eval Return': '2068',
         'Warmup Steps': 'N/A',
         'Hash Bits': 'N/A',
@@ -232,6 +251,7 @@ def main():
         'Game': 'Frostbite',
         'Config': 'Retrieval 미사용',
         'Seed': 3710,
+        'State': 'finished',
         'Eval Return': '1904',
         'Warmup Steps': 'N/A',
         'Hash Bits': 'N/A',
@@ -240,12 +260,14 @@ def main():
 
     parsed_df = pd.DataFrame(data)
 
-    # 1. 성능이 N/A인 것은 무시
+    # 1. 실행 중인 run은 평가 점수가 없어도 유지합니다.
     parsed_df['Eval Return'] = parsed_df['Eval Return'].astype(str)
     parsed_df = parsed_df[
-        (parsed_df['Eval Return'] != 'N/A') & 
-        (parsed_df['Eval Return'] != 'nan') &
-        (parsed_df['Eval Return'].str.strip() != '')
+        parsed_df['State'].eq('running') | (
+            (parsed_df['Eval Return'] != 'N/A') &
+            (parsed_df['Eval Return'] != 'nan') &
+            (parsed_df['Eval Return'].str.strip() != '')
+        )
     ]
     
     # 2. 모든 실험 결과 표시 (중복 런 포함 모두 나열하기 위해 중복 제거 로직 삭제)
@@ -255,7 +277,7 @@ def main():
     # 3. 동일한 시드에서 여러 결과가 있을 경우, 셀 하나에 여러 줄로 나열
     def aggregate_cell(group):
         def format_single_row(r):
-            val = r['Eval Return']
+            val = 'RUNNING' if r['State'] == 'running' else r['Eval Return']
             try:
                 val = f"{float(val):.2f}"
             except ValueError:
@@ -275,10 +297,10 @@ def main():
         if len(group) == 1:
             return format_single_row(group.iloc[0])
         else:
-            # Hash Bits가 10인 실험이 존재한다면, 해당 실험들만 남깁니다.
+            # 완료 점수의 Hash Bits=10 우선 규칙을 유지하되 실행 중인 run도 표시합니다.
             is_hb_10 = group['Hash Bits'].apply(lambda x: str(x).strip() in ['10', '10.0'])
             if is_hb_10.any():
-                group = group[is_hb_10]
+                group = group[is_hb_10 | group['State'].eq('running')]
                 
             if len(group) == 1:
                 return format_single_row(group.iloc[0])
@@ -287,7 +309,7 @@ def main():
             has_diff_hash = group['Hash Bits'].nunique() > 1
             has_diff_warmup = group['Warmup Steps'].nunique() > 1
             for _, r in group.iterrows():
-                val = r['Eval Return']
+                val = 'RUNNING' if r['State'] == 'running' else r['Eval Return']
                 try:
                     val = f"{float(val):.2f}"
                 except ValueError:
@@ -413,6 +435,17 @@ def main():
                     cell.font = Font(name=cell.font.name, size=16, bold=cell.font.bold, italic=cell.font.italic, color=cell.font.color)
                 else:
                     cell.font = Font(size=16)
+
+        # Drama와 동일한 색상으로 실행 중인 run이 포함된 시드 셀을 강조합니다.
+        running_fill = PatternFill(fill_type='solid', fgColor='FFF2CC')
+        for column_idx, column in enumerate(pivot_df.columns, start=3):
+            if not str(column).strip().isdigit():
+                continue
+            for row in worksheet.iter_rows(min_row=start_row, min_col=column_idx, max_col=column_idx):
+                cell = row[0]
+                if 'RUNNING' in str(cell.value):
+                    cell.fill = running_fill
+                    cell.font = Font(name=cell.font.name, size=16, bold=True, color='9C6500')
                     
         # 2. A, B열 내용에 맞게 열 너비 자동 맞춤
         for col_letter, col_idx in [('A', 1), ('B', 2)]:
