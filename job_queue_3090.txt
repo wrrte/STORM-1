@@ -1,2 +1,1 @@
-python -u train.py -n "Jamesbond-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl"
-python -u train.py -n "Freeway-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Freeway-v5" -trajectory_path "D_TRAJ/Freeway.pkl" JointTrainAgent.UseDemonstration True
+python -u train.py -n "Kangaroo-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.target 1
