@@ -226,7 +226,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.global_rebuild_cooldown = 2000
 
     conf.defrost()
-    # Match the incoming type before YACS merges: enable also accepts "Both".
+    # Match the incoming type before YACS merges: enable accepts "Both" or a list.
     # The trainer validates/normalizes its value together with CLI overrides.
     with open(config_path, "r") as config_file:
         incoming = CN.load_cfg(config_file)

@@ -28,7 +28,8 @@ JointTrainAgent:
   EvalEpisodes: 20
 
   Retrieval:
-    enable: Both # True, False, or "Both": share warmup through an episode boundary, then run _O followed by _X
+    enable: Both # True, False, "Both" (_O then _X), or an experiment list (shared warmup)
+    # Example: enable: [baseline, retrieval, target1, value, add] (runs in list order)
     batch_size_reduction: "retrieved" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
     value_signal: "value_diff" # "value_diff" (V_t - V_{t-1}) or "value" (V_t); used by z_score

@@ -27,8 +27,8 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from retrieval import RetrievalContextManager
 from training_branches import (
-    capture_rng_state, launch_training_branches, parse_retrieval_mode, save_final_models,
-    restore_rng_state, split_retrieval_override,
+    RETRIEVAL_EXPERIMENTS, configure_storm_retrieval_run,
+    capture_rng_state, launch_training_branches, save_final_models, restore_rng_state,
 )
 import pandas as pd
 
@@ -182,7 +182,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   retrieval_state_resume=None, rng_state_resume=None,
                                   branch_commands=None):
     if branch_commands is not None and num_envs != 1:
-        raise ValueError("Both episode-boundary branching requires NumEnvs=1; parallel environments cannot be paused independently")
+        raise ValueError("Shared warmup episode-boundary branching requires NumEnvs=1; parallel environments cannot be paused independently")
 
     # create ckpt dir
     os.makedirs(f"ckpt/{args.n}", exist_ok=True)
@@ -290,12 +290,18 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             logger.writer.close()
             import wandb
             wandb.finish()
-            enabled_command, disabled_command = branch_commands
-            launch_training_branches(
-                ckpt_dir,
-                enabled_command + ["--resume_from", ckpt_dir],
-                disabled_command + ["--resume_from", ckpt_dir],
-            )
+            if isinstance(branch_commands, dict):
+                launch_training_branches(ckpt_dir, experiments={
+                    name: command + ["--resume_from", ckpt_dir]
+                    for name, command in branch_commands.items()
+                })
+            else:
+                enabled_command, disabled_command = branch_commands
+                launch_training_branches(
+                    ckpt_dir,
+                    enabled_command + ["--resume_from", ckpt_dir],
+                    disabled_command + ["--resume_from", ckpt_dir],
+                )
             raise RuntimeError("The branch supervisor unexpectedly returned")
 
         if branch_commands is not None:
@@ -395,12 +401,10 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             
             logger.log("Retrieval/triggered_anchors_step", num_trig)
             if retrieval_manager is not None and retrieval_manager.enabled:
-                logger.log("Retrieval/td_error_mean", retrieval_manager.ema_mean.mean())
-                logger.log("Retrieval/td_error_var", retrieval_manager.ema_var.mean())
-                value_signal = retrieval_manager.value_signal
-                value_mean, value_var = retrieval_manager.get_ema_stats(value_signal)
-                logger.log(f"Retrieval/{value_signal}_mean", value_mean.mean())
-                logger.log(f"Retrieval/{value_signal}_var", value_var.mean())
+                for signal in retrieval_manager.statistics_signals:
+                    signal_mean, signal_var = retrieval_manager.get_ema_stats(signal)
+                    logger.log(f"Retrieval/{signal}_mean", signal_mean.mean())
+                    logger.log(f"Retrieval/{signal}_var", signal_var.mean())
         # <<< train world model part
 
         # train agent part >>>
@@ -621,38 +625,11 @@ if __name__ == "__main__":
     parser.add_argument("-trajectory_path", type=str, required=True)
     parser.add_argument("--resume_from", type=str, default=None, help="Path to resume checkpoint directory")
     parser.add_argument("--branch_mode", choices=("true", "false"), default=None, help=argparse.SUPPRESS)
+    parser.add_argument("--branch_experiment", choices=tuple(RETRIEVAL_EXPERIMENTS), default=None, help=argparse.SUPPRESS)
     args, extra_args = parser.parse_known_args()
     conf = load_config(args.config_path)
-    remaining_overrides, retrieval_override = split_retrieval_override(
-        extra_args, "JointTrainAgent.Retrieval.enable")
-    conf.defrost()
-    if remaining_overrides:
-        conf.merge_from_list(remaining_overrides)
-    retrieval_mode = parse_retrieval_mode(
-        retrieval_override if retrieval_override is not None else conf.JointTrainAgent.Retrieval.enable)
-    if args.branch_mode is not None:
-        retrieval_mode = parse_retrieval_mode(args.branch_mode)
-    conf.JointTrainAgent.Retrieval.enable = retrieval_mode
-    conf.freeze()
+    branch_commands = configure_storm_retrieval_run(conf, args, extra_args, __file__)
     print(colorama.Fore.RED + str(args) + " extra: " + str(extra_args) + colorama.Style.RESET_ALL)
-
-    branch_commands = None
-    if retrieval_mode == "Both":
-        warmup_steps = conf.JointTrainAgent.Retrieval.warmup_steps
-        if warmup_steps < -1 or warmup_steps >= conf.JointTrainAgent.SampleMaxSteps:
-            raise ValueError("Both requires -1 (dynamic) or 0 <= Retrieval.warmup_steps < SampleMaxSteps")
-        common_command = [
-            sys.executable, os.path.abspath(__file__),
-            "-n", args.n, "-seed", str(args.seed),
-            "-config_path", os.path.abspath(f"runs/{args.n}_Both/config.yaml"),
-            "-env_name", args.env_name,
-            "-trajectory_path", os.path.abspath(args.trajectory_path),
-        ] + extra_args
-        branch_commands = (common_command + ["--branch_mode", "true"],
-                           common_command + ["--branch_mode", "false"])
-        args.n += "_Both"
-    else:
-        args.n += "_O" if retrieval_mode else "_X"
 
     # # EvalMode가 active인 경우 결정론적(deterministic) 환경 강제 설정
     # if conf.JointTrainAgent.EvalMode == "active":
@@ -756,7 +733,7 @@ if __name__ == "__main__":
         )
 
         if branch_commands is not None:
-            raise RuntimeError("Both did not reach an episode boundary after the warmup target and before SampleMaxSteps; no branches were started")
+            raise RuntimeError("Shared warmup did not reach an episode boundary after the warmup target and before SampleMaxSteps; no branches were started")
 
         if conf.JointTrainAgent.EvalMode in ["active", "final_only"]:
             print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
