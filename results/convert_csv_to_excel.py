@@ -100,6 +100,35 @@ def parse_score(value):
         return float('nan')
 
 
+def mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells):
+    """표시된 run 중 save_warmup=True가 있는 시드 셀을 강조합니다."""
+    warmup_fill = PatternFill(fill_type='solid', fgColor='C6EFCE')
+    warmup_side = Side(border_style='medium', color='00B050')
+    for game, config, seed in highlighted_cells:
+        cell = worksheet.cell(
+            row=start_row + pivot_df.index.get_loc((game, config)),
+            column=pivot_df.columns.get_loc(seed) + 3,
+        )
+        font = copy(cell.font)
+        font.bold = True
+        # 실행 중/제외 시드의 배경색과 취소선을 보존하고 초록 테두리로 함께 표시합니다.
+        if 'RUNNING' not in str(cell.value) and not font.strike:
+            cell.fill = warmup_fill
+            font.color = '006100'
+        cell.font = font
+        border = copy(cell.border)
+        border.left = border.right = border.top = border.bottom = warmup_side
+        cell.border = border
+        note = (
+            '초록색 테두리: 이 셀에 표시된 run 중 config의 '
+            'JointTrainAgent.Retrieval.save_warmup 값이 True인 run이 있습니다.'
+        )
+        if cell.comment:
+            cell.comment.text += '\n\n' + note
+        else:
+            cell.comment = Comment(note, 'STORM')
+
+
 def add_paired_baseline_mean(pivot_df, excluded_seeds):
     """제외 목록을 반영한 공통 시드 평균과 논문/target 16 행의 baseline 대비 비교를 추가."""
     seed_columns = [column for column in pivot_df.columns if str(column).strip().isdigit()]
@@ -284,6 +313,7 @@ def main():
             'Eval Return': eval_return,
             'Warmup Steps': calculated_warmup_steps,
             'Hash Bits': h_bits,
+            'Save Warmup': str(row.get('Save Warmup', '')).strip().lower() == 'true',
             'Created At': created_at_utc
         })
 
@@ -296,6 +326,7 @@ def main():
         'Eval Return': '2068',
         'Warmup Steps': 'N/A',
         'Hash Bits': 'N/A',
+        'Save Warmup': False,
         'Created At': pd.to_datetime("2026-08-11T04:36:29Z", utc=True)
     })
     data.append({
@@ -306,6 +337,7 @@ def main():
         'Eval Return': '1904',
         'Warmup Steps': 'N/A',
         'Hash Bits': 'N/A',
+        'Save Warmup': False,
         'Created At': pd.to_datetime("2026-08-11T04:36:35Z", utc=True)
     })
 
@@ -327,6 +359,11 @@ def main():
     
     # 3. 동일한 시드에서 여러 결과가 있을 경우, 셀 하나에 여러 줄로 나열
     def aggregate_cell(group):
+        # 점수와 강조 여부 모두 실제로 표시되는 run만 기준으로 계산합니다.
+        is_hb_10 = group['Hash Bits'].apply(lambda x: str(x).strip() in ['10', '10.0'])
+        if is_hb_10.any():
+            group = group[is_hb_10 | group['State'].eq('running')]
+
         def format_single_row(r):
             val = 'RUNNING' if r['State'] == 'running' else r['Eval Return']
             try:
@@ -346,16 +383,8 @@ def main():
             return str(val)
 
         if len(group) == 1:
-            return format_single_row(group.iloc[0])
+            value = format_single_row(group.iloc[0])
         else:
-            # 완료 점수의 Hash Bits=10 우선 규칙을 유지하되 실행 중인 run도 표시합니다.
-            is_hb_10 = group['Hash Bits'].apply(lambda x: str(x).strip() in ['10', '10.0'])
-            if is_hb_10.any():
-                group = group[is_hb_10 | group['State'].eq('running')]
-                
-            if len(group) == 1:
-                return format_single_row(group.iloc[0])
-
             items = []
             has_diff_hash = group['Hash Bits'].nunique() > 1
             has_diff_warmup = group['Warmup Steps'].nunique() > 1
@@ -379,9 +408,18 @@ def main():
                     items.append(f"{val} ({', '.join(extras)})")
                 else:
                     items.append(f"{val}")
-            return ", ".join(items)
+            value = ", ".join(items)
 
-    agg_df = parsed_df.groupby(['Game', 'Config', 'Seed']).apply(aggregate_cell, include_groups=False).reset_index(name='Final Eval Return')
+        return pd.Series({
+            'Final Eval Return': value,
+            'Save Warmup': group['Save Warmup'].any(),
+        })
+
+    agg_df = parsed_df.groupby(['Game', 'Config', 'Seed']).apply(aggregate_cell, include_groups=False).reset_index()
+    highlighted_cells = set(
+        agg_df.loc[agg_df['Save Warmup'], ['Game', 'Config', 'Seed']]
+        .itertuples(index=False, name=None)
+    )
     
     # Pivot table
     pivot_df = agg_df.pivot_table(
@@ -542,6 +580,8 @@ def main():
                         right=cell.border.right,
                         bottom=cell.border.bottom
                     )
+
+        mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells)
 
     print(f"Successfully saved to {output_path}")
 

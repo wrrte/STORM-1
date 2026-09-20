@@ -146,6 +146,7 @@ def main():
         if is_both and run.state != "running":
             continue
         ret_enable = 'Both' if is_both else bool(ret_enable)
+        save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
             
         # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
         commit_hash = run.commit
@@ -230,6 +231,7 @@ def main():
             "Logic": logic_type,
             "Eval Return": eval_return,
             "Retrieval Enable": ret_enable,
+            "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
             "Warmup Steps": warmup_steps,
             "Calculated Warmup Steps": calculated_warmup_steps,
             "Dynamic Warmup Delay Steps": dynamic_warmup_delay_steps,
@@ -259,7 +261,7 @@ def main():
     
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
+        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Save Warmup", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:
