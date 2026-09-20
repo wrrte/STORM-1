@@ -1,2 +1,0 @@
-
-python -u train.py -n "Seaquest-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Seaquest-v5" -trajectory_path "D_TRAJ/Seaquest.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
