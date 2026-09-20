@@ -81,8 +81,8 @@ def mark_excluded_seeds(worksheet, pivot_df, start_row, excluded_seeds):
             cell.font = font
             cell.comment = Comment(
                 f'EXCLUDED_SEEDS: {game}, seed {seed}\n'
-                'STORM-1/results/update_tex.py의 EXCLUDED_SEEDS에 지정되어 '
-                'LaTeX 결과 집계에서 제외되는 시드입니다.\n'
+                'STORM/results/update_tex.py의 EXCLUDED_SEEDS에 지정되어 '
+                '공통 시드 평균, Δ Score, Δ HNS 및 LaTeX 결과 집계에서 제외되는 시드입니다.\n'
                 '취소선은 제외된 시드, 노란색 배경은 실행 중인 run을 뜻합니다.',
                 'STORM',
             )
@@ -100,12 +100,10 @@ def parse_score(value):
         return float('nan')
 
 
-def add_paired_baseline_mean(pivot_df):
-    """공통 시드 평균과 논문/target 16 행의 baseline 대비 비교를 추가."""
+def add_paired_baseline_mean(pivot_df, excluded_seeds):
+    """제외 목록을 반영한 공통 시드 평균과 논문/target 16 행의 baseline 대비 비교를 추가."""
     seed_columns = [column for column in pivot_df.columns if str(column).strip().isdigit()]
     columns = list(pivot_df.columns)
-    if 6020 not in columns:
-        columns.append(6020)
     columns += [
         '   ', PAIRED_MEAN_COLUMN, SCORE_DELTA_COLUMN, HNS_DELTA_COLUMN,
     ]
@@ -116,8 +114,12 @@ def add_paired_baseline_mean(pivot_df):
         target_key = (game, 'target: 16 (anchor 미설정)')
         if baseline_key not in pivot_df.index or target_key not in pivot_df.index:
             continue
-        baseline = pivot_df.loc[baseline_key, seed_columns].map(parse_score)
-        target = pivot_df.loc[target_key, seed_columns].map(parse_score)
+        game_seed_columns = [
+            column for column in seed_columns
+            if int(str(column).strip()) not in excluded_seeds.get(game, set())
+        ]
+        baseline = pivot_df.loc[baseline_key, game_seed_columns].map(parse_score)
+        target = pivot_df.loc[target_key, game_seed_columns].map(parse_score)
         valid = baseline.notna() & target.notna()
         if valid.any():
             baseline_mean = baseline[valid].mean()
@@ -389,10 +391,13 @@ def main():
         aggfunc='first'
     )
 
-    # Target column order
-    target_columns = [1, 2, 10, 710, 3710, ' ', 2000, 2010, '  ', 5090]
-    extra_seeds = [c for c in pivot_df.columns if c not in [1, 2, 10, 710, 3710, 2000, 2010, 5090]]
-    full_columns = target_columns + extra_seeds
+    # 시드 그룹 순서. 6020은 결과가 없어도 60*0 그룹 내에 표시합니다.
+    target_columns = [1, 2, 10, 710, 1710, 2710, 3710, ' ', 2000, 2010, '  ', 5090]
+    extra_seeds = sorted((set(pivot_df.columns) | {6020}) - set(target_columns))
+    seeds_999 = [seed for seed in extra_seeds if str(seed).startswith('999')]
+    full_columns = target_columns + [seed for seed in extra_seeds if seed not in seeds_999]
+    if seeds_999:
+        full_columns += ['    '] + seeds_999
     
     pivot_df = pivot_df.reindex(columns=full_columns)
     pivot_df = pivot_df.fillna('')
@@ -423,7 +428,7 @@ def main():
     # Sort the multi-index: alphabetical by Game, then by specified Config order
     sorted_index = sorted(pivot_df.index, key=lambda x: (x[0], get_sort_key(x[1])))
     pivot_df = pivot_df.reindex(sorted_index)
-    pivot_df = add_paired_baseline_mean(pivot_df)
+    pivot_df = add_paired_baseline_mean(pivot_df, excluded_seeds)
 
     output_path = 'converted_results.xlsx'
     
@@ -432,9 +437,13 @@ def main():
         
         workbook = writer.book
         worksheet = writer.sheets['Results']
+        # 세로 스크롤 시 첫 행의 시드 번호 헤더를 고정합니다.
+        worksheet.freeze_panes = 'A2'
 
         mean_col = pivot_df.columns.get_loc(PAIRED_MEAN_COLUMN) + 3
-        worksheet.column_dimensions[get_column_letter(mean_col - 1)].width = 3
+        for column_idx, column in enumerate(pivot_df.columns, start=3):
+            if not str(column).strip():
+                worksheet.column_dimensions[get_column_letter(column_idx)].width = 3
         for offset, (width, number_format) in enumerate([
             (30, '0.00'),
             (46, '+0.00;-0.00;0.00'),
@@ -447,6 +456,7 @@ def main():
 
         worksheet.cell(row=1, column=mean_col).comment = Comment(
             'Retrieval 미사용과 target: 16 양쪽에 유효한 점수가 있는 공통 시드만 사용합니다. '
+            'update_tex.py의 EXCLUDED_SEEDS에 지정된 시드는 제외합니다. '
             '각 시드에 여러 결과가 있으면 첫 번째 점수를 사용합니다.',
             'STORM',
         )
@@ -458,7 +468,8 @@ def main():
         worksheet.cell(row=1, column=mean_col + 2).comment = Comment(
             'STORM (논문) 행: (Retrieval 미사용 평균 − STORM 논문 점수) / (Human − Random).\n'
             'target: 16 행: (target: 16 평균 − Retrieval 미사용 평균) / (Human − Random).\n'
-            '모든 평균은 공통 시드 기준이며 HNS 차이는 부호를 유지합니다. 백분율이 아닙니다.',
+            '모든 평균은 EXCLUDED_SEEDS를 제외한 공통 시드 기준이며 '
+            'HNS 차이는 부호를 유지합니다. 백분율이 아닙니다.',
             'STORM',
         )
 
