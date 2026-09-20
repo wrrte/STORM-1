@@ -32,8 +32,10 @@ JointTrainAgent:
     batch_size_reduction: "retrieved" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
     value_signal: "value_diff" # "value_diff" (V_t - V_{t-1}) or "value" (V_t); used by z_score
+    score_combination: "multiply" # "multiply" or "add"; combines ReLU(z_TD) and softplus(z_value)
     threshold: 1.0
-    z_score_threshold: 3.5
+    z_score_threshold: 3.5 # Used by score_combination: multiply
+    additive_z_score_threshold: 4.0 # Used by score_combination: add
     anchor_offset: -3 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 
     hash_bits: 10
     hash_sample_mode: "probs"

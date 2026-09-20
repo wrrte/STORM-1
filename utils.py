@@ -200,6 +200,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.batch_size_reduction = "anchors"
     conf.JointTrainAgent.Retrieval.trigger_mode = "absolute" # "absolute" or "z_score"
     conf.JointTrainAgent.Retrieval.value_signal = "value_diff" # "value_diff" or "value" for z_score
+    conf.JointTrainAgent.Retrieval.score_combination = "multiply" # "multiply" or "add" for z_score
     conf.JointTrainAgent.Retrieval.anchor_offset = -2
     conf.JointTrainAgent.Retrieval.hash_bits = 12
     conf.JointTrainAgent.Retrieval.hash_sample_mode = "probs"
@@ -212,6 +213,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.max_warmup_steps = 80000
     conf.JointTrainAgent.Retrieval.threshold = 1.0
     conf.JointTrainAgent.Retrieval.z_score_threshold = 2.0
+    conf.JointTrainAgent.Retrieval.additive_z_score_threshold = 4.0
     conf.JointTrainAgent.Retrieval.ema_alpha = 0.01
     conf.JointTrainAgent.Retrieval.max_bucket_size = 100000
     conf.JointTrainAgent.Retrieval.max_anchors = 10
