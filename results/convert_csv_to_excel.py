@@ -44,6 +44,49 @@ SCORE_DELTA_COLUMN = 'Δ Score (행별 비교)'
 HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
 
 
+def expand_shared_runs(df):
+    """공통 warmup의 진행 상태를 선택된 실험의 실제 config로 펼칩니다."""
+    # training_branches.py의 RETRIEVAL_EXPERIMENTS와 동일한 부분 설정입니다.
+    overrides = {
+        'baseline': {'Retrieval Enable': False},
+        'retrieval': {'Retrieval Enable': True},
+        'target1': {'Retrieval Enable': True, 'Retrieval Target': 1},
+        'value': {'Retrieval Enable': True, 'Value Signal': 'value'},
+        'add': {'Retrieval Enable': True, 'Score Combination': 'add'},
+    }
+    rows = []
+    for row in df.to_dict('records'):
+        enable = str(row['Retrieval Enable']).strip()
+        if enable.startswith('['):
+            experiments = ast.literal_eval(enable)
+            if not isinstance(experiments, list) or not experiments:
+                raise ValueError(f'Invalid Retrieval.enable experiment list: {enable}')
+            experiments = [str(name).strip().lower() for name in experiments]
+        elif enable.lower() == 'both' or str(row['Run Name']).lower().endswith('_both'):
+            experiments = ['baseline', 'retrieval']
+        else:
+            rows.append(row)
+            continue
+
+        if row['State'] != 'running':
+            continue
+        for name in dict.fromkeys(experiments):
+            if name not in overrides:
+                raise ValueError(f'Unknown Retrieval.enable experiment: {name}')
+            rows.append({**row, **overrides[name]})
+    return pd.DataFrame(rows, columns=list(dict.fromkeys([
+        *df.columns, 'Value Signal', 'Score Combination',
+    ])))
+
+
+def config_value(row, column, default):
+    """새 config 필드가 없는 과거 CSV/백업에는 학습 코드의 기본값을 적용합니다."""
+    value = row.get(column)
+    if pd.isna(value) or str(value).strip().lower() in {'', 'n/a', 'nan', 'none'}:
+        return default
+    return value
+
+
 def load_excluded_seeds():
     """update_tex.py를 실행하지 않고 현재 EXCLUDED_SEEDS 설정을 읽습니다."""
     source_path = Path(__file__).resolve().with_name('update_tex.py')
@@ -183,19 +226,7 @@ def main():
         df['State'] = ''
     df['State'] = df['State'].fillna('').astype(str).str.strip().str.lower()
 
-    # Both의 공통 학습 단계에서는 Retrieval 사용/미사용 양쪽에 진행 상태를 표시합니다.
-    is_both = (
-        df['Retrieval Enable'].astype(str).str.strip().str.lower().eq('both')
-        | df['Run Name'].astype(str).str.lower().str.endswith('_both')
-    )
-    running_both = df[
-        df['State'].eq('running') & is_both
-    ]
-    df = pd.concat([
-        df[~is_both],
-        running_both.assign(**{'Retrieval Enable': False}),
-        running_both.assign(**{'Retrieval Enable': True}),
-    ], ignore_index=True)
+    df = expand_shared_runs(df)
 
     # Data extraction
     data = []
@@ -259,8 +290,9 @@ def main():
         # ---------------------------------------------------------
         # 실험 필터링 및 표기법 변경 로직
         # 1. Retrieval을 사용하지 않은 실험은 'Retrieval 미사용'으로 표기
-        # 2. Retrieval을 사용한 실험 중 특정 조건(Warmup 50000, BSR retrieved, Z score 3.5)만 필터링
+        # 2. Warmup 50000, BSR retrieved, 적용 임계값(multiply: 3.5 / add: 4.0)만 유지
         # 3. target 1 또는 16이고 anchor 미설정인 실험만 유지 (기존대로 0.0625도 미설정 취급)
+        # 4. value_signal=value / score_combination=add는 별도 config 행으로 표시
         # ---------------------------------------------------------
         if not ret_enable:
             config = 'Retrieval 미사용'
@@ -269,13 +301,22 @@ def main():
             if pd.isna(bsr) or str(bsr).strip() == '' or str(bsr) == 'nan':
                 bsr = 'N/A'
 
-            z_score = row.get('Z Score Threshold', 'N/A')
+            value_signal = str(config_value(row, 'Value Signal', 'value_diff')).strip().lower()
+            score_combination = str(config_value(row, 'Score Combination', 'multiply')).strip().lower()
+            if value_signal not in ('value_diff', 'value') or score_combination not in ('multiply', 'add'):
+                continue
+            if score_combination == 'add':
+                z_score = config_value(row, 'Additive Z Score Threshold', 4.0)
+                expected_z_score = 4.0
+            else:
+                z_score = row.get('Z Score Threshold', 'N/A')
+                expected_z_score = 3.5
             try:
                 z_score_float = float(z_score)
             except (ValueError, TypeError):
                 z_score_float = None
 
-            if warmup_steps == 50000 and str(bsr) == 'retrieved' and z_score_float == 3.5:
+            if warmup_steps == 50000 and str(bsr) == 'retrieved' and z_score_float == expected_z_score:
                 r_target = row.get('Retrieval Target', 'N/A')
                 try:
                     r_target = float(r_target)
@@ -294,6 +335,13 @@ def main():
                         str(a_weight) == 'nan' or str(a_weight) == 'N/A' or
                         anchor_is_unset):
                     config = f'target: {int(r_target)} (anchor 미설정)'
+                    variants = []
+                    if value_signal == 'value':
+                        variants.append('value')
+                    if score_combination == 'add':
+                        variants.append('add')
+                    if variants:
+                        config += f" [{', '.join(variants)}]"
                 else:
                     continue
             else:
@@ -458,10 +506,14 @@ def main():
     ]
 
     def get_sort_key(config_str):
+        variant_order = next((
+            order for order, suffix in enumerate([' [value]', ' [add]', ' [value, add]'], start=1)
+            if config_str.endswith(suffix)
+        ), 0)
         for i, base in enumerate(base_order):
             if config_str.startswith(base):
-                return i
-        return len(base_order)
+                return i, variant_order, config_str
+        return len(base_order), variant_order, config_str
 
     # Sort the multi-index: alphabetical by Game, then by specified Config order
     sorted_index = sorted(pivot_df.index, key=lambda x: (x[0], get_sort_key(x[1])))

@@ -3,6 +3,7 @@ import contextlib
 import csv
 import importlib.util
 import io
+import json
 import os
 from pathlib import Path
 import sys
@@ -134,6 +135,70 @@ class RunningRunsTests(unittest.TestCase):
         self.assertEqual(cells['Alien', TARGET, 2].value, '300.00')
         self.assertIsNone(cells['Alien', TARGET, 2].fill.fill_type)
         self.assertEqual(cells['Alien', TARGET, converter.PAIRED_MEAN_COLUMN].value, 300)
+
+    def test_variant_configs_export_and_keep_scores_separate(self):
+        baseline = make_run('baseline', 2, False, 'finished', 100)
+        retrieval = make_run('retrieval', 2, True, 'finished', 150)
+        target1 = make_run('target1', 2, True, 'finished', 200)
+        target1.config['JointTrainAgent']['Retrieval']['target'] = 1
+        value = make_run('value', 2, True, 'finished', 250)
+        value.config['JointTrainAgent']['Retrieval'].update(
+            value_signal='value', score_combination='multiply', save_warmup=True)
+        additive = make_run('add', 2, True, 'finished', 300)
+        additive.config['JointTrainAgent.Retrieval.value_signal'] = 'value_diff'
+        additive.config['JointTrainAgent.Retrieval.score_combination'] = 'add'
+        additive.config['JointTrainAgent.Retrieval.additive_z_score_threshold'] = 4.0
+        # add uses its own threshold; the inactive multiply threshold must not filter it.
+        additive.config['JointTrainAgent.Retrieval.z_score_threshold'] = 99
+        combined = make_run('combined', 2, True, 'finished', 350)
+        combined.config['JointTrainAgent']['Retrieval'].update(
+            value_signal='value', score_combination='add', additive_z_score_threshold=4.0)
+        filtered = make_run('filtered', 2, True, 'finished', 999)
+        filtered.config['JointTrainAgent']['Retrieval'].update(
+            score_combination='add', additive_z_score_threshold=5.0)
+
+        rows = self.export([baseline, retrieval, target1, value, additive, combined, filtered])
+        self.assertEqual(rows['value']['Value Signal'], 'value')
+        self.assertEqual(rows['add']['Score Combination'], 'add')
+        self.assertEqual(rows['add']['Additive Z Score Threshold'], '4.0')
+        cells = self.workbook_cells()
+        expected = {
+            BASELINE: '100.00', TARGET: '150.00',
+            'target: 1 (anchor 미설정)': '200.00',
+            TARGET + ' [value]': '250.00', TARGET + ' [add]': '300.00',
+            TARGET + ' [value, add]': '350.00',
+        }
+        for config, score in expected.items():
+            self.assertEqual(cells['Alien', config, 2].value, score)
+        self.assertEqual(cells['Alien', TARGET, converter.PAIRED_MEAN_COLUMN].value, 150)
+        self.assertEqual(cells['Alien', TARGET, converter.SCORE_DELTA_COLUMN].value, 50)
+        self.assertEqual(cells['Alien', TARGET + ' [value]', 2].fill.fgColor.rgb[-6:], 'C6EFCE')
+
+    def test_shared_experiment_lists_only_mark_selected_effective_configs(self):
+        experiments = ['baseline', 'retrieval', 'target1', 'value', 'add']
+        shared = make_run('shared', 2, experiments, score=999)
+        shared.name = 'Alien_shared_2'
+        subset = make_run('subset', 5090, ['value', 'add'])
+        inherited = make_run('inherited', 710, ['retrieval', 'add'])
+        inherited.config['JointTrainAgent']['Retrieval'].update(target=1, value_signal='value')
+        finished = make_run('finished', 6020, experiments, 'finished', 999)
+        rows = self.export([shared, subset, inherited, finished])
+        self.assertEqual(json.loads(rows['shared']['Retrieval Enable']), experiments)
+        self.assertEqual(rows['shared']['Seed'], '2')
+        self.assertNotIn('finished', rows)
+        cells = self.workbook_cells()
+        for config in [BASELINE, TARGET, 'target: 1 (anchor 미설정)',
+                       TARGET + ' [value]', TARGET + ' [add]']:
+            cell = cells['Alien', config, 2]
+            self.assertEqual(cell.value, 'RUNNING')
+            self.assertEqual(cell.fill.fgColor.rgb[-6:], 'FFF2CC')
+        for config in [TARGET + ' [value]', TARGET + ' [add]']:
+            self.assertEqual(cells['Alien', config, 5090].value, 'RUNNING')
+        self.assertIsNone(cells['Alien', BASELINE, 5090].value)
+        self.assertIsNone(cells['Alien', TARGET, 5090].value)
+        self.assertEqual(cells['Alien', 'target: 1 (anchor 미설정) [value]', 710].value, 'RUNNING')
+        self.assertEqual(cells['Alien', 'target: 1 (anchor 미설정) [value, add]', 710].value, 'RUNNING')
+        self.assertTrue(all('999' not in str(cell.value) for cell in cells.values()))
 
 
 if __name__ == '__main__':

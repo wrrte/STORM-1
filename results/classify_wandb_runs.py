@@ -6,6 +6,7 @@ import subprocess
 import os
 import csv
 import io
+import json
 from collections import Counter
 
 
@@ -143,9 +144,13 @@ def main():
             str(ret_enable).strip().lower() == 'both'
             or str(run.name).lower().endswith('_both')
         )
-        if is_both and run.state != "running":
+        is_experiment_list = isinstance(ret_enable, list)
+        if (is_both or is_experiment_list) and run.state != "running":
             continue
-        ret_enable = 'Both' if is_both else bool(ret_enable)
+        if is_both:
+            ret_enable = 'Both'
+        elif not is_experiment_list:
+            ret_enable = str(ret_enable).strip().lower() in ('true', '1', 't')
         save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
             
         # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
@@ -213,6 +218,10 @@ def main():
         
         z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.z_score_threshold')
         z_score_threshold = z_score_threshold if z_score_threshold is not None else 'N/A'
+
+        value_signal = get_config_val(run.config, 'JointTrainAgent.Retrieval.value_signal')
+        score_combination = get_config_val(run.config, 'JointTrainAgent.Retrieval.score_combination')
+        additive_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.additive_z_score_threshold')
         
         hash_bits = get_config_val(run.config, 'JointTrainAgent.Retrieval.hash_bits')
         hash_bits = hash_bits if hash_bits is not None else 'N/A'
@@ -230,7 +239,7 @@ def main():
             "Commit": commit_hash[:7] if commit_hash else "None",
             "Logic": logic_type,
             "Eval Return": eval_return,
-            "Retrieval Enable": ret_enable,
+            "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
             "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
             "Warmup Steps": warmup_steps,
             "Calculated Warmup Steps": calculated_warmup_steps,
@@ -239,6 +248,9 @@ def main():
             "Min Warmup Steps": min_warmup_steps,
             "Batch Size Reduction": batch_size_reduction,
             "Z Score Threshold": z_score_threshold,
+            "Value Signal": value_signal if value_signal is not None else 'N/A',
+            "Score Combination": score_combination if score_combination is not None else 'N/A',
+            "Additive Z Score Threshold": additive_z_score_threshold if additive_z_score_threshold is not None else 'N/A',
             "Hash Bits": hash_bits,
             "Retrieval Target": retrieval_target,
             "Anchor Weight": anchor_weight,
@@ -261,7 +273,7 @@ def main():
     
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Save Warmup", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
+        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Save Warmup", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:
