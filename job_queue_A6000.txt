@@ -1,2 +1,4 @@
 python -u train.py -n "Frostbite-6000" -seed 6000 -config_path "config_files/STORM.yaml" -env_name "ALE/Frostbite-v5" -trajectory_path "D_TRAJ/Frostbite.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
 python -u train.py -n "MsPacman-6000" -seed 6000 -config_path "config_files/STORM.yaml" -env_name "ALE/MsPacman-v5" -trajectory_path "MsPacman.pkl" JointTrainAgent.Retrieval.enable "['value', 'target1', 'add']"
+
+python -u train.py -n "Gopher-6020" -seed 6020 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval', 'baseline']" JointTrainAgent.Retrieval.save_warmup True
