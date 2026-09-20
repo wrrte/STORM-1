@@ -27,7 +27,8 @@ import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from retrieval import RetrievalContextManager
 from training_branches import (
-    RETRIEVAL_EXPERIMENTS, configure_storm_retrieval_run,
+    configure_storm_retrieval_run, parse_storm_training_args,
+    save_storm_warmup_metadata, launch_storm_warmup_followup,
     capture_rng_state, launch_training_branches, save_final_models, restore_rng_state,
 )
 import pandas as pd
@@ -267,7 +268,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                     print(colorama.Fore.YELLOW + f"Dynamic warmup finished at step {current_total_steps}!" + colorama.Style.RESET_ALL)
             is_retrieval_warmup = not warmup_finished
         else:
-            is_retrieval_warmup = (total_steps * num_envs) < warmup_steps_config
+            is_retrieval_warmup = not warmup_finished and (total_steps * num_envs) < warmup_steps_config
 
         if branch_commands is not None and not is_retrieval_warmup and at_episode_boundary:
             # The previous iteration collected and trained on the episode's
@@ -286,6 +287,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 last_rebuild_step, True, list(episode_rewards), dynamic_warmup_met_step,
                 retrieval_manager=retrieval_manager, shared_warmup=True,
             )
+            if getattr(retrieval_config, "save_warmup", False):
+                save_storm_warmup_metadata(
+                    ckpt_dir, conf, args, total_steps, retrieval_manager.statistics_signals)
             vec_env.close()
             logger.writer.close()
             import wandb
@@ -617,16 +621,9 @@ if __name__ == "__main__":
     torch.backends.cudnn.allow_tf32 = True
 
     # parse arguments
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-n", type=str, required=True)
-    parser.add_argument("-seed", type=int, required=True)
-    parser.add_argument("-config_path", type=str, required=True)
-    parser.add_argument("-env_name", type=str, required=True)
-    parser.add_argument("-trajectory_path", type=str, required=True)
-    parser.add_argument("--resume_from", type=str, default=None, help="Path to resume checkpoint directory")
-    parser.add_argument("--branch_mode", choices=("true", "false"), default=None, help=argparse.SUPPRESS)
-    parser.add_argument("--branch_experiment", choices=tuple(RETRIEVAL_EXPERIMENTS), default=None, help=argparse.SUPPRESS)
-    args, extra_args = parser.parse_known_args()
+    args, extra_args = parse_storm_training_args()
+    if args.resume_warmup is not None:
+        launch_storm_warmup_followup(args, extra_args, __file__, load_config)
     conf = load_config(args.config_path)
     branch_commands = configure_storm_retrieval_run(conf, args, extra_args, __file__)
     print(colorama.Fore.RED + str(args) + " extra: " + str(extra_args) + colorama.Style.RESET_ALL)
@@ -669,7 +666,7 @@ if __name__ == "__main__":
         )
 
         # judge whether to load demonstration trajectory
-        if conf.JointTrainAgent.UseDemonstration:
+        if conf.JointTrainAgent.UseDemonstration and not args.resume_from:
             print(colorama.Fore.MAGENTA + f"loading demonstration trajectory from {args.trajectory_path}" + colorama.Style.RESET_ALL)
             replay_buffer.load_trajectory(path=args.trajectory_path)
 

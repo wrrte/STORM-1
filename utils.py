@@ -197,6 +197,7 @@ def load_config(config_path):
     
     conf.JointTrainAgent.Retrieval = CN()
     conf.JointTrainAgent.Retrieval.enable = False
+    conf.JointTrainAgent.Retrieval.save_warmup = False
     conf.JointTrainAgent.Retrieval.batch_size_reduction = "anchors"
     conf.JointTrainAgent.Retrieval.trigger_mode = "absolute" # "absolute" or "z_score"
     conf.JointTrainAgent.Retrieval.value_signal = "value_diff" # "value_diff" or "value" for z_score

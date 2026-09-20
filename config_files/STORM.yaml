@@ -30,6 +30,7 @@ JointTrainAgent:
   Retrieval:
     enable: Both # True, False, "Both" (_O then _X), or an experiment list (shared warmup)
     # Example: enable: [baseline, retrieval, target1, value, add] (runs in list order)
+    save_warmup: False # Save both value statistics + reusable warmup for later --resume_warmup jobs
     batch_size_reduction: "retrieved" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
     value_signal: "value_diff" # "value_diff" (V_t - V_{t-1}) or "value" (V_t); used by z_score
