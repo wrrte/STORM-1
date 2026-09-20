@@ -25,6 +25,7 @@ def load_script(name):
 
 classifier = load_script('classify_wandb_runs')
 converter = load_script('convert_csv_to_excel')
+tex_updater = load_script('update_tex')
 BASELINE = 'Retrieval 미사용'
 TARGET = 'target: 16 (anchor 미설정)'
 
@@ -173,6 +174,23 @@ class RunningRunsTests(unittest.TestCase):
         self.assertEqual(cells['Alien', TARGET, converter.PAIRED_MEAN_COLUMN].value, 150)
         self.assertEqual(cells['Alien', TARGET, converter.SCORE_DELTA_COLUMN].value, 50)
         self.assertEqual(cells['Alien', TARGET + ' [value]', 2].fill.fgColor.rgb[-6:], 'C6EFCE')
+        with contextlib.redirect_stdout(io.StringIO()):
+            results = tex_updater.load_results('converted_results.xlsx')
+        self.assertEqual(results['Alien'], ([100.0], [150.0]))
+
+    def test_tex_does_not_substitute_ablation_scores_for_missing_retrieval(self):
+        baseline = make_run('baseline', 2, False, 'finished', 100)
+        value = make_run('value', 2, True, 'finished', 900)
+        value.config['JointTrainAgent']['Retrieval']['value_signal'] = 'value'
+        additive = make_run('add', 2, True, 'finished', 800)
+        additive.config['JointTrainAgent']['Retrieval']['score_combination'] = 'add'
+        self.export([baseline, value, additive])
+        cells = self.workbook_cells()
+        self.assertEqual(cells['Alien', TARGET + ' [value]', 2].value, '900.00')
+        self.assertEqual(cells['Alien', TARGET + ' [add]', 2].value, '800.00')
+        with contextlib.redirect_stdout(io.StringIO()):
+            results = tex_updater.load_results('converted_results.xlsx')
+        self.assertNotIn('Alien', results)
 
     def test_shared_experiment_lists_only_mark_selected_effective_configs(self):
         experiments = ['baseline', 'retrieval', 'target1', 'value', 'add']

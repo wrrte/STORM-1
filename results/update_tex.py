@@ -243,6 +243,8 @@ def load_results(
     
     for game in games:
         game_df = df[df['Game'] == game]
+        # Match complete config labels: FLASH uses only the default target: 16 row.
+        # Rows ending in [value], [add], or [value, add] are separate ablations.
         c1_row = game_df[game_df['Config'].astype(str) == configs[0]]
         c2_row = game_df[game_df['Config'].astype(str) == configs[1]]
         

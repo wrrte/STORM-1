@@ -8,6 +8,7 @@ import csv
 import io
 import json
 from collections import Counter
+from tqdm import tqdm
 
 
 # W&B에서 삭제된 target: 1 (anchor 미설정) run 37개의 고정 백업.
@@ -121,7 +122,8 @@ def main():
 
     results = []
     
-    print(f"총 {len(runs)}개의 run을 확인했습니다. 분류를 시작합니다...\n")
+    total_runs = len(runs)
+    print(f"총 {total_runs}개의 run을 확인했습니다. 분류를 시작합니다...")
     
     def get_config_val(config, key_path):
         if key_path in config:
@@ -135,129 +137,133 @@ def main():
                 return None
         return val
 
-    for run in runs:
-        if run.state == "killed":
-            continue
+    with tqdm(
+        runs, total=total_runs, desc="Classifying", unit="run",
+        dynamic_ncols=True, file=sys.stdout,
+    ) as progress:
+        for run in progress:
+            progress.set_postfix_str(f"Run: {' '.join(str(run.name).split())}")
+            if run.state == "killed":
+                continue
 
-        ret_enable = get_config_val(run.config, 'JointTrainAgent.Retrieval.enable')
-        is_both = (
-            str(ret_enable).strip().lower() == 'both'
-            or str(run.name).lower().endswith('_both')
-        )
-        is_experiment_list = isinstance(ret_enable, list)
-        if (is_both or is_experiment_list) and run.state != "running":
-            continue
-        if is_both:
-            ret_enable = 'Both'
-        elif not is_experiment_list:
-            ret_enable = str(ret_enable).strip().lower() in ('true', '1', 't')
-        save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
+            ret_enable = get_config_val(run.config, 'JointTrainAgent.Retrieval.enable')
+            is_both = (
+                str(ret_enable).strip().lower() == 'both'
+                or str(run.name).lower().endswith('_both')
+            )
+            is_experiment_list = isinstance(ret_enable, list)
+            if (is_both or is_experiment_list) and run.state != "running":
+                continue
+            if is_both:
+                ret_enable = 'Both'
+            elif not is_experiment_list:
+                ret_enable = str(ret_enable).strip().lower() in ('true', '1', 't')
+            save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
             
-        # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
-        commit_hash = run.commit
+            # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
+            commit_hash = run.commit
         
-        # run.commit이 없는 경우 config나 summary 등 다른 곳에 수동 기록했는지 확인
-        if not commit_hash and 'commit' in run.config:
-            commit_hash = run.config['commit']
+            # run.commit이 없는 경우 config나 summary 등 다른 곳에 수동 기록했는지 확인
+            if not commit_hash and 'commit' in run.config:
+                commit_hash = run.config['commit']
             
-        logic_type = get_logic_for_commit(commit_hash)
+            logic_type = get_logic_for_commit(commit_hash)
         
-        eval_return = run.summary.get('eval/episode_avg_return', 'N/A')
+            eval_return = run.summary.get('eval/episode_avg_return', 'N/A')
         
-        warmup_steps = 'N/A'
-        calculated_warmup_steps = 'N/A'
-        if ret_enable:
-            w_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_steps')
-            warmup_steps = w_steps if w_steps is not None else 'N/A'
-            calculated_warmup_steps = warmup_steps
+            warmup_steps = 'N/A'
+            calculated_warmup_steps = 'N/A'
+            if ret_enable:
+                w_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_steps')
+                warmup_steps = w_steps if w_steps is not None else 'N/A'
+                calculated_warmup_steps = warmup_steps
             
-            # warmup_steps가 -1인 경우, Retrieval/retrieved_contexts 그래프의 첫 스텝에서 가져옴
-            if str(warmup_steps) == '-1':
+                # warmup_steps가 -1인 경우, Retrieval/retrieved_contexts 그래프의 첫 스텝에서 가져옴
+                if str(warmup_steps) == '-1':
+                    try:
+                        # 백엔드 샘플링을 방지하기 위해 samples 값을 크게 설정하여 전체를 가져옵니다.
+                        hist_df = run.history(keys=["Retrieval/retrieved_contexts"], samples=1000000)
+                        if not hist_df.empty and "_step" in hist_df.columns:
+                            first_step = int(hist_df["_step"].min())
+                            calculated_warmup_steps = first_step + 1024
+                        else:
+                            tqdm.write(f"[{run.name}] 히스토리에 '_step' 정보가 없습니다.")
+                    except Exception as e:
+                        tqdm.write(f"[{run.name}] 히스토리에서 warmup steps를 가져오지 못했습니다: {e}")
+            
+            # 1. 런 이름에서 시드 추출 우선 시도 (형식: {env}_{id}_{seed}_{O/X/Both})
+            seed = None
+            parts = str(run.name).split('_')
+            if len(parts) >= 4 and parts[-1].upper() in ['O', 'X', 'BOTH']:
                 try:
-                    # 백엔드 샘플링을 방지하기 위해 samples 값을 크게 설정하여 전체를 가져옵니다.
-                    hist_df = run.history(keys=["Retrieval/retrieved_contexts"], samples=1000000)
-                    if not hist_df.empty and "_step" in hist_df.columns:
-                        first_step = int(hist_df["_step"].min())
-                        calculated_warmup_steps = first_step + 1024
-                    else:
-                        print(f"[{run.name}] 히스토리에 '_step' 정보가 없습니다.")
-                except Exception as e:
-                    print(f"[{run.name}] 히스토리에서 warmup steps를 가져오지 못했습니다: {e}")
-            
-        # 1. 런 이름에서 시드 추출 우선 시도 (형식: {env}_{id}_{seed}_{O/X/Both})
-        seed = None
-        parts = str(run.name).split('_')
-        if len(parts) >= 4 and parts[-1].upper() in ['O', 'X', 'BOTH']:
-            try:
-                seed = int(parts[-2])
-            except ValueError:
-                pass
-        elif len(parts) >= 3 and parts[-1].isdigit():
-            # Both 공통 단계의 Logger는 O/X 접미사 없이 이름을 기록합니다.
-            seed = int(parts[-1])
+                    seed = int(parts[-2])
+                except ValueError:
+                    pass
+            elif len(parts) >= 3 and parts[-1].isdigit():
+                # Both 공통 단계의 Logger는 O/X 접미사 없이 이름을 기록합니다.
+                seed = int(parts[-1])
                 
-        # 2. 런 이름에서 유추 실패 시 Config에서 읽어오기 ('Seed' 또는 'seed' 확인)
-        if seed is None:
-            seed = get_config_val(run.config, 'Seed')
+            # 2. 런 이름에서 유추 실패 시 Config에서 읽어오기 ('Seed' 또는 'seed' 확인)
             if seed is None:
-                seed = get_config_val(run.config, 'seed')
+                seed = get_config_val(run.config, 'Seed')
+                if seed is None:
+                    seed = get_config_val(run.config, 'seed')
                 
-        seed = seed if seed is not None else 'N/A'
+            seed = seed if seed is not None else 'N/A'
         
-        dynamic_warmup_delay_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_delay_steps')
-        dynamic_warmup_delay_steps = dynamic_warmup_delay_steps if dynamic_warmup_delay_steps is not None else 'N/A'
+            dynamic_warmup_delay_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_delay_steps')
+            dynamic_warmup_delay_steps = dynamic_warmup_delay_steps if dynamic_warmup_delay_steps is not None else 'N/A'
         
-        dynamic_warmup_target_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_target_steps')
-        dynamic_warmup_target_steps = dynamic_warmup_target_steps if dynamic_warmup_target_steps is not None else 'N/A'
+            dynamic_warmup_target_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_target_steps')
+            dynamic_warmup_target_steps = dynamic_warmup_target_steps if dynamic_warmup_target_steps is not None else 'N/A'
         
-        min_warmup_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.min_warmup_steps')
-        min_warmup_steps = min_warmup_steps if min_warmup_steps is not None else 'N/A'
+            min_warmup_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.min_warmup_steps')
+            min_warmup_steps = min_warmup_steps if min_warmup_steps is not None else 'N/A'
         
-        batch_size_reduction = get_config_val(run.config, 'JointTrainAgent.Retrieval.batch_size_reduction')
-        batch_size_reduction = batch_size_reduction if batch_size_reduction is not None else 'N/A'
+            batch_size_reduction = get_config_val(run.config, 'JointTrainAgent.Retrieval.batch_size_reduction')
+            batch_size_reduction = batch_size_reduction if batch_size_reduction is not None else 'N/A'
         
-        z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.z_score_threshold')
-        z_score_threshold = z_score_threshold if z_score_threshold is not None else 'N/A'
+            z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.z_score_threshold')
+            z_score_threshold = z_score_threshold if z_score_threshold is not None else 'N/A'
 
-        value_signal = get_config_val(run.config, 'JointTrainAgent.Retrieval.value_signal')
-        score_combination = get_config_val(run.config, 'JointTrainAgent.Retrieval.score_combination')
-        additive_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.additive_z_score_threshold')
+            value_signal = get_config_val(run.config, 'JointTrainAgent.Retrieval.value_signal')
+            score_combination = get_config_val(run.config, 'JointTrainAgent.Retrieval.score_combination')
+            additive_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.additive_z_score_threshold')
         
-        hash_bits = get_config_val(run.config, 'JointTrainAgent.Retrieval.hash_bits')
-        hash_bits = hash_bits if hash_bits is not None else 'N/A'
+            hash_bits = get_config_val(run.config, 'JointTrainAgent.Retrieval.hash_bits')
+            hash_bits = hash_bits if hash_bits is not None else 'N/A'
         
-        retrieval_target = get_config_val(run.config, 'JointTrainAgent.Retrieval.target')
-        retrieval_target = retrieval_target if retrieval_target is not None else 'N/A'
+            retrieval_target = get_config_val(run.config, 'JointTrainAgent.Retrieval.target')
+            retrieval_target = retrieval_target if retrieval_target is not None else 'N/A'
         
-        anchor_weight = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight')
-        anchor_weight = anchor_weight if anchor_weight is not None else 'N/A'
+            anchor_weight = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight')
+            anchor_weight = anchor_weight if anchor_weight is not None else 'N/A'
         
-        results.append({
-            "Run Name": run.name,
-            "Run ID": run.id,
-            "State": run.state,
-            "Commit": commit_hash[:7] if commit_hash else "None",
-            "Logic": logic_type,
-            "Eval Return": eval_return,
-            "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
-            "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
-            "Warmup Steps": warmup_steps,
-            "Calculated Warmup Steps": calculated_warmup_steps,
-            "Dynamic Warmup Delay Steps": dynamic_warmup_delay_steps,
-            "Dynamic Warmup Target Steps": dynamic_warmup_target_steps,
-            "Min Warmup Steps": min_warmup_steps,
-            "Batch Size Reduction": batch_size_reduction,
-            "Z Score Threshold": z_score_threshold,
-            "Value Signal": value_signal if value_signal is not None else 'N/A',
-            "Score Combination": score_combination if score_combination is not None else 'N/A',
-            "Additive Z Score Threshold": additive_z_score_threshold if additive_z_score_threshold is not None else 'N/A',
-            "Hash Bits": hash_bits,
-            "Retrieval Target": retrieval_target,
-            "Anchor Weight": anchor_weight,
-            "Seed": seed,
-            "Created At": run.created_at
-        })
-        print(f"Run: {run.name:20} | Commit: {str(commit_hash)[:7]:7} | Return: {str(eval_return)[:8]:8} | Logic: {logic_type} | Ret: {ret_enable} | Orig Warmup: {warmup_steps} | Calc Warmup: {calculated_warmup_steps} | Seed: {seed} | Created: {run.created_at}")
+            results.append({
+                "Run Name": run.name,
+                "Run ID": run.id,
+                "State": run.state,
+                "Commit": commit_hash[:7] if commit_hash else "None",
+                "Logic": logic_type,
+                "Eval Return": eval_return,
+                "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
+                "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
+                "Warmup Steps": warmup_steps,
+                "Calculated Warmup Steps": calculated_warmup_steps,
+                "Dynamic Warmup Delay Steps": dynamic_warmup_delay_steps,
+                "Dynamic Warmup Target Steps": dynamic_warmup_target_steps,
+                "Min Warmup Steps": min_warmup_steps,
+                "Batch Size Reduction": batch_size_reduction,
+                "Z Score Threshold": z_score_threshold,
+                "Value Signal": value_signal if value_signal is not None else 'N/A',
+                "Score Combination": score_combination if score_combination is not None else 'N/A',
+                "Additive Z Score Threshold": additive_z_score_threshold if additive_z_score_threshold is not None else 'N/A',
+                "Hash Bits": hash_bits,
+                "Retrieval Target": retrieval_target,
+                "Anchor Weight": anchor_weight,
+                "Seed": seed,
+                "Created At": run.created_at
+            })
 
     live_count = len(results)
     results = merge_archived_target_1_runs(results)

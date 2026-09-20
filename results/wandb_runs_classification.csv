@@ -544,6 +544,7 @@ ChopperCommand_f8wrqau6_710,f8wrqau6,running,1089892,num_valid_anchors,N/A,True,
 BattleZone_tfke1sme_6000,tfke1sme,running,501c4f0,num_valid_anchors,N/A,True,N/A,50000,50000,3000,20000,5000,retrieved,3.5,value,multiply,4,10,16,0.0625,6000,2026-09-20T08:13:26Z
 Amidar_0yzsi5xw_6020,0yzsi5xw,running,501c4f0,num_valid_anchors,N/A,True,N/A,50000,50000,3000,20000,5000,retrieved,3.5,value_diff,add,4,10,16,0.0625,6020,2026-09-20T08:23:26Z
 Seaquest_xix6h720_9999,xix6h720,running,2275d46,num_valid_anchors,N/A,"[""value"", ""add""]",False,50000,50000,3000,20000,5000,retrieved,3.5,value_diff,multiply,4,10,16,0.0625,9999,2026-09-20T09:30:59Z
+Frostbite_o9ktp3rz_6000,o9ktp3rz,running,161830a,num_valid_anchors,N/A,"[""value"", ""add""]",False,50000,50000,3000,20000,5000,retrieved,3.5,value_diff,multiply,4,10,16,0.0625,6000,2026-09-20T10:34:58Z
 Frostbite_nmi7yn4w_6000_O,nmi7yn4w,finished,486129f,num_valid_anchors,2119.5,True,,50000,50000,3000,20000,5000,retrieved,3.5,,,,11,1,N/A,6000,2026-09-03T05:10:47Z
 Frostbite_ykunnmjg_6010_O,ykunnmjg,finished,486129f,num_valid_anchors,261.5,True,,50000,50000,3000,20000,5000,retrieved,3.5,,,,11,1,N/A,6010,2026-09-03T05:11:08Z
 BattleZone_co5yu3w3_2000_O,co5yu3w3,finished,486129f,num_valid_anchors,5550,True,,50000,50000,3000,20000,5000,retrieved,3.5,,,,11,1,N/A,2000,2026-09-03T05:11:55Z
