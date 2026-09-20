@@ -397,8 +397,10 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             if retrieval_manager is not None and retrieval_manager.enabled:
                 logger.log("Retrieval/td_error_mean", retrieval_manager.ema_mean.mean())
                 logger.log("Retrieval/td_error_var", retrieval_manager.ema_var.mean())
-                logger.log("Retrieval/value_diff_mean", retrieval_manager.ema_vd_mean.mean())
-                logger.log("Retrieval/value_diff_var", retrieval_manager.ema_vd_var.mean())
+                value_signal = retrieval_manager.value_signal
+                value_mean, value_var = retrieval_manager.get_ema_stats(value_signal)
+                logger.log(f"Retrieval/{value_signal}_mean", value_mean.mean())
+                logger.log(f"Retrieval/{value_signal}_var", value_var.mean())
         # <<< train world model part
 
         # train agent part >>>

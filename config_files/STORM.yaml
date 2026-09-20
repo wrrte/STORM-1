@@ -31,6 +31,7 @@ JointTrainAgent:
     enable: Both # True, False, or "Both": share warmup through an episode boundary, then run _O followed by _X
     batch_size_reduction: "retrieved" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
+    value_signal: "value_diff" # "value_diff" (V_t - V_{t-1}) or "value" (V_t); used by z_score
     threshold: 1.0
     z_score_threshold: 3.5
     anchor_offset: -3 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 

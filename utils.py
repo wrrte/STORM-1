@@ -199,6 +199,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.enable = False
     conf.JointTrainAgent.Retrieval.batch_size_reduction = "anchors"
     conf.JointTrainAgent.Retrieval.trigger_mode = "absolute" # "absolute" or "z_score"
+    conf.JointTrainAgent.Retrieval.value_signal = "value_diff" # "value_diff" or "value" for z_score
     conf.JointTrainAgent.Retrieval.anchor_offset = -2
     conf.JointTrainAgent.Retrieval.hash_bits = 12
     conf.JointTrainAgent.Retrieval.hash_sample_mode = "probs"
