@@ -15,7 +15,7 @@ EXCLUDED_SEEDS = {
     "Frostbite": {10},
     "BankHeist": {6020},
     "Krull": {2000},
-    "Gopher": {6000, 9999}, 
+    "Gopher": {6000, 6010, 9999}, 
 }
 
 
