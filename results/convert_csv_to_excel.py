@@ -1,4 +1,5 @@
 import ast
+import json
 from copy import copy
 from pathlib import Path
 
@@ -45,7 +46,7 @@ HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
 
 
 def expand_shared_runs(df):
-    """공통 warmup의 진행 상태를 선택된 실험의 실제 config로 펼칩니다."""
+    """공통 warmup과 실행 중인 분기의 예정 실험을 실제 config로 펼칩니다."""
     # training_branches.py의 RETRIEVAL_EXPERIMENTS와 동일한 부분 설정입니다.
     overrides = {
         'baseline': {'Retrieval Enable': False},
@@ -66,6 +67,9 @@ def expand_shared_runs(df):
             experiments = ['baseline', 'retrieval']
         else:
             rows.append(row)
+            if row['State'] == 'running':
+                pending_configs = json.loads(config_value(row, 'Pending Retrieval Configs', '[]'))
+                rows.extend({**row, **config} for config in pending_configs)
             continue
 
         if row['State'] != 'running':

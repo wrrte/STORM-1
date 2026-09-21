@@ -7,6 +7,7 @@ import os
 import csv
 import io
 import json
+import ast
 import tempfile
 from collections import Counter
 from tqdm import tqdm
@@ -110,21 +111,63 @@ def parse_save_warmup_request(args):
     return requested
 
 
-def get_save_warmup_request(run, effective_save_warmup):
-    """자식 분기에서 False로 초기화된 값은 실행 metadata로 요청 여부를 확인합니다."""
-    if str(effective_save_warmup).strip().lower() != 'false':
-        return None
+def get_run_args(run):
+    """자식 분기의 원래 실험 순서와 save_warmup 요청을 metadata에서 읽습니다."""
     try:
         with tempfile.TemporaryDirectory(prefix='storm-run-metadata-') as directory:
             with run.file('wandb-metadata.json').download(root=directory, replace=True) as source:
                 metadata = json.load(source)
-        return parse_save_warmup_request(metadata.get('args'))
+        return metadata.get('args')
     except Exception as error:
         tqdm.write(
-            f'[{run.name}] save_warmup 실행 인자를 확인하지 못했습니다 '
+            f'[{run.name}] 실행 인자를 확인하지 못했습니다 '
             f'({type(error).__name__}). config 값으로 표시합니다.'
         )
         return None
+
+
+def parse_pending_retrieval_configs(args):
+    """현재 분기 다음에 실행할 실험을 CSV 열에 적용할 부분 설정으로 반환합니다."""
+    if not isinstance(args, list):
+        return []
+    values = dict(zip(args, args[1:]))
+    # argparse는 --branch_experiment=value 형식도 허용합니다.
+    for argument in args:
+        if argument.startswith('--branch_experiment='):
+            values['--branch_experiment'] = argument.split('=', 1)[1]
+    try:
+        experiments = ast.literal_eval(values.get('JointTrainAgent.Retrieval.enable', 'None'))
+    except (ValueError, SyntaxError):
+        return []
+    if not isinstance(experiments, list):
+        return []
+    experiments = [str(name).strip().lower() for name in experiments]
+    branch = values.get('--branch_experiment')
+    overrides = {
+        'baseline': {'Retrieval Enable': False},
+        'retrieval': {'Retrieval Enable': True},
+        'target1': {'Retrieval Enable': True, 'Retrieval Target': 1},
+        'value': {'Retrieval Enable': True, 'Value Signal': 'value'},
+        'add': {'Retrieval Enable': True, 'Score Combination': 'add'},
+    }
+    if branch not in experiments or any(name not in overrides for name in experiments):
+        return []
+
+    # 각 자식은 공통 설정에서 시작하므로 현재 분기의 강제 설정을 전파하지 않습니다.
+    # 원래 CLI 값을 우선하고, 지정하지 않은 키는 STORM.yaml 기본값을 사용합니다.
+    defaults = {
+        'Retrieval Target': ('target', 16),
+        'Value Signal': ('value_signal', 'value_diff'),
+        'Score Combination': ('score_combination', 'multiply'),
+    }
+    common = {
+        column: values.get(f'JointTrainAgent.Retrieval.{key}', default)
+        for column, (key, default) in defaults.items() if column in overrides[branch]
+    }
+    return [
+        {**common, **overrides[name]}
+        for name in experiments[experiments.index(branch) + 1:]
+    ]
 
 
 def main():
@@ -189,7 +232,11 @@ def main():
             elif not is_experiment_list:
                 ret_enable = str(ret_enable).strip().lower() in ('true', '1', 't')
             save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
-            save_warmup_requested = get_save_warmup_request(run, save_warmup)
+            check_save_warmup = str(save_warmup).strip().lower() == 'false'
+            check_pending = run.state == 'running' and not (is_both or is_experiment_list)
+            run_args = get_run_args(run) if check_save_warmup or check_pending else None
+            save_warmup_requested = parse_save_warmup_request(run_args) if check_save_warmup else None
+            pending_configs = parse_pending_retrieval_configs(run_args) if check_pending else []
             
             # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
             commit_hash = run.commit
@@ -278,6 +325,7 @@ def main():
                 "Logic": logic_type,
                 "Eval Return": eval_return,
                 "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
+                "Pending Retrieval Configs": json.dumps(pending_configs),
                 "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
                 "Save Warmup Requested": save_warmup_requested if save_warmup_requested is not None else 'N/A',
                 "Warmup Steps": warmup_steps,
@@ -311,7 +359,7 @@ def main():
     
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
+        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:

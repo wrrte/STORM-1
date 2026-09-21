@@ -218,6 +218,88 @@ class RunningRunsTests(unittest.TestCase):
         self.assertEqual(cells['Alien', 'target: 1 (anchor 미설정) [value, add]', 710].value, 'RUNNING')
         self.assertTrue(all('999' not in str(cell.value) for cell in cells.values()))
 
+    def test_running_branch_marks_only_current_and_remaining_experiments(self):
+        experiments = ['retrieval', 'target1', 'value', 'add']
+        retrieval = make_run('retrieval', 6030, True, 'finished', 100)
+        target1 = make_run('target1', 6030, True, 'finished', 200)
+        target1.config['JointTrainAgent']['Retrieval']['target'] = 1
+        value = make_run('value', 6030, True, score=9999)
+        value.config['JointTrainAgent']['Retrieval'].update(value_signal='value', save_warmup=False)
+        value.file = Mock()
+        args = ['JointTrainAgent.Retrieval.enable', repr(experiments),
+                'JointTrainAgent.Retrieval.save_warmup', 'True',
+                '--branch_experiment', 'value']
+        value.file.return_value.download.side_effect = lambda **kwargs: io.StringIO(
+            json.dumps({'args': args}))
+
+        rows = self.export([retrieval, target1, value])
+        self.assertEqual(json.loads(rows['value']['Pending Retrieval Configs']), [
+            {'Retrieval Enable': True, 'Value Signal': 'value_diff', 'Score Combination': 'add'},
+        ])
+        value.file.assert_called_once_with('wandb-metadata.json')
+        cells = self.workbook_cells()
+        self.assertEqual(cells['Alien', TARGET, 6030].value, '100.00')
+        self.assertEqual(cells['Alien', 'target: 1 (anchor 미설정)', 6030].value, '200.00')
+        for config in [TARGET + ' [value]', TARGET + ' [add]']:
+            cell = cells['Alien', config, 6030]
+            self.assertEqual(cell.value, 'RUNNING')
+            self.assertEqual(cell.fill.fgColor.rgb[-6:], 'FFF2CC')
+            self.assertEqual(cell.border.left.color.rgb[-6:], '00B050')
+        self.assertNotIn(('Alien', TARGET + ' [value, add]', 6030), cells)
+        self.assertTrue(all('9999' not in str(cell.value) for cell in cells.values()))
+
+        value.state = 'finished'
+        value.summary['eval/episode_avg_return'] = 250
+        additive = make_run('add', 6030, True)
+        additive.config['JointTrainAgent']['Retrieval']['score_combination'] = 'add'
+        additive.file = Mock()
+        additive.file.return_value.download.return_value = io.StringIO(json.dumps({
+            'args': args[:-1] + ['add'],
+        }))
+        rows = self.export([retrieval, target1, value, additive])
+        self.assertEqual(json.loads(rows['value']['Pending Retrieval Configs']), [])
+        self.assertEqual(json.loads(rows['add']['Pending Retrieval Configs']), [])
+        cells = self.workbook_cells()
+        self.assertEqual(cells['Alien', TARGET + ' [value]', 6030].value, '250.00')
+        self.assertEqual(cells['Alien', TARGET + ' [add]', 6030].value, 'RUNNING')
+
+        additive.state = 'finished'
+        additive.summary['eval/episode_avg_return'] = 300
+        self.export([retrieval, target1, value, additive])
+        self.assertEqual(self.workbook_cells()['Alien', TARGET + ' [add]', 6030].value, '300.00')
+
+    def test_pending_branches_follow_list_order_and_restore_common_cli_settings(self):
+        for branch, settings, extra_args, expected in [
+            ('target1', {'target': 1}, [], [
+                TARGET, TARGET + ' [value]', TARGET + ' [add]', BASELINE,
+            ]),
+            ('value', {'target': 1, 'value_signal': 'value'}, [
+                'JointTrainAgent.Retrieval.value_signal', 'value_diff',
+                'JointTrainAgent.Retrieval.value_signal', 'value',
+            ], ['target: 1 (anchor 미설정) [value, add]', BASELINE]),
+            ('add', {'score_combination': 'add'}, [], [BASELINE]),
+        ]:
+            with self.subTest(branch=branch):
+                run = make_run('child', 6030, True)
+                run.config['JointTrainAgent']['Retrieval'].update(settings)
+                run.file = Mock()
+                run.file.return_value.download.return_value = io.StringIO(json.dumps({'args': [
+                    'JointTrainAgent.Retrieval.enable', repr(['target1', 'retrieval', 'value', 'add', 'baseline']),
+                    *extra_args, f'--branch_experiment={branch}',
+                ]}))
+                self.export([run])
+                cells = self.workbook_cells()
+                for config in expected:
+                    self.assertEqual(cells['Alien', config, 6030].value, 'RUNNING')
+
+    def test_pending_configs_ignore_missing_invalid_and_unrelated_metadata(self):
+        for args in (None, [], ['--branch_experiment', 'value'],
+                     ['JointTrainAgent.Retrieval.enable', 'invalid', '--branch_experiment', 'value'],
+                     ['JointTrainAgent.Retrieval.enable', "['add']", '--branch_experiment', 'value'],
+                     ['JointTrainAgent.Retrieval.enable', "['value', 'unknown']", '--branch_experiment', 'value']):
+            with self.subTest(args=args):
+                self.assertEqual(classifier.parse_pending_retrieval_configs(args), [])
+
     def test_child_warmup_request_highlights_all_five_effective_configs(self):
         # Real failure: koenosnj requested save_warmup=True on the CLI, but
         # configure_storm_retrieval_run resets the child's logged config to False.
