@@ -1,16 +1,6 @@
-python -u train.py -n "Gopher-9998" -seed 9998 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "Gopher.pkl" JointTrainAgent.Retrieval.enable "['value', 'target1', 'add']"
+
+python -u train.py -n "Gopher-9997" -seed 9997 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
 
 python -u train.py -n "BankHeist-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "BankHeist.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
 
 
-python -u train.py -n "Kangaroo-9997" -seed 9997 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
-python -u train.py -n "Krull-9997" -seed 9997 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
-python -u train.py -n "RoadRunner-9997" -seed 9997 -config_path "config_files/STORM.yaml" -env_name "ALE/RoadRunner-v5" -trajectory_path "D_TRAJ/RoadRunner.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
-python -u train.py -n "UpNDown-9997" -seed 9997 -config_path "config_files/STORM.yaml" -env_name "ALE/UpNDown-v5" -trajectory_path "D_TRAJ/UpNDown.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
-python -u train.py -n "BankHeist-9997" -seed 9997 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "D_TRAJ/BankHeist.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
-python -u train.py -n "Qbert-9997" -seed 9997 -config_path "config_files/STORM.yaml" -env_name "ALE/Qbert-v5" -trajectory_path "D_TRAJ/Qbert.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
