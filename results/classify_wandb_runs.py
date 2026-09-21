@@ -7,6 +7,7 @@ import os
 import csv
 import io
 import json
+import tempfile
 from collections import Counter
 from tqdm import tqdm
 
@@ -97,6 +98,35 @@ def get_logic_for_commit(commit_hash):
         # 파일이 존재하지 않거나 커밋을 찾을 수 없는 경우
         return "Unknown (Git error or train.py missing)"
 
+
+def parse_save_warmup_request(args):
+    """실행 인자의 명시적인 save_warmup 요청을 읽습니다 (마지막 지정 우선)."""
+    if not isinstance(args, list):
+        return None
+    requested = None
+    for key, value in zip(args, args[1:]):
+        if key == 'JointTrainAgent.Retrieval.save_warmup':
+            requested = {'true': True, 'false': False}.get(str(value).strip().lower())
+    return requested
+
+
+def get_save_warmup_request(run, effective_save_warmup):
+    """자식 분기에서 False로 초기화된 값은 실행 metadata로 요청 여부를 확인합니다."""
+    if str(effective_save_warmup).strip().lower() != 'false':
+        return None
+    try:
+        with tempfile.TemporaryDirectory(prefix='storm-run-metadata-') as directory:
+            with run.file('wandb-metadata.json').download(root=directory, replace=True) as source:
+                metadata = json.load(source)
+        return parse_save_warmup_request(metadata.get('args'))
+    except Exception as error:
+        tqdm.write(
+            f'[{run.name}] save_warmup 실행 인자를 확인하지 못했습니다 '
+            f'({type(error).__name__}). config 값으로 표시합니다.'
+        )
+        return None
+
+
 def main():
     # 1. 자동 로그인 처리
     api_key_path = os.path.join(os.path.dirname(__file__), '.wandb_api_key')
@@ -159,6 +189,7 @@ def main():
             elif not is_experiment_list:
                 ret_enable = str(ret_enable).strip().lower() in ('true', '1', 't')
             save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
+            save_warmup_requested = get_save_warmup_request(run, save_warmup)
             
             # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
             commit_hash = run.commit
@@ -248,6 +279,7 @@ def main():
                 "Eval Return": eval_return,
                 "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
                 "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
+                "Save Warmup Requested": save_warmup_requested if save_warmup_requested is not None else 'N/A',
                 "Warmup Steps": warmup_steps,
                 "Calculated Warmup Steps": calculated_warmup_steps,
                 "Dynamic Warmup Delay Steps": dynamic_warmup_delay_steps,
@@ -279,7 +311,7 @@ def main():
     
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Save Warmup", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
+        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:

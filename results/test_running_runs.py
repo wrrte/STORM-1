@@ -10,7 +10,7 @@ import sys
 import tempfile
 from types import SimpleNamespace
 import unittest
-from unittest.mock import patch
+from unittest.mock import Mock, patch
 
 from openpyxl import load_workbook
 
@@ -217,6 +217,78 @@ class RunningRunsTests(unittest.TestCase):
         self.assertEqual(cells['Alien', 'target: 1 (anchor 미설정) [value]', 710].value, 'RUNNING')
         self.assertEqual(cells['Alien', 'target: 1 (anchor 미설정) [value, add]', 710].value, 'RUNNING')
         self.assertTrue(all('999' not in str(cell.value) for cell in cells.values()))
+
+    def test_child_warmup_request_highlights_all_five_effective_configs(self):
+        # Real failure: koenosnj requested save_warmup=True on the CLI, but
+        # configure_storm_retrieval_run resets the child's logged config to False.
+        variants = {
+            'baseline': (False, {}, BASELINE),
+            'retrieval': (True, {}, TARGET),
+            'target1': (True, {'target': 1}, 'target: 1 (anchor 미설정)'),
+            'value': (True, {'value_signal': 'value'}, TARGET + ' [value]'),
+            'add': (True, {'score_combination': 'add'}, TARGET + ' [add]'),
+        }
+        runs = []
+        for experiment, (enabled, overrides, _) in variants.items():
+            run_id = 'koenosnj' if experiment == 'retrieval' else experiment
+            run = make_run(run_id, 6030, enabled, 'finished', 2933)
+            run.name = f'Gopher_{run_id}_6030'
+            run.config['JointTrainAgent']['Retrieval'].update(save_warmup=False, **overrides)
+            run.file = Mock()
+            run.file.return_value.download.return_value = io.StringIO(json.dumps({'args': [
+                '-n', 'Gopher-6030', '-seed', '6030',
+                'JointTrainAgent.Retrieval.enable', repr([experiment]),
+                'JointTrainAgent.Retrieval.save_warmup', 'True',
+                '--branch_experiment', experiment,
+                '--resume_from', '/home/choemj/STORM-1/ckpt/Gopher-6030_Shared/shared_warmup_50356',
+            ]}))
+            runs.append(run)
+
+        rows = self.export(runs)
+        cells = self.workbook_cells()
+        for run, (_, _, config) in zip(runs, variants.values()):
+            with self.subTest(config=config):
+                self.assertEqual(rows[run.id]['Save Warmup'], 'False')
+                self.assertEqual(rows[run.id]['Save Warmup Requested'], 'True')
+                cell = cells['Gopher', config, 6030]
+                self.assertEqual(cell.value, '2933.00')
+                self.assertEqual(cell.fill.fgColor.rgb[-6:], 'C6EFCE')
+                self.assertEqual(cell.border.left.color.rgb[-6:], '00B050')
+
+    def test_missing_or_false_warmup_request_keeps_unhighlighted_score(self):
+        key = 'JointTrainAgent.Retrieval.save_warmup'
+        runs = []
+        for seed, args in enumerate((None, [], [key, 'True', key, 'False']), 6030):
+            run = make_run(str(seed), seed, True, 'finished', 2933)
+            run.config['JointTrainAgent']['Retrieval']['save_warmup'] = False
+            run.file = Mock()
+            if args is None:
+                run.file.side_effect = FileNotFoundError('No metadata')
+            else:
+                run.file.return_value.download.return_value = io.StringIO(json.dumps({'args': args}))
+            runs.append(run)
+        rows = self.export(runs)
+        cells = self.workbook_cells()
+        self.assertEqual(rows['6030']['Save Warmup Requested'], 'N/A')
+        self.assertEqual(rows['6031']['Save Warmup Requested'], 'N/A')
+        self.assertEqual(rows['6032']['Save Warmup Requested'], 'False')
+        for seed in range(6030, 6033):
+            cell = cells['Alien', TARGET, seed]
+            self.assertEqual(cell.value, '2933.00')
+            self.assertIsNone(cell.fill.fill_type)
+
+    def test_running_child_preserves_yellow_and_adds_warmup_border(self):
+        run = make_run('child', 6030, True, score=999)
+        run.config['JointTrainAgent']['Retrieval']['save_warmup'] = False
+        run.file = Mock()
+        run.file.return_value.download.return_value = io.StringIO(json.dumps({'args': [
+            'JointTrainAgent.Retrieval.save_warmup', 'True',
+        ]}))
+        self.export([run])
+        cell = self.workbook_cells()['Alien', TARGET, 6030]
+        self.assertEqual(cell.value, 'RUNNING')
+        self.assertEqual(cell.fill.fgColor.rgb[-6:], 'FFF2CC')
+        self.assertEqual(cell.border.left.color.rgb[-6:], '00B050')
 
 
 if __name__ == '__main__':

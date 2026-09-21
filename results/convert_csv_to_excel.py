@@ -144,7 +144,7 @@ def parse_score(value):
 
 
 def mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells):
-    """표시된 run 중 save_warmup=True가 있는 시드 셀을 강조합니다."""
+    """config 또는 실행 인자에서 save_warmup=True인 run의 시드 셀을 강조합니다."""
     warmup_fill = PatternFill(fill_type='solid', fgColor='C6EFCE')
     warmup_side = Side(border_style='medium', color='00B050')
     for game, config, seed in highlighted_cells:
@@ -163,8 +163,9 @@ def mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells):
         border.left = border.right = border.top = border.bottom = warmup_side
         cell.border = border
         note = (
-            '초록색 테두리: 이 셀에 표시된 run 중 config의 '
-            'JointTrainAgent.Retrieval.save_warmup 값이 True인 run이 있습니다.'
+            '초록색 테두리: 이 셀에 표시된 run 중 config 또는 실행 인자에서 '
+            'JointTrainAgent.Retrieval.save_warmup=True인 run이 있습니다. '
+            '자식 분기는 재저장을 방지하기 위해 최종 config가 False일 수 있습니다.'
         )
         if cell.comment:
             cell.comment.text += '\n\n' + note
@@ -361,7 +362,10 @@ def main():
             'Eval Return': eval_return,
             'Warmup Steps': calculated_warmup_steps,
             'Hash Bits': h_bits,
-            'Save Warmup': str(row.get('Save Warmup', '')).strip().lower() == 'true',
+            'Save Warmup': any(
+                str(row.get(column, '')).strip().lower() == 'true'
+                for column in ('Save Warmup', 'Save Warmup Requested')
+            ),
             'Created At': created_at_utc
         })
 
