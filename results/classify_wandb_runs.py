@@ -126,6 +126,22 @@ def get_run_args(run):
         return None
 
 
+def scheduling_metadata(args, retrieval_enable):
+    """큐 스케줄러가 기존 warmup의 실제 경로와 현재 단계를 식별할 정보."""
+    values = dict(zip(args, args[1:])) if isinstance(args, list) else {}
+    for argument in args or []:
+        if argument.startswith('--') and '=' in argument:
+            key, value = argument.split('=', 1)
+            values[key] = value
+    checkpoint = values.get('--resume_from', '')
+    shared = isinstance(retrieval_enable, list) or str(retrieval_enable).lower() == 'both'
+    return {
+        'Warmup Directory': checkpoint or values.get('--resume_warmup', ''),
+        'Base Run Name': values.get('-n', ''),
+        'Training Phase': 'warmup' if shared else ('branch' if checkpoint else ''),
+    }
+
+
 def parse_pending_retrieval_configs(args):
     """현재 분기 다음에 실행할 실험을 CSV 열에 적용할 부분 설정으로 반환합니다."""
     if not isinstance(args, list):
@@ -234,7 +250,11 @@ def main():
             save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
             check_save_warmup = str(save_warmup).strip().lower() == 'false'
             check_pending = run.state == 'running' and not (is_both or is_experiment_list)
-            run_args = get_run_args(run) if check_save_warmup or check_pending else None
+            needs_metadata = (
+                check_save_warmup or check_pending or run.state == 'running'
+                or str(save_warmup).strip().lower() == 'true'
+            )
+            run_args = get_run_args(run) if needs_metadata else None
             save_warmup_requested = parse_save_warmup_request(run_args) if check_save_warmup else None
             pending_configs = parse_pending_retrieval_configs(run_args) if check_pending else []
             
@@ -342,7 +362,8 @@ def main():
                 "Retrieval Target": retrieval_target,
                 "Anchor Weight": anchor_weight,
                 "Seed": seed,
-                "Created At": run.created_at
+                "Created At": run.created_at,
+                **scheduling_metadata(run_args, ret_enable),
             })
 
     live_count = len(results)
@@ -360,6 +381,7 @@ def main():
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
+        fieldnames += ["Warmup Directory", "Base Run Name", "Training Phase"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:

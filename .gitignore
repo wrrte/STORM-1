@@ -8,3 +8,5 @@ venv/
 6_train.sh
 populate_queue.sh
 Miniconda3-latest-Linux-x86_64.sh
+experiment_scheduler.lock
+results/experiment_scheduler_state.json

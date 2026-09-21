@@ -327,11 +327,18 @@ class RunningRunsTests(unittest.TestCase):
             runs.append(run)
 
         rows = self.export(runs)
-        cells = self.workbook_cells()
+        # This fixture tests warmup highlighting independently of the user's
+        # editable exclusion list (Gopher 6030 may now legitimately be excluded).
+        with patch.object(converter, 'load_excluded_seeds', return_value={}):
+            cells = self.workbook_cells()
         for run, (_, _, config) in zip(runs, variants.values()):
             with self.subTest(config=config):
                 self.assertEqual(rows[run.id]['Save Warmup'], 'False')
                 self.assertEqual(rows[run.id]['Save Warmup Requested'], 'True')
+                self.assertEqual(rows[run.id]['Warmup Directory'],
+                                 '/home/choemj/STORM-1/ckpt/Gopher-6030_Shared/shared_warmup_50356')
+                self.assertEqual(rows[run.id]['Base Run Name'], 'Gopher-6030')
+                self.assertEqual(rows[run.id]['Training Phase'], 'branch')
                 cell = cells['Gopher', config, 6030]
                 self.assertEqual(cell.value, '2933.00')
                 self.assertEqual(cell.fill.fgColor.rgb[-6:], 'C6EFCE')

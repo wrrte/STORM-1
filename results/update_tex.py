@@ -17,7 +17,7 @@ EXCLUDED_SEEDS = {
     "BattleZone": {6010},
     "Boxing": {6000},
     "Krull": {2000, 2010},
-    "Gopher": {6000, 6010, 9999}, 
+    "Gopher": {6000, 6010, 6020, 6030, 9999}, 
     "PrivateEye": {6000},
     "Qbert": {3710},
 }
