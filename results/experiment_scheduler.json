@@ -1,9 +1,10 @@
 {
-  "anomaly_hns_gap": 1.0,
+  "anomaly_hns_gap": 0.2,
+  "anomaly_seed_hns_gap": 0.6,
   "improvement_hns": 1.0,
-  "successful_pairs_per_game": 1,
-  "lookahead_hours": 6.0,
-  "max_new_jobs": 16,
+  "successful_pairs_per_game": null,
+  "lookahead_hours": 18.0,
+  "max_new_jobs": null,
   "gpus": {
     "pro6k": {
       "count": 1,
@@ -11,7 +12,7 @@
       "retrieval_hours": 3.0,
       "baseline_hours": 1.5,
       "historical_seeds": [1, 2, 10, 710, 1710, 2710, 3710],
-      "new_seed_range": [10000, 19999]
+      "seed_sequence": {"start": 710, "step": 1000}
     },
     "3090": {
       "count": 1,
@@ -19,7 +20,7 @@
       "retrieval_hours": 11.0,
       "baseline_hours": 3.0,
       "historical_seeds": [2000, 2010],
-      "new_seed_range": [20000, 29999]
+      "seed_sequence": {"start": 2000, "step": 10}
     },
     "A6000": {
       "count": 4,
@@ -27,15 +28,15 @@
       "retrieval_hours": 3.5,
       "baseline_hours": 2.5,
       "historical_seeds": [6000, 6010, 6020, 6030, 6040],
-      "new_seed_range": [60000, 69999]
+      "seed_sequence": {"start": 6000, "step": 10}
     },
     "titan": {
       "count": 1,
       "warmup_hours": 2.0,
       "retrieval_hours": 3.0,
       "baseline_hours": 2.0,
-      "historical_seeds": [9996, 9997, 9998, 9999],
-      "new_seed_range": [90000, 99999]
+      "historical_seeds": [9999, 9998, 9997, 9996],
+      "seed_sequence": {"start": 9999, "step": -1}
     }
   }
 }

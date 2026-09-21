@@ -15,6 +15,7 @@ import csv
 from datetime import datetime, timezone
 import fcntl
 import json
+from itertools import count, chain
 import math
 import os
 from pathlib import Path, PurePosixPath
@@ -60,6 +61,11 @@ def value(row, key, default=''):
 
 def truth(item):
     return str(item).lower() in {'true', '1', 't'}
+
+
+def reaches(gap, threshold):
+    """Inclusive HNS boundary, allowing only floating-point roundoff."""
+    return gap >= threshold or math.isclose(gap, threshold, rel_tol=0, abs_tol=1e-12)
 
 
 def timestamp(text):
@@ -200,13 +206,12 @@ def parse_command(line, gpu):
 
 
 def validate_config(config):
-    for key in ('anomaly_hns_gap', 'improvement_hns', 'lookahead_hours'):
+    for key in ('anomaly_hns_gap', 'anomaly_seed_hns_gap', 'improvement_hns', 'lookahead_hours'):
         if number(config.get(key)) is None or config[key] < 0:
             raise ValueError(f'{key}: 0 이상의 숫자가 필요합니다.')
     for key in ('successful_pairs_per_game', 'max_new_jobs'):
-        if type(config.get(key)) is not int or config[key] < 1:
-            raise ValueError(f'{key}: 양의 정수가 필요합니다.')
-    ranges = []
+        if config.get(key) is not None and (type(config[key]) is not int or config[key] < 1):
+            raise ValueError(f'{key}: null(제한 없음) 또는 양의 정수가 필요합니다.')
     historical = set()
     if set(config['gpus']) != {'pro6k', '3090', 'A6000', 'titan'}:
         raise ValueError('gpus에는 pro6k, 3090, A6000, titan이 필요합니다.')
@@ -216,18 +221,37 @@ def validate_config(config):
         for key in ('warmup_hours', 'retrieval_hours', 'baseline_hours'):
             if number(spec[key]) is None or spec[key] <= 0:
                 raise ValueError(f'{gpu}.{key}: 양수가 필요합니다.')
-        start, end = spec['new_seed_range']
-        if type(start) is not int or type(end) is not int or not 0 <= start <= end < 2**32:
-            raise ValueError(f'{gpu}: 잘못된 new_seed_range')
-        if any(start <= b and a <= end for a, b in ranges):
-            raise ValueError('GPU별 new_seed_range가 겹칩니다.')
-        ranges.append((start, end))
+        sequence = spec['seed_sequence']
+        if type(sequence.get('start')) is not int or not 0 <= sequence['start'] < 2**32:
+            raise ValueError(f'{gpu}: seed_sequence.start는 유효한 시드 정수여야 합니다.')
+        if type(sequence.get('step')) is not int or sequence['step'] == 0:
+            raise ValueError(f'{gpu}: seed_sequence.step은 0이 아닌 정수여야 합니다.')
         seeds = set(spec['historical_seeds'])
         if historical & seeds:
             raise ValueError('historical_seeds의 GPU 배정이 겹칩니다.')
         historical |= seeds
     if not sum(spec['count'] for spec in config['gpus'].values()):
         raise ValueError('사용 가능한 GPU가 없습니다.')
+
+
+def sequence_contains(seed, sequence):
+    if seed is None:
+        return False
+    offset = seed - sequence['start']
+    return 0 <= seed < 2**32 and offset * sequence['step'] >= 0 and offset % sequence['step'] == 0
+
+
+def seed_candidates(spec):
+    """Try this GPU's established seeds, then extend its numerical rule."""
+    sequence = spec['seed_sequence']
+    generated = count(sequence['start'], sequence['step'])
+    seen = set()
+    for seed in chain(spec['historical_seeds'], generated):
+        if not 0 <= seed < 2**32:
+            return
+        if seed not in seen:
+            seen.add(seed)
+            yield seed
 
 
 def gpu_for_seed(seed, config, jobs, queued):
@@ -237,9 +261,15 @@ def gpu_for_seed(seed, config, jobs, queued):
     if len(known) > 1:
         raise ValueError(f'시드 {seed}의 GPU 배정이 충돌합니다: {known}')
     for gpu, spec in config['gpus'].items():
-        start, end = spec['new_seed_range']
-        if seed in spec['historical_seeds'] or (seed is not None and start <= seed <= end):
+        if seed in spec['historical_seeds']:
             return gpu
+    matches = [gpu for gpu, spec in config['gpus'].items()
+               if sequence_contains(seed, spec['seed_sequence'])]
+    if matches:
+        # New dispatches have an explicit GPU in the ledger. For an external run
+        # without that record, infer the closest progression (2020/6100/9995).
+        return min(matches, key=lambda gpu: (seed - config['gpus'][gpu]['seed_sequence']['start'])
+                   // config['gpus'][gpu]['seed_sequence']['step'])
     raise ValueError(f'시드 {seed}의 GPU를 모릅니다. 설정의 historical_seeds에 추가하세요.')
 
 
@@ -334,15 +364,27 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
     summaries = {}
     for game, (random_score, human_score, paper_score) in references.items():
         scale = human_score - random_score
-        means = {}
+        means, low_seeds = {}, {}
         for kind in ('baseline', 'retrieval'):
-            values = [r['score'] for (g, k, _), r in scores.items() if g == game and k == kind]
-            means[kind] = statistics.mean(values) if values else None
+            samples = [r for (g, k, _), r in scores.items() if g == game and k == kind]
+            means[kind] = statistics.mean(r['score'] for r in samples) if samples else None
+            low_seeds[kind] = [{'seed': r['seed'], 'hns_gap': (paper_score - r['score']) / scale}
+                               for r in samples if reaches((paper_score - r['score']) / scale,
+                                                           config['anomaly_seed_hns_gap'])]
         gaps = {kind: (paper_score - mean) / scale if mean is not None else None
                 for kind, mean in means.items()}
-        anomalous = any(gap is not None and gap >= config['anomaly_hns_gap'] for gap in gaps.values())
+        reasons = {}
+        for kind, gap in gaps.items():
+            if gap is None:
+                continue
+            if reaches(gap, config['anomaly_hns_gap']):
+                reasons[kind] = 'mean_gap'
+            elif gap > 0 and not math.isclose(gap, 0, abs_tol=1e-12) and low_seeds[kind]:
+                reasons[kind] = 'below_paper_with_low_seed'
+        anomalous = bool(reasons)
         if (games is not None and game in games) or (games is None and anomalous):
             summaries[game] = {'means': means, 'paper_score': paper_score, 'hns_gaps': gaps,
+                               'low_seeds': low_seeds, 'reasons': reasons,
                                'priority': max(gap or 0 for gap in gaps.values())}
     selected = set(summaries) | {job['game'] for job in jobs}
     if games is not None:
@@ -449,8 +491,26 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
             push_load(slots, job['gpu'], duration([job['kind']], config['gpus'][job['gpu']],
                                                 job['kind'] == 'retrieval'))
     initial_slots = copy.deepcopy(slots)
-    used_seeds = {r['seed'] for r in rows} | {q['seed'] for q in queued} | {j['seed'] for j in jobs}
-    used_seeds |= {seed for seeds in excluded.values() for seed in seeds}
+    used_seeds = defaultdict(set)
+    for item in [*rows, *queued, *jobs]:
+        used_seeds[item['game']].add(item['seed'])
+    for game, seeds in excluded.items():
+        used_seeds[game].update(seeds)
+    # Seed ownership is shared across games, while score/experiment existence is
+    # per game. Explicit older dispatches keep their original GPU assignments.
+    owners = defaultdict(set)
+    for gpu, spec in config['gpus'].items():
+        for seed in spec['historical_seeds']:
+            owners[seed].add(gpu)
+    for item in [*queued, *jobs]:
+        owners[item['seed']].add(item['gpu'])
+
+    def next_seed(game, gpu):
+        return next((seed for seed in seed_candidates(config['gpus'][gpu])
+                     if seed not in used_seeds[game] and not (owners[seed] - {gpu})), None)
+
+    def within_job_limit():
+        return config['max_new_jobs'] is None or len(additions) < config['max_new_jobs']
 
     def add_job(game, gpu, kind, source=None):
         if source:
@@ -460,10 +520,10 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
             comparison = threshold(game)
             if comparison is None:
                 return False
-            start, end = config['gpus'][gpu]['new_seed_range']
-            seed = next((s for s in range(start, end + 1) if s not in used_seeds), None)
+            seed = next_seed(game, gpu)
             if seed is None:
-                raise ValueError(f'{gpu}: 새 시드 범위를 모두 사용했습니다.')
+                notices.append(f'{game}/{gpu}: 규칙에 맞는 새 시드를 모두 사용했습니다.')
+                return False
             warmup = f'ckpt/{game}-{seed}_Shared'
         job = {'id': f'{game}:{seed}:{kind}', 'game': game, 'seed': seed, 'kind': kind,
                'gpu': gpu, 'warmup': warmup, 'status': 'pending', 'adopted': False,
@@ -482,7 +542,8 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
         else:
             jobs.append(job)
         additions.append(job)
-        used_seeds.add(seed)
+        used_seeds[game].add(seed)
+        owners[seed].add(gpu)
         return True
 
     # Promote successful targets before allocating speculative seed searches.
@@ -523,7 +584,7 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
         if not slots[job['gpu']]:
             notices.append(f"{job['id']}: warmup이 있는 {job['gpu']}의 GPU count가 0입니다.")
             continue
-        if len(additions) < config['max_new_jobs']:
+        if within_job_limit():
             add_job(job['game'], job['gpu'], 'baseline', job)
 
     def active_count(game):
@@ -533,35 +594,52 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
         return len(tracked | external)
 
     def enough_successes(game):
-        return sum(j['game'] == game and j['kind'] == 'retrieval' and j['status'] == 'complete'
+        goal = config['successful_pairs_per_game']
+        return goal is not None and sum(j['game'] == game and j['kind'] == 'retrieval' and j['status'] == 'complete'
                    and j.get('accepted', False)
-                   and j['seed'] not in excluded.get(game, set()) for j in jobs) >= config['successful_pairs_per_game']
+                   and j['seed'] not in excluded.get(game, set()) for j in jobs) >= goal
 
     eligible = [game for game in summaries if not enough_successes(game) and threshold(game) is not None]
     eligible.sort(key=lambda game: (-summaries[game]['priority'], game))
 
     def best_gpu(allowed=None, fill=False):
-        available = [gpu for gpu in (allowed or slots) if slots[gpu]]
+        available = [gpu for gpu in (slots if allowed is None else allowed) if slots[gpu]]
         return min(available, key=lambda gpu: (
             min(slots[gpu]) if fill else 0,
             min(slots[gpu]) + duration(['retrieval'], config['gpus'][gpu]), gpu), default=None)
 
-    # One initial/replacement trial per game; queued and running trials count.
+    horizon = config['lookahead_hours']
+
+    def needs_work():
+        return [gpu for gpu in slots if slots[gpu] and min(slots[gpu]) < horizon]
+
+    exhausted = set()
+    # First spread work across games on GPUs below the coverage target. With a
+    # zero horizon, retain the optional one-at-a-time experiment mode.
     for game in eligible:
-        if len(additions) >= config['max_new_jobs']:
+        if not within_job_limit():
             break
         if active_count(game) == 0:
-            gpu = best_gpu()
+            gpu = best_gpu(needs_work() if horizon else None)
             if gpu:
-                add_job(game, gpu, 'retrieval')
-    # Then fill only slots forecast to empty within the planning horizon.
-    while eligible and len(additions) < config['max_new_jobs']:
-        spare = [gpu for gpu in slots if slots[gpu] and min(slots[gpu]) < config['lookahead_hours']]
+                if not add_job(game, gpu, 'retrieval'):
+                    exhausted.add((game, gpu))
+    # Top up each physical GPU, not the average or latest finish of a GPU pool.
+    while eligible and within_job_limit():
+        spare = [gpu for gpu in needs_work() if any((game, gpu) not in exhausted for game in eligible)]
         if not spare:
             break
-        game = min(eligible, key=lambda g: (active_count(g), -summaries[g]['priority'], g))
-        if not add_job(game, best_gpu(spare, fill=True), 'retrieval'):
-            break
+        gpu = best_gpu(spare, fill=True)
+        candidates = [game for game in eligible if (game, gpu) not in exhausted]
+        game = min(candidates, key=lambda g: (active_count(g), -summaries[g]['priority'], g))
+        if not add_job(game, gpu, 'retrieval'):
+            exhausted.add((game, gpu))
+
+    shortfall = {gpu: [max(0, horizon - hours) for hours in available]
+                 for gpu, available in slots.items() if any(hours < horizon for hours in available)}
+    if shortfall:
+        reason = 'max_new_jobs 제한' if not within_job_limit() else '탐색 대상/비교 점수/사용 가능한 새 시드 부족'
+        notices.append(f'{horizon:g}시간 작업량을 채우지 못한 GPU가 있습니다: {reason}.')
 
     for job in jobs:
         if job['kind'] != 'retrieval' or not (job['status'] == 'failed' or (
@@ -577,6 +655,7 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
                             'reason': 'failed' if job['status'] == 'failed' else 'below_threshold_or_excluded'})
     return state, {'new_jobs': additions, 'games': summaries, 'cleanup': cleanup,
                    'gpu_available_hours_before': initial_slots, 'gpu_available_hours_after': slots,
+                   'coverage_target_hours': horizon, 'coverage_shortfall_hours': shortfall,
                    'notices': sorted(set(notices))}
 
 
@@ -601,6 +680,11 @@ def print_report(report, state, dry_run):
         gaps = ', '.join(f'{kind} ΔHNS={gap:.3f}' if gap is not None else f'{kind} 없음'
                          for kind, gap in summary['hns_gaps'].items())
         print(f'대상 {game}: 논문 대비 부족분 {gaps}')
+        for kind, reason in summary['reasons'].items():
+            if reason == 'below_paper_with_low_seed':
+                seeds = ', '.join(f"{item['seed']} (ΔHNS={item['hns_gap']:.3f})"
+                                  for item in summary['low_seeds'][kind])
+                print(f'  {kind}: 평균이 논문 미만이며 낮은 시드가 있음: {seeds}')
     for gpu, available in report['gpu_available_hours_before'].items():
         print(f'{gpu}: 기존 작업 후 GPU별 예상 여유 시점 {[round(v, 2) for v in available]} 시간')
     for job in state['jobs']:
@@ -613,6 +697,9 @@ def print_report(report, state, dry_run):
               f"(예상 시작 +{job['estimated_start_hours']:.2f}h, 완료 +{job['estimated_finish_hours']:.2f}h)")
         print(job['command'])
     print(f"새 명령 {len(report['new_jobs'])}개")
+    for gpu, available in report['gpu_available_hours_after'].items():
+        print(f'{gpu}: 추가 후 GPU별 예상 작업량 {[round(v, 2) for v in available]} 시간 '
+              f"(목표 {report['coverage_target_hours']:g}시간)")
     for item in report['cleanup']:
         path = item['warmup'] or '경로 미확인: classify_wandb_runs.py를 다시 실행해 확인'
         print(f"warmup 삭제 필요 (자동 삭제 안 함): {item['job']} / {item['gpu']} / {path}")

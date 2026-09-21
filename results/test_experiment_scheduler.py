@@ -37,6 +37,7 @@ class SchedulerTests(unittest.TestCase):
     def setUp(self):
         self.config = json.loads((scheduler.HERE / 'experiment_scheduler.json').read_text())
         self.config['lookahead_hours'] = 0
+        self.config['successful_pairs_per_game'] = 1
         for gpu, spec in self.config['gpus'].items():
             spec['count'] = int(gpu == 'pro6k')
         self.references = scheduler.literal_setting(scheduler.HERE / 'convert_csv_to_excel.py', 'REFERENCE_SCORES')
@@ -66,7 +67,7 @@ class SchedulerTests(unittest.TestCase):
         tokens = shlex.split(job['command'])
         self.assertEqual(tokens[tokens.index(scheduler.PREFIX + 'enable') + 1], "['retrieval']")
         self.assertEqual(tokens[tokens.index(scheduler.PREFIX + 'save_warmup') + 1], 'True')
-        self.assertEqual(state['jobs'][0]['seed'], 10000)
+        self.assertEqual(state['jobs'][0]['seed'], 2)
 
     def test_finished_hash_10_is_preferred_as_in_workbook(self):
         older = row(10, 2000, run_id='older', **{'Created At': '2026-09-20T00:00:00Z'})
@@ -110,7 +111,7 @@ class SchedulerTests(unittest.TestCase):
         seed = report['new_jobs'][0]['seed']
         state, report = self.plan(self.rows + [row(seed, 5154.8, run_id='failedscore')], state)
         self.assertEqual([j['kind'] for j in report['new_jobs']], ['retrieval'])
-        self.assertEqual(report['new_jobs'][0]['seed'], seed + 1)
+        self.assertEqual(report['new_jobs'][0]['seed'], 710)
         self.assertEqual(report['cleanup'][0]['warmup'], f'ckpt/Gopher-{seed}_Shared')
         self.assertEqual(report['new_jobs'][0]['reference_score'], 3000)
 
@@ -160,7 +161,7 @@ class SchedulerTests(unittest.TestCase):
         job = state['jobs'][0]
         state, report = self.plan(state=state, fail_jobs=[job['id']])
         self.assertEqual(state['jobs'][0]['status'], 'failed')
-        self.assertEqual(report['new_jobs'][0]['seed'], job['seed'] + 1)
+        self.assertEqual(report['new_jobs'][0]['seed'], 710)
         self.assertEqual(len(report['cleanup']), 1)
 
     def test_old_baseline_score_cannot_complete_new_followup(self):
@@ -214,6 +215,124 @@ class SchedulerTests(unittest.TestCase):
                 self.assertEqual(report['new_jobs'], [])
                 self.assertEqual(queue.read_text(), first)
                 self.assertEqual(len(json.loads(state_path.read_text())['jobs']), 1)
+
+    def test_anomaly_mean_and_low_seed_boundaries(self):
+        self.references = {'Gopher': (0, 100, 100)}
+        for values, expected in [
+                ([80], True),                         # Exactly 0.2 below paper.
+                ([80.00000001], False),
+                ([40, 150], True),                     # Mean only 0.05 below, one seed 0.6 below.
+                ([40.00000001, 150], False),
+                ([40, 160], False),                    # Mean equals paper.
+                ([40, 170], False)]:                   # Mean above paper.
+            for kind in ('retrieval', 'baseline'):
+                with self.subTest(values=values, kind=kind):
+                    rows = [row(seed, score, kind=kind) for seed, score in zip((1, 10), values)]
+                    _, report = self.plan(rows)
+                    self.assertEqual('Gopher' in report['games'], expected)
+
+    def test_excluded_seed_and_unrelated_config_do_not_trigger_anomaly(self):
+        self.references = {'Gopher': (0, 100, 100)}
+        rows = [row(1, 40), row(10, 150), row(2, -1000, **{'Value Signal': 'value'})]
+        _, report = self.plan(rows, excluded={'Gopher': {1}})
+        self.assertNotIn('Gopher', report['games'])
+        # Both halves of the second condition belong to the same config.
+        rows = [row(1, 95), row(1, 40, kind='baseline'), row(10, 170, kind='baseline')]
+        _, report = self.plan(rows)
+        self.assertNotIn('Gopher', report['games'])
+
+    def test_each_gpu_gets_eighteen_hours_without_old_sixteen_job_cap(self):
+        self.config = json.loads((scheduler.HERE / 'experiment_scheduler.json').read_text())
+        state, report = self.plan()
+        self.assertEqual(len(report['new_jobs']), 22)
+        self.assertEqual(report['gpu_available_hours_after'], {
+            'pro6k': [18], '3090': [28], 'A6000': [18, 18, 18, 18], 'titan': [20]})
+        self.assertEqual(report['coverage_shortfall_hours'], {})
+        pairs = [(job['game'], job['seed']) for job in report['new_jobs']]
+        self.assertEqual(len(pairs), len(set(pairs)))
+        queues = {gpu: '\n'.join(j['command'] for j in report['new_jobs'] if j['gpu'] == gpu)
+                  for gpu in self.config['gpus']}
+        _, repeated = self.plan(state=state, queues=queues)
+        self.assertEqual(repeated['new_jobs'], [])
+
+    def test_gpu_expansion_and_uneven_existing_work_are_filled_individually(self):
+        self.config = json.loads((scheduler.HERE / 'experiment_scheduler.json').read_text())
+        self.config['gpus']['A6000']['count'] = 5
+        self.config['gpus']['pro6k']['count'] = 2
+        # One long command can leave other A6000 devices completely idle.
+        long_job = scheduler.make_command('Alien', 6000, 'retrieval').replace(
+            "['retrieval']", "['retrieval', 'value', 'add', 'target1', 'baseline']")
+        _, report = self.plan(queues={**self.queues, 'A6000': long_job})
+        self.assertEqual(report['gpu_available_hours_before']['A6000'], [19, 0, 0, 0, 0])
+        for hours in report['gpu_available_hours_after'].values():
+            self.assertTrue(all(hour >= 18 for hour in hours))
+        self.assertEqual(report['gpu_available_hours_after']['A6000'], [19, 18, 18, 18, 18])
+
+    def test_full_queues_do_not_get_an_unnecessary_first_trial(self):
+        self.config['lookahead_hours'] = 18
+        queues = {**self.queues, 'pro6k': '\n'.join(
+            scheduler.make_command('Alien', seed, 'retrieval') for seed in (1, 2, 10, 710))}
+        _, report = self.plan(queues=queues)
+        self.assertEqual(report['new_jobs'], [])
+        self.assertEqual(report['gpu_available_hours_after']['pro6k'], [18])
+
+    def test_eighteen_hour_fill_continues_after_a_success_if_game_is_still_low(self):
+        state, _ = self.plan()
+        seed = state['jobs'][0]['seed']
+        self.config['lookahead_hours'] = 18
+        self.config['successful_pairs_per_game'] = None
+        _, report = self.plan(self.rows + [row(seed, 6000)], state)
+        self.assertEqual(report['new_jobs'][0]['kind'], 'baseline')
+        self.assertTrue(any(j['kind'] == 'retrieval' for j in report['new_jobs']))
+        self.assertGreaterEqual(report['gpu_available_hours_after']['pro6k'][0], 18)
+
+    def test_gpu_seed_rules_extend_and_reuse_seeds_between_different_games(self):
+        cases = [
+            ('3090', [2000, 2010], 2020),
+            ('A6000', list(range(6000, 6100, 10)), 6100),
+            ('pro6k', [1, 2, 10, 710, 1710, 2710, 3710], 4710),
+            ('titan', [9999, 9998, 9997, 9996], 9995),
+        ]
+        for gpu, used, expected in cases:
+            with self.subTest(gpu=gpu):
+                for name, spec in self.config['gpus'].items():
+                    spec['count'] = int(name == gpu)
+                rows = [row(seed, 3000) for seed in used]
+                rows.append(row(expected, 1000, game='Alien'))
+                _, report = self.plan(rows, games=['Gopher'])
+                self.assertEqual([(j['gpu'], j['seed']) for j in report['new_jobs']], [(gpu, expected)])
+                self.assertEqual(scheduler.gpu_for_seed(expected, self.config, [], []), gpu)
+
+    def test_unrun_historical_seed_precedes_extended_seed(self):
+        for name, spec in self.config['gpus'].items():
+            spec['count'] = int(name == '3090')
+        _, report = self.plan([row(2000, 3000), row(2010, 1000, game='Alien')], games=['Gopher'])
+        self.assertEqual(report['new_jobs'][0]['seed'], 2010)
+
+    def test_excluded_and_reserved_seed_are_skipped_per_game(self):
+        for name, spec in self.config['gpus'].items():
+            spec['count'] = int(name == '3090')
+        state, report = self.plan([row(2000, 3000), row(2010, 3000)], excluded={'Gopher': {2020}})
+        self.assertEqual(report['new_jobs'][0]['seed'], 2030)
+        state, report = self.plan([row(2000, 3000), row(2010, 3000)], state,
+                                 excluded={'Gopher': {2020}}, fail_jobs=['Gopher:2030:retrieval'])
+        self.assertEqual(report['new_jobs'][0]['seed'], 2040)
+
+    def test_legacy_dispatched_seed_keeps_its_gpu_after_rule_change(self):
+        state, _ = self.plan()
+        job = state['jobs'][0]
+        job.update(seed=10000, id='Gopher:10000:retrieval', warmup='ckpt/Gopher-10000_Shared')
+        rows = self.rows + [row(10000, 6000)]
+        _, report = self.plan(rows, state)
+        self.assertEqual(report['new_jobs'][0]['gpu'], 'pro6k')
+        self.assertEqual(report['new_jobs'][0]['seed'], 10000)
+
+    def test_optional_cap_reports_unfilled_capacity(self):
+        self.config['lookahead_hours'] = 18
+        self.config['max_new_jobs'] = 1
+        _, report = self.plan()
+        self.assertEqual(report['coverage_shortfall_hours'], {'pro6k': [13.5]})
+        self.assertTrue(any('max_new_jobs' in notice for notice in report['notices']))
 
 
 if __name__ == '__main__':
