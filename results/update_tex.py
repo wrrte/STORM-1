@@ -12,9 +12,12 @@ BASE_COLUMN = 3
 OURS_COLUMN = 4
 DELTA_COLUMN = 5
 EXCLUDED_SEEDS = {
+    "Alien": {5090},
+    "Amidar": {5090},
+    "Assault": {2010},
     "Frostbite": {10},
     "BankHeist": {6020, 6030},
-    "BattleZone": {6010},
+    "BattleZone": {2000, 6010},
     "Boxing": {6000},
     "Krull": {2000, 2010, 6010, 6030},
     "Gopher": {6000, 6010, 6020, 6030, 6040, 9996, 9999}, 
