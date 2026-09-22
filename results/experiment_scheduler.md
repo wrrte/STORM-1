@@ -35,6 +35,9 @@ worker가 켜져 있으면 해당 큐에서 학습을 시작합니다. 명령은
   두 기준은 설정의 `anomaly_hns_gap`, `anomaly_seed_hns_gap`으로 변경할 수 있습니다.
 - 새 시드는 `JointTrainAgent.Retrieval.enable "['retrieval']"` 및
   `JointTrainAgent.Retrieval.save_warmup True`로 시작합니다.
+  target·anchor weight·warmup steps 등 나머지 설정은 `config_files/STORM.yaml`에서
+  상속하므로 생성 명령에 중복해서 붙이지 않습니다. `['retrieval']` 자체는 enable만
+  활성화하며, 나머지 값을 고정하는 프리셋은 아닙니다.
 - 통과 원점수는 `기존 target 16 최저 점수 + (Human - Random) × 1.0`입니다.
   HNS 1은 1%가 아닙니다. 비교 시드/점수/기준을 등록 시 저장해, 결과가 나온 뒤
   자기 자신 때문에 기준이 변하지 않게 합니다. 등록 전 이미 완료된 외부 실험을
@@ -97,6 +100,10 @@ warmup 2.5h + 두 retrieval 분기 7h = 9.5h로 추정합니다. 실행 중인 �
 비는 GPU부터 추가 시드를 배정해 **각 물리 GPU의 예상 작업량을 18시간 이상**으로
 채웁니다. A6000 4대도 평균이나 가장 늦게 끝나는 한 대를 기준으로 삼지 않고 각각
 확인합니다. 이미 모든 GPU에 18시간 이상 작업이 있으면 신규 탐색은 추가하지 않습니다.
+
+출력 마지막의 GPU별 예상 작업량 아래에는 **이번 호출에서 추가한 작업만** 게임별로
+집계합니다. `새로운 학습`은 warmup부터 시작하는 retrieval이고, `이어지는 학습`은
+저장된 warmup에서 재개하는 baseline입니다. 추가된 작업이 없는 게임은 표시하지 않습니다.
 
 `lookahead_hours`의 기본값은 **18**입니다. 기존 호출당 16개 제한과 게임당 통과 시드
 1개 제한 때문에 작업량을 덜 채우는 일이 없도록 `max_new_jobs`와

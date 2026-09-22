@@ -329,13 +329,7 @@ def make_command(game, seed, kind, warmup=''):
         f'-config_path "config_files/STORM.yaml" -env_name "ALE/{game}-v5" '
         f'-trajectory_path "D_TRAJ/{game}.pkl" '
         'JointTrainAgent.Retrieval.enable "[\'retrieval\']" '
-        'JointTrainAgent.Retrieval.save_warmup True '
-        'JointTrainAgent.Retrieval.target 16 JointTrainAgent.Retrieval.anchor_weight 0.0625 '
-        'JointTrainAgent.Retrieval.warmup_steps 50000 '
-        'JointTrainAgent.Retrieval.batch_size_reduction retrieved '
-        'JointTrainAgent.Retrieval.z_score_threshold 3.5 '
-        'JointTrainAgent.Retrieval.value_signal value_diff '
-        'JointTrainAgent.Retrieval.score_combination multiply JointTrainAgent.Retrieval.hash_bits 10'
+        'JointTrainAgent.Retrieval.save_warmup True'
     )
 
 
@@ -711,6 +705,14 @@ def print_report(report, state, dry_run, excluded):
     for gpu, available in report['gpu_available_hours_after'].items():
         print(f'{gpu}: 추가 후 GPU별 예상 작업량 {[round(v, 2) for v in available]} 시간 '
               f"(목표 {report['coverage_target_hours']:g}시간)")
+    game_counts = defaultdict(lambda: {'new': 0, 'continued': 0})
+    for job in report['new_jobs']:
+        category = 'new' if job['kind'] == 'retrieval' else 'continued'
+        game_counts[job['game']][category] += 1
+    if game_counts:
+        print('이번에 추가한 게임별 학습:')
+        for game, counts in sorted(game_counts.items()):
+            print(f"  {game}: 새로운 학습 {counts['new']}개, 이어지는 학습 {counts['continued']}개")
     for item in report['cleanup']:
         path = item['warmup'] or '경로 미확인: classify_wandb_runs.py를 다시 실행해 확인'
         print(f"warmup 삭제 필요 (자동 삭제 안 함): {item['job']} / {item['gpu']} / {path}")
