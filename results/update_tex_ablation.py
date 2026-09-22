@@ -1,11 +1,13 @@
-"""Update the neighbor-retrieval ablation table from paired Excel seed scores.
+"""Update the neighbor, value, and additive ablation tables from Excel seed scores.
 
-Usage: python STORM-1/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
+Usage: python STORM/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
 Uses the same exclusions, duplicate-result parsing, and aggregation as update_tex.py.
-Only the marked ablation table is written; main performance scores are untouched.
+Each variant is paired independently with default FLASH on common training seeds.
+Only the marked ablation tables are written; main performance scores are untouched.
 """
 
 import argparse
+from dataclasses import dataclass
 from pathlib import Path
 
 from update_tex import (
@@ -19,13 +21,69 @@ from update_tex import (
 )
 
 
-CONFIGS = ('target: 16 (anchor 미설정)', 'target: 1 (anchor 미설정)')
-METHOD_NAMES = ('Full FLASH', 'No neighbor')
-BEGIN_MARKER = '% BEGIN AUTO NEIGHBOR RETRIEVAL ABLATION'
-END_MARKER = '% END AUTO NEIGHBOR RETRIEVAL ABLATION'
+FLASH_CONFIG = 'target: 16 (anchor 미설정)'
 
 
-def render_ablation_table(lines, results):
+@dataclass(frozen=True)
+class Ablation:
+    variant_config: str
+    variant_name: str
+    marker_name: str
+    label: str
+    caption: str
+
+    @property
+    def configs(self):
+        return (FLASH_CONFIG, self.variant_config)
+
+    @property
+    def method_names(self):
+        return ('Full FLASH', self.variant_name)
+
+    @property
+    def begin_marker(self):
+        return f'% BEGIN AUTO {self.marker_name} ABLATION'
+
+    @property
+    def end_marker(self):
+        return f'% END AUTO {self.marker_name} ABLATION'
+
+
+ABLATIONS = {
+    'neighbor': Ablation(
+        'target: 1 (anchor 미설정)', 'No neighbor', 'NEIGHBOR RETRIEVAL',
+        'tab:neighbor_retrieval_ablation',
+        r'Neighbor retrieval ablation on STORM. Full FLASH uses retrieval '
+        r'target $n=16$; No neighbor uses $n=1$ (anchor only), both with the default '
+        r'anchor setting. ',
+    ),
+    'value': Ablation(
+        FLASH_CONFIG + ' [value]', 'Absolute value', 'VALUE SIGNAL',
+        'tab:value_signal_ablation',
+        r'Value signal ablation on STORM. Full FLASH uses the signed temporal '
+        r'value difference $V(s_t)-V(s_{t-1})$; Absolute value uses the state '
+        r'value $V(s_t)$. Both use retrieval target $n=16$, the default anchor '
+        r'setting, and multiplicative score combination. ',
+    ),
+    'add': Ablation(
+        FLASH_CONFIG + ' [add]', 'Additive', 'SCORE COMBINATION',
+        'tab:score_combination_ablation',
+        r'Score combination ablation on STORM. Full FLASH multiplies the '
+        r'ReLU-transformed normalized TD-error and softplus-transformed '
+        r'normalized temporal value difference; Additive sums these terms. '
+        r'Both use retrieval target $n=16$ and the default anchor setting. ',
+    ),
+}
+
+# Preserve the original neighbor-table defaults for callers updating one table.
+NEIGHBOR = ABLATIONS['neighbor']
+CONFIGS = NEIGHBOR.configs
+METHOD_NAMES = NEIGHBOR.method_names
+BEGIN_MARKER = NEIGHBOR.begin_marker
+END_MARKER = NEIGHBOR.end_marker
+
+
+def render_ablation_table(lines, results, ablation=NEIGHBOR):
     # Reuse the main-table calculation in memory for identical normalization,
     # rounding, and pooled per-seed IQM. Project only the two score columns.
     calculated_rows = main_table_rows(update_table(lines, results))
@@ -45,9 +103,8 @@ def render_ablation_table(lines, results):
         r'\begin{table}[!t]',
         r'\centering',
         r'\small',
-        r'\caption{Neighbor retrieval ablation on STORM. Full FLASH uses retrieval '
-        r'target $n=16$; No neighbor uses $n=1$ (anchor only), both with the default '
-        r'anchor setting. Each game mean uses only training seeds with valid scores '
+        r'\caption{' + ablation.caption +
+        r'Each game mean uses only training seeds with valid scores '
         r'for both variants; $N$ is the number of paired seeds. '
         f'Excluded training seeds are {exclusions}. '
         f'The current comparison covers {game_count} games and {seed_count} seed pairs. '
@@ -55,10 +112,10 @@ def render_ablation_table(lines, results):
         r'paired results and the Random/Human references in Table~\ref{tab:main_performance}. '
         r'Mean, Median, and Optimality Gap use human-normalized game means; IQM pools '
         r'the unrounded per-seed human-normalized scores.}',
-        r'\label{tab:neighbor_retrieval_ablation}',
+        rf'\label{{{ablation.label}}}',
         r'\begin{tabular}{lrrr}',
         r'\toprule',
-        r'Game & $N$ & Full FLASH & No neighbor \\',
+        f'Game & $N$ & {ablation.method_names[0]} & {ablation.method_names[1]} ' + r'\\',
         r'\midrule',
     ]
     metrics_started = False
@@ -70,20 +127,22 @@ def render_ablation_table(lines, results):
             metrics_started = True
         count = '' if is_metric else str(len(results[label][0]) if label in results else 0)
         full = parts[BASE_COLUMN].strip()
-        no_neighbor = parts[OURS_COLUMN].strip()
-        table.append(f'{label} & {count} & {full} & {no_neighbor} ' + r'\\')
+        variant = parts[OURS_COLUMN].strip()
+        table.append(f'{label} & {count} & {full} & {variant} ' + r'\\')
     table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}'])
     return '\n'.join(table) + '\n'
 
 
-def update_ablation_table(document, results):
+def update_ablation_table(document, results, ablation=NEIGHBOR):
     """Replace exactly one marked table while preserving all surrounding text."""
     lines = document.splitlines(keepends=True)
-    begins = [i for i, line in enumerate(lines) if line.strip() == BEGIN_MARKER]
-    ends = [i for i, line in enumerate(lines) if line.strip() == END_MARKER]
+    begins = [i for i, line in enumerate(lines) if line.strip() == ablation.begin_marker]
+    ends = [i for i, line in enumerate(lines) if line.strip() == ablation.end_marker]
     if len(begins) != 1 or len(ends) != 1 or begins[0] >= ends[0]:
-        raise ValueError('Expected exactly one ordered pair of ablation table markers.')
-    table = render_ablation_table(lines, results)
+        raise ValueError(
+            f'Expected exactly one ordered pair of {ablation.marker_name} ablation table markers.'
+        )
+    table = render_ablation_table(lines, results, ablation)
     return ''.join(lines[:begins[0] + 1]) + table + ''.join(lines[ends[0]:])
 
 
@@ -95,10 +154,11 @@ def main():
     args = parser.parse_args()
 
     document = args.tex.read_text(encoding='utf-8')
-    results = load_results(args.excel, configs=CONFIGS, method_names=METHOD_NAMES)
-    updated = update_ablation_table(document, results)
-    args.tex.write_text(updated, encoding='utf-8')
-    print(f'Successfully updated {args.tex} with Full FLASH / No neighbor results.')
+    for ablation in ABLATIONS.values():
+        results = load_results(args.excel, configs=ablation.configs, method_names=ablation.method_names)
+        document = update_ablation_table(document, results, ablation)
+    args.tex.write_text(document, encoding='utf-8')
+    print(f'Successfully updated {args.tex} with neighbor, value, and additive ablation results.')
 
 
 if __name__ == '__main__':
