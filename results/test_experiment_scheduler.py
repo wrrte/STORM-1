@@ -647,6 +647,136 @@ class MissingSeedTests(unittest.TestCase):
         self.assertEqual([(job['game'], job['kind']) for job in report['new_jobs']],
                          [('Gopher', 'paired'), ('Alien', 'retrieval')])
 
+    def test_reuse_hns_boundary_and_single_branch_commands_in_both_directions(self):
+        boundary = 100 - 100 * scheduler.REUSE_HNS_GAP
+        for existing_kind in ('baseline', 'retrieval'):
+            missing_kind = 'retrieval' if existing_kind == 'baseline' else 'baseline'
+            for score, reusable in ((boundary - 0.00001, False), (boundary, False), (boundary + 0.00001, True),
+                                    (100, True), (150, True)):
+                with self.subTest(existing_kind=existing_kind, score=score):
+                    rows = self.rows + [row(710, score, kind=existing_kind)]
+                    _, report = self.plan(rows=rows, fill_missing_seeds=True)
+                    self.assertEqual(len(report['new_jobs']), 1)
+                    job = report['new_jobs'][0]
+                    parsed = scheduler.parse_command(job['command'], job['gpu'])
+                    self.assertEqual(job['seed'], 710 if reusable else 1710)
+                    self.assertEqual(parsed['names'], [missing_kind] if reusable else ['retrieval', 'baseline'])
+                    self.assertNotIn(scheduler.PREFIX + 'save_warmup', job['command'])
+                    self.assertFalse(parsed['resume'])
+                    hours = (4.5 if missing_kind == 'retrieval' else 3) if reusable else 6
+                    self.assertEqual(job['estimated_finish_hours'], hours)
+
+    def test_reuse_priority_groups_and_order_with_only_one_seed_missing(self):
+        candidates = [
+            row(710, 130), row(1710, 120),
+            row(2710, 110, kind='baseline'), row(3710, 125, kind='baseline'),
+            row(4710, 100), row(5710, 95),
+            row(6710, 95, kind='baseline'), row(7710, 100, kind='baseline'),
+        ]
+        # Removing each winner checks the actual dispatch order across all four
+        # groups, including equality with the paired mean and paper score.
+        for index in range(len(candidates)):
+            remaining = candidates[index:]
+            with self.subTest(index=index):
+                _, report = self.plan(rows=self.rows + list(reversed(remaining)), fill_missing_seeds=True)
+                ranked = report['reusable_seeds']['Gopher']
+                self.assertEqual([item['seed'] for item in ranked], [sample['seed'] for sample in remaining])
+                self.assertEqual([item['priority'] for item in ranked], [1, 1, 2, 2, 3, 3, 4, 4][index:])
+                self.assertEqual([job['seed'] for job in report['new_jobs']], [remaining[0]['seed']])
+
+    def test_priority_mean_uses_only_nonexcluded_common_seeds(self):
+        rows = self.rows + [row(710, 110), row(1710, 1000), row(2710, 101, kind='baseline')]
+        for sample in rows:
+            if sample['seed'] == 2 and sample['kind'] == 'retrieval':
+                sample['score'] = 1000
+        _, report = self.plan(rows=rows, excluded={'Gopher': {2}}, fill_missing_seeds=True)
+        ranked = report['reusable_seeds']['Gopher']
+        self.assertEqual([item['seed'] for item in ranked], [1710, 710, 2710])
+        self.assertEqual([item['priority'] for item in ranked], [1, 1, 2])
+        self.assertTrue(all(item['main_retrieval_mean'] == 100 for item in ranked))
+        self.assertEqual([job['seed'] for job in report['new_jobs']], [1710, 710])
+
+    def test_no_common_seed_mean_places_retrieval_in_third_group(self):
+        rows = [row(710, 150), row(1710, 101, kind='baseline')]
+        _, report = self.plan(rows=rows, fill_missing_seeds=True)
+        ranked = report['reusable_seeds']['Gopher']
+        self.assertEqual([(item['seed'], item['priority']) for item in ranked], [(1710, 2), (710, 3)])
+        self.assertTrue(all(item['main_retrieval_mean'] is None for item in ranked))
+        self.assertEqual([job['seed'] for job in report['new_jobs'][:2]], [1710, 710])
+        self.assertEqual([job['names'] for job in report['new_jobs']],
+                         [['retrieval'], ['baseline'], ['retrieval', 'baseline'], ['retrieval', 'baseline']])
+
+    def test_reused_single_branch_queue_running_and_completion_are_idempotent(self):
+        for existing_kind in ('baseline', 'retrieval'):
+            with self.subTest(existing_kind=existing_kind):
+                missing_kind = 'retrieval' if existing_kind == 'baseline' else 'baseline'
+                rows = self.rows + [row(710, 100, kind=existing_kind, run_id='existing')]
+                state, report = self.plan(rows=rows, fill_missing_seeds=True)
+                job = report['new_jobs'][0]
+                queues = {**self.queues, 'pro6k': job['command']}
+                state, report = self.plan(rows=rows, state=state, queues=queues, fill_missing_seeds=True)
+                self.assertEqual(report['new_jobs'], [])
+                self.assertEqual(state['jobs'][0]['status'], 'pending')
+                self.assertTrue(report['reusable_seeds']['Gopher'][0]['reserved'])
+                # The pre-existing opposite result is not evidence that the new
+                # command ran if the command is removed before execution.
+                _, removed = self.plan(rows=rows, state=state, fill_missing_seeds=True)
+                self.assertEqual(removed['removed_jobs'], [job['id']])
+                running = row(710, kind=missing_kind, state='running', run_id='new')
+                state, report = self.plan(rows=rows + [running], state=state, fill_missing_seeds=True)
+                self.assertEqual(state['jobs'][0]['status'], 'running')
+                self.assertEqual(report['new_jobs'], [])
+                state, report = self.plan(rows=rows, state=state, fill_missing_seeds=True)
+                self.assertEqual(state['jobs'][0]['status'], 'awaiting_result')
+                self.assertEqual(report['new_jobs'], [])
+                expected_hours = 4.5 if missing_kind == 'retrieval' else 3
+                self.assertEqual(report['gpu_available_hours_before']['pro6k'], [expected_hours])
+                completed = row(710, 100, kind=missing_kind, run_id='new')
+                state, report = self.plan(rows=rows + [completed], state=state)
+                self.assertEqual(state['jobs'][0]['status'], 'complete')
+                self.assertEqual(state['jobs'][0]['scores'], {missing_kind: 100})
+                self.assertEqual(report['insufficient_seeds'], {})
+                self.assertEqual(report['new_jobs'], [])
+                self.assertEqual(report['cleanup'], [])
+
+    def test_failed_missing_branch_retries_only_that_branch(self):
+        rows = self.rows + [row(710, 100, kind='baseline', run_id='existing')]
+        state, _ = self.plan(rows=rows, fill_missing_seeds=True)
+        rows.append(row(710, state='crashed', run_id='failed'))
+        state, report = self.plan(rows=rows, state=state, fill_missing_seeds=True)
+        self.assertEqual([(job['seed'], job['names'], job['attempt']) for job in report['new_jobs']],
+                         [(710, ['retrieval'], 2)])
+        self.assertIn('failed', state['jobs'][0]['before_ids'])
+        self.assertEqual(report['cleanup'], [])
+
+    def test_breakout_reuse_score_hns_and_missing_kind_are_printed_in_red(self):
+        self.references = {'Breakout': (1.7, 30.5, 16)}
+        rows = [row(seed, 16, game='Breakout', kind=kind, run_id=f'{seed}-{kind}')
+                for seed in (10, 2000, 3710) for kind in ('baseline', 'retrieval')]
+        rows.append(row(2, 14.35, game='Breakout', kind='baseline'))
+        state, report = self.plan(rows=rows, fill_missing_seeds=True)
+        self.assertEqual([(job['seed'], job['names']) for job in report['new_jobs']], [(2, ['retrieval'])])
+        item = report['reusable_seeds']['Breakout'][0]
+        self.assertAlmostEqual(item['hns'], (14.35 - 1.7) / 28.8)
+        self.assertAlmostEqual(item['hns_gap'], (16 - 14.35) / 28.8)
+        output = io.StringIO()
+        output.isatty = lambda: True
+        with redirect_stdout(output):
+            scheduler.print_report(report, state, True, {})
+        text = output.getvalue()
+        self.assertIn('\033[31m    재사용 가능 (우선순위 4)', text)
+        self.assertIn('seed 2: 기존 baseline 점수=14.35, HNS=0.4392', text)
+        self.assertIn('ΔHNS=+0.0573', text)
+        self.assertIn('retrieval만 평가', text)
+
+    def test_unavailable_priority_seed_waits_without_lower_priority_replacement(self):
+        self.config['gpus']['pro6k']['count'] = 0
+        self.config['gpus']['A6000']['count'] = 1
+        rows = self.rows + [row(710, 130), row(6000, 110, kind='baseline')]
+        _, report = self.plan(rows=rows, fill_missing_seeds=True)
+        self.assertEqual(report['new_jobs'], [])
+        self.assertTrue(any('Gopher seed 710: baseline만' in notice for notice in report['notices']))
+
     def test_cli_fill_dry_run_and_dispatch_use_only_temporary_queues(self):
         with tempfile.TemporaryDirectory() as directory:
             root = Path(directory)

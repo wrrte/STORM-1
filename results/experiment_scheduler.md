@@ -77,22 +77,46 @@ python schedule_experiments.py --fill-missing-seeds --dry-run
 python schedule_experiments.py --fill-missing-seeds
 ```
 
-새 시드마다 `JointTrainAgent.Retrieval.enable "['retrieval', 'baseline']"`로 두 분기를
-함께 실행합니다. `save_warmup` 인자는 넣지 않으며 `STORM.yaml`의 기본값 `False`를
-사용합니다. 이 작업은 점수 개선 기준으로 baseline 실행 여부를 결정하지 않고,
-두 분기가 모두 유효한 점수로 완료되어야 완료 처리합니다. 상태 파일에는
-`GAME:SEED:paired`로 기록하며, warmup 삭제나 baseline 재개 작업을 추가하지 않습니다.
+먼저 한 종류의 완료 점수만 있는 기존 시드를 확인합니다. 논문 대비 부족분
+`(논문 점수 - 기존 점수) / (Human - Random)`이 `schedule_experiments.py`의
+`REUSE_HNS_GAP`보다 작으면 기존 점수를 재사용하고 같은 시드에서 빠진 종류만 학습합니다.
+경계값과 같으면 재사용하지 않으며, 논문보다 높은 점수는 조건을 만족합니다.
+출력에는 기존 점수, `HNS = (점수 - Random) / (Human - Random)`, 논문과의 HNS 차이,
+빠진 종류와 재사용 우선순위를 함께 표시합니다. JSON의 `reusable_seeds`에도 기록합니다.
+
+재사용 후보가 부족한 시드 수보다 많으면 다음 순서로 필요한 수만 선택합니다.
+
+1. 현재 main performance의 평균 retrieval보다 높은 retrieval: 높은 점수부터.
+2. 논문보다 높은 baseline: 낮은 점수부터.
+3. 나머지 retrieval: 높은 점수부터.
+4. 나머지 baseline: 낮은 점수부터.
+
+1번의 평균에는 제외 목록을 뺀 **완료된 공통 시드**만 사용합니다. 아직 짝이 없는
+retrieval 점수는 평균에 넣지 않습니다. 공통 시드가 없어 평균을 계산할 수 없으면
+retrieval 후보는 3번에 들어갑니다. 같은 우선순위와 점수이면 작은 시드를 먼저 선택합니다.
+기존 큐·실행 중·결과 대기 작업으로 이미 보충될 시드는 새로 등록하지 않습니다.
+
+재사용 시에는 `JointTrainAgent.Retrieval.enable "['retrieval']"` 또는 `"['baseline']"`으로
+빠진 분기를 실행합니다. 재사용 후보로 채우지 못한 수만 새 시드의
+`"['retrieval', 'baseline']"` 작업으로 보충합니다. 모든 보충 명령은 `save_warmup` 인자를
+넣지 않고 `STORM.yaml`의 기본값 `False`를 사용합니다. 저장된 warmup 경로를 가정하지
+않으며, 각 명령은 warmup부터 학습합니다. 상태 파일에는 `GAME:SEED:paired`와 실제로
+학습하는 `names`를 기록합니다. 재사용하는 점수는 `reused_score`에 남기며, 빠진 분기가
+완료되면 해당 보충 작업도 완료 처리합니다. warmup 삭제나 baseline 재개 작업은 추가하지 않습니다.
 
 완료 점수와 기존 큐·실행 중·결과 대기 작업으로 확보될 공통 시드를 합쳐 4개가 될 만큼만
 등록합니다. 같은 시드는 한 번만 세며, retrieval만 있는 작업은 baseline도 확보된 경우에만
 공통 시드로 셉니다. 반복 호출해도 중복 등록하지 않고, 분기가 실패하면 다음 호출에서
-새 시드를 배정합니다. 옵션 없이 다시 호출해도 등록된 작업의 결과는 계속 추적합니다.
+재사용 조건을 다시 확인해 빠진 분기를 재시도하거나 새 시드를 배정합니다.
+옵션 없이 다시 호출해도 등록된 작업의 결과는 계속 추적합니다.
 
 기존 통과 후보의 baseline 후속 작업을 먼저 처리하고, 시드 보충을 배정한 뒤 이상 게임의
 새 시드 탐색을 배정합니다. `lookahead_hours`와 `max_new_jobs` 제한을 함께 적용하므로
 GPU가 이미 목표 작업량으로 차 있으면 다음 호출로 보충을 미룹니다. `lookahead_hours: 0`이면
 보충에는 시간 제한을 적용하지 않고 부족한 수만큼 등록합니다. `--games`를 함께 쓰면
 보충할 게임도 해당 목록으로 제한합니다. 부족 목록 자체는 전체 게임 기준으로 표시합니다.
+재사용 시드는 기존 GPU 배정을 유지합니다. 우선순위로 선택한 시드의 GPU가 비활성 상태이거나
+작업량 제한에 도달했으면 보충을 미루며, 낮은 순위의 후보나 새 시드로 대체하지 않습니다.
 
 ## GPU와 작업량 설정
 

@@ -696,8 +696,21 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
                 'paper_hns': (paper_score - random_score) / scale, 'hns_gap': gap,
                 'reserved': seed in expected_pairs[game],
             })
-    for candidates in reusable_seeds.values():
-        candidates.sort(key=lambda item: (-item['hns'], item['seed']))
+    for game, candidates in reusable_seeds.items():
+        # Use exactly the completed common seeds used by main performance;
+        # unpaired retrieval results must not move their own comparison mean.
+        paired_scores = [scores[game, 'retrieval', seed]['score']
+                         for seed in insufficient_seeds[game]['seeds']]
+        retrieval_mean = statistics.mean(paired_scores) if paired_scores else None
+        paper_score = references[game][2]
+        for item in candidates:
+            item['main_retrieval_mean'] = retrieval_mean
+            if item['kind'] == 'retrieval':
+                item['priority'] = 1 if retrieval_mean is not None and item['score'] > retrieval_mean else 3
+            else:
+                item['priority'] = 2 if item['score'] > paper_score else 4
+        candidates.sort(key=lambda item: (
+            item['priority'], -item['score'] if item['kind'] == 'retrieval' else item['score'], item['seed']))
 
     # Fill finite main-performance deficits before the unbounded anomaly search.
     if fill_missing_seeds:
@@ -825,7 +838,7 @@ def print_report(report, state, dry_run, excluded):
               f"({summary['missing']}개 부족, 시드: {summary['seeds']}){reset}")
         for item in report['reusable_seeds'][game]:
             status = ' (이미 큐/실행/결과 대기 중)' if item['reserved'] else ''
-            print(f'{red}    재사용 가능 {reuse_description(item)}{status}{reset}')
+            print(f"{red}    재사용 가능 (우선순위 {item['priority']}) {reuse_description(item)}{status}{reset}")
     for gpu, available in report['gpu_available_hours_before'].items():
         print(f'{gpu}: 기존 작업 후 GPU별 예상 여유 시점 {[round(v, 2) for v in available]} 시간')
     for job in state['jobs']:
