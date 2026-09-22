@@ -115,6 +115,36 @@ class SchedulerTests(unittest.TestCase):
         self.assertEqual(report['cleanup'][0]['warmup'], f'ckpt/Gopher-{seed}_Shared')
         self.assertEqual(report['new_jobs'][0]['reference_score'], 3000)
 
+    def test_excluded_external_results_are_not_adopted_or_reused(self):
+        excluded = {'Gopher': {2}}
+        for score in (1000, 6000):
+            with self.subTest(score=score):
+                rows = self.rows + [row(2, score, **{'Save Warmup Requested': 'True'})]
+                state, report = self.plan(rows, excluded=excluded)
+                self.assertEqual([job['seed'] for job in state['jobs']], [710])
+                self.assertEqual([(job['seed'], job['kind']) for job in report['new_jobs']],
+                                 [(710, 'retrieval')])
+                self.assertEqual(report['cleanup'], [])
+
+    def test_excluded_ledger_results_are_silent_and_remain_reserved(self):
+        for score, status in ((1000, 'finished'), (6000, 'finished'), (None, 'failed')):
+            with self.subTest(score=score, status=status):
+                state, _ = self.plan()
+                job = state['jobs'][0]
+                excluded = {'Gopher': {job['seed']}}
+                rows = self.rows + [row(job['seed'], score, state=status, run_id='result')]
+                # Cover both newly observed results and already recorded results.
+                for _ in range(2):
+                    state, report = self.plan(rows, state, excluded=excluded)
+                    self.assertIn(job['id'], [item['id'] for item in state['jobs']])
+                    self.assertTrue(all(item['seed'] != job['seed'] for item in report['new_jobs']))
+                    self.assertEqual(report['cleanup'], [])
+                    output = io.StringIO()
+                    with redirect_stdout(output):
+                        scheduler.print_report(report, state, True, excluded)
+                    self.assertNotIn(job['id'], output.getvalue())
+                    self.assertNotIn('warmup 삭제 필요', output.getvalue())
+
     def test_live_score_never_promotes_and_shared_phase_reserves_seed(self):
         state, report = self.plan()
         seed = report['new_jobs'][0]['seed']

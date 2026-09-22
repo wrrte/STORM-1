@@ -21,6 +21,7 @@ import os
 from pathlib import Path, PurePosixPath
 import shlex
 import statistics
+import sys
 import tempfile
 
 
@@ -397,10 +398,12 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
     ids = {job['id'] for job in jobs}
     candidates = []
     for item in queued:
-        if item['game'] in selected and item['kinds'] == ['retrieval'] and item['save_warmup']:
+        if (item['game'] in selected and item['kinds'] == ['retrieval'] and item['save_warmup']
+                and item['seed'] not in excluded.get(item['game'], set())):
             candidates.append({**item, 'row': None})
     for row in rows:
         if (row['game'] in selected and row['kind'] == 'retrieval' and row['seed'] is not None
+                and row['seed'] not in excluded.get(row['game'], set())
                 and any(truth(row.get(key)) for key in ('Save Warmup', 'Save Warmup Requested'))):
             gpu = gpu_for_seed(row['seed'], config, jobs, queued)
             candidates.append({'game': row['game'], 'seed': row['seed'], 'gpu': gpu,
@@ -642,9 +645,12 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
         notices.append(f'{horizon:g}시간 작업량을 채우지 못한 GPU가 있습니다: {reason}.')
 
     for job in jobs:
+        # Excluded seeds have already had their checkpoints deleted. Keep their
+        # ledger history for seed reservation, but never request cleanup again.
+        if job['seed'] in excluded.get(job['game'], set()):
+            continue
         if job['kind'] != 'retrieval' or not (job['status'] == 'failed' or (
-                job['status'] == 'complete' and (not job.get('accepted')
-                or job['seed'] in excluded.get(job['game'], set())))):
+                job['status'] == 'complete' and not job.get('accepted'))):
             continue
         # Do not recommend deletion while any variant might still use the source.
         busy = any(q['game'] == job['game'] and q['seed'] == job['seed'] for q in queued)
@@ -652,7 +658,7 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
         busy |= any(j['game'] == job['game'] and j['seed'] == job['seed'] and j['status'] in ACTIVE for j in jobs)
         if not busy:
             cleanup.append({'job': job['id'], 'gpu': job['gpu'], 'warmup': job['warmup'],
-                            'reason': 'failed' if job['status'] == 'failed' else 'below_threshold_or_excluded'})
+                            'reason': 'failed' if job['status'] == 'failed' else 'below_threshold'})
     return state, {'new_jobs': additions, 'games': summaries, 'cleanup': cleanup,
                    'gpu_available_hours_before': initial_slots, 'gpu_available_hours_after': slots,
                    'coverage_target_hours': horizon, 'coverage_shortfall_hours': shortfall,
@@ -674,7 +680,8 @@ def atomic_json(path, data):
             os.unlink(temporary)
 
 
-def print_report(report, state, dry_run):
+def print_report(report, state, dry_run, excluded):
+    use_color = sys.stdout.isatty()
     print('미리보기 (큐/상태 저장 안 함)' if dry_run else '실험 큐 갱신 완료')
     for game, summary in report['games'].items():
         gaps = ', '.join(f'{kind} ΔHNS={gap:.3f}' if gap is not None else f'{kind} 없음'
@@ -688,9 +695,13 @@ def print_report(report, state, dry_run):
     for gpu, available in report['gpu_available_hours_before'].items():
         print(f'{gpu}: 기존 작업 후 GPU별 예상 여유 시점 {[round(v, 2) for v in available]} 시간')
     for job in state['jobs']:
+        if job['seed'] in excluded.get(job['game'], set()):
+            continue
         if job['kind'] == 'retrieval':
-            result = f", 결과={job['score']:g}, {'통과' if job.get('accepted') else '미달/제외'}" if 'score' in job else ''
-            print(f"{job['id']} [{job['status']}] 기준 seed {job['reference_seed']}: "
+            green, reset = ('\033[32m', '\033[0m') if use_color and job.get('accepted') else ('', '')
+            result = (f", 결과={green}{job['score']:g}{reset}, "
+                      f"{green}{'통과' if job.get('accepted') else '미달'}{reset}") if 'score' in job else ''
+            print(f"{green}{job['id']}{reset} [{job['status']}] 기준 seed {job['reference_seed']}: "
                   f"{job['reference_score']:g} → {job['threshold_score']:g} 이상{result}")
     for job in report['new_jobs']:
         print(f"추가 {job['gpu']} {job['id']} "
@@ -753,7 +764,7 @@ def main(argv=None):
                         os.fsync(output.fileno())
         if args.report:
             atomic_json(args.report, report)
-    print_report(report, state, args.dry_run)
+    print_report(report, state, args.dry_run, excluded)
     return report
 
 
