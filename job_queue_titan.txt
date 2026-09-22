@@ -1,9 +1,0 @@
-
-python -u train.py -n "Gopher-9997" -seed 9997 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
-python -u train.py -n "BankHeist-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "BankHeist.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
-
-python -u train.py -n "Gopher-9996" -seed 9996 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
-python -u train.py -n "Pong-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Pong-v5" -trajectory_path "D_TRAJ/Pong.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
