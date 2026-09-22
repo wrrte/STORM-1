@@ -60,6 +60,40 @@ worker가 켜져 있으면 해당 큐에서 학습을 시작합니다. 명령은
 별개입니다. 새 시드는 **해당 게임**의 기존 점수·큐·상태 파일·제외 목록과 겹치지 않게
 고릅니다. 다른 게임에서 사용한 시드라도 해당 게임에서 아직 사용하지 않았다면 가능합니다.
 
+## Main performance 시드 보충
+
+매번 **main performance에 쓰이는 공통 시드가 4개 미만인 게임 수와 게임별 시드 수**를
+출력합니다. baseline과 기본 retrieval(target 16)의 유효한 완료 점수가 모두 있는 시드만
+세며, `EXCLUDED_SEEDS`와 위의 이상 게임 판정에 해당하는 게임은 제외합니다.
+결과가 전혀 없는 게임은 0개로 표시합니다. 터미널에서는 빨간색이며, 파일이나 파이프로
+보내는 출력은 색상 코드 없는 일반 텍스트입니다. JSON 보고서의 `insufficient_seeds`에는
+게임별 `count`, `seeds`, `missing`이 들어갑니다.
+
+표시만 하려면 기존 명령을 사용합니다. 부족한 시드의 학습도 등록하려면 다음 옵션을
+추가합니다.
+
+```bash
+python schedule_experiments.py --fill-missing-seeds --dry-run
+python schedule_experiments.py --fill-missing-seeds
+```
+
+새 시드마다 `JointTrainAgent.Retrieval.enable "['retrieval', 'baseline']"`로 두 분기를
+함께 실행합니다. `save_warmup` 인자는 넣지 않으며 `STORM.yaml`의 기본값 `False`를
+사용합니다. 이 작업은 점수 개선 기준으로 baseline 실행 여부를 결정하지 않고,
+두 분기가 모두 유효한 점수로 완료되어야 완료 처리합니다. 상태 파일에는
+`GAME:SEED:paired`로 기록하며, warmup 삭제나 baseline 재개 작업을 추가하지 않습니다.
+
+완료 점수와 기존 큐·실행 중·결과 대기 작업으로 확보될 공통 시드를 합쳐 4개가 될 만큼만
+등록합니다. 같은 시드는 한 번만 세며, retrieval만 있는 작업은 baseline도 확보된 경우에만
+공통 시드로 셉니다. 반복 호출해도 중복 등록하지 않고, 분기가 실패하면 다음 호출에서
+새 시드를 배정합니다. 옵션 없이 다시 호출해도 등록된 작업의 결과는 계속 추적합니다.
+
+기존 통과 후보의 baseline 후속 작업을 먼저 처리하고, 시드 보충을 배정한 뒤 이상 게임의
+새 시드 탐색을 배정합니다. `lookahead_hours`와 `max_new_jobs` 제한을 함께 적용하므로
+GPU가 이미 목표 작업량으로 차 있으면 다음 호출로 보충을 미룹니다. `lookahead_hours: 0`이면
+보충에는 시간 제한을 적용하지 않고 부족한 수만큼 등록합니다. `--games`를 함께 쓰면
+보충할 게임도 해당 목록으로 제한합니다. 부족 목록 자체는 전체 게임 기준으로 표시합니다.
+
 ## GPU와 작업량 설정
 
 `experiment_scheduler.json`에서 개수와 시간을 바꿀 수 있습니다.
@@ -102,7 +136,7 @@ warmup 2.5h + 두 retrieval 분기 7h = 9.5h로 추정합니다. 실행 중인 �
 확인합니다. 이미 모든 GPU에 18시간 이상 작업이 있으면 신규 탐색은 추가하지 않습니다.
 
 출력 마지막의 GPU별 예상 작업량 아래에는 **이번 호출에서 추가한 작업만** 게임별로
-집계합니다. `새로운 학습`은 warmup부터 시작하는 retrieval이고, `이어지는 학습`은
+집계합니다. `새로운 학습`은 warmup부터 시작하는 retrieval 또는 시드 보충의 두 분기 작업이고, `이어지는 학습`은
 저장된 warmup에서 재개하는 baseline입니다. 추가된 작업이 없는 게임은 표시하지 않습니다.
 
 `lookahead_hours`의 기본값은 **18**입니다. 기존 호출당 16개 제한과 게임당 통과 시드

@@ -495,5 +495,186 @@ class SchedulerTests(unittest.TestCase):
         self.assertTrue(any('max_new_jobs' in notice for notice in report['notices']))
 
 
+class MissingSeedTests(unittest.TestCase):
+    def setUp(self):
+        self.config = json.loads((scheduler.HERE / 'experiment_scheduler.json').read_text())
+        self.config['lookahead_hours'] = 0
+        for gpu, spec in self.config['gpus'].items():
+            spec['count'] = int(gpu == 'pro6k')
+        self.references = {'Gopher': (0, 100, 100)}
+        self.rows = self.pairs((1, 2, 10))
+        self.queues = dict.fromkeys(self.config['gpus'], '')
+
+    @staticmethod
+    def pairs(seeds, game='Gopher'):
+        return [row(seed, 100, game=game, kind=kind, run_id=f'{game}-{seed}-{kind}')
+                for seed in seeds for kind in ('baseline', 'retrieval')]
+
+    def plan(self, rows=None, state=None, queues=None, excluded=None, **kwargs):
+        return scheduler.plan(self.rows if rows is None else rows,
+                              self.queues if queues is None else queues, state or {}, self.config,
+                              self.references, excluded or {}, NOW, **kwargs)
+
+    def test_report_counts_only_valid_common_seeds_and_excludes_anomalies(self):
+        self.references.update({game: (0, 100, 100) for game in ('Alien', 'Amidar', 'Assault')})
+        rows = self.pairs((1, 2)) + [
+            row(1, 101, run_id='duplicate'), row(10, 100),
+            row(710, 100), row(710, 100, kind='baseline', state='failed'),
+            row(1710, 100), row(1710, 100, kind='baseline', state='running'),
+            row(2710, 100, kind='baseline'), row(2710, 100, **{'Retrieval Target': '1'}),
+            row(1, 50, game='Alien', kind='baseline'),
+        ] + self.pairs((1, 2, 10, 710), game='Amidar')
+        _, report = self.plan(rows, excluded={'Gopher': {2}})
+        self.assertEqual(report['insufficient_seeds'], {
+            'Gopher': {'count': 1, 'missing': 3, 'seeds': [1]},
+            'Assault': {'count': 0, 'missing': 4, 'seeds': []},
+        })
+        self.assertIn('Alien', report['games'])
+        self.assertFalse(any(job['kind'] == 'paired' for job in report['new_jobs']))
+
+    def test_shortage_output_is_red_on_terminal_and_plain_when_redirected(self):
+        state, report = self.plan()
+        for tty in (False, True):
+            with self.subTest(tty=tty):
+                output = io.StringIO()
+                output.isatty = lambda: tty
+                with redirect_stdout(output):
+                    scheduler.print_report(report, state, True, {})
+                text = output.getvalue()
+                self.assertIn('main performance 공통 시드 4개 미만: 1개 게임 (이상 게임 제외)', text)
+                self.assertIn('Gopher: 3개 / 4개 (1개 부족, 시드: [1, 2, 10])', text)
+                self.assertEqual('\033[31m' in text, tty)
+                if tty:
+                    self.assertIn('\033[31m  Gopher:', text)
+
+    def test_fill_dispatches_both_without_save_warmup_and_is_idempotent(self):
+        state, report = self.plan(fill_missing_seeds=True)
+        self.assertEqual(len(report['new_jobs']), 1)
+        job = report['new_jobs'][0]
+        parsed = scheduler.parse_command(job['command'], job['gpu'])
+        self.assertEqual(parsed['names'], ['retrieval', 'baseline'])
+        self.assertNotIn(scheduler.PREFIX + 'save_warmup', job['command'])
+        self.assertFalse(parsed['resume'])
+        self.assertEqual(job['estimated_finish_hours'], 6)
+        queues = {**self.queues, 'pro6k': job['command']}
+        state, report = self.plan(state=state, queues=queues, fill_missing_seeds=True)
+        self.assertEqual(report['new_jobs'], [])
+        self.assertEqual(report['removed_jobs'], [])
+        self.assertEqual(state['jobs'][0]['status'], 'pending')
+        # Deleting an unstarted command releases the pair reservation as well.
+        _, report = self.plan(state=state, fill_missing_seeds=True)
+        self.assertEqual(report['removed_jobs'], [job['id']])
+        self.assertEqual([j['id'] for j in report['new_jobs']], [job['id']])
+
+    def test_zero_seeds_need_no_comparison_score_and_stop_at_four(self):
+        _, report = self.plan(rows=[], fill_missing_seeds=True)
+        self.assertEqual(len(report['new_jobs']), 4)
+        self.assertEqual({job['kind'] for job in report['new_jobs']}, {'paired'})
+        _, report = self.plan(rows=self.pairs((1, 2, 10, 710)), fill_missing_seeds=True)
+        self.assertEqual(report['new_jobs'], [])
+        self.assertEqual(report['insufficient_seeds'], {})
+
+    def test_external_pending_pairs_count_once_and_excluded_seeds_do_not_count(self):
+        command = scheduler.make_command('Gopher', 710, 'paired')
+        queues = {**self.queues, 'pro6k': command + '\n' + command}
+        _, report = self.plan(queues=queues, fill_missing_seeds=True)
+        self.assertEqual(report['new_jobs'], [])
+        _, report = self.plan(queues=queues, excluded={'Gopher': {710}}, fill_missing_seeds=True)
+        self.assertEqual([job['seed'] for job in report['new_jobs']], [1710])
+        shared = row(710, state='running', **{'Retrieval Enable': "['retrieval', 'baseline']"})
+        _, report = self.plan(rows=self.rows + [shared], fill_missing_seeds=True)
+        self.assertEqual(report['new_jobs'], [])
+        baseline = scheduler.make_command('Gopher', 710, 'baseline', 'ckpt/source_Shared')
+        _, report = self.plan(rows=self.rows + [row(710, 100)],
+                              queues={**self.queues, 'pro6k': baseline}, fill_missing_seeds=True)
+        self.assertEqual(report['new_jobs'], [])
+        # A retrieval-only queue does not guarantee a completed pair.
+        _, report = self.plan(queues={**self.queues, 'pro6k': command.replace(
+            "['retrieval', 'baseline']", "['retrieval']")}, fill_missing_seeds=True)
+        self.assertEqual([job['kind'] for job in report['new_jobs']], ['paired'])
+
+    def test_pair_waits_for_both_results_without_threshold_or_followup(self):
+        state, report = self.plan(fill_missing_seeds=True)
+        job = report['new_jobs'][0]
+        rows = self.rows + [row(job['seed'], 100, run_id='new-retrieval')]
+        state, report = self.plan(rows=rows, state=state, fill_missing_seeds=True)
+        self.assertEqual(state['jobs'][0]['status'], 'awaiting_result')
+        self.assertEqual(report['new_jobs'], [])
+        self.assertEqual(report['gpu_available_hours_before']['pro6k'], [6])
+        rows.append(row(job['seed'], kind='baseline', state='running', run_id='new-baseline'))
+        state, report = self.plan(rows=rows, state=state, fill_missing_seeds=True)
+        self.assertEqual(state['jobs'][0]['status'], 'running')
+        with self.assertRaisesRegex(ValueError, '아직 큐/CSV에 실행 중'):
+            self.plan(rows=rows, state=state, fail_jobs=[job['id']])
+        rows[-1] = row(job['seed'], 100, kind='baseline', run_id='new-baseline')
+        # Reconciliation also works when the fill flag is omitted next time.
+        state, report = self.plan(rows=rows, state=state)
+        self.assertEqual(state['jobs'][0]['status'], 'complete')
+        self.assertEqual(state['jobs'][0]['scores'], {'retrieval': 100, 'baseline': 100})
+        self.assertEqual(report['insufficient_seeds'], {})
+        self.assertEqual(report['new_jobs'], [])
+        self.assertEqual(report['cleanup'], [])
+
+    def test_failed_pair_replaced_without_saved_warmup_cleanup(self):
+        state, report = self.plan(fill_missing_seeds=True)
+        job = report['new_jobs'][0]
+        for kind in ('retrieval', 'baseline'):
+            with self.subTest(kind=kind):
+                rows = self.rows + [row(job['seed'], state='crashed', kind=kind, run_id='failed')]
+                updated, report = self.plan(rows=rows, state=state, fill_missing_seeds=True)
+                self.assertEqual(updated['jobs'][0]['status'], 'failed')
+                self.assertEqual([j['seed'] for j in report['new_jobs']], [1710])
+                self.assertEqual(report['cleanup'], [])
+
+    def test_fill_respects_gpu_horizon_and_job_cap(self):
+        self.config['lookahead_hours'] = 18
+        _, report = self.plan(rows=[], fill_missing_seeds=True)
+        self.assertEqual(len(report['new_jobs']), 3)
+        self.assertEqual(report['gpu_available_hours_after']['pro6k'], [18])
+        self.config['max_new_jobs'] = 1
+        _, report = self.plan(rows=[], fill_missing_seeds=True)
+        self.assertEqual(len(report['new_jobs']), 1)
+        self.assertEqual(report['coverage_shortfall_hours']['pro6k'], [12])
+
+    def test_fill_uses_game_filter_and_never_adds_pairs_for_anomalies(self):
+        self.references['Alien'] = (0, 100, 100)
+        rows = self.rows + self.pairs((1, 2, 10), game='Alien')
+        _, report = self.plan(rows=rows, games=['Gopher'], fill_missing_seeds=True)
+        self.assertEqual([(job['game'], job['kind']) for job in report['new_jobs']], [('Gopher', 'paired')])
+        rows = self.rows + [row(1, 50, game='Alien')]
+        _, report = self.plan(rows=rows, fill_missing_seeds=True)
+        self.assertNotIn('Alien', report['insufficient_seeds'])
+        self.assertEqual([(job['game'], job['kind']) for job in report['new_jobs']],
+                         [('Gopher', 'paired'), ('Alien', 'retrieval')])
+
+    def test_cli_fill_dry_run_and_dispatch_use_only_temporary_queues(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            config_path, csv_path, state_path = (root / name for name in ('config.json', 'runs.csv', 'state.json'))
+            config_path.write_text(json.dumps(self.config))
+            # Use real reference scores so Gopher is not anomalous through main().
+            rows = self.pairs((1, 2, 10))
+            for sample in rows:
+                sample['Eval Return'] = '10000'
+            with csv_path.open('w', newline='') as output:
+                writer = csv.DictWriter(output, fieldnames=list(rows[0]))
+                writer.writeheader()
+                writer.writerows(rows)
+            args = ['--config', str(config_path), '--csv', str(csv_path), '--queue-dir', str(root),
+                    '--state', str(state_path), '--games', 'Gopher', '--fill-missing-seeds']
+            queue = root / 'job_queue_pro6k.txt'
+            with redirect_stdout(io.StringIO()):
+                report = scheduler.main(args + ['--dry-run'])
+                self.assertEqual([j['kind'] for j in report['new_jobs']], ['paired'])
+                self.assertFalse(state_path.exists())
+                self.assertFalse(queue.exists())
+                scheduler.main(args)
+                commands = queue.read_text()
+                self.assertEqual(len(commands.splitlines()), 1)
+                report = scheduler.main(args)
+                self.assertEqual(report['new_jobs'], [])
+                self.assertEqual(queue.read_text(), commands)
+
+
 if __name__ == '__main__':
     unittest.main()
