@@ -1,5 +1,9 @@
-"""Offline regression checks for the TITAN RTX precision exception."""
+"""Offline regression checks for automatic and overridden AMP precision."""
 
+import os
+import shlex
+import subprocess
+import sys
 import unittest
 from unittest.mock import patch
 
@@ -11,6 +15,36 @@ from sub_models.precision import get_amp_dtype
 
 
 class PrecisionTests(unittest.TestCase):
+    def setUp(self):
+        self.env_patch = patch.dict(os.environ, {"STORM_AMP_DTYPE": "auto"})
+        self.env_patch.start()
+        self.addCleanup(self.env_patch.stop)
+
+    def test_explicit_precision_overrides_gpu_detection(self):
+        for name in ("NVIDIA TITAN RTX", "NVIDIA RTX A6000", "NVIDIA GeForce RTX 3090"):
+            for requested, expected in (("fp16", torch.float16), ("bf16", torch.bfloat16),
+                                        (" FP16 ", torch.float16)):
+                with self.subTest(gpu=name, requested=requested), \
+                        patch.dict(os.environ, {"STORM_AMP_DTYPE": requested}), \
+                        patch("torch.cuda.is_available", return_value=True), \
+                        patch("torch.cuda.get_device_name", return_value=name):
+                    self.assertEqual(get_amp_dtype(), expected)
+
+    def test_invalid_precision_fails_explicitly(self):
+        with patch.dict(os.environ, {"STORM_AMP_DTYPE": "fp32"}):
+            with self.assertRaisesRegex(ValueError, "STORM_AMP_DTYPE.*auto, fp16, or bf16"):
+                get_amp_dtype()
+
+    def test_queue_prefix_reaches_children_without_changing_next_job(self):
+        child_code = "import os; print(os.environ['STORM_AMP_DTYPE'])"
+        parent_code = ("import subprocess, sys; "
+                       f"subprocess.run([sys.executable, '-c', {child_code!r}], check=True)")
+        command = shlex.join([sys.executable, "-c", parent_code])
+        # Match the worker's eval, then execute an unmarked job in the same shell.
+        script = f"eval {shlex.quote('STORM_AMP_DTYPE=fp16 ' + command)}\neval {shlex.quote(command)}"
+        result = subprocess.run(["bash", "-c", script], check=True, text=True, capture_output=True)
+        self.assertEqual(result.stdout.splitlines(), ["fp16", "auto"])
+
     def test_only_titan_rtx_selects_fp16(self):
         names = {
             "NVIDIA TITAN RTX": torch.float16,
@@ -62,8 +96,16 @@ class PrecisionTests(unittest.TestCase):
                 for actual, reference in zip(inputs, reference_inputs):
                     self.assertTrue(torch.equal(actual.grad, reference.grad))
 
-    def test_titan_fp16_mask_has_finite_outputs_and_gradients(self):
-        with patch("torch.cuda.is_available", return_value=True), patch("torch.cuda.get_device_name", return_value="NVIDIA TITAN RTX"):
+    def test_fp16_mask_has_finite_outputs_and_gradients(self):
+        for name, requested in (("NVIDIA TITAN RTX", "auto"),
+                                ("NVIDIA RTX A6000", "fp16"),
+                                ("NVIDIA GeForce RTX 3090", "fp16")):
+            with self.subTest(gpu=name, requested=requested), \
+                    patch.dict(os.environ, {"STORM_AMP_DTYPE": requested}):
+                self.check_fp16_attention(name)
+
+    def check_fp16_attention(self, gpu_name):
+        with patch("torch.cuda.is_available", return_value=True), patch("torch.cuda.get_device_name", return_value=gpu_name):
             module = ScaledDotProductAttention(temperature=2.0, attn_dropout=0.0)
         inputs = [torch.randn(2, 2, 4, 4, dtype=torch.float16, requires_grad=True) for _ in range(3)]
         mask = torch.ones(1, 1, 4, 4, dtype=torch.bool).tril()

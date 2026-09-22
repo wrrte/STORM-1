@@ -75,8 +75,14 @@ To reproduce the speed metrics mentioned in the paper, please consider the follo
 
 ## Troubleshooting
 ### Mixed precision on other devices
-- Our experiments used bfloat16 to accelerate training. On **NVIDIA TITAN RTX only**, the current CUDA device is detected automatically and FP16 is used for world-model/agent autocast, imagination buffers, and KV caches. FP16 attention on that GPU uses `-6e4` for masking to prevent overflow. This works with direct `python train.py` commands and the existing worker scripts, respecting `CUDA_VISIBLE_DEVICES`. Other GPUs keep the original BF16 behavior and `-1e9` attention mask; there is no general fallback for older GPUs such as V100. The policy is defined in `sub_models/precision.py`.
-- Restart the training process to apply precision changes; an already-running process keeps its loaded code. The existing `init_imagine_buffer: ...@torch.float16` message confirms the TITAN RTX path. Model/checkpoint tensor formats and optimizer settings are unchanged.
+- By default (`STORM_AMP_DTYPE=auto`, or unset), **NVIDIA TITAN RTX** uses FP16 and other GPUs use BF16. Detection respects `CUDA_VISIBLE_DEVICES`; there is no general fallback for older GPUs such as V100. The policy is defined in `sub_models/precision.py`.
+- To use the same FP16 path on an A6000, RTX 3090, or another GPU, prefix that job with `STORM_AMP_DTYPE=fp16`. For example, put the following single line in `job_queue_A6000.txt` (run workers from the `STORM` directory):
+  ```shell
+  STORM_AMP_DTYPE=fp16 python -u train.py -n Pong-fp16-seed1 -seed 1 -config_path config_files/STORM.yaml -env_name ALE/Pong-v5 -trajectory_path Pong.pkl
+  ```
+  Existing `0_train.sh` and other workers pass this through without changes. The prefix applies to that command and its child processes, including shared-warmup branches; it does not change later queue jobs. For a separately queued resume/followup or standalone evaluation, repeat the prefix. Use `STORM_AMP_DTYPE=bf16` to force BF16 or `STORM_AMP_DTYPE=auto` for GPU detection.
+- The selected dtype applies to world-model/agent autocast, imagination buffers, and KV caches. FP16 attention uses `-6e4` for masking to prevent overflow; BF16 keeps `-1e9`. This selects mixed precision, not a conversion of all model/checkpoint tensors. Optimizer settings are unchanged.
+- The startup message `AMP dtype: torch.float16` confirms FP16 selection. Changes apply to newly started training processes; an already-running process keeps its loaded code.
 - On devices like the NVIDIA A100, using bfloat16 may slow down the training. In this case, you can toggle the `self.use_amp = True` option in both `agents.py` and `sub_models/world_models.py`.
 
 ### Windows and WSL

@@ -13,13 +13,15 @@ OURS_COLUMN = 4
 DELTA_COLUMN = 5
 EXCLUDED_SEEDS = {
     "Frostbite": {10},
-    "BankHeist": {6020},
+    "BankHeist": {6020, 6030},
     "BattleZone": {6010},
     "Boxing": {6000},
-    "Krull": {2000, 2010},
-    "Gopher": {6000, 6010, 6020, 6030, 9999}, 
-    "PrivateEye": {6000},
-    "Qbert": {3710},
+    "Krull": {2000, 2010, 6010, 6030},
+    "Gopher": {6000, 6010, 6020, 6030, 6040, 9999}, 
+    "PrivateEye": {6000, 6030},
+    "Qbert": {3710, 6030},
+    "RoadRunner": {2000},
+    "UpNDown": {6020},
 }
 
 

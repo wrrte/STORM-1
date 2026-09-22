@@ -22,6 +22,7 @@ from replay_buffer import ReplayBuffer
 import env_wrapper
 import agents
 from sub_models.functions_losses import symexp
+from sub_models.precision import get_amp_dtype
 from sub_models.world_models import WorldModel, MSELoss
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -622,6 +623,8 @@ if __name__ == "__main__":
 
     # parse arguments
     args, extra_args = parse_storm_training_args()
+    print(f"AMP dtype: {get_amp_dtype()} "
+          f"(STORM_AMP_DTYPE={os.environ.get('STORM_AMP_DTYPE', 'auto')})", flush=True)
     if args.resume_warmup is not None:
         launch_storm_warmup_followup(args, extra_args, __file__, load_config)
     conf = load_config(args.config_path)
