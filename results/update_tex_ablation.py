@@ -4,6 +4,8 @@ Usage: python STORM/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
 Uses the same result loading, duplicate-result parsing, and aggregation as update_tex.py.
 Each variant is paired independently with default FLASH on common training seeds.
 Only the marked ablation tables are written; main performance scores are untouched.
+Each table ends with a float barrier to keep it within its ablation subsection.
+The target document must load the placeins package.
 """
 
 import argparse
@@ -95,7 +97,7 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
     seed_count = sum(len(results[game][0]) for game in games if game in results)
 
     table = [
-        r'\begin{table}[!t]',
+        r'\begin{table}[!htbp]',
         r'\centering',
         r'\small',
         r'\caption{' + ablation.caption +
@@ -124,7 +126,8 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
         full = parts[BASE_COLUMN].strip()
         variant = parts[OURS_COLUMN].strip()
         table.append(f'{label} & {count} & {full} & {variant} ' + r'\\')
-    table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}'])
+    # Flush the table before the next subsection or Extended Related Work.
+    table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}', r'\FloatBarrier'])
     return '\n'.join(table) + '\n'
 
 
