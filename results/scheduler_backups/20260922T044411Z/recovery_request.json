@@ -1,0 +1,27 @@
+{
+  "job_ids": [
+    "RoadRunner:6030:baseline",
+    "Gopher:9997:baseline",
+    "Krull:6040:retrieval",
+    "Gopher:9995:retrieval",
+    "RoadRunner:6040:retrieval",
+    "Kangaroo:6020:retrieval",
+    "Freeway:9999:retrieval",
+    "BankHeist:6040:retrieval",
+    "Assault:6020:retrieval",
+    "Boxing:6030:retrieval",
+    "Krull:6050:retrieval",
+    "Gopher:9994:retrieval",
+    "RoadRunner:6050:retrieval",
+    "Kangaroo:6040:retrieval"
+  ],
+  "input_sha256": {
+    "/media/storage_data/ai2lab/choemj/STORM/results/experiment_scheduler_state.json": "ebf4db5c3a5ae4c0f689788e87d25fb65940ee5022964dde619d4a7a8af02715",
+    "/media/storage_data/ai2lab/choemj/STORM/results/experiment_scheduler.json": "be7ed593db64d4dec2cee4f02b62563093aa6920ce5e1267073c01e0ef4b1b17",
+    "/media/storage_data/ai2lab/choemj/STORM/results/update_tex.py": "388a1f16afda1378b2c6a673ffdda0a55a46fdf084f9e2737d0ed484ba1616f7",
+    "/media/storage_data/ai2lab/choemj/STORM/job_queue_3090.txt": "e34c8b49fc240f1e3de6a1d153ada16994f9c8069573d38660b7a9bcde9307cd",
+    "/media/storage_data/ai2lab/choemj/STORM/job_queue_A6000.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855",
+    "/media/storage_data/ai2lab/choemj/STORM/job_queue_pro6k.txt": "dc39c2a7a039e8b48c183bdf5b584177616e85ac12559ededcb7ddd2f58c246d",
+    "/media/storage_data/ai2lab/choemj/STORM/job_queue_titan.txt": "e3b0c44298fc1c149afbf4c8996fb92427ae41e4649b934ca495991b7852b855"
+  }
+}

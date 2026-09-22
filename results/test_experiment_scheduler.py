@@ -75,14 +75,119 @@ class SchedulerTests(unittest.TestCase):
         scores = scheduler.latest_scores([older, newer], {})
         self.assertEqual(scores['Gopher', 'retrieval', 10]['score'], 2000)
 
-    def test_pending_and_missing_result_do_not_duplicate(self):
+    def test_pending_queue_is_idempotent_and_missing_command_is_replanned(self):
         state, report = self.plan()
-        queues = {**self.queues, 'pro6k': report['new_jobs'][0]['command']}
+        job = report['new_jobs'][0]
+        queues = {**self.queues, 'pro6k': job['command']}
         state, report = self.plan(state=state, queues=queues)
         self.assertEqual(report['new_jobs'], [])
+        self.assertEqual(report['removed_jobs'], [])
         state, report = self.plan(state=state)
+        self.assertEqual(report['removed_jobs'], [job['id']])
+        self.assertEqual([item['id'] for item in report['new_jobs']], [job['id']])
+        self.assertEqual(state['jobs'][0]['status'], 'pending')
+
+    def test_queue_sync_replans_with_current_exclusions_and_cleans_legacy_waits(self):
+        original, _ = self.plan()
+        job = original['jobs'][0]
+        for status in ('pending', 'awaiting_result'):
+            with self.subTest(status=status):
+                job['status'] = status
+                new_state, report = self.plan(state=original, excluded={'Gopher': {10}})
+                replacement = report['new_jobs'][0]
+                self.assertEqual(replacement['id'], job['id'])
+                self.assertEqual(replacement['reference_seed'], 1)
+                self.assertAlmostEqual(replacement['threshold_score'], 6154.9)
+                self.assertEqual(report['removed_jobs'], [job['id']])
+                self.assertEqual(report['gpu_available_hours_before']['pro6k'], [0])
+                self.assertEqual(report['cleanup'], [])
+                self.assertEqual(len(new_state['jobs']), 1)
+                self.assertEqual(job['reference_seed'], 10)
+                self.assertEqual(job['status'], status)
+        _, report = self.plan(state=original, excluded={'Gopher': {job['seed']}})
+        self.assertEqual(report['new_jobs'][0]['seed'], 710)
+
+    def test_queue_sync_preserves_csv_execution_and_results(self):
+        state, _ = self.plan()
+        job = state['jobs'][0]
+        for status, overrides in (
+                ('running', {}), ('finished', {}), ('failed', {}),
+                ('running', {'Retrieval Enable': "['retrieval']"}),
+                ('finished', {'Retrieval Enable': "['retrieval']"})):
+            rows = self.rows + [row(job['seed'], 6000, state=status, **overrides)]
+            with self.subTest(status=status, overrides=overrides):
+                updated, report = self.plan(rows, state)
+                self.assertEqual(report['removed_jobs'], [])
+                self.assertTrue(updated['jobs'][0]['execution_observed'])
+
+    def test_queue_sync_remembers_execution_when_later_csv_omits_it(self):
+        state, _ = self.plan()
+        job = state['jobs'][0]
+        state, _ = self.plan(self.rows + [row(job['seed'], state='running')], state)
+        for _ in range(2):
+            state, report = self.plan(state=state)
+            self.assertEqual(report['removed_jobs'], [])
+            self.assertEqual(report['new_jobs'], [])
+            self.assertEqual(state['jobs'][0]['status'], 'awaiting_result')
+        # A running status from an older ledger is also execution evidence.
+        state['jobs'][0].pop('execution_observed')
+        state['jobs'][0]['status'] = 'running'
+        state, report = self.plan(state=state)
+        self.assertEqual(report['removed_jobs'], [])
+        self.assertTrue(state['jobs'][0]['execution_observed'])
+
+    def test_queue_sync_replans_baseline_and_preserves_completed_source(self):
+        state, _ = self.plan()
+        seed = state['jobs'][0]['seed']
+        rows = self.rows + [row(seed, 6000, **{
+            'Warmup Directory': f'ckpt/Gopher-{seed}_Shared/shared_warmup_50123'})]
+        state, report = self.plan(rows, state)
+        baseline = report['new_jobs'][0]
+        completed = state['jobs'][0].copy()
+        state, report = self.plan(rows, state)
+        self.assertEqual(report['removed_jobs'], [baseline['id']])
+        self.assertEqual(state['jobs'][0], completed)
+        self.assertEqual(len(report['new_jobs']), 1)
+        self.assertEqual(report['new_jobs'][0]['command'], baseline['command'])
+        self.assertEqual(report['cleanup'], [])
+
+    def test_queue_sync_only_removes_deleted_entries_and_releases_capacity(self):
+        self.config['lookahead_hours'] = 18
+        self.config['successful_pairs_per_game'] = None
+        state, _ = self.plan()
+        kept = state['jobs'][::2]
+        deleted = state['jobs'][1::2]
+        queues = {**self.queues, 'pro6k': '\n'.join(job['command'] for job in kept)}
+        updated, report = self.plan(state=state, queues=queues,
+                                    excluded={'Gopher': {deleted[0]['seed']}})
+        self.assertEqual(set(report['removed_jobs']), {job['id'] for job in deleted})
+        self.assertEqual(report['gpu_available_hours_before']['pro6k'], [9])
+        self.assertEqual(report['gpu_available_hours_after']['pro6k'], [18])
+        self.assertEqual(len(report['new_jobs']), 2)
+        by_id = {job['id']: job for job in updated['jobs']}
+        self.assertEqual(len(by_id), 4)
+        for job in kept:
+            self.assertEqual(by_id[job['id']], job)
+        self.assertNotIn(deleted[0]['id'], by_id)
+
+    def test_queue_sync_removes_obsolete_job_without_recreating_it(self):
+        state, _ = self.plan()
+        job_id = state['jobs'][0]['id']
+        # Current scores no longer meet the anomaly criteria.
+        rows = [row(10, 100000), row(1, 100000)]
+        state, report = self.plan(rows, state)
+        self.assertEqual(state['jobs'], [])
+        self.assertEqual(report['removed_jobs'], [job_id])
         self.assertEqual(report['new_jobs'], [])
-        self.assertEqual(state['jobs'][0]['status'], 'awaiting_result')
+
+    def test_queue_sync_handles_replacing_a_command_with_another_variant(self):
+        state, _ = self.plan()
+        job = state['jobs'][0]
+        queues = {**self.queues, 'pro6k': job['command'].replace("['retrieval']", "['value']")}
+        state, report = self.plan(state=state, queues=queues)
+        self.assertEqual(report['removed_jobs'], [job['id']])
+        self.assertEqual(report['new_jobs'][0]['seed'], 710)
+        self.assertEqual(report['gpu_available_hours_before']['pro6k'], [4.5])
 
     def test_success_resumes_identical_warmup_on_original_gpu_once(self):
         state, report = self.plan()
@@ -159,9 +264,12 @@ class SchedulerTests(unittest.TestCase):
         rows = self.rows + [row(6040, 10000, run_id='old')]
         state, report = self.plan(rows, queues=queues)
         self.assertEqual(report['new_jobs'], [])
-        state, report = self.plan(rows, state)
-        self.assertEqual(state['jobs'][0]['status'], 'awaiting_result')
+        state, report = self.plan(rows, state, queues)
+        self.assertEqual(state['jobs'][0]['status'], 'pending')
         self.assertFalse(state['jobs'][0].get('accepted', False))
+        state, report = self.plan(rows, state)
+        self.assertEqual(report['removed_jobs'], ['Gopher:6040:retrieval'])
+        self.assertFalse(any(job['seed'] == 6040 for job in state['jobs']))
 
     def test_all_gpu_slots_get_work_before_second_wave(self):
         self.config = json.loads((scheduler.HERE / 'experiment_scheduler.json').read_text())
@@ -200,8 +308,15 @@ class SchedulerTests(unittest.TestCase):
         rows = self.rows + [row(seed, 6000), row(seed, 3000, kind='baseline', run_id='oldbaseline')]
         state, report = self.plan(rows, state)
         self.assertEqual(report['new_jobs'][0]['kind'], 'baseline')
+        baseline = report['new_jobs'][0]
+        queues = {**self.queues, 'pro6k': baseline['command']}
+        state, report = self.plan(rows, state, queues)
+        self.assertEqual(report['new_jobs'], [])
+        self.assertEqual(state['jobs'][-1]['status'], 'pending')
         state, report = self.plan(rows, state)
-        self.assertEqual(state['jobs'][-1]['status'], 'awaiting_result')
+        self.assertEqual(report['removed_jobs'], [baseline['id']])
+        self.assertEqual(report['new_jobs'][0]['kind'], 'baseline')
+        self.assertEqual(state['jobs'][-1]['status'], 'pending')
 
     def test_baseline_crash_retries_same_warmup_without_repeating_target(self):
         state, _ = self.plan()
@@ -213,9 +328,10 @@ class SchedulerTests(unittest.TestCase):
         self.assertEqual([j['kind'] for j in report['new_jobs']], ['baseline'])
         self.assertEqual(state['jobs'][-1]['attempt'], 2)
         self.assertEqual(len(state['jobs']), 2)
-        state, report = self.plan(rows, state)
+        queues = {**self.queues, 'pro6k': report['new_jobs'][0]['command']}
+        state, report = self.plan(rows, state, queues)
         self.assertEqual(report['new_jobs'], [])
-        self.assertEqual(state['jobs'][-1]['status'], 'awaiting_result')
+        self.assertEqual(state['jobs'][-1]['status'], 'pending')
 
     def test_dispatch_preserves_queue_without_newline_and_is_idempotent(self):
         with tempfile.TemporaryDirectory() as directory:
@@ -245,6 +361,20 @@ class SchedulerTests(unittest.TestCase):
                 self.assertEqual(report['new_jobs'], [])
                 self.assertEqual(queue.read_text(), first)
                 self.assertEqual(len(json.loads(state_path.read_text())['jobs']), 1)
+                # Simulate removing only the generated command before execution.
+                queue.write_text(old)
+                saved_state = state_path.read_text()
+                job_id = json.loads(saved_state)['jobs'][0]['id']
+                report = scheduler.main(args + ['--dry-run'])
+                self.assertEqual(report['removed_jobs'], [job_id])
+                self.assertEqual(len(report['new_jobs']), 1)
+                self.assertEqual(state_path.read_text(), saved_state)
+                self.assertEqual(queue.read_text(), old)
+                scheduler.main(args)
+                self.assertEqual(queue.read_text(), first)
+                report = scheduler.main(args)
+                self.assertEqual(report['new_jobs'], [])
+                self.assertEqual(queue.read_text(), first)
 
     def test_anomaly_mean_and_low_seed_boundaries(self):
         self.references = {'Gopher': (0, 100, 100)}

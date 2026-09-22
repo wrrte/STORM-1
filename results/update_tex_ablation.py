@@ -1,7 +1,7 @@
 """Update the neighbor, value, and additive ablation tables from Excel seed scores.
 
 Usage: python STORM/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
-Uses the same exclusions, duplicate-result parsing, and aggregation as update_tex.py.
+Uses the same result loading, duplicate-result parsing, and aggregation as update_tex.py.
 Each variant is paired independently with default FLASH on common training seeds.
 Only the marked ablation tables are written; main performance scores are untouched.
 """
@@ -12,7 +12,6 @@ from pathlib import Path
 
 from update_tex import (
     BASE_COLUMN,
-    EXCLUDED_SEEDS,
     OURS_COLUMN,
     load_results,
     main_table_rows,
@@ -94,22 +93,18 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
         raise ValueError(f"Games missing from the main table: {sorted(missing_references)}")
     game_count = sum(game in results for game in games)
     seed_count = sum(len(results[game][0]) for game in games if game in results)
-    exclusions = '; '.join(
-        f"{game}: {', '.join(str(seed) for seed in sorted(seeds))}"
-        for game, seeds in EXCLUDED_SEEDS.items()
-    )
 
     table = [
         r'\begin{table}[!t]',
         r'\centering',
         r'\small',
         r'\caption{' + ablation.caption +
-        r'Each game mean uses only training seeds with valid scores '
-        r'for both variants; $N$ is the number of paired seeds. '
-        f'Excluded training seeds are {exclusions}. '
+        r'Each game mean is computed over $N$ paired training seeds shared by '
+        r'both variants. The number of training seeds can differ across ablations '
+        r'and from Table~\ref{tab:main_performance}. '
         f'The current comparison covers {game_count} games and {seed_count} seed pairs. '
-        r'A dash indicates no paired results. Aggregate metrics use only games with '
-        r'paired results and the Random/Human references in Table~\ref{tab:main_performance}. '
+        r'A dash indicates no paired results. Aggregate metrics summarize games with '
+        r'paired results using the Random/Human references in Table~\ref{tab:main_performance}. '
         r'Mean, Median, and Optimality Gap use human-normalized game means; IQM pools '
         r'the unrounded per-seed human-normalized scores.}',
         rf'\label{{{ablation.label}}}',

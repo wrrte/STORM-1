@@ -1,0 +1,90 @@
+실험 큐 갱신 완료
+대상 BankHeist: 논문 대비 부족분 baseline ΔHNS=0.256, retrieval ΔHNS=0.213
+대상 Boxing: 논문 대비 부족분 baseline ΔHNS=0.042, retrieval ΔHNS=-0.158
+  baseline: 평균이 논문 미만이며 낮은 시드가 있음: 10 (ΔHNS=0.950)
+대상 CrazyClimber: 논문 대비 부족분 baseline ΔHNS=0.385, retrieval ΔHNS=0.354
+대상 Freeway: 논문 대비 부족분 baseline ΔHNS=0.301, retrieval ΔHNS=0.022
+대상 Gopher: 논문 대비 부족분 baseline ΔHNS=1.912, retrieval ΔHNS=1.149
+대상 Kangaroo: 논문 대비 부족분 baseline ΔHNS=0.911, retrieval ΔHNS=0.829
+대상 Krull: 논문 대비 부족분 baseline ΔHNS=2.399, retrieval ΔHNS=1.640
+대상 Pong: 논문 대비 부족분 baseline ΔHNS=0.075, retrieval ΔHNS=0.223
+대상 RoadRunner: 논문 대비 부족분 baseline ΔHNS=1.088, retrieval ΔHNS=0.499
+pro6k: 기존 작업 후 GPU별 예상 여유 시점 [24.03] 시간
+3090: 기존 작업 후 GPU별 예상 여유 시점 [60.02] 시간
+A6000: 기존 작업 후 GPU별 예상 여유 시점 [11.55, 11.13, 3.75, 3.75] 시간
+titan: 기존 작업 후 GPU별 예상 여유 시점 [3.63] 시간
+CrazyClimber:2010:retrieval [pending] 기준 seed 3710: 53655 → 78703.9 이상
+Kangaroo:6030:retrieval [complete] 기준 seed 6010: 760 → 3743 이상, 결과=2900, 미달
+RoadRunner:6030:retrieval [complete] 기준 seed 2000: 8195 → 16028.5 이상, 결과=16410, 통과
+UpNDown:6030:retrieval [complete] 기준 seed 6020: 2974.5 → 14134.3 이상, 결과=7972.5, 미달
+Gopher:9997:retrieval [complete] 기준 seed 10: 3327 → 5481.9 이상, 결과=8373, 통과
+Krull:6040:retrieval [pending] 기준 seed 6000: 6447.5 → 7515 이상
+Gopher:9995:retrieval [pending] 기준 seed 10: 3327 → 5481.9 이상
+RoadRunner:6040:retrieval [pending] 기준 seed 6000: 8325 → 16158.5 이상
+Kangaroo:9999:retrieval [pending] 기준 seed 6010: 760 → 3743 이상
+Freeway:6030:retrieval [pending] 기준 seed 6010: 32.75 → 62.35 이상
+BankHeist:6040:retrieval [pending] 기준 seed 2000: 169.5 → 908.4 이상
+Boxing:6030:retrieval [pending] 기준 seed 10: 76.15 → 88.15 이상
+Krull:6050:retrieval [pending] 기준 seed 6000: 6447.5 → 7515 이상
+Gopher:9994:retrieval [pending] 기준 seed 10: 3327 → 5481.9 이상
+RoadRunner:6050:retrieval [pending] 기준 seed 6000: 8325 → 16158.5 이상
+Kangaroo:6020:retrieval [pending] 기준 seed 6010: 760 → 3743 이상
+CrazyClimber:6000:retrieval [pending] 기준 seed 3710: 53655 → 78703.9 이상
+추가 A6000 RoadRunner:6030:baseline (예상 시작 +3.75h, 완료 +6.25h)
+python -u train.py --resume_warmup ckpt/RoadRunner-6030_Shared/shared_warmup_51024 -n RoadRunner-6030 -seed 6030 JointTrainAgent.Retrieval.enable "['baseline']"
+추가 titan Gopher:9997:baseline (예상 시작 +3.63h, 완료 +5.63h)
+python -u train.py --resume_warmup ckpt/Gopher-9997_Shared/shared_warmup_50444 -n Gopher-9997 -seed 9997 JointTrainAgent.Retrieval.enable "['baseline']"
+추가 A6000 Krull:6040:retrieval (예상 시작 +3.75h, 완료 +9.75h)
+python -u train.py -n "Krull-6040" -seed 6040 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 titan Gopher:9995:retrieval (예상 시작 +5.63h, 완료 +10.63h)
+python -u train.py -n "Gopher-9995" -seed 9995 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 A6000 RoadRunner:6040:retrieval (예상 시작 +6.25h, 완료 +12.25h)
+python -u train.py -n "RoadRunner-6040" -seed 6040 -config_path "config_files/STORM.yaml" -env_name "ALE/RoadRunner-v5" -trajectory_path "D_TRAJ/RoadRunner.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 titan Kangaroo:9999:retrieval (예상 시작 +10.63h, 완료 +15.63h)
+python -u train.py -n "Kangaroo-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 A6000 Freeway:6030:retrieval (예상 시작 +9.75h, 완료 +15.75h)
+python -u train.py -n "Freeway-6030" -seed 6030 -config_path "config_files/STORM.yaml" -env_name "ALE/Freeway-v5" -trajectory_path "D_TRAJ/Freeway.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 A6000 BankHeist:6040:retrieval (예상 시작 +11.13h, 완료 +17.13h)
+python -u train.py -n "BankHeist-6040" -seed 6040 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "D_TRAJ/BankHeist.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 A6000 Boxing:6030:retrieval (예상 시작 +11.55h, 완료 +17.55h)
+python -u train.py -n "Boxing-6030" -seed 6030 -config_path "config_files/STORM.yaml" -env_name "ALE/Boxing-v5" -trajectory_path "D_TRAJ/Boxing.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 A6000 Krull:6050:retrieval (예상 시작 +12.25h, 완료 +18.25h)
+python -u train.py -n "Krull-6050" -seed 6050 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 titan Gopher:9994:retrieval (예상 시작 +15.63h, 완료 +20.63h)
+python -u train.py -n "Gopher-9994" -seed 9994 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 A6000 RoadRunner:6050:retrieval (예상 시작 +15.75h, 완료 +21.75h)
+python -u train.py -n "RoadRunner-6050" -seed 6050 -config_path "config_files/STORM.yaml" -env_name "ALE/RoadRunner-v5" -trajectory_path "D_TRAJ/RoadRunner.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 A6000 Kangaroo:6020:retrieval (예상 시작 +17.13h, 완료 +23.13h)
+python -u train.py -n "Kangaroo-6020" -seed 6020 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+추가 A6000 CrazyClimber:6000:retrieval (예상 시작 +17.55h, 완료 +23.55h)
+python -u train.py -n "CrazyClimber-6000" -seed 6000 -config_path "config_files/STORM.yaml" -env_name "ALE/CrazyClimber-v5" -trajectory_path "D_TRAJ/CrazyClimber.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+새 명령 14개
+pro6k: 추가 후 GPU별 예상 작업량 [24.03] 시간 (목표 18시간)
+3090: 추가 후 GPU별 예상 작업량 [60.02] 시간 (목표 18시간)
+A6000: 추가 후 GPU별 예상 작업량 [23.55, 23.13, 18.25, 21.75] 시간 (목표 18시간)
+titan: 추가 후 GPU별 예상 작업량 [20.63] 시간 (목표 18시간)
+이번에 추가한 게임별 학습:
+  BankHeist: 새로운 학습 1개, 이어지는 학습 0개
+  Boxing: 새로운 학습 1개, 이어지는 학습 0개
+  CrazyClimber: 새로운 학습 1개, 이어지는 학습 0개
+  Freeway: 새로운 학습 1개, 이어지는 학습 0개
+  Gopher: 새로운 학습 2개, 이어지는 학습 1개
+  Kangaroo: 새로운 학습 2개, 이어지는 학습 0개
+  Krull: 새로운 학습 2개, 이어지는 학습 0개
+  RoadRunner: 새로운 학습 2개, 이어지는 학습 1개
+warmup 삭제 필요 (자동 삭제 안 함): Kangaroo:6030:retrieval / A6000 / ckpt/Kangaroo-6030_Shared/shared_warmup_50067
+warmup 삭제 필요 (자동 삭제 안 함): UpNDown:6030:retrieval / A6000 / ckpt/UpNDown-6030_Shared/shared_warmup_50056
+안내: Assault:6020:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: BankHeist:6040:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Boxing:6030:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Freeway:9999:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Gopher:9994:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Gopher:9995:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Gopher:9997:baseline: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Kangaroo:6020:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Kangaroo:6040:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Krull:6040:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: Krull:6050:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: RoadRunner:6030:baseline: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: RoadRunner:6040:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.
+안내: RoadRunner:6050:retrieval: 실행 전 취소한 작업의 예약을 해제하고 현재 설정으로 다시 계획합니다.

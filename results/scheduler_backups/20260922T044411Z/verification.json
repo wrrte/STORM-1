@@ -1,0 +1,404 @@
+{
+  "new_jobs": [],
+  "forgotten_jobs": [],
+  "games": {
+    "BankHeist": {
+      "means": {
+        "baseline": 451.7142857142857,
+        "retrieval": 483.5
+      },
+      "paper_score": 641,
+      "hns_gaps": {
+        "baseline": 0.2561723024573207,
+        "retrieval": 0.21315468940316687
+      },
+      "low_seeds": {
+        "baseline": [
+          {
+            "seed": 2000,
+            "hns_gap": 0.6469075652997699
+          },
+          {
+            "seed": 6010,
+            "hns_gap": 0.6374340235485181
+          }
+        ],
+        "retrieval": [
+          {
+            "seed": 2000,
+            "hns_gap": 0.6381107051021789
+          }
+        ]
+      },
+      "reasons": {
+        "baseline": "mean_gap",
+        "retrieval": "mean_gap"
+      },
+      "priority": 0.2561723024573207
+    },
+    "Boxing": {
+      "means": {
+        "baseline": 79.5,
+        "retrieval": 81.9
+      },
+      "paper_score": 80,
+      "hns_gaps": {
+        "baseline": 0.041666666666666664,
+        "retrieval": -0.1583333333333338
+      },
+      "low_seeds": {
+        "baseline": [
+          {
+            "seed": 10,
+            "hns_gap": 0.9500000000000005
+          }
+        ],
+        "retrieval": []
+      },
+      "reasons": {
+        "baseline": "below_paper_with_low_seed"
+      },
+      "priority": 0.041666666666666664
+    },
+    "CrazyClimber": {
+      "means": {
+        "baseline": 57130.0,
+        "retrieval": 57908.333333333336
+      },
+      "paper_score": 66776,
+      "hns_gaps": {
+        "baseline": 0.3850867702773375,
+        "retrieval": 0.3540142148623957
+      },
+      "low_seeds": {
+        "baseline": [
+          {
+            "seed": 10,
+            "hns_gap": 0.8046660731608972
+          },
+          {
+            "seed": 710,
+            "hns_gap": 0.677315171524498
+          }
+        ],
+        "retrieval": []
+      },
+      "reasons": {
+        "baseline": "mean_gap",
+        "retrieval": "mean_gap"
+      },
+      "priority": 0.3850867702773375
+    },
+    "Freeway": {
+      "means": {
+        "baseline": 25.0875,
+        "retrieval": 33.35
+      },
+      "paper_score": 34,
+      "hns_gaps": {
+        "baseline": 0.301097972972973,
+        "retrieval": 0.021959459459459412
+      },
+      "low_seeds": {
+        "baseline": [
+          {
+            "seed": 2000,
+            "hns_gap": 1.1486486486486487
+          }
+        ],
+        "retrieval": []
+      },
+      "reasons": {
+        "baseline": "mean_gap"
+      },
+      "priority": 0.301097972972973
+    },
+    "Gopher": {
+      "means": {
+        "baseline": 4118.833333333333,
+        "retrieval": 5765.0
+      },
+      "paper_score": 8240,
+      "hns_gaps": {
+        "baseline": 1.9124630686652127,
+        "retrieval": 1.1485451761102603
+      },
+      "low_seeds": {
+        "baseline": [
+          {
+            "seed": 1,
+            "hns_gap": 1.0543412687363682
+          },
+          {
+            "seed": 10,
+            "hns_gap": 2.3040512320757345
+          },
+          {
+            "seed": 3710,
+            "hns_gap": 1.8659798598542856
+          },
+          {
+            "seed": 710,
+            "hns_gap": 2.0075177502436308
+          },
+          {
+            "seed": 2,
+            "hns_gap": 2.0826952526799385
+          },
+          {
+            "seed": 9998,
+            "hns_gap": 2.1601930484013177
+          }
+        ],
+        "retrieval": [
+          {
+            "seed": 10,
+            "hns_gap": 2.2799201819109935
+          },
+          {
+            "seed": 3710,
+            "hns_gap": 2.0469627360898417
+          }
+        ]
+      },
+      "reasons": {
+        "baseline": "mean_gap",
+        "retrieval": "mean_gap"
+      },
+      "priority": 1.9124630686652127
+    },
+    "Kangaroo": {
+      "means": {
+        "baseline": 1490.0,
+        "retrieval": 1736.0
+      },
+      "paper_score": 4208,
+      "hns_gaps": {
+        "baseline": 0.911163258464633,
+        "retrieval": 0.8286959436808582
+      },
+      "low_seeds": {
+        "baseline": [
+          {
+            "seed": 2000,
+            "hns_gap": 0.9178679182031512
+          },
+          {
+            "seed": 2010,
+            "hns_gap": 0.8307073416024137
+          },
+          {
+            "seed": 10,
+            "hns_gap": 0.8172980221253772
+          },
+          {
+            "seed": 6000,
+            "hns_gap": 0.8910492792490781
+          },
+          {
+            "seed": 6010,
+            "hns_gap": 1.0988937311431446
+          }
+        ],
+        "retrieval": [
+          {
+            "seed": 2000,
+            "hns_gap": 0.8776399597720416
+          },
+          {
+            "seed": 10,
+            "hns_gap": 0.8206503519946363
+          },
+          {
+            "seed": 6000,
+            "hns_gap": 0.8508213208179685
+          },
+          {
+            "seed": 6010,
+            "hns_gap": 1.1558833389205498
+          }
+        ]
+      },
+      "reasons": {
+        "baseline": "mean_gap",
+        "retrieval": "mean_gap"
+      },
+      "priority": 0.911163258464633
+    },
+    "Krull": {
+      "means": {
+        "baseline": 5852.5,
+        "retrieval": 6662.25
+      },
+      "paper_score": 8413,
+      "hns_gaps": {
+        "baseline": 2.3985948477751755,
+        "retrieval": 1.6400468384074942
+      },
+      "low_seeds": {
+        "baseline": [
+          {
+            "seed": 10,
+            "hns_gap": 2.0711943793911005
+          },
+          {
+            "seed": 3710,
+            "hns_gap": 2.159718969555035
+          },
+          {
+            "seed": 710,
+            "hns_gap": 2.5517564402810304
+          },
+          {
+            "seed": 9999,
+            "hns_gap": 1.989695550351288
+          },
+          {
+            "seed": 6000,
+            "hns_gap": 2.9831381733021076
+          },
+          {
+            "seed": 6020,
+            "hns_gap": 2.636065573770492
+          }
+        ],
+        "retrieval": [
+          {
+            "seed": 10,
+            "hns_gap": 1.7203747072599531
+          },
+          {
+            "seed": 9999,
+            "hns_gap": 1.5142857142857142
+          },
+          {
+            "seed": 6000,
+            "hns_gap": 1.8412177985948477
+          },
+          {
+            "seed": 6020,
+            "hns_gap": 1.4843091334894614
+          }
+        ]
+      },
+      "reasons": {
+        "baseline": "mean_gap",
+        "retrieval": "mean_gap"
+      },
+      "priority": 2.3985948477751755
+    },
+    "Pong": {
+      "means": {
+        "baseline": 8.3375,
+        "retrieval": 3.1375
+      },
+      "paper_score": 11,
+      "hns_gaps": {
+        "baseline": 0.07542492917847025,
+        "retrieval": 0.22273371104815864
+      },
+      "low_seeds": {
+        "baseline": [],
+        "retrieval": [
+          {
+            "seed": 2010,
+            "hns_gap": 0.8753541076487252
+          }
+        ]
+      },
+      "reasons": {
+        "retrieval": "mean_gap"
+      },
+      "priority": 0.22273371104815864
+    },
+    "RoadRunner": {
+      "means": {
+        "baseline": 9045.0,
+        "retrieval": 13651.25
+      },
+      "paper_score": 17564,
+      "hns_gaps": {
+        "baseline": 1.0875087764090126,
+        "retrieval": 0.49948937256654113
+      },
+      "low_seeds": {
+        "baseline": [
+          {
+            "seed": 6000,
+            "hns_gap": 1.3115465628390885
+          },
+          {
+            "seed": 6010,
+            "hns_gap": 1.005170102763771
+          },
+          {
+            "seed": 6020,
+            "hns_gap": 0.9458096636241782
+          }
+        ],
+        "retrieval": [
+          {
+            "seed": 6000,
+            "hns_gap": 1.179421714431608
+          }
+        ]
+      },
+      "reasons": {
+        "baseline": "mean_gap",
+        "retrieval": "mean_gap"
+      },
+      "priority": 1.0875087764090126
+    }
+  },
+  "cleanup": [
+    {
+      "job": "Kangaroo:6030:retrieval",
+      "gpu": "A6000",
+      "warmup": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+      "reason": "below_threshold"
+    },
+    {
+      "job": "UpNDown:6030:retrieval",
+      "gpu": "A6000",
+      "warmup": "ckpt/UpNDown-6030_Shared/shared_warmup_50056",
+      "reason": "below_threshold"
+    }
+  ],
+  "gpu_available_hours_before": {
+    "pro6k": [
+      24.029008140000002
+    ],
+    "3090": [
+      60.02484147333333
+    ],
+    "A6000": [
+      23.54650814,
+      23.132063695555555,
+      18.25,
+      21.75
+    ],
+    "titan": [
+      20.628174806666667
+    ]
+  },
+  "gpu_available_hours_after": {
+    "pro6k": [
+      24.029008140000002
+    ],
+    "3090": [
+      60.02484147333333
+    ],
+    "A6000": [
+      23.54650814,
+      23.132063695555555,
+      18.25,
+      21.75
+    ],
+    "titan": [
+      20.628174806666667
+    ]
+  },
+  "coverage_target_hours": 18.0,
+  "coverage_shortfall_hours": {},
+  "notices": []
+}

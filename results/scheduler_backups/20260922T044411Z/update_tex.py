@@ -234,7 +234,7 @@ def load_results(
     configs=('Retrieval 미사용', 'target: 16 (anchor 미설정)'),
     method_names=('STORM', 'STORM+ours'),
 ):
-    """Load paired raw scores for the two methods by training seed."""
+    """Keep both methods' raw scores for common, non-excluded training seeds."""
     df = pd.read_excel(excel_path, sheet_name='Results', index_col=[0, 1])
     df = df.reset_index()
     

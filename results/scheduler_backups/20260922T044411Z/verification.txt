@@ -1,0 +1,39 @@
+미리보기 (큐/상태 저장 안 함)
+대상 BankHeist: 논문 대비 부족분 baseline ΔHNS=0.256, retrieval ΔHNS=0.213
+대상 Boxing: 논문 대비 부족분 baseline ΔHNS=0.042, retrieval ΔHNS=-0.158
+  baseline: 평균이 논문 미만이며 낮은 시드가 있음: 10 (ΔHNS=0.950)
+대상 CrazyClimber: 논문 대비 부족분 baseline ΔHNS=0.385, retrieval ΔHNS=0.354
+대상 Freeway: 논문 대비 부족분 baseline ΔHNS=0.301, retrieval ΔHNS=0.022
+대상 Gopher: 논문 대비 부족분 baseline ΔHNS=1.912, retrieval ΔHNS=1.149
+대상 Kangaroo: 논문 대비 부족분 baseline ΔHNS=0.911, retrieval ΔHNS=0.829
+대상 Krull: 논문 대비 부족분 baseline ΔHNS=2.399, retrieval ΔHNS=1.640
+대상 Pong: 논문 대비 부족분 baseline ΔHNS=0.075, retrieval ΔHNS=0.223
+대상 RoadRunner: 논문 대비 부족분 baseline ΔHNS=1.088, retrieval ΔHNS=0.499
+pro6k: 기존 작업 후 GPU별 예상 여유 시점 [24.03] 시간
+3090: 기존 작업 후 GPU별 예상 여유 시점 [60.02] 시간
+A6000: 기존 작업 후 GPU별 예상 여유 시점 [23.55, 23.13, 18.25, 21.75] 시간
+titan: 기존 작업 후 GPU별 예상 여유 시점 [20.63] 시간
+CrazyClimber:2010:retrieval [pending] 기준 seed 3710: 53655 → 78703.9 이상
+Kangaroo:6030:retrieval [complete] 기준 seed 6010: 760 → 3743 이상, 결과=2900, 미달
+RoadRunner:6030:retrieval [complete] 기준 seed 2000: 8195 → 16028.5 이상, 결과=16410, 통과
+UpNDown:6030:retrieval [complete] 기준 seed 6020: 2974.5 → 14134.3 이상, 결과=7972.5, 미달
+Gopher:9997:retrieval [complete] 기준 seed 10: 3327 → 5481.9 이상, 결과=8373, 통과
+Krull:6040:retrieval [pending] 기준 seed 6000: 6447.5 → 7515 이상
+Gopher:9995:retrieval [pending] 기준 seed 10: 3327 → 5481.9 이상
+RoadRunner:6040:retrieval [pending] 기준 seed 6000: 8325 → 16158.5 이상
+Kangaroo:9999:retrieval [pending] 기준 seed 6010: 760 → 3743 이상
+Freeway:6030:retrieval [pending] 기준 seed 6010: 32.75 → 62.35 이상
+BankHeist:6040:retrieval [pending] 기준 seed 2000: 169.5 → 908.4 이상
+Boxing:6030:retrieval [pending] 기준 seed 10: 76.15 → 88.15 이상
+Krull:6050:retrieval [pending] 기준 seed 6000: 6447.5 → 7515 이상
+Gopher:9994:retrieval [pending] 기준 seed 10: 3327 → 5481.9 이상
+RoadRunner:6050:retrieval [pending] 기준 seed 6000: 8325 → 16158.5 이상
+Kangaroo:6020:retrieval [pending] 기준 seed 6010: 760 → 3743 이상
+CrazyClimber:6000:retrieval [pending] 기준 seed 3710: 53655 → 78703.9 이상
+새 명령 0개
+pro6k: 추가 후 GPU별 예상 작업량 [24.03] 시간 (목표 18시간)
+3090: 추가 후 GPU별 예상 작업량 [60.02] 시간 (목표 18시간)
+A6000: 추가 후 GPU별 예상 작업량 [23.55, 23.13, 18.25, 21.75] 시간 (목표 18시간)
+titan: 추가 후 GPU별 예상 작업량 [20.63] 시간 (목표 18시간)
+warmup 삭제 필요 (자동 삭제 안 함): Kangaroo:6030:retrieval / A6000 / ckpt/Kangaroo-6030_Shared/shared_warmup_50067
+warmup 삭제 필요 (자동 삭제 안 함): UpNDown:6030:retrieval / A6000 / ckpt/UpNDown-6030_Shared/shared_warmup_50056

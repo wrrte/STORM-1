@@ -1,8 +1,8 @@
 """Incremental, offline experiment planning from the W&B classification CSV.
 
 Run after classify_wandb_runs.py; --dry-run previews without dispatching jobs.
-The CSV is authoritative for completion, the ledger reserves dispatched seeds,
-and existing worker flock files protect queue appends. No checkpoints are deleted.
+The CSV tracks execution/results, and pending reservations follow the current
+queues. Existing worker flock files protect queue appends. No checkpoints are deleted.
 Only the standard library is required. See experiment_scheduler.md.
 """
 
@@ -355,6 +355,24 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
                 notices.append(f'{gpu} 기존 큐 중복: {key}; 기존 명령은 유지합니다.')
             seen.add(key)
             queued.append(item)
+    # Queue edits automatically release unstarted reservations before selecting
+    # games, thresholds, seeds or GPU loads. Execution evidence survives later
+    # CSV snapshots that might omit a run; completed/failed history is retained.
+    queued_keys = {(item['game'], item['seed'], kind) for item in queued for kind in item['kinds']}
+    removed = set()
+    for job in jobs:
+        if job['status'] not in ACTIVE:
+            continue
+        evidence = [row for row in rows if (row['game'], row['seed']) == (job['game'], job['seed'])
+                    and row['Run ID'] not in job['before_ids']
+                    and job['kind'] in running_kinds(row)]
+        if job['status'] == 'running' or evidence:
+            job['execution_observed'] = True
+        if (job['id'] not in fail_jobs and not job.get('execution_observed')
+                and (job['game'], job['seed'], job['kind']) not in queued_keys):
+            removed.add(job['id'])
+            notices.append(f"{job['id']}: 큐에서 제거되었고 실행 기록이 없어 대기 예약을 자동 정리했습니다.")
+    jobs[:] = [job for job in jobs if job['id'] not in removed]
     scores = latest_scores(rows, excluded)
     summaries = {}
     for game, (random_score, human_score, paper_score) in references.items():
@@ -467,7 +485,7 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
             job['status'] = 'failed'
         else:
             job['status'] = 'awaiting_result'
-            notices.append(f"{job['id']}: CSV/큐에서 완료를 확인할 수 없어 재등록하지 않습니다.")
+            notices.append(f"{job['id']}: 실행 이력이 있어 결과 대기를 유지합니다.")
     unknown_failures = set(fail_jobs) - {job['id'] for job in jobs}
     if unknown_failures:
         raise ValueError(f'없는 작업 ID: {sorted(unknown_failures)}')
@@ -653,7 +671,8 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
         if not busy:
             cleanup.append({'job': job['id'], 'gpu': job['gpu'], 'warmup': job['warmup'],
                             'reason': 'failed' if job['status'] == 'failed' else 'below_threshold'})
-    return state, {'new_jobs': additions, 'games': summaries, 'cleanup': cleanup,
+    return state, {'new_jobs': additions, 'removed_jobs': sorted(removed),
+                   'games': summaries, 'cleanup': cleanup,
                    'gpu_available_hours_before': initial_slots, 'gpu_available_hours_after': slots,
                    'coverage_target_hours': horizon, 'coverage_shortfall_hours': shortfall,
                    'notices': sorted(set(notices))}
@@ -752,8 +771,8 @@ def main(argv=None):
         state, report = plan(rows, texts, state, config, references, excluded,
                              datetime.now(timezone.utc), args.games, args.fail_job)
         if not args.dry_run:
-            # Reserve before dispatch. If a write fails, missing results remain
-            # reserved for manual reconciliation; never duplicate expensive jobs.
+            # Save before dispatch; a later invocation reconciles any unwritten
+            # commands against the queues and available execution evidence.
             atomic_json(args.state, state)
             for gpu, path in paths.items():
                 commands = [job['command'] for job in report['new_jobs'] if job['gpu'] == gpu]
