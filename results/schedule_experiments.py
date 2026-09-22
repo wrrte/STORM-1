@@ -31,6 +31,7 @@ PREFIX = 'JointTrainAgent.Retrieval.'
 ACTIVE = {'pending', 'running', 'awaiting_result'}
 MAIN_KINDS = ('retrieval', 'baseline')
 MAIN_SEED_TARGET = 4
+REUSE_HNS_GAP = 0.1
 VARIANTS = {
     'baseline': {'Retrieval Enable': 'False'},
     'retrieval': {'Retrieval Enable': 'True'},
@@ -282,7 +283,7 @@ def duration(names, spec, warmup=True):
 
 
 def job_kinds(job):
-    return MAIN_KINDS if job['kind'] == 'paired' else (job['kind'],)
+    return tuple(job.get('names', MAIN_KINDS)) if job['kind'] == 'paired' else (job['kind'],)
 
 
 def running_kinds(row):
@@ -325,12 +326,12 @@ def push_load(slots, gpu, hours):
     return start
 
 
-def make_command(game, seed, kind, warmup=''):
+def make_command(game, seed, kind, warmup='', *, names=None):
     if kind == 'baseline':
         return (f'python -u train.py --resume_warmup {shlex.quote(warmup)} '
                 f'-n {shlex.quote(f"{game}-{seed}")} -seed {seed} '
                 'JointTrainAgent.Retrieval.enable "[\'baseline\']"')
-    names = list(MAIN_KINDS) if kind == 'paired' else ['retrieval']
+    names = list(MAIN_KINDS if names is None else names) if kind == 'paired' else ['retrieval']
     command = (
         f'python -u train.py -n "{game}-{seed}" -seed {seed} '
         f'-config_path "config_files/STORM.yaml" -env_name "ALE/{game}-v5" '
@@ -551,10 +552,13 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
     def within_job_limit():
         return config['max_new_jobs'] is None or len(additions) < config['max_new_jobs']
 
-    def add_job(game, gpu, kind, source=None):
+    def add_job(game, gpu, kind, source=None, reuse=None):
+        names = (reuse['missing_kind'],) if reuse else (MAIN_KINDS if kind == 'paired' else (kind,))
         if source:
             seed, warmup = source['seed'], source['warmup']
             comparison = {}
+        elif reuse:
+            seed, warmup, comparison = reuse['seed'], '', {}
         else:
             comparison = {} if kind == 'paired' else threshold(game)
             if comparison is None:
@@ -568,8 +572,12 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
                'gpu': gpu, 'warmup': warmup, 'status': 'pending', 'adopted': False,
                'registered_at': now.isoformat(),
                'before_ids': [r['Run ID'] for r in rows if (r['game'], r['seed']) == (game, seed)
-                              and r['kind'] in (MAIN_KINDS if kind == 'paired' else (kind,))],
-               'command': make_command(game, seed, kind, warmup), **comparison}
+                              and r['kind'] in names],
+               'command': make_command(game, seed, kind, warmup, names=names), **comparison}
+        if kind == 'paired':
+            job['names'] = list(names)
+        if reuse:
+            job['reused_score'] = copy.deepcopy(reuse)
         if source:
             job['source_job'] = source['id']
         hours = duration(job_kinds(job), config['gpus'][gpu], kind != 'baseline')
@@ -670,13 +678,50 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
                 and set(MAIN_KINDS).issubset(kinds)):
             expected_pairs[game].add(seed)
 
+    reusable_seeds = {game: [] for game in insufficient_seeds}
+    for (game, kind, seed), sample in scores.items():
+        if game not in insufficient_seeds:
+            continue
+        missing_kind = next(name for name in MAIN_KINDS if name != kind)
+        if (game, missing_kind, seed) in scores:
+            continue
+        random_score, human_score, paper_score = references[game]
+        scale = human_score - random_score
+        gap = (paper_score - sample['score']) / scale
+        if not reaches(gap, REUSE_HNS_GAP):
+            reusable_seeds[game].append({
+                'seed': seed, 'kind': kind, 'missing_kind': missing_kind,
+                'score': sample['score'], 'run_id': sample['Run ID'],
+                'hns': (sample['score'] - random_score) / scale,
+                'paper_hns': (paper_score - random_score) / scale, 'hns_gap': gap,
+                'reserved': seed in expected_pairs[game],
+            })
+    for candidates in reusable_seeds.values():
+        candidates.sort(key=lambda item: (-item['hns'], item['seed']))
+
     # Fill finite main-performance deficits before the unbounded anomaly search.
     if fill_missing_seeds:
         candidates = [game for game in insufficient_seeds if games is None or game in games]
+        deferred_reuse = defaultdict(int)
+        # Prefer completing existing seeds to training two new branches. Keep
+        # their established GPU assignment, even when that GPU must wait.
+        for game in sorted(candidates, key=lambda g: (len(expected_pairs[g]), g)):
+            remaining = max(0, MAIN_SEED_TARGET - len(expected_pairs[game]))
+            reusable = [item for item in reusable_seeds[game] if not item['reserved']][:remaining]
+            for item in reusable:
+                gpu = gpu_for_seed(item['seed'], config, jobs, queued)
+                if within_job_limit() and slots[gpu] and (not horizon or min(slots[gpu]) < horizon):
+                    add_job(game, gpu, 'paired', reuse=item)
+                    expected_pairs[game].add(item['seed'])
+                else:
+                    deferred_reuse[game] += 1
+                    notices.append(f"{game} seed {item['seed']}: {item['missing_kind']}만 추가하면 되지만 "
+                                   f'{gpu} 작업량/GPU 개수 또는 max_new_jobs 제한으로 등록을 보류합니다.')
         exhausted_pairs = set()
         while within_job_limit():
             available = needs_work() if horizon else [gpu for gpu in slots if slots[gpu]]
-            choices = [game for game in candidates if len(expected_pairs[game]) < MAIN_SEED_TARGET
+            choices = [game for game in candidates
+                       if len(expected_pairs[game]) + deferred_reuse[game] < MAIN_SEED_TARGET
                        and any((game, gpu) not in exhausted_pairs for gpu in available)]
             if not choices:
                 break
@@ -731,7 +776,8 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
             cleanup.append({'job': job['id'], 'gpu': job['gpu'], 'warmup': job['warmup'],
                             'reason': 'failed' if job['status'] == 'failed' else 'below_threshold'})
     return state, {'new_jobs': additions, 'removed_jobs': sorted(removed),
-                   'games': summaries, 'insufficient_seeds': insufficient_seeds, 'cleanup': cleanup,
+                   'games': summaries, 'insufficient_seeds': insufficient_seeds,
+                   'reusable_seeds': reusable_seeds, 'cleanup': cleanup,
                    'gpu_available_hours_before': initial_slots, 'gpu_available_hours_after': slots,
                    'coverage_target_hours': horizon, 'coverage_shortfall_hours': shortfall,
                    'notices': sorted(set(notices))}
@@ -750,6 +796,12 @@ def atomic_json(path, data):
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
+
+
+def reuse_description(item):
+    return (f"seed {item['seed']}: 기존 {item['kind']} 점수={item['score']:g}, HNS={item['hns']:.4f} "
+            f"(ΔHNS={item['hns_gap']:+.4f} "
+            f"< {REUSE_HNS_GAP:g}) → {item['missing_kind']}만 평가")
 
 
 def print_report(report, state, dry_run, excluded):
@@ -771,13 +823,18 @@ def print_report(report, state, dry_run, excluded):
     for game, summary in sorted(shortages.items()):
         print(f"{red}  {game}: {summary['count']}개 / {MAIN_SEED_TARGET}개 "
               f"({summary['missing']}개 부족, 시드: {summary['seeds']}){reset}")
+        for item in report['reusable_seeds'][game]:
+            status = ' (이미 큐/실행/결과 대기 중)' if item['reserved'] else ''
+            print(f'{red}    재사용 가능 {reuse_description(item)}{status}{reset}')
     for gpu, available in report['gpu_available_hours_before'].items():
         print(f'{gpu}: 기존 작업 후 GPU별 예상 여유 시점 {[round(v, 2) for v in available]} 시간')
     for job in state['jobs']:
         if job['seed'] in excluded.get(job['game'], set()):
             continue
         if job['kind'] == 'paired':
-            print(f"{job['id']} [{job['status']}] main performance 시드 보충 (retrieval + baseline)")
+            print(f"{job['id']} [{job['status']}] main performance 시드 보충 ({' + '.join(job_kinds(job))})")
+            if job.get('reused_score'):
+                print(f"  {reuse_description(job['reused_score'])}")
         elif job['kind'] == 'retrieval':
             green, reset = ('\033[32m', '\033[0m') if use_color and job.get('accepted') else ('', '')
             result = (f", 결과={green}{job['score']:g}{reset}, "
@@ -817,7 +874,7 @@ def main(argv=None):
     parser.add_argument('--games', nargs='+', help='자동 대상 선정 대신 지정한 게임만 탐색')
     parser.add_argument('--fill-missing-seeds', action='store_true',
                         help='이상 게임을 제외하고 main performance 공통 시드를 4개까지 '
-                             'retrieval + baseline으로 보충 (save_warmup 기본값 False)')
+                             '보충: 재사용 가능한 점수가 있으면 빠진 분기만 실행 (save_warmup 기본값 False)')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--fail-job', action='append', default=[], metavar='GAME:SEED:KIND',
                         help='큐/실행 중에 없고 결과가 유실된 작업을 실패로 기록')
