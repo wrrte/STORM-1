@@ -33,6 +33,16 @@ def row(seed, score=None, kind='retrieval', state='finished', game='Gopher', run
     return result
 
 
+def read_csv_rows(samples):
+    with tempfile.TemporaryDirectory() as directory:
+        path = Path(directory) / 'runs.csv'
+        with path.open('w', newline='') as output:
+            writer = csv.DictWriter(output, fieldnames=list(samples[0]))
+            writer.writeheader()
+            writer.writerows(samples)
+        return scheduler.read_rows(path)
+
+
 class SchedulerTests(unittest.TestCase):
     def setUp(self):
         self.config = json.loads((scheduler.HERE / 'experiment_scheduler.json').read_text())
@@ -74,6 +84,59 @@ class SchedulerTests(unittest.TestCase):
         newer = row(10, 1000, run_id='newer', **{'Hash Bits': '11'})
         scores = scheduler.latest_scores([older, newer], {})
         self.assertEqual(scores['Gopher', 'retrieval', 10]['score'], 2000)
+
+    def test_manual_baseline_completes_frostbite_common_seeds(self):
+        self.references = {'Frostbite': self.references['Frostbite']}
+        rows = read_csv_rows([
+            row(seed, 2000, game='Frostbite', kind=kind, run_id=f'{seed}-{kind}')
+            for seed in (710, 6000, 6010) for kind in ('retrieval', 'baseline')
+        ] + [row(3710, 2779, game='Frostbite')])
+        excluded = {'Frostbite': {10}}
+        scores = scheduler.latest_scores(rows, excluded)
+        self.assertEqual(scores['Frostbite', 'baseline', 3710]['score'], 1904)
+        self.assertNotIn(('Frostbite', 'baseline', 10), scores)
+        common = {seed for game, kind, seed in scores if kind == 'retrieval'
+                  and (game, 'baseline', seed) in scores}
+        self.assertEqual(common, {710, 3710, 6000, 6010})
+        _, report = self.plan(rows, excluded=excluded, fill_missing_seeds=True)
+        self.assertEqual(report['insufficient_seeds'], {})
+        self.assertEqual(report['new_jobs'], [])
+        self.assertIn('수동 기록 반영: Frostbite seed 3710 baseline 점수=1904 (manual_results.json)',
+                      report['notices'])
+        self.assertFalse(any('seed 10 ' in notice for notice in report['notices']))
+
+    def test_manual_scores_obey_finished_hash_and_date_preference(self):
+        for state, score, overrides, expected in (
+            ('finished', 2200, {'Hash Bits': 'N/A'}, 2200),
+            ('finished', 2100, {'Created At': '2026-08-01T00:00:00Z'}, 2100),
+            ('finished', 2100, {'Created At': '2026-08-01T00:00:00Z', 'Hash Bits': 'N/A'}, 1904),
+            ('running', 9999, {}, 1904),
+            ('failed', 9999, {}, 1904),
+            ('finished', None, {}, 1904),
+        ):
+            with self.subTest(state=state, score=score, overrides=overrides):
+                rows = read_csv_rows([row(3710, score, kind='baseline', state=state,
+                                          game='Frostbite', **overrides)])
+                scores = scheduler.latest_scores(rows, {})
+                self.assertEqual(scores['Frostbite', 'baseline', 3710]['score'], expected)
+                self.assertEqual(scores['Frostbite', 'baseline', 10]['score'], 2068)
+
+    def test_manual_history_does_not_complete_or_preserve_unstarted_rerun(self):
+        self.references = {'Frostbite': self.references['Frostbite']}
+        rows = read_csv_rows([row(3710, 2779, game='Frostbite')])
+        job_id = 'Frostbite:3710:baseline'
+        for status in ('pending', 'running'):
+            with self.subTest(status=status):
+                job = {'id': job_id, 'game': 'Frostbite', 'seed': 3710, 'kind': 'baseline',
+                       'gpu': 'pro6k', 'status': status, 'before_ids': [],
+                       'warmup': 'ckpt/Frostbite-3710_Shared', 'command': ''}
+                state, report = self.plan(rows, {'version': 1, 'jobs': [job]})
+                if status == 'pending':
+                    self.assertEqual(report['removed_jobs'], [job_id])
+                    self.assertEqual(state['jobs'], [])
+                else:
+                    self.assertEqual(state['jobs'][0]['status'], 'awaiting_result')
+                    self.assertNotIn('score', state['jobs'][0])
 
     def test_pending_queue_is_idempotent_and_missing_command_is_replanned(self):
         state, report = self.plan()

@@ -231,6 +231,10 @@ def main():
         df['State'] = ''
     df['State'] = df['State'].fillna('').astype(str).str.strip().str.lower()
 
+    # W&B에 누락된 수동 점수는 스케줄러와 같은 원본을 사용합니다.
+    manual_path = Path(__file__).resolve().with_name('manual_results.json')
+    manual_rows = json.loads(manual_path.read_text(encoding='utf-8'))
+    df = pd.concat([df, pd.DataFrame(manual_rows)], ignore_index=True)
     df = expand_shared_runs(df)
 
     # Data extraction
@@ -372,30 +376,6 @@ def main():
             ),
             'Created At': created_at_utc
         })
-
-    # 강제로 Frostbite - Retrieval 미사용의 누락된 시드 추가
-    data.append({
-        'Game': 'Frostbite',
-        'Config': 'Retrieval 미사용',
-        'Seed': 10,
-        'State': 'finished',
-        'Eval Return': '2068',
-        'Warmup Steps': 'N/A',
-        'Hash Bits': 'N/A',
-        'Save Warmup': False,
-        'Created At': pd.to_datetime("2026-08-11T04:36:29Z", utc=True)
-    })
-    data.append({
-        'Game': 'Frostbite',
-        'Config': 'Retrieval 미사용',
-        'Seed': 3710,
-        'State': 'finished',
-        'Eval Return': '1904',
-        'Warmup Steps': 'N/A',
-        'Hash Bits': 'N/A',
-        'Save Warmup': False,
-        'Created At': pd.to_datetime("2026-08-11T04:36:35Z", utc=True)
-    })
 
     parsed_df = pd.DataFrame(data)
 

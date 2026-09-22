@@ -1,4 +1,4 @@
-"""Incremental, offline experiment planning from the W&B classification CSV.
+"""Incremental, offline experiment planning from W&B CSV and manual results.
 
 Run after classify_wandb_runs.py; --dry-run previews without dispatching jobs.
 The CSV tracks execution/results, and pending reservations follow the current
@@ -117,12 +117,14 @@ def row_kind(row):
 
 
 def read_rows(path):
+    """Load CSV and the workbook's manual scores through the same classification."""
     with path.open(encoding='utf-8-sig', newline='') as source:
         reader = csv.DictReader(source)
         required = {'Run Name', 'Run ID', 'State', 'Seed', 'Eval Return', 'Retrieval Enable'}
         if not required.issubset(reader.fieldnames or []):
             raise ValueError(f'{path}: 필요한 CSV 열이 없습니다: {sorted(required)}')
         rows = list(reader)
+    rows.extend(json.loads((HERE / 'manual_results.json').read_text(encoding='utf-8')))
     for row in rows:
         row['game'] = row['Run Name'].split('_')[0]
         seed = number(row['Seed'])
@@ -372,7 +374,8 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
     for job in jobs:
         if job['status'] not in ACTIVE:
             continue
-        evidence = [row for row in rows if (row['game'], row['seed']) == (job['game'], job['seed'])
+        evidence = [row for row in rows if row.get('Source') != 'manual'
+                    and (row['game'], row['seed']) == (job['game'], job['seed'])
                     and row['Run ID'] not in job['before_ids']
                     and set(job_kinds(job)) & running_kinds(row)]
         if job['status'] == 'running' or evidence:
@@ -383,6 +386,10 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
             notices.append(f"{job['id']}: 큐에서 제거되었고 실행 기록이 없어 대기 예약을 자동 정리했습니다.")
     jobs[:] = [job for job in jobs if job['id'] not in removed]
     scores = latest_scores(rows, excluded)
+    for (game, kind, seed), sample in scores.items():
+        if sample.get('Source') == 'manual':
+            notices.append(f"수동 기록 반영: {game} seed {seed} {kind} 점수={sample['score']:g} "
+                           '(manual_results.json)')
     summaries, insufficient_seeds = {}, {}
     for game, (random_score, human_score, paper_score) in references.items():
         scale = human_score - random_score
@@ -468,7 +475,10 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
     occupied |= {(r['game'], r['seed'], kind) for r in running for kind in running_kinds(r)}
     for job in jobs:
         kinds = job_kinds(job)
-        matching = [r for r in rows if r['game'] == job['game'] and r['seed'] == job['seed']
+        # Historical manual scores count for coverage, but do not prove that a
+        # newly scheduled rerun executed or completed.
+        matching = [r for r in rows if r.get('Source') != 'manual'
+                    and r['game'] == job['game'] and r['seed'] == job['seed']
                     and r['kind'] in kinds and r['Run ID'] not in job['before_ids']]
         latest_by_kind = {kind: max((r for r in matching if r['kind'] == kind),
                                    key=lambda r: timestamp(r.get('Created At')), default=None)

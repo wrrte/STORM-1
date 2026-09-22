@@ -1,7 +1,7 @@
 # 결과를 보고 다음 실험 등록하기
 
-`schedule_experiments.py`는 W&B에 접속하지 않고 분류 CSV와 현재 큐를 읽습니다.
-엑셀은 사람이 확인하는 용도이며, 판정에는 반올림하지 않은 CSV 점수를 사용합니다.
+`schedule_experiments.py`는 W&B에 접속하지 않고 분류 CSV, `manual_results.json`과 현재 큐를 읽습니다.
+엑셀은 사람이 확인하는 용도이며, 판정에는 반올림하지 않은 CSV·수동 기록 점수를 사용합니다.
 Python 표준 라이브러리만 필요합니다.
 
 ```bash
@@ -23,6 +23,15 @@ worker가 켜져 있으면 해당 큐에서 학습을 시작합니다. 명령은
   날짜, anchor, warmup, z-score, value/add 구분과 hash_bits=10 선호는 엑셀 기준에
   맞춥니다. baseline은 과거 점수도 포함합니다. 시드별 최신 **완료** 점수를 사용하며
   running/failed/crashed run의 중간 점수는 사용하지 않습니다.
+- W&B에 누락되어 엑셀 변환기에 하드코딩했던 점수는 `manual_results.json`에서
+  공동 관리합니다. 현재 Frostbite baseline의 seed 10 = 2068, seed 3710 = 1904가
+  있으며, 엑셀 변환기와 스케줄러 모두 이 파일을 읽습니다. 수동 점수도 동일한
+  hash_bits/날짜 우선순위와 `EXCLUDED_SEEDS`를 적용해 평균·공통 시드·재사용 후보에
+  반영합니다. 현재 Frostbite seed 10은 제외 목록에 있어 집계하지 않습니다.
+  실제 선택된 수동 점수는 출력의 `수동 기록 반영` 안내에서 확인할 수 있습니다.
+  새 수동 기록은 같은 CSV 열 이름을 사용해 추가하고 `Source`는 `manual`,
+  `Run ID`는 `manual:게임:분기:시드` 형태의 고유 식별자로 지정합니다. 이 ID는
+  W&B run ID가 아니며, 수동 기록으로 새로 예약한 작업의 실행·완료를 판정하지 않습니다.
 - `update_tex.py`의 현재 `EXCLUDED_SEEDS`를 매번 읽어 평균과 비교 기준에서 제외합니다.
   제외된 시드는 체크포인트를 이미 삭제한 것으로 처리해 결과 로그와 삭제 알림을
   출력하지 않습니다. 실행 이력으로는 유지하여 새 명령에 같은 시드를 다시 쓰지 않습니다.

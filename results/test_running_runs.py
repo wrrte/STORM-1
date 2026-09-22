@@ -14,6 +14,8 @@ from unittest.mock import Mock, patch
 
 from openpyxl import load_workbook
 
+import schedule_experiments as scheduler
+
 
 def load_script(name):
     spec = importlib.util.spec_from_file_location(name, Path(__file__).with_name(name + '.py'))
@@ -122,6 +124,22 @@ class RunningRunsTests(unittest.TestCase):
         self.assertEqual(cells['Alien', TARGET, converter.PAIRED_MEAN_COLUMN].value, 150)
         self.assertEqual(cells['Alien', BASELINE, 1].value, '100.00')
         self.assertIsNone(cells['Alien', BASELINE, 1].fill.fill_type)
+
+    def test_manual_frostbite_scores_match_scheduler_and_preserve_exclusions(self):
+        run = make_run('frost3710', 3710, True, 'finished', 2779)
+        run.name = 'Frostbite_frost3710_3710_O'
+        self.export([run])
+        cells = self.workbook_cells()
+        scores = scheduler.latest_scores(
+            scheduler.read_rows(Path('wandb_runs_classification.csv')), converter.load_excluded_seeds())
+        baseline_score = scores['Frostbite', 'baseline', 3710]['score']
+        self.assertEqual(baseline_score, 1904)
+        self.assertEqual(converter.parse_score(cells['Frostbite', BASELINE, 3710].value), baseline_score)
+        self.assertEqual(cells['Frostbite', BASELINE, converter.PAIRED_MEAN_COLUMN].value, baseline_score)
+        self.assertEqual(cells['Frostbite', TARGET, converter.PAIRED_MEAN_COLUMN].value, 2779)
+        self.assertEqual(cells['Frostbite', BASELINE, 10].value, '2068.00')
+        self.assertTrue(cells['Frostbite', BASELINE, 10].font.strike)
+        self.assertNotIn(('Frostbite', 'baseline', 10), scores)
 
     def test_finished_run_replaces_marker_and_restores_paired_mean(self):
         run = make_run('target', 2, True)

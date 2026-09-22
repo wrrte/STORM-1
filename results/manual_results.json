@@ -1,0 +1,28 @@
+[
+  {
+    "Run Name": "Frostbite_manual_10_X",
+    "Run ID": "manual:Frostbite:baseline:10",
+    "State": "finished",
+    "Seed": "10",
+    "Eval Return": "2068",
+    "Retrieval Enable": "False",
+    "Warmup Steps": "N/A",
+    "Hash Bits": "N/A",
+    "Save Warmup": "False",
+    "Created At": "2026-08-11T04:36:29Z",
+    "Source": "manual"
+  },
+  {
+    "Run Name": "Frostbite_manual_3710_X",
+    "Run ID": "manual:Frostbite:baseline:3710",
+    "State": "finished",
+    "Seed": "3710",
+    "Eval Return": "1904",
+    "Retrieval Enable": "False",
+    "Warmup Steps": "N/A",
+    "Hash Bits": "N/A",
+    "Save Warmup": "False",
+    "Created At": "2026-08-11T04:36:35Z",
+    "Source": "manual"
+  }
+]
