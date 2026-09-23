@@ -1,3 +1,5 @@
 python -u train.py -n "Gopher-9994" -seed 9994 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
 python -u train.py --resume_warmup ckpt/Pong-9999_Shared JointTrainAgent.Retrieval.enable "['baseline', 'target1', 'add', 'value']" 
 python -u train.py -n "KungFuMaster-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/KungFuMaster-v5" -trajectory_path "D_TRAJ/KungFuMaster.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+
+python -u train.py -n "Frostbite-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Frostbite-v5" -trajectory_path "D_TRAJ/Frostbite.pkl" JointTrainAgent.Retrieval.enable "['value']" JointTrainAgent.Retrieval.save_warmup True
