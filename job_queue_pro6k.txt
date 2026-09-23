@@ -1,3 +1,4 @@
 python -u train.py -n "Freeway-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Freeway-v5" -trajectory_path "D_TRAJ/Freeway.pkl" JointTrainAgent.Retrieval.enable "['retrieval', 'baseline', 'target1', 'value', 'add']" JointTrainAgent.UseDemonstration True
 python -u train.py -n "Pong-3710" -seed 3710 -config_path "config_files/STORM.yaml" -env_name "ALE/Pong-v5" -trajectory_path "D_TRAJ/Pong.pkl" JointTrainAgent.Retrieval.enable "['baseline', 'target1', 'value', 'add']"
 python -u train.py -n "Seaquest-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Seaquest-v5" -trajectory_path "D_TRAJ/Seaquest.pkl" JointTrainAgent.Retrieval.enable "['retrieval', 'target1', 'value', 'add']"
+python -u train.py -n "Qbert-10" -seed 10 -config_path "config_files/STORM.yaml" -env_name "ALE/Qbert-v5" -trajectory_path "D_TRAJ/Qbert.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
