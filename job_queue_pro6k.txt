@@ -1,2 +1,0 @@
-python -u train.py -n "Breakout-2" -seed 2 -config_path "config_files/STORM.yaml" -env_name "ALE/Breakout-v5" -trajectory_path "D_TRAJ/Breakout.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-python -u train.py -n "Jamesbond-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
