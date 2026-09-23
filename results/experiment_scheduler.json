@@ -23,7 +23,7 @@
       "seed_sequence": {"start": 2000, "step": 10}
     },
     "A6000": {
-      "count": 4,
+      "count": 7,
       "warmup_hours": 2.5,
       "retrieval_hours": 3.5,
       "baseline_hours": 2.5,

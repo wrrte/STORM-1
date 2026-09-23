@@ -1,0 +1,1 @@
+python -u train.py -n "BankHeist-2010" -seed 2010 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "D_TRAJ/BankHeist.pkl" JointTrainAgent.Retrieval.enable "['target1', 'value', 'add']"
