@@ -18,17 +18,20 @@ EXCLUDED_SEEDS = {
     "Frostbite": {10},
     "BankHeist": {6020, 6030, 6040},
     "BattleZone": {2000, 6010},
-    "Boxing": {6000},
+    "Boxing": {6000, 6030},
     "Breakout": {2},
+    "CrazyClimber": {6000},
     "Freeway": {6030},
+    "Jamesbond": {9999},
     "Kangaroo": {6010, 9999},
     "Krull": {2000, 2010, 6010, 6030},
+    "KungFuMaster": {2010},
     "Gopher": {6000, 6010, 6020, 6030, 6040, 9995, 9996, 9999}, 
     "Pong": {2010},
     "PrivateEye": {6000, 6030},
     "Qbert": {3710, 6030},
-    "RoadRunner": {2000, 6000},
-    "UpNDown": {6020},
+    "RoadRunner": {2000, 6000, 6050},
+    "UpNDown": {6020, 9999},
 }
 
 
