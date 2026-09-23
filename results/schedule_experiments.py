@@ -344,7 +344,7 @@ def make_command(game, seed, kind, warmup='', *, names=None):
 
 
 def plan(rows, queue_texts, state, config, references, excluded, now, games=None, fail_jobs=(),
-         fill_missing_seeds=False):
+         fill_missing_seeds=True):
     """Pure planning: returns a new ledger and report, without touching disk."""
     state = copy.deepcopy(state)
     state.setdefault('version', 1)
@@ -414,10 +414,10 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
         paired_seeds = sorted(
             seed for g, kind, seed in scores
             if g == game and kind == 'retrieval' and (game, 'baseline', seed) in scores)
-        if not anomalous and len(paired_seeds) < MAIN_SEED_TARGET:
+        if len(paired_seeds) < MAIN_SEED_TARGET:
             insufficient_seeds[game] = {'seeds': paired_seeds, 'count': len(paired_seeds),
                                         'missing': MAIN_SEED_TARGET - len(paired_seeds)}
-        if (games is not None and game in games) or (games is None and anomalous):
+        if anomalous and (games is None or game in games):
             summaries[game] = {'means': means, 'paper_score': paper_score, 'hns_gaps': gaps,
                                'low_seeds': low_seeds, 'reasons': reasons,
                                'priority': max(gap or 0 for gap in gaps.values())}
@@ -657,8 +657,7 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
                    and j.get('accepted', False)
                    and j['seed'] not in excluded.get(game, set()) for j in jobs) >= goal
 
-    eligible = [game for game in summaries if not enough_successes(game) and threshold(game) is not None
-                and not (fill_missing_seeds and game in insufficient_seeds)]
+    eligible = [game for game in summaries if not enough_successes(game) and threshold(game) is not None]
     eligible.sort(key=lambda game: (-summaries[game]['priority'], game))
 
     def best_gpu(allowed=None, fill=False, names=('retrieval',)):
@@ -671,6 +670,18 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
 
     def needs_work():
         return [gpu for gpu in slots if slots[gpu] and min(slots[gpu]) < horizon]
+
+    # First ensure every eligible anomaly has a search in flight. Existing
+    # reservations satisfy this pass, so repeated calls do not add another wave.
+    # The time horizon limits only the final, optional top-up pass.
+    exhausted = set()
+    for game in eligible:
+        if not within_job_limit():
+            break
+        if active_count(game) == 0:
+            gpu = best_gpu()
+            if gpu and not add_job(game, gpu, 'retrieval'):
+                exhausted.add((game, gpu))
 
     # Count distinct completed or reserved pairs, including externally queued
     # branches. A retrieval-only search cannot promise a future baseline.
@@ -722,28 +733,29 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
         candidates.sort(key=lambda item: (
             item['priority'], -item['score'] if item['kind'] == 'retrieval' else item['score'], item['seed']))
 
-    # Fill finite main-performance deficits before the unbounded anomaly search.
+    # Next fill every finite main-performance deficit, including anomalous games,
+    # even if these required jobs take the queue beyond the time horizon.
+    seed_games = [game for game in insufficient_seeds if games is None or game in games]
     if fill_missing_seeds:
-        candidates = [game for game in insufficient_seeds if games is None or game in games]
         deferred_reuse = defaultdict(int)
         # Prefer completing existing seeds to training two new branches. Keep
         # their established GPU assignment, even when that GPU must wait.
-        for game in sorted(candidates, key=lambda g: (len(expected_pairs[g]), g)):
+        for game in sorted(seed_games, key=lambda g: (len(expected_pairs[g]), g)):
             remaining = max(0, MAIN_SEED_TARGET - len(expected_pairs[game]))
             reusable = [item for item in reusable_seeds[game] if not item['reserved']][:remaining]
             for item in reusable:
                 gpu = gpu_for_seed(item['seed'], config, jobs, queued)
-                if within_job_limit() and slots[gpu] and (not horizon or min(slots[gpu]) < horizon):
+                if within_job_limit() and slots[gpu]:
                     add_job(game, gpu, 'paired', reuse=item)
                     expected_pairs[game].add(item['seed'])
                 else:
                     deferred_reuse[game] += 1
                     notices.append(f"{game} seed {item['seed']}: {item['missing_kind']}만 추가하면 되지만 "
-                                   f'{gpu} 작업량/GPU 개수 또는 max_new_jobs 제한으로 등록을 보류합니다.')
+                                   f'{gpu} GPU 개수 또는 max_new_jobs 제한으로 등록을 보류합니다.')
         exhausted_pairs = set()
         while within_job_limit():
-            available = needs_work() if horizon else [gpu for gpu in slots if slots[gpu]]
-            choices = [game for game in candidates
+            available = [gpu for gpu in slots if slots[gpu]]
+            choices = [game for game in seed_games
                        if len(expected_pairs[game]) + deferred_reuse[game] < MAIN_SEED_TARGET
                        and any((game, gpu) not in exhausted_pairs for gpu in available)]
             if not choices:
@@ -755,19 +767,19 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
             else:
                 exhausted_pairs.add((game, gpu))
 
-    exhausted = set()
-    # First spread work across games on GPUs below the coverage target. With a
-    # zero horizon, retain the optional one-at-a-time experiment mode.
-    for game in eligible:
-        if not within_job_limit():
-            break
-        if active_count(game) == 0:
-            gpu = best_gpu(needs_work() if horizon else None)
-            if gpu:
-                if not add_job(game, gpu, 'retrieval'):
-                    exhausted.add((game, gpu))
+    remaining_seed_deficits = {
+        game: MAIN_SEED_TARGET - len(expected_pairs[game])
+        for game in seed_games if len(expected_pairs[game]) < MAIN_SEED_TARGET
+    }
+    if fill_missing_seeds and remaining_seed_deficits:
+        for game, missing in sorted(remaining_seed_deficits.items()):
+            notices.append(f'{game}: 공통 시드 {missing}개를 아직 확보하지 못했습니다. '
+                           'GPU 개수, max_new_jobs 또는 새 시드 제한을 확인하세요.')
+
+    # Only after seed coverage is secured, spend spare time on more searches.
     # Top up each physical GPU, not the average or latest finish of a GPU pool.
-    while eligible and within_job_limit():
+    while (eligible and within_job_limit()
+           and (not fill_missing_seeds or not remaining_seed_deficits)):
         spare = [gpu for gpu in needs_work() if any((game, gpu) not in exhausted for game in eligible)]
         if not spare:
             break
@@ -780,7 +792,9 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
     shortfall = {gpu: [max(0, horizon - hours) for hours in available]
                  for gpu, available in slots.items() if any(hours < horizon for hours in available)}
     if shortfall:
-        reason = 'max_new_jobs 제한' if not within_job_limit() else '탐색 대상/비교 점수/사용 가능한 새 시드 부족'
+        reason = ('max_new_jobs 제한' if not within_job_limit() else
+                  '공통 시드 보충 보류' if fill_missing_seeds and remaining_seed_deficits else
+                  '탐색 대상/비교 점수/사용 가능한 새 시드 부족')
         notices.append(f'{horizon:g}시간 작업량을 채우지 못한 GPU가 있습니다: {reason}.')
 
     for job in jobs:
@@ -800,6 +814,8 @@ def plan(rows, queue_texts, state, config, references, excluded, now, games=None
                             'reason': 'failed' if job['status'] == 'failed' else 'below_threshold'})
     return state, {'new_jobs': additions, 'removed_jobs': sorted(removed),
                    'games': summaries, 'insufficient_seeds': insufficient_seeds,
+                   'fill_missing_seeds': fill_missing_seeds,
+                   'remaining_seed_deficits': remaining_seed_deficits,
                    'reusable_seeds': reusable_seeds, 'cleanup': cleanup,
                    'gpu_available_hours_before': initial_slots, 'gpu_available_hours_after': slots,
                    'coverage_target_hours': horizon, 'coverage_shortfall_hours': shortfall,
@@ -842,7 +858,7 @@ def print_report(report, state, dry_run, excluded):
     shortages = report['insufficient_seeds']
     red, reset = ('\033[31m', '\033[0m') if use_color else ('', '')
     print(f'{red}main performance 공통 시드 {MAIN_SEED_TARGET}개 미만: '
-          f'{len(shortages)}개 게임 (이상 게임 제외){reset}')
+          f'{len(shortages)}개 게임 (이상 게임 포함){reset}')
     for game, summary in sorted(shortages.items()):
         print(f"{red}  {game}: {summary['count']}개 / {MAIN_SEED_TARGET}개 "
               f"({summary['missing']}개 부족, 시드: {summary['seeds']}){reset}")
@@ -869,6 +885,9 @@ def print_report(report, state, dry_run, excluded):
               f"(예상 시작 +{job['estimated_start_hours']:.2f}h, 완료 +{job['estimated_finish_hours']:.2f}h)")
         print(job['command'])
     print(f"새 명령 {len(report['new_jobs'])}개")
+    if report['fill_missing_seeds']:
+        print('시드 보충 후 완료/예정 공통 시드가 부족한 게임: '
+              f"{len(report['remaining_seed_deficits'])}개")
     for gpu, available in report['gpu_available_hours_after'].items():
         print(f'{gpu}: 추가 후 GPU별 예상 작업량 {[round(v, 2) for v in available]} 시간 '
               f"(목표 {report['coverage_target_hours']:g}시간)")
@@ -894,10 +913,10 @@ def main(argv=None):
     parser.add_argument('--queue-dir', type=Path, default=HERE.parent)
     parser.add_argument('--state', type=Path, default=HERE / 'experiment_scheduler_state.json')
     parser.add_argument('--report', type=Path, help='판정과 생성 명령을 JSON으로 저장')
-    parser.add_argument('--games', nargs='+', help='자동 대상 선정 대신 지정한 게임만 탐색')
-    parser.add_argument('--fill-missing-seeds', action='store_true',
-                        help='이상 게임을 제외하고 main performance 공통 시드를 4개까지 '
-                             '보충: 재사용 가능한 점수가 있으면 빠진 분기만 실행 (save_warmup 기본값 False)')
+    parser.add_argument('--games', nargs='+', help='이상 게임 탐색과 시드 보충을 지정한 게임으로 제한')
+    parser.add_argument('--fill-missing-seeds', action=argparse.BooleanOptionalAction, default=True,
+                        help='기본 활성화: 이상 여부와 관계없이 공통 시드를 4개까지 보충. '
+                             '재사용 가능한 점수는 빠진 분기만 실행; --no-fill-missing-seeds로 끄기')
     parser.add_argument('--dry-run', action='store_true')
     parser.add_argument('--fail-job', action='append', default=[], metavar='GAME:SEED:KIND',
                         help='큐/실행 중에 없고 결과가 유실된 작업을 실패로 기록')
