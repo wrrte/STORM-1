@@ -1,1 +1,0 @@
-python -u train.py -n "MsPacman-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/MsPacman-v5" -trajectory_path "D_TRAJ/MsPacman.pkl" JointTrainAgent.Retrieval.enable "['target1']" 
