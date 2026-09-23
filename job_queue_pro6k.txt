@@ -1,0 +1,4 @@
+python -u train.py -n "Freeway-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Freeway-v5" -trajectory_path "D_TRAJ/Freeway.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+python -u train.py -n "Kangaroo-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+python -u train.py -n "Krull-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+python -u train.py -n "Freeway-2" -seed 2 -config_path "config_files/STORM.yaml" -env_name "ALE/Freeway-v5" -trajectory_path "D_TRAJ/Freeway.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True

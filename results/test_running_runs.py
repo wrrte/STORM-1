@@ -66,7 +66,8 @@ class RunningRunsTests(unittest.TestCase):
 
     def workbook_cells(self):
         with contextlib.redirect_stdout(io.StringIO()):
-            converter.main()
+            converter.main(csv_path='wandb_runs_classification.csv',
+                           output_path='converted_results.xlsx', queue_dir=Path.cwd())
         workbook = load_workbook('converted_results.xlsx')
         self.addCleanup(workbook.close)
         worksheet = workbook['Results']
@@ -79,6 +80,141 @@ class RunningRunsTests(unittest.TestCase):
             for header, cell in zip(headers[2:], row[2:]):
                 cells[game, row[1].value, header] = cell
         return cells
+
+    def queue_job(self, seed, mode=None, **settings):
+        import shlex
+        command = [
+            'python', '-u', 'train.py', '-n', f'Alien-{seed}', '-seed', str(seed),
+            '-env_name', 'ALE/Alien-v5', '-config_path',
+            str(converter.HERE.parent / 'config_files/STORM.yaml'),
+        ]
+        if mode is not None:
+            settings['enable'] = repr(mode) if isinstance(mode, list) else str(mode)
+        for key, item in settings.items():
+            command.extend([f'JointTrainAgent.Retrieval.{key}', str(item)])
+        return shlex.join(command)
+
+    def test_queues_include_external_jobs_both_variants_and_new_seeds(self):
+        self.export([])
+        Path('job_queue.txt').write_text('# manual queue\n\n' + self.queue_job(12345))
+        Path('job_queue_custom_gpu.txt').write_text(
+            'STORM_AMP_DTYPE=fp16 ' + self.queue_job(12346, ['target1', 'value', 'add']))
+        # Stale scheduler history must never turn into a queue marker.
+        Path('experiment_scheduler_state.json').write_text(json.dumps({
+            'jobs': [{'game': 'Alien', 'seed': 55555, 'status': 'pending'}],
+        }))
+        cells = self.workbook_cells()
+        for config, seed in [(BASELINE, 12345), (TARGET, 12345),
+                             ('target: 1 (anchor 미설정)', 12346),
+                             (TARGET + ' [value]', 12346), (TARGET + ' [add]', 12346)]:
+            cell = cells['Alien', config, seed]
+            self.assertEqual(cell.value, 'QUEUED')
+            self.assertEqual(cell.fill.fgColor.rgb[-6:], 'DDEBF7')
+            self.assertIn('train.py', cell.comment.text)
+        self.assertIn('job_queue.txt:3', cells['Alien', TARGET, 12345].comment.text)
+        self.assertIsNone(cells['Alien', TARGET, 12346].value)
+        self.assertIsNone(cells['Alien', TARGET, converter.PAIRED_MEAN_COLUMN].value)
+        self.assertNotIn(('Alien', TARGET, 55555), cells)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertNotIn('Alien', tex_updater.load_results('converted_results.xlsx'))
+
+    def test_queued_reruns_preserve_scores_hash_preference_and_aggregates(self):
+        self.export([
+            make_run('baseline', 1, False, 'finished', 100, created_at='2026-08-01T00:00:00Z'),
+            make_run('target', 1, True, 'finished', 150, hash_bits=11),
+            make_run('baseline2', 2, False, 'finished', 200),
+            make_run('target2', 2, True, 'finished', 250),
+            make_run('target2older', 2, True, 'finished', 999, hash_bits=11),
+        ])
+        queue = Path('job_queue_3090.txt')
+        commands = [self.queue_job(1, True), self.queue_job(2, True, hash_bits=11)]
+        queue.write_text('\n'.join(commands))
+        cells = self.workbook_cells()
+        self.assertEqual(cells['Alien', TARGET, 1].value, '150.00, QUEUED')
+        self.assertEqual(cells['Alien', TARGET, 2].value, '250.00, QUEUED')
+        self.assertEqual(cells['Alien', TARGET, converter.PAIRED_MEAN_COLUMN].value, 200)
+        self.assertEqual(cells['Alien', BASELINE, converter.PAIRED_MEAN_COLUMN].value, 150)
+        self.assertEqual(cells['Alien', TARGET, converter.SCORE_DELTA_COLUMN].value, 50)
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(tex_updater.load_results('converted_results.xlsx')['Alien'],
+                             ([100, 200], [150, 250]))
+        self.assertEqual(queue.read_text(), '\n'.join(commands))
+        queue.write_text('')
+        cells = self.workbook_cells()
+        self.assertEqual(cells['Alien', TARGET, 1].value, '150.00')
+        self.assertIsNone(cells['Alien', TARGET, 1].fill.fill_type)
+        self.assertIsNone(cells['Alien', TARGET, 1].comment)
+
+    def test_queued_styles_preserve_running_exclusions_and_warmup_borders(self):
+        self.export([make_run('running', 2, True)])
+        command = self.queue_job(5090, True, save_warmup=True)
+        Path('job_queue_A6000.txt').write_text('\n'.join([
+            self.queue_job(2, True, save_warmup=True), command, command,
+        ]))
+        cells = self.workbook_cells()
+        running = cells['Alien', TARGET, 2]
+        self.assertEqual(running.value, 'RUNNING, QUEUED')
+        self.assertEqual(running.fill.fgColor.rgb[-6:], 'FFF2CC')
+        self.assertEqual(running.border.left.color.rgb[-6:], '00B050')
+        excluded = cells['Alien', TARGET, 5090]
+        self.assertEqual(excluded.value, 'QUEUED ×2')
+        self.assertTrue(excluded.font.strike)
+        self.assertEqual(excluded.fill.fgColor.rgb[-6:], 'DDEBF7')
+        self.assertEqual(excluded.border.left.color.rgb[-6:], '00B050')
+        for note in ('EXCLUDED_SEEDS', 'job_queue_A6000.txt:2', 'job_queue_A6000.txt:3', 'save_warmup'):
+            self.assertIn(note, excluded.comment.text)
+
+    def test_queued_configs_use_yaml_and_cli_before_named_overrides(self):
+        self.export([])
+        config_path = Path('config_files/custom.yaml')
+        config_path.parent.mkdir()
+        config = converter.yaml.safe_load(
+            (converter.HERE.parent / 'config_files/STORM.yaml').read_text())
+        config['JointTrainAgent']['Retrieval'].update(target=1, value_signal='value',
+                                                     enable=['retrieval', 'add'])
+        config_path.write_text(converter.yaml.safe_dump(config))
+        Path('job_queue_titan.txt').write_text(
+            'python -u train.py -seed=710 -env_name=ALE/Alien-v5 '
+            '-config_path=config_files/custom.yaml JointTrainAgent.Retrieval.target 16\n'
+            'python train.py -seed 1710 -env_name ALE/Alien-v5 '
+            '-config_path config_files/custom.yaml JointTrainAgent.Retrieval.enable "[\'target1\']" '
+            'JointTrainAgent.Retrieval.target 16')
+        cells = self.workbook_cells()
+        self.assertEqual(cells['Alien', TARGET + ' [value]', 710].value, 'QUEUED')
+        self.assertEqual(cells['Alien', TARGET + ' [value, add]', 710].value, 'QUEUED')
+        self.assertEqual(cells['Alien', 'target: 1 (anchor 미설정) [value]', 1710].value, 'QUEUED')
+
+    def test_queued_resume_reads_saved_config_and_remote_baseline_name(self):
+        self.export([])
+        warmup = Path('ckpt/arbitrary_name/shared_warmup_50012')
+        warmup.mkdir(parents=True)
+        (warmup.parent / 'warmup.json').write_text(json.dumps({'checkpoint': warmup.name}))
+        (warmup / 'warmup_metadata.json').write_text(json.dumps({
+            'run_name': 'arbitrary_name', 'seed': 710, 'env_name': 'ALE/Alien-v5', 'step': 50012,
+        }))
+        config = converter.yaml.safe_load(
+            (converter.HERE.parent / 'config_files/STORM.yaml').read_text())
+        config['JointTrainAgent']['Retrieval']['target'] = 1
+        (warmup / 'config.yaml').write_text(converter.yaml.safe_dump(config))
+        Path('job_queue_pro6k.txt').write_text(
+            'python train.py --resume_warmup=ckpt/arbitrary_name '
+            'JointTrainAgent.Retrieval.enable "[\'retrieval\', \'baseline\']"\n'
+            'python train.py --resume_warmup /remote/STORM/ckpt/Alien-1710_Shared '
+            'JointTrainAgent.Retrieval.enable "[\'baseline\']"')
+        cells = self.workbook_cells()
+        for config, seed in [('target: 1 (anchor 미설정)', 710), (BASELINE, 710), (BASELINE, 1710)]:
+            self.assertEqual(cells['Alien', config, seed].value, 'QUEUED')
+
+    def test_invalid_queue_line_reports_source_and_keeps_other_jobs(self):
+        self.export([])
+        Path('job_queue_3090.txt').write_text('\n'.join([
+            '# comment', 'python train.py "unterminated', self.queue_job(710, ['unknown']),
+            self.queue_job(1710, False),
+        ]))
+        with self.assertWarnsRegex(UserWarning, 'job_queue_3090.txt:2'):
+            cells = self.workbook_cells()
+        self.assertEqual(cells['Alien', BASELINE, 1710].value, 'QUEUED')
+        self.assertIsNone(cells['Alien', BASELINE, 710].value)
 
     def test_export_keeps_running_and_both_but_excludes_killed_and_finished_both(self):
         both = make_run('both', 5090, 'Both')

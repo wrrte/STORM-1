@@ -1,9 +1,15 @@
 import ast
+import fcntl
 import json
+import re
+import shlex
+import warnings
+from contextlib import ExitStack
 from copy import copy
 from pathlib import Path
 
 import pandas as pd
+import yaml
 from openpyxl.comments import Comment
 from openpyxl.styles import Alignment, Border, Side, Font, PatternFill
 from openpyxl.utils import get_column_letter
@@ -43,6 +49,139 @@ REFERENCE_SCORES = {
 PAIRED_MEAN_COLUMN = 'Mean (공통 시드)'
 SCORE_DELTA_COLUMN = 'Δ Score (행별 비교)'
 HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
+HERE = Path(__file__).resolve().parent
+RETRIEVAL_COLUMNS = {
+    'enable': 'Retrieval Enable', 'warmup_steps': 'Warmup Steps',
+    'target': 'Retrieval Target', 'batch_size_reduction': 'Batch Size Reduction',
+    'z_score_threshold': 'Z Score Threshold', 'anchor_weight': 'Anchor Weight',
+    'value_signal': 'Value Signal', 'score_combination': 'Score Combination',
+    'additive_z_score_threshold': 'Additive Z Score Threshold',
+    'hash_bits': 'Hash Bits', 'save_warmup': 'Save Warmup',
+}
+
+
+def queue_command_row(command, queue_dir):
+    """학습을 실행하지 않고 큐 명령의 YAML/CLI 설정을 CSV와 같은 열로 읽습니다."""
+    tokens = shlex.split(command, comments=True)
+    if not tokens:
+        return None
+    if any(token in {';', '&&', '||', '|', '&', '>', '>>', '<'} for token in tokens):
+        raise ValueError('복합 셸 명령은 지원하지 않습니다')
+    train_index = next((i for i, token in enumerate(tokens) if Path(token).name == 'train.py'), None)
+    if train_index is None:
+        raise ValueError('train.py 명령이 아닙니다')
+    args = {}
+    index = train_index + 1
+    while index < len(tokens):
+        key = tokens[index]
+        if key.startswith('-') and '=' in key:
+            key, item = key.split('=', 1)
+            index += 1
+        else:
+            if index + 1 == len(tokens):
+                raise ValueError(f'{key}: 값이 없습니다')
+            item = tokens[index + 1]
+            index += 2
+        args[key] = item
+
+    def local_path(raw):
+        path = Path(raw)
+        if not path.is_absolute():
+            return queue_dir / path
+        # 다른 worker의 절대 경로도 공유 저장소의 동일 파일로 조회합니다.
+        if not path.exists():
+            for root in ('ckpt', 'runs', 'config_files'):
+                if root in path.parts:
+                    return queue_dir.joinpath(*path.parts[path.parts.index(root):])
+        return path
+
+    metadata = {}
+    resume = args.get('--resume_warmup')
+    if resume:
+        checkpoint = local_path(resume)
+        locator = checkpoint / 'warmup.json'
+        if locator.is_file():
+            checkpoint /= json.loads(locator.read_text(encoding='utf-8'))['checkpoint']
+        metadata_path = checkpoint / 'warmup_metadata.json'
+        if metadata_path.is_file():
+            metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
+        config_path = checkpoint / 'config.yaml'
+    else:
+        config_path = local_path(args.get('-config_path', 'config_files/STORM.yaml'))
+
+    if config_path.is_file():
+        config = yaml.safe_load(config_path.read_text(encoding='utf-8'))
+        retrieval = dict(config['JointTrainAgent']['Retrieval'])
+    else:
+        # 원격 warmup의 baseline은 retrieval 설정 없이도 행을 확정할 수 있습니다.
+        mode = args.get('JointTrainAgent.Retrieval.enable', '')
+        if not resume or mode.strip().lower() not in {'false', "['baseline']", '["baseline"]'}:
+            raise ValueError(f'설정 파일을 찾을 수 없습니다: {config_path}')
+        retrieval = {}
+    prefix = 'JointTrainAgent.Retrieval.'
+    for key, item in args.items():
+        if key.startswith(prefix):
+            try:
+                item = ast.literal_eval(item)
+            except (ValueError, SyntaxError):
+                pass
+            retrieval[key[len(prefix):]] = item
+    if '--branch_experiment' in args:
+        retrieval['enable'] = [args['--branch_experiment']]
+    elif '--branch_mode' in args:
+        retrieval['enable'] = args['--branch_mode']
+    mode = retrieval.get('enable')
+    if isinstance(mode, list):
+        mode = [str(name).strip().lower() for name in mode]
+        if not mode or any(name not in {'baseline', 'retrieval', 'target1', 'value', 'add'} for name in mode):
+            raise ValueError(f'알 수 없는 Retrieval.enable 실험 목록: {mode}')
+        retrieval['enable'] = repr(mode)
+    elif str(mode).lower() not in {'true', 'false', 'both'}:
+        raise ValueError(f'알 수 없는 Retrieval.enable: {mode}')
+
+    base = args.get('-n', metadata.get('run_name', ''))
+    if not base and resume:
+        base = next((part[:-7] for part in Path(resume).parts if part.endswith('_Shared')), '')
+    env = args.get('-env_name', metadata.get('env_name', ''))
+    game = env.split('/')[-1].removesuffix('-v5') if env else base.split('-')[0]
+    seed = args.get('-seed', metadata.get('seed'))
+    if seed is None:
+        match = re.search(r'-(?:seed)?(\d+)$', base)
+        seed = match.group(1) if match else None
+    if not game or seed is None or not str(seed).isdigit():
+        raise ValueError('게임/시드를 읽을 수 없습니다')
+    return {
+        **{column: retrieval.get(key, 'N/A') for key, column in RETRIEVAL_COLUMNS.items()},
+        'Run Name': f'{game}_queued_{seed}', 'Seed': int(seed),
+        'State': 'queued', 'Eval Return': 'N/A',
+        'Created At': pd.Timestamp.now(tz='UTC').isoformat(),
+        'Calculated Warmup Steps': metadata.get('step', retrieval.get('warmup_steps', 'N/A')),
+    }
+
+
+def read_queued_runs(queue_dir):
+    """등록 이력 대신 현재 모든 job_queue*.txt의 스냅샷을 읽습니다."""
+    queue_dir = Path(queue_dir)
+    paths = sorted({*queue_dir.glob('job_queue_*.txt'), *queue_dir.glob('job_queue.txt')})
+    rows = []
+    for path in paths:
+        with ExitStack() as stack:
+            lock_path = path.with_suffix('.lock')
+            if lock_path.exists():
+                lock = stack.enter_context(lock_path.open('r'))
+                fcntl.flock(lock, fcntl.LOCK_SH)
+            lines = path.read_text(encoding='utf-8').splitlines()
+        for line_number, command in enumerate(lines, start=1):
+            source = f'{path.name}:{line_number}'
+            try:
+                row = queue_command_row(command, queue_dir)
+            except (ValueError, SyntaxError, KeyError, TypeError, OSError, yaml.YAMLError) as error:
+                warnings.warn(f'{source}: 큐 표시를 건너뜁니다: {error}', stacklevel=2)
+                continue
+            if row is not None:
+                row['Queue Details'] = f'{source}\n{command.strip()}'
+                rows.append(row)
+    return rows
 
 
 def expand_shared_runs(df):
@@ -72,7 +211,7 @@ def expand_shared_runs(df):
                 rows.extend({**row, **config} for config in pending_configs)
             continue
 
-        if row['State'] != 'running':
+        if row['State'] not in {'running', 'queued'}:
             continue
         for name in dict.fromkeys(experiments):
             if name not in overrides:
@@ -159,7 +298,7 @@ def mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells):
         font = copy(cell.font)
         font.bold = True
         # 실행 중/제외 시드의 배경색과 취소선을 보존하고 초록 테두리로 함께 표시합니다.
-        if 'RUNNING' not in str(cell.value) and not font.strike:
+        if not any(marker in str(cell.value) for marker in ('RUNNING', 'QUEUED')) and not font.strike:
             cell.fill = warmup_fill
             font.color = '006100'
         cell.font = font
@@ -170,6 +309,32 @@ def mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells):
             '초록색 테두리: 이 셀에 표시된 run 중 config 또는 실행 인자에서 '
             'JointTrainAgent.Retrieval.save_warmup=True인 run이 있습니다. '
             '자식 분기는 재저장을 방지하기 위해 최종 config가 False일 수 있습니다.'
+        )
+        if cell.comment:
+            cell.comment.text += '\n\n' + note
+        else:
+            cell.comment = Comment(note, 'STORM')
+
+
+def mark_queued_runs(worksheet, pivot_df, start_row, agg_df):
+    """대기 셀과 출처를 표시하며 실행 중 배경/제외 시드 취소선을 유지합니다."""
+    queued_fill = PatternFill(fill_type='solid', fgColor='DDEBF7')
+    for _, row in agg_df[agg_df['Queue Details'].ne('')].iterrows():
+        cell = worksheet.cell(
+            row=start_row + pivot_df.index.get_loc((row['Game'], row['Config'])),
+            column=pivot_df.columns.get_loc(row['Seed']) + 3,
+        )
+        font = copy(cell.font)
+        font.bold = True
+        if 'RUNNING' not in str(cell.value):
+            cell.fill = queued_fill
+            font.color = '1F4E78'
+        cell.font = font
+        note = (
+            'QUEUED (파란색): 엑셀 생성 시 현재 job queue에 남아 있는 예정 실험입니다. '
+            'RUNNING과 함께 있으면 실행 중을 뜻하는 노란색을 우선합니다. '
+            '기존 점수는 유지하며 대기 표시는 점수 집계에 포함하지 않습니다.\n\n'
+            + row['Queue Details']
         )
         if cell.comment:
             cell.comment.text += '\n\n' + note
@@ -223,10 +388,13 @@ def add_paired_baseline_mean(pivot_df, excluded_seeds):
     return pivot_df
 
 
-def main():
+def main(csv_path=None, output_path=None, queue_dir=None):
+    csv_path = Path(csv_path) if csv_path is not None else HERE / 'wandb_runs_classification.csv'
+    output_path = Path(output_path) if output_path is not None else HERE / 'converted_results.xlsx'
+    queue_dir = Path(queue_dir) if queue_dir is not None else HERE.parent
     excluded_seeds = load_excluded_seeds()
     # Load CSV
-    df = pd.read_csv('wandb_runs_classification.csv')
+    df = pd.read_csv(csv_path)
     if 'State' not in df:
         df['State'] = ''
     df['State'] = df['State'].fillna('').astype(str).str.strip().str.lower()
@@ -234,7 +402,8 @@ def main():
     # W&B에 누락된 수동 점수는 스케줄러와 같은 원본을 사용합니다.
     manual_path = Path(__file__).resolve().with_name('manual_results.json')
     manual_rows = json.loads(manual_path.read_text(encoding='utf-8'))
-    df = pd.concat([df, pd.DataFrame(manual_rows)], ignore_index=True)
+    queued_rows = read_queued_runs(queue_dir)
+    df = pd.concat([df, pd.DataFrame(manual_rows), pd.DataFrame(queued_rows)], ignore_index=True)
     df = expand_shared_runs(df)
 
     # Data extraction
@@ -370,6 +539,7 @@ def main():
             'Eval Return': eval_return,
             'Warmup Steps': calculated_warmup_steps,
             'Hash Bits': h_bits,
+            'Queue Details': config_value(row, 'Queue Details', ''),
             'Save Warmup': any(
                 str(row.get(column, '')).strip().lower() == 'true'
                 for column in ('Save Warmup', 'Save Warmup Requested')
@@ -379,10 +549,10 @@ def main():
 
     parsed_df = pd.DataFrame(data)
 
-    # 1. 실행 중인 run은 평가 점수가 없어도 유지합니다.
+    # 1. 실행 중/대기 중인 run은 평가 점수가 없어도 유지합니다.
     parsed_df['Eval Return'] = parsed_df['Eval Return'].astype(str)
     parsed_df = parsed_df[
-        parsed_df['State'].eq('running') | (
+        parsed_df['State'].isin(['running', 'queued']) | (
             (parsed_df['Eval Return'] != 'N/A') &
             (parsed_df['Eval Return'] != 'nan') &
             (parsed_df['Eval Return'].str.strip() != '')
@@ -395,6 +565,8 @@ def main():
     
     # 3. 동일한 시드에서 여러 결과가 있을 경우, 셀 하나에 여러 줄로 나열
     def aggregate_cell(group):
+        queued = group[group['State'].eq('queued')]
+        group = group[~group['State'].eq('queued')]
         # 점수와 강조 여부 모두 실제로 표시되는 run만 기준으로 계산합니다.
         is_hb_10 = group['Hash Bits'].apply(lambda x: str(x).strip() in ['10', '10.0'])
         if is_hb_10.any():
@@ -418,7 +590,9 @@ def main():
                 
             return str(val)
 
-        if len(group) == 1:
+        if group.empty:
+            value = ''
+        elif len(group) == 1:
             value = format_single_row(group.iloc[0])
         else:
             items = []
@@ -446,9 +620,14 @@ def main():
                     items.append(f"{val}")
             value = ", ".join(items)
 
+        # 점수 뒤에 붙여 첫 점수를 사용하는 평균/LaTeX 집계를 보존합니다.
+        if not queued.empty:
+            marker = 'QUEUED' if len(queued) == 1 else f'QUEUED ×{len(queued)}'
+            value = f'{value}, {marker}' if value else marker
         return pd.Series({
             'Final Eval Return': value,
-            'Save Warmup': group['Save Warmup'].any(),
+            'Save Warmup': group['Save Warmup'].any() or queued['Save Warmup'].any(),
+            'Queue Details': '\n\n'.join(queued['Queue Details']),
         })
 
     agg_df = parsed_df.groupby(['Game', 'Config', 'Seed']).apply(aggregate_cell, include_groups=False).reset_index()
@@ -508,8 +687,6 @@ def main():
     pivot_df = pivot_df.reindex(sorted_index)
     pivot_df = add_paired_baseline_mean(pivot_df, excluded_seeds)
 
-    output_path = 'converted_results.xlsx'
-    
     with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
         pivot_df.to_excel(writer, sheet_name='Results')
         
@@ -586,6 +763,7 @@ def main():
                     cell.font = Font(name=cell.font.name, size=16, bold=True, color='9C6500')
 
         mark_excluded_seeds(worksheet, pivot_df, start_row, excluded_seeds)
+        mark_queued_runs(worksheet, pivot_df, start_row, agg_df)
                     
         # 2. A, B열 내용에 맞게 열 너비 자동 맞춤
         for col_letter, col_idx in [('A', 1), ('B', 2)]:
@@ -624,6 +802,8 @@ def main():
         mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells)
 
     print(f"Successfully saved to {output_path}")
+    print(f"Current job queues: {len(queued_rows)} jobs, "
+          f"{agg_df['Queue Details'].ne('').sum()} queued experiment cells")
 
 if __name__ == '__main__':
     main()
