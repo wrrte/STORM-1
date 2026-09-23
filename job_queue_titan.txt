@@ -1,4 +1,1 @@
-python -u train.py --resume_warmup ckpt/Gopher-9997_Shared/shared_warmup_50444 -n Gopher-9997 -seed 9997 JointTrainAgent.Retrieval.enable "['baseline']"
-python -u train.py -n "Gopher-9995" -seed 9995 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-python -u train.py -n "Kangaroo-9999" -seed 9999 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
 python -u train.py -n "Gopher-9994" -seed 9994 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
