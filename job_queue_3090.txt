@@ -1,7 +1,1 @@
-python -u train.py -n "CrazyClimber-2000" -seed 2000 -config_path "config_files/STORM.yaml" -env_name "ALE/CrazyClimber-v5" -trajectory_path "CrazyClimber.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
-
-
-python -u train.py -n "KungFuMaster-2010" -seed 2010 -config_path "config_files/STORM.yaml" -env_name "ALE/KungFuMaster-v5" -trajectory_path "D_TRAJ/KungFuMaster.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-
-
 python -u train.py -n "CrazyClimber-2010" -seed 2010 -config_path "config_files/STORM.yaml" -env_name "ALE/CrazyClimber-v5" -trajectory_path "D_TRAJ/CrazyClimber.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
