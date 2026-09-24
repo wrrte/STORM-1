@@ -329,13 +329,14 @@ def push_load(slots, gpu, hours):
 
 
 def make_command(game, seed, kind, warmup='', *, names=None):
+    env_prefix = 'STORM_AMP_DTYPE=fp16 ' if game == 'Gopher' else ''
     if kind == 'baseline':
-        return (f'python -u train.py --resume_warmup {shlex.quote(warmup)} '
+        return (f'{env_prefix}python -u train.py --resume_warmup {shlex.quote(warmup)} '
                 f'-n {shlex.quote(f"{game}-{seed}")} -seed {seed} '
                 'JointTrainAgent.Retrieval.enable "[\'baseline\']"')
     names = list(MAIN_KINDS if names is None else names) if kind == 'paired' else ['retrieval']
     command = (
-        f'python -u train.py -n "{game}-{seed}" -seed {seed} '
+        f'{env_prefix}python -u train.py -n "{game}-{seed}" -seed {seed} '
         f'-config_path "config_files/STORM.yaml" -env_name "ALE/{game}-v5" '
         f'-trajectory_path "D_TRAJ/{game}.pkl" '
         f'JointTrainAgent.Retrieval.enable "{names}"'
