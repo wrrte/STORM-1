@@ -16,7 +16,9 @@ import pandas as pd
 import update_tex_ablation as updater
 
 
-GAMES = ['Frostbite', 'Gopher', 'Pong'] + [f'Game{i}' for i in range(23)]
+# Keep synthetic fixtures independent of the user's editable MAIN_GAMES.
+DISPLAY_GAMES = ['Frostbite', 'Gopher', 'Pong']
+GAMES = DISPLAY_GAMES + [f'Game{i}' for i in range(23)]
 METRICS = [r'\#Superhuman ($\uparrow$)', r'Mean ($\uparrow$)',
            r'Median ($\uparrow$)', r'IQM ($\uparrow$)', r'Optimality Gap ($\downarrow$)']
 MARKERS = [(updater.MAIN_BEGIN_MARKER, updater.MAIN_END_MARKER)] + [
@@ -93,7 +95,7 @@ class AblationUpdateTests(unittest.TestCase):
                            for game, scores in results.items()}
                       for key, results in self.results.items()}
 
-    def update(self, document=None, games=updater.MAIN_GAMES):
+    def update(self, document=None, games=DISPLAY_GAMES):
         document = self.document if document is None else document
         for key, ablation in updater.ABLATIONS.items():
             document = updater.update_ablation_table(document, self.results[key], ablation)
@@ -114,7 +116,7 @@ class AblationUpdateTests(unittest.TestCase):
         return main
 
     def test_partial_coverage_matches_all_appendix_cells_and_known_metrics(self):
-        main = self.assert_metric_parity(updater.MAIN_GAMES)
+        main = self.assert_metric_parity(DISPLAY_GAMES)
         expected = [('1', '1'), ('2.000', '1.500'), ('2.000', '1.500'),
                     ('1.500', '1.250'), ('0.000', '0.000')]
         for metric, values in zip(METRICS, expected):
@@ -122,7 +124,7 @@ class AblationUpdateTests(unittest.TestCase):
         self.assertEqual(main['Pong'], ['-'] * 6)
 
     def test_metrics_do_not_depend_on_display_games(self):
-        expected = self.assert_metric_parity(updater.MAIN_GAMES)
+        expected = self.assert_metric_parity(DISPLAY_GAMES)
         for games in ([], ['Gopher'], ['Pong', 'Frostbite'], list(reversed(GAMES))):
             with self.subTest(games=games):
                 actual = self.assert_metric_parity(games)
@@ -135,7 +137,7 @@ class AblationUpdateTests(unittest.TestCase):
             for game in GAMES:
                 self.results[key].setdefault(game, ([20.], [40.]))
                 self.seeds[key].setdefault(game, (0,))
-        self.assert_metric_parity(updater.MAIN_GAMES)
+        self.assert_metric_parity(DISPLAY_GAMES)
 
     def test_empty_comparison_has_dashes_without_hiding_other_comparisons(self):
         self.results['neighbor'] = {}
@@ -149,13 +151,13 @@ class AblationUpdateTests(unittest.TestCase):
         self.results['add'] = deepcopy(self.results['value'])
         self.results['add']['Frostbite'][1][0] += 50
         self.seeds['add'] = deepcopy(self.seeds['value'])
-        self.assert_metric_parity(updater.MAIN_GAMES, shared=True)
+        self.assert_metric_parity(DISPLAY_GAMES, shared=True)
 
     def test_same_scores_with_different_seed_ids_keep_separate_baselines(self):
         self.results['add'] = deepcopy(self.results['value'])
         self.seeds['add'] = deepcopy(self.seeds['value'])
         self.seeds['add']['Frostbite'] = (100, 101)
-        self.assert_metric_parity(updater.MAIN_GAMES)
+        self.assert_metric_parity(DISPLAY_GAMES)
 
     def test_edited_prose_headings_and_section_labels_are_preserved_exactly(self):
         document = self.document.replace('Introduction to be edited.', 'Rewritten intro.\n' * 30)
@@ -178,10 +180,11 @@ class AblationUpdateTests(unittest.TestCase):
         document = re.sub(block_pattern(*MARKERS[0]), '', self.document)
         document = document.replace('\\subsection{Ablation Studies}\n\\label{subsec:ablation_main}',
                                     '\\subsection{Edited title}\\label{subsec:ablation_main} % note')
-        updated = updater.update_main_ablation_table(document, self.results, self.seeds)
+        updated = updater.update_main_ablation_table(document, self.results, self.seeds, DISPLAY_GAMES)
         inserted = '\n' + re.search(block_pattern(*MARKERS[0]), updated).group() + '\n'
         self.assertEqual(updated.replace(inserted, '', 1), document)
-        self.assertEqual(updater.update_main_ablation_table(updated, self.results, self.seeds), updated)
+        self.assertEqual(
+            updater.update_main_ablation_table(updated, self.results, self.seeds, DISPLAY_GAMES), updated)
 
     def test_existing_unmarked_summary_is_not_duplicated(self):
         document = self.document.replace(updater.MAIN_BEGIN_MARKER, '').replace(

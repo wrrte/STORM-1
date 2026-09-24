@@ -113,8 +113,6 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
     missing_references = set(results) - set(games)
     if missing_references:
         raise ValueError(f"Games missing from the main table: {sorted(missing_references)}")
-    game_count = sum(game in results for game in games)
-    seed_count = sum(len(results[game][0]) for game in games if game in results)
 
     table = [
         r'\begin{table}[!htbp]',
@@ -124,7 +122,6 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
         r'Each game mean is computed over $N$ paired training seeds shared by '
         r'both variants. The number of training seeds can differ across ablations '
         r'and from Table~\ref{tab:main_performance}. '
-        f'The current comparison covers {game_count} games and {seed_count} seed pairs. '
         r'A dash indicates no paired results. Aggregate metrics summarize games with '
         r'paired results using the Random/Human references in Table~\ref{tab:main_performance}. '
         r'Mean, Median, and Optimality Gap use human-normalized game means; IQM pools '
@@ -272,10 +269,6 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
                     r'and scores; neighbor retrieval has a separate baseline. ')
     else:
         caption += r'Full FLASH is shown separately where paired seeds or scores differ. '
-    if any(len(results[key]) < ATARI_GAME_COUNT for key in ABLATIONS):
-        coverage = ', '.join(f'{ABLATIONS[key].variant_name}: {len(results[key])}/26'
-                             for key in ABLATIONS)
-        caption += f'Current game coverage: {coverage}. '
     caption += r'A dash indicates unavailable results.'
     table = [
         r'\begin{table}[!htbp]', r'\centering', r'\small',
