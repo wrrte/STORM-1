@@ -1,5 +1,3 @@
-python -u train.py -n "Freeway-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Freeway-v5" -trajectory_path "D_TRAJ/Freeway.pkl" JointTrainAgent.Retrieval.enable "['retrieval', 'baseline', 'target1', 'value', 'add']" JointTrainAgent.UseDemonstration True
-python -u train.py -n "Alien-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Alien-v5" -trajectory_path "D_TRAJ/Alien.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
 python -u train.py -n "Amidar-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Amidar-v5" -trajectory_path "D_TRAJ/Amidar.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
 python -u train.py -n "Assault-1" -seed 1 -config_path "config_files/STORM.yaml" -env_name "ALE/Assault-v5" -trajectory_path "D_TRAJ/Assault.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
 python -u train.py --resume_warmup ckpt/Jamesbond-1_Shared JointTrainAgent.Retrieval.enable "['target1', 'value', 'add']"

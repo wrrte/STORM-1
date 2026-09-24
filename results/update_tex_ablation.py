@@ -1,6 +1,6 @@
 """Update appendix ablations and a compact main-text summary from Excel seed scores.
 
-Usage: python STORM-1/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
+Usage: python STORM/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
        [--main-games Frostbite Gopher KungFuMaster]
 Edit MAIN_GAMES below to set the default game rows (in display order). The
 --main-games option overrides that list for one run; --main-games alone shows
@@ -9,10 +9,13 @@ Uses the same result loading, duplicate-result parsing, and aggregation as updat
 Each variant is paired independently with default FLASH on common training seeds.
 The main summary shares Full FLASH for value/add only when all paired seed IDs
 and baseline scores agree. Neighbor retrieval always keeps its own baseline.
-Main-summary metrics require all 26 games, regardless of the selected game rows.
-Until then they are dashes; appendix tables retain their available-game metrics.
+Main-summary metrics match the appendix's available-game metrics exactly,
+regardless of the selected game rows (including when fewer than 26 are available).
 Only the marked ablation tables are written; the main summary's markers are
-inserted in subsec:ablation_main on the first run. Main performance is untouched.
+inserted in subsec:ablation_main on the first run. Once installed, the markers
+locate the table independently of surrounding prose, headings, and section labels.
+Keep each marker pair around just its table and float barrier. Malformed or
+ambiguous blocks raise an error before saving. Main performance is untouched.
 Each table ends with a float barrier to keep it within its ablation subsection.
 The target document must load the placeins package.
 """
@@ -36,7 +39,7 @@ from update_tex import (
 
 FLASH_CONFIG = 'target: 16 (anchor 미설정)'
 # 본문에 표시할 게임을 원하는 순서로 지정하세요. CLI --main-games로도 변경 가능합니다.
-MAIN_GAMES = ['Frostbite', 'Gopher', 'Pong']
+MAIN_GAMES = ['Jamesbond', 'Gopher', 'Pong']
 ATARI_GAME_COUNT = 26
 MAIN_BEGIN_MARKER = '% BEGIN AUTO MAIN ABLATION'
 MAIN_END_MARKER = '% END AUTO MAIN ABLATION'
@@ -151,14 +154,48 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
 def update_ablation_table(document, results, ablation=NEIGHBOR):
     """Replace exactly one marked table while preserving all surrounding text."""
     lines = document.splitlines(keepends=True)
-    begins = [i for i, line in enumerate(lines) if line.strip() == ablation.begin_marker]
-    ends = [i for i, line in enumerate(lines) if line.strip() == ablation.end_marker]
-    if len(begins) != 1 or len(ends) != 1 or begins[0] >= ends[0]:
-        raise ValueError(
-            f'Expected exactly one ordered pair of {ablation.marker_name} ablation table markers.'
-        )
+    bounds = marked_table_bounds(lines, ablation.begin_marker, ablation.end_marker,
+                                 ablation.label)
+    if bounds is None:
+        raise ValueError(f'Missing {ablation.marker_name} ablation table markers.')
     table = render_ablation_table(lines, results, ablation)
-    return ''.join(lines[:begins[0] + 1]) + table + ''.join(lines[ends[0]:])
+    return replace_marked_table(lines, bounds, table)
+
+
+def tex_code(line):
+    """Ignore LaTeX comments when inspecting labels and section boundaries."""
+    return re.split(r'(?<!\\)%', line, maxsplit=1)[0]
+
+
+def marked_table_bounds(lines, begin_marker, end_marker, label):
+    """Reject ambiguous or oversized blocks before replacing any document text."""
+    begins = [i for i, line in enumerate(lines) if line.strip() == begin_marker]
+    ends = [i for i, line in enumerate(lines) if line.strip() == end_marker]
+    if not begins and not ends:
+        return None
+    if len(begins) != 1 or len(ends) != 1 or begins[0] >= ends[0]:
+        raise ValueError(f'Expected exactly one ordered pair of {begin_marker} markers.')
+    begin, end = begins[0], ends[0]
+    body = '\n'.join(tex_code(line) for line in lines[begin + 1:end])
+    label_text = rf'\label{{{label}}}'
+    if (not re.fullmatch(r'\s*\\begin\{table\}.*\\end\{table\}\s*'
+                         r'(?:\\FloatBarrier\s*)?', body, flags=re.DOTALL)
+            or body.count(r'\begin{table}') != 1
+            or body.count(r'\end{table}') != 1
+            or body.count(label_text) != 1
+            or sum(tex_code(line).count(label_text) for line in lines) != 1
+            or any(line.strip().startswith(('% BEGIN AUTO ', '% END AUTO '))
+                   for line in lines[begin + 1:end])):
+        raise ValueError(f'Markers for {label} must enclose only its single table '
+                         'and optional FloatBarrier, with a unique table label.')
+    return begin, end
+
+
+def replace_marked_table(lines, bounds, table):
+    begin, end = bounds
+    newline = '\r\n' if lines[begin].endswith('\r\n') else '\n'
+    return (''.join(lines[:begin + 1]) + table.replace('\n', newline)
+            + ''.join(lines[end:]))
 
 
 def shared_trigger_baseline(results, paired_seeds):
@@ -173,7 +210,7 @@ def shared_trigger_baseline(results, paired_seeds):
 
 
 def render_main_ablation_table(lines, results, paired_seeds, games):
-    """Select display rows only after calculating metrics on the full benchmark."""
+    """Use the same available-game cells as the appendix, then select display rows."""
     source_rows = main_table_rows(lines)
     references = {parts[0].strip(): parts for _, parts, _ in source_rows
                   if metric_name(parts[0]) is None}
@@ -193,7 +230,6 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         raise ValueError('--main-games must not contain duplicate games.')
 
     cells = {}
-    complete = {}
     for key in ABLATIONS:
         unknown_results = results[key].keys() - references.keys()
         if unknown_results:
@@ -205,7 +241,6 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         # Never pass the selected display games to the aggregation routine.
         cells[key] = {parts[0].strip(): parts
                       for _, parts, _ in main_table_rows(update_table(lines, results[key]))}
-        complete[key] = references.keys() == results[key].keys()
 
     shared = shared_trigger_baseline(results, paired_seeds)
     groups = [('Neighbor retrieval', [('neighbor', BASE_COLUMN, 'Full FLASH'),
@@ -228,7 +263,8 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         r'Ablations on STORM (Tables~\ref{tab:neighbor_retrieval_ablation}, '
         r'\ref{tab:value_signal_ablation}, and \ref{tab:score_combination_ablation}). '
         r'Game scores use the paired training seeds of each appendix comparison. '
-        r'Aggregate metrics use all 26 games, independently of the game rows shown; '
+        r'Aggregate metrics match the corresponding appendix tables and use all '
+        r'games with paired results for each comparison, independently of the game rows shown; '
         r'IQM pools per-seed human-normalized scores. '
     )
     if shared:
@@ -236,12 +272,10 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
                     r'and scores; neighbor retrieval has a separate baseline. ')
     else:
         caption += r'Full FLASH is shown separately where paired seeds or scores differ. '
-    if not all(complete.values()):
+    if any(len(results[key]) < ATARI_GAME_COUNT for key in ABLATIONS):
         coverage = ', '.join(f'{ABLATIONS[key].variant_name}: {len(results[key])}/26'
                              for key in ABLATIONS)
-        caption += (f'Current game coverage: {coverage}. '
-                    r'Aggregate metrics are withheld until all 26 games have paired '
-                    r'results for that comparison. ')
+        caption += f'Current game coverage: {coverage}. '
     caption += r'A dash indicates unavailable results.'
     table = [
         r'\begin{table}[!htbp]', r'\centering', r'\small',
@@ -263,11 +297,9 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
                   r'\midrule'])
     metrics = [parts[0].strip() for _, parts, _ in source_rows if metric_name(parts[0])]
     for label in [*games, *metrics]:
-        is_metric = metric_name(label) is not None
         if games and label == metrics[0]:
             table.append(r'\midrule')
         values = [cells[key][label][column].strip()
-                  if not is_metric or complete[key] else '-'
                   for key, column, _ in columns]
         table.append(' & '.join([label, *values]) + r' \\')
     table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}', r'\FloatBarrier'])
@@ -277,25 +309,28 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
 def update_main_ablation_table(document, results, paired_seeds, games=MAIN_GAMES):
     """Install or replace the generated block without changing the user's prose."""
     lines = document.splitlines(keepends=True)
+    bounds = marked_table_bounds(lines, MAIN_BEGIN_MARKER, MAIN_END_MARKER,
+                                 'tab:ablation_main')
+    if bounds is not None:
+        table = render_main_ablation_table(lines, results, paired_seeds, games)
+        return replace_marked_table(lines, bounds, table)
+
+    # Without markers, never append a second copy of an existing summary.
+    if any(r'\label{tab:ablation_main}' in tex_code(line) for line in lines):
+        raise ValueError('Existing tab:ablation_main is missing its AUTO MAIN ABLATION '
+                         'markers; restore them around the table before updating.')
     labels = [i for i, line in enumerate(lines)
-              if line.strip() == r'\label{subsec:ablation_main}']
+              for _ in re.finditer(re.escape(r'\label{subsec:ablation_main}'), tex_code(line))]
     if len(labels) != 1:
         raise ValueError('Expected exactly one \\label{subsec:ablation_main}.')
     start = labels[0] + 1
     stop = next((i for i in range(start, len(lines))
-                 if re.match(r'\s*\\(?:subsection|section|appendix)\b', lines[i])), len(lines))
-    begins = [i for i, line in enumerate(lines) if line.strip() == MAIN_BEGIN_MARKER]
-    ends = [i for i, line in enumerate(lines) if line.strip() == MAIN_END_MARKER]
-    if begins or ends:
-        if (len(begins) != 1 or len(ends) != 1
-                or not start <= begins[0] < ends[0] < stop):
-            raise ValueError('Expected exactly one ordered pair of MAIN ablation table '
-                             'markers inside subsec:ablation_main.')
+                 if re.match(r'\s*\\(?:subsection|section|appendix)\b|\s*\\end\{document\}',
+                             tex_code(lines[i]))), len(lines))
     table = render_main_ablation_table(lines, results, paired_seeds, games)
-    if begins:
-        return ''.join(lines[:begins[0] + 1]) + table + ''.join(lines[ends[0]:])
+    newline = '\r\n' if lines[labels[0]].endswith('\r\n') else '\n'
     block = MAIN_BEGIN_MARKER + '\n' + table + MAIN_END_MARKER + '\n\n'
-    return ''.join(lines[:stop]) + '\n' + block + ''.join(lines[stop:])
+    return ''.join(lines[:stop]) + newline + block.replace('\n', newline) + ''.join(lines[stop:])
 
 
 def main():
@@ -305,10 +340,11 @@ def main():
     parser.add_argument('--tex', type=Path, default=script_dir.parent.parent / 'iclr2027_conference.tex')
     parser.add_argument('--main-games', nargs='*', default=MAIN_GAMES, metavar='GAME',
                         help='Game rows in display order; overrides MAIN_GAMES for this run. '
-                             'Pass no names to show only the 26-game aggregate metrics.')
+                             'Pass no names to show only the appendix aggregate metrics.')
     args = parser.parse_args()
 
-    document = args.tex.read_text(encoding='utf-8')
+    with args.tex.open(encoding='utf-8', newline='') as source:
+        document = source.read()
     results, paired_seeds = {}, {}
     for key, ablation in ABLATIONS.items():
         results[key], paired_seeds[key] = load_results(
@@ -317,7 +353,8 @@ def main():
         )
         document = update_ablation_table(document, results[key], ablation)
     document = update_main_ablation_table(document, results, paired_seeds, args.main_games)
-    args.tex.write_text(document, encoding='utf-8')
+    with args.tex.open('w', encoding='utf-8', newline='') as destination:
+        destination.write(document)
     print(f'Successfully updated {args.tex} with appendix and main-text ablation results.')
 
 
