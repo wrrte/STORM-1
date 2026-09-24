@@ -7,7 +7,7 @@
   "max_new_jobs": null,
   "gpus": {
     "pro6k": {
-      "count": 2,
+      "count": 1,
       "warmup_hours": 1.5,
       "retrieval_hours": 3.0,
       "baseline_hours": 1.5,
@@ -23,7 +23,7 @@
       "seed_sequence": {"start": 2000, "step": 10}
     },
     "A6000": {
-      "count": 7,
+      "count": 6,
       "warmup_hours": 2.5,
       "retrieval_hours": 3.5,
       "baseline_hours": 2.5,
