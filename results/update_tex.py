@@ -240,8 +240,9 @@ def load_results(
     excel_path,
     configs=('Retrieval 미사용', 'target: 16 (anchor 미설정)'),
     method_names=('STORM', 'STORM+ours'),
+    include_seeds=False,
 ):
-    """Load paired raw scores for the two methods by training seed."""
+    """Load paired scores, optionally returning their training-seed IDs as well."""
     df = pd.read_excel(excel_path, sheet_name='Results', index_col=[0, 1])
     df = df.reset_index()
     
@@ -252,6 +253,7 @@ def load_results(
     
     games = df['Game'].unique()
     results = {}
+    paired_seeds = {}
     
     for game in games:
         game_df = df[df['Game'] == game]
@@ -281,12 +283,13 @@ def load_results(
             baseline_scores = [parse_val(c1[s]) for s in valid_seeds]
             ours_scores = [parse_val(c2[s]) for s in valid_seeds]
             results[game] = (baseline_scores, ours_scores)
+            paired_seeds[game] = tuple(int(str(s).strip()) for s in valid_seeds)
             print(
                 f"[{game}] Common seeds: {valid_seeds} -> "
                 f"{method_names[0]}: {format_val(np.mean(baseline_scores))}, "
                 f"{method_names[1]}: {format_val(np.mean(ours_scores))}"
             )
-    return results
+    return (results, paired_seeds) if include_seeds else results
 
 
 def main():

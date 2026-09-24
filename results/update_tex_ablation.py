@@ -1,20 +1,32 @@
-"""Update the neighbor, value, and additive ablation tables from Excel seed scores.
+"""Update appendix ablations and a compact main-text summary from Excel seed scores.
 
-Usage: python STORM/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
+Usage: python STORM-1/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
+       [--main-games Frostbite Gopher KungFuMaster]
+Edit MAIN_GAMES below to set the default game rows (in display order). The
+--main-games option overrides that list for one run; --main-games alone shows
+only metrics. Re-running regenerates the entire summary, including its layout.
 Uses the same result loading, duplicate-result parsing, and aggregation as update_tex.py.
 Each variant is paired independently with default FLASH on common training seeds.
-Only the marked ablation tables are written; main performance scores are untouched.
+The main summary shares Full FLASH for value/add only when all paired seed IDs
+and baseline scores agree. Neighbor retrieval always keeps its own baseline.
+Main-summary metrics require all 26 games, regardless of the selected game rows.
+Until then they are dashes; appendix tables retain their available-game metrics.
+Only the marked ablation tables are written; the main summary's markers are
+inserted in subsec:ablation_main on the first run. Main performance is untouched.
 Each table ends with a float barrier to keep it within its ablation subsection.
 The target document must load the placeins package.
 """
 
 import argparse
 from dataclasses import dataclass
+import math
 from pathlib import Path
+import re
 
 from update_tex import (
     BASE_COLUMN,
     OURS_COLUMN,
+    extract_float,
     load_results,
     main_table_rows,
     metric_name,
@@ -23,6 +35,11 @@ from update_tex import (
 
 
 FLASH_CONFIG = 'target: 16 (anchor 미설정)'
+# 본문에 표시할 게임을 원하는 순서로 지정하세요. CLI --main-games로도 변경 가능합니다.
+MAIN_GAMES = ['Frostbite', 'Gopher', 'Pong']
+ATARI_GAME_COUNT = 26
+MAIN_BEGIN_MARKER = '% BEGIN AUTO MAIN ABLATION'
+MAIN_END_MARKER = '% END AUTO MAIN ABLATION'
 
 
 @dataclass(frozen=True)
@@ -144,19 +161,164 @@ def update_ablation_table(document, results, ablation=NEIGHBOR):
     return ''.join(lines[:begins[0] + 1]) + table + ''.join(lines[ends[0]:])
 
 
+def shared_trigger_baseline(results, paired_seeds):
+    """Compare seed identities and unrounded scores across the entire benchmark."""
+    def signature(key):
+        return {
+            game: dict(zip(paired_seeds[key][game], scores[0], strict=True))
+            for game, scores in results[key].items()
+        }
+
+    return signature('value') == signature('add')
+
+
+def render_main_ablation_table(lines, results, paired_seeds, games):
+    """Select display rows only after calculating metrics on the full benchmark."""
+    source_rows = main_table_rows(lines)
+    references = {parts[0].strip(): parts for _, parts, _ in source_rows
+                  if metric_name(parts[0]) is None}
+    if len(references) != ATARI_GAME_COUNT:
+        raise ValueError(f'Main ablation summary requires {ATARI_GAME_COUNT} game references; '
+                         f'found {len(references)} in tab:main_performance.')
+    for game, parts in references.items():
+        random, human = (extract_float(parts[column]) for column in (1, 2))
+        if (random is None or human is None or not math.isfinite(random)
+                or not math.isfinite(human) or random == human):
+            raise ValueError(f'Invalid Random/Human references for {game}.')
+    unknown = set(games) - references.keys()
+    if unknown:
+        raise ValueError(f'Unknown --main-games entries: {sorted(unknown)}. '
+                         f'Choose from: {", ".join(references)}')
+    if len(games) != len(set(games)):
+        raise ValueError('--main-games must not contain duplicate games.')
+
+    cells = {}
+    complete = {}
+    for key in ABLATIONS:
+        unknown_results = results[key].keys() - references.keys()
+        if unknown_results:
+            raise ValueError(f'Games missing from the main table: {sorted(unknown_results)}')
+        for game, scores in results[key].items():
+            if (len(scores) != 2 or not scores[0] or len(scores[0]) != len(scores[1])
+                    or any(not math.isfinite(score) for method in scores for score in method)):
+                raise ValueError(f'Invalid paired scores for {key}: {game}.')
+        # Never pass the selected display games to the aggregation routine.
+        cells[key] = {parts[0].strip(): parts
+                      for _, parts, _ in main_table_rows(update_table(lines, results[key]))}
+        complete[key] = references.keys() == results[key].keys()
+
+    shared = shared_trigger_baseline(results, paired_seeds)
+    groups = [('Neighbor retrieval', [('neighbor', BASE_COLUMN, 'Full FLASH'),
+                                      ('neighbor', OURS_COLUMN, 'No neighbor')])]
+    if shared:
+        groups.append(('Value signal / Combination', [
+            ('value', BASE_COLUMN, 'Full FLASH'),
+            ('value', OURS_COLUMN, 'Absolute value'),
+            ('add', OURS_COLUMN, 'Additive'),
+        ]))
+    else:
+        groups.extend([
+            ('Value signal', [('value', BASE_COLUMN, 'Full FLASH'),
+                              ('value', OURS_COLUMN, 'Absolute value')]),
+            ('Combination', [('add', BASE_COLUMN, 'Full FLASH'),
+                             ('add', OURS_COLUMN, 'Additive')]),
+        ])
+    columns = [column for _, group in groups for column in group]
+    caption = (
+        r'Ablations on STORM (Tables~\ref{tab:neighbor_retrieval_ablation}, '
+        r'\ref{tab:value_signal_ablation}, and \ref{tab:score_combination_ablation}). '
+        r'Game scores use the paired training seeds of each appendix comparison. '
+        r'Aggregate metrics use all 26 games, independently of the game rows shown; '
+        r'IQM pools per-seed human-normalized scores. '
+    )
+    if shared:
+        caption += (r'Value and combination ablations share the same Full FLASH seeds '
+                    r'and scores; neighbor retrieval has a separate baseline. ')
+    else:
+        caption += r'Full FLASH is shown separately where paired seeds or scores differ. '
+    if not all(complete.values()):
+        coverage = ', '.join(f'{ABLATIONS[key].variant_name}: {len(results[key])}/26'
+                             for key in ABLATIONS)
+        caption += (f'Current game coverage: {coverage}. '
+                    r'Aggregate metrics are withheld until all 26 games have paired '
+                    r'results for that comparison. ')
+    caption += r'A dash indicates unavailable results.'
+    table = [
+        r'\begin{table}[!htbp]', r'\centering', r'\small',
+        r'\setlength{\tabcolsep}{3pt}',
+        r'\caption{' + caption + '}', r'\label{tab:ablation_main}',
+        r'\begin{tabular}{@{}l' + 'r' * len(columns) + r'@{}}', r'\toprule',
+        ' & ' + ' & '.join(rf'\multicolumn{{{len(group)}}}{{c}}{{{title}}}'
+                          for title, group in groups) + r' \\',
+    ]
+    offset = 2
+    rules = []
+    for _, group in groups:
+        rules.append(rf'\cmidrule(lr){{{offset}-{offset + len(group) - 1}}}')
+        offset += len(group)
+    headers = [r'\shortstack{' + name.replace(' ', r'\\') + '}'
+               for _, _, name in columns]
+    table.extend([' '.join(rules),
+                  'Game / Metric & ' + ' & '.join(headers) + r' \\',
+                  r'\midrule'])
+    metrics = [parts[0].strip() for _, parts, _ in source_rows if metric_name(parts[0])]
+    for label in [*games, *metrics]:
+        is_metric = metric_name(label) is not None
+        if games and label == metrics[0]:
+            table.append(r'\midrule')
+        values = [cells[key][label][column].strip()
+                  if not is_metric or complete[key] else '-'
+                  for key, column, _ in columns]
+        table.append(' & '.join([label, *values]) + r' \\')
+    table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}', r'\FloatBarrier'])
+    return '\n'.join(table) + '\n'
+
+
+def update_main_ablation_table(document, results, paired_seeds, games=MAIN_GAMES):
+    """Install or replace the generated block without changing the user's prose."""
+    lines = document.splitlines(keepends=True)
+    labels = [i for i, line in enumerate(lines)
+              if line.strip() == r'\label{subsec:ablation_main}']
+    if len(labels) != 1:
+        raise ValueError('Expected exactly one \\label{subsec:ablation_main}.')
+    start = labels[0] + 1
+    stop = next((i for i in range(start, len(lines))
+                 if re.match(r'\s*\\(?:subsection|section|appendix)\b', lines[i])), len(lines))
+    begins = [i for i, line in enumerate(lines) if line.strip() == MAIN_BEGIN_MARKER]
+    ends = [i for i, line in enumerate(lines) if line.strip() == MAIN_END_MARKER]
+    if begins or ends:
+        if (len(begins) != 1 or len(ends) != 1
+                or not start <= begins[0] < ends[0] < stop):
+            raise ValueError('Expected exactly one ordered pair of MAIN ablation table '
+                             'markers inside subsec:ablation_main.')
+    table = render_main_ablation_table(lines, results, paired_seeds, games)
+    if begins:
+        return ''.join(lines[:begins[0] + 1]) + table + ''.join(lines[ends[0]:])
+    block = MAIN_BEGIN_MARKER + '\n' + table + MAIN_END_MARKER + '\n\n'
+    return ''.join(lines[:stop]) + '\n' + block + ''.join(lines[stop:])
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     script_dir = Path(__file__).resolve().parent
     parser.add_argument('--excel', type=Path, default=script_dir / 'converted_results.xlsx')
     parser.add_argument('--tex', type=Path, default=script_dir.parent.parent / 'iclr2027_conference.tex')
+    parser.add_argument('--main-games', nargs='*', default=MAIN_GAMES, metavar='GAME',
+                        help='Game rows in display order; overrides MAIN_GAMES for this run. '
+                             'Pass no names to show only the 26-game aggregate metrics.')
     args = parser.parse_args()
 
     document = args.tex.read_text(encoding='utf-8')
-    for ablation in ABLATIONS.values():
-        results = load_results(args.excel, configs=ablation.configs, method_names=ablation.method_names)
-        document = update_ablation_table(document, results, ablation)
+    results, paired_seeds = {}, {}
+    for key, ablation in ABLATIONS.items():
+        results[key], paired_seeds[key] = load_results(
+            args.excel, configs=ablation.configs, method_names=ablation.method_names,
+            include_seeds=True,
+        )
+        document = update_ablation_table(document, results[key], ablation)
+    document = update_main_ablation_table(document, results, paired_seeds, args.main_games)
     args.tex.write_text(document, encoding='utf-8')
-    print(f'Successfully updated {args.tex} with neighbor, value, and additive ablation results.')
+    print(f'Successfully updated {args.tex} with appendix and main-text ablation results.')
 
 
 if __name__ == '__main__':
