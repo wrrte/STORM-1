@@ -321,6 +321,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             world_model.eval()
             agent.eval()
             with torch.no_grad():
+                current_obs_tensor = rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255
                 if len(context_action) == 0:
                     action = vec_env.action_space.sample()
                     current_latent_for_hash = None
@@ -335,12 +336,13 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                         agent_state,
                         greedy=False
                     )
+                    # Hash the same observation that is appended to replay below.
                     current_latent_for_hash = world_model.encode_obs(
-                        torch.cat(list(context_obs), dim=1)[:, -1:], 
+                        current_obs_tensor,
                         sample_mode=getattr(retrieval_config, "hash_sample_mode", "probs")
                     ).squeeze(1)
 
-            context_obs.append(rearrange(torch.Tensor(current_obs).cuda(), "B H W C -> B 1 C H W")/255)
+            context_obs.append(current_obs_tensor)
             context_action.append(action)
         else:
             action = vec_env.action_space.sample()
