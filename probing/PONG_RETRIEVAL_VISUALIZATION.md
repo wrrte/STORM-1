@@ -80,7 +80,9 @@ warmup 체크포인트에 과거 검색 이력이 없으므로 과거 학습 당
 | `point_event.png`, `point_event.pdf` | 득점 주변 연속 화면, action·reward, 득점 직후 화면, surprise·anchor 위치 |
 | `events/anchor/point_event.png`, `.pdf` | anchor를 t=0으로 한 t−2부터 t+6까지의 실제 연속 화면 |
 | `events/neighbor_01/point_event.png`, `.pdf` 등 | 각 neighbor의 t−2부터 t+6까지 실제 연속 화면. 번호는 검색 반환 순서이며 재정렬하지 않음 |
-| `all_point_events.png`, `.pdf` | anchor와 모든 neighbor를 행으로, 동일한 상대 시점을 열로 배치한 전체 비교표 |
+| `all_point_events.png` | anchor와 모든 neighbor를 행으로, 동일한 상대 시점을 열로 배치한 전체 비교표 |
+| `all_point_events.pdf` | 전체 행을 위·아래 절반으로 나누어 순서대로 넣은 2페이지 PDF |
+| `all_point_events_top.png`, `.pdf` / `all_point_events_bottom.png`, `.pdf` | 위·아래 절반을 별도 그림으로 저장한 파일 |
 | `point_events.npz`, `point_events.json` | 재배치에 사용할 실제 연속 프레임·action·reward·인덱스·유효성 mask와 메타데이터 |
 | `surprise_scores.png`, `surprise_scores.pdf` | 선택된 득점 이벤트 주변의 재계산 점수와 threshold |
 | `candidate_scores.csv` | 모든 후보의 인덱스·점수·TD error·value·z-score와 `trigger_passed`, 시퀀스 최대 점수·위치. CSV만 점수순 정렬이며 선택은 무작위 |
@@ -97,6 +99,10 @@ NPZ의 `next_obs_valid=False`로 기록합니다. 해당 NPZ의 0 배열을 실�
 ## 각 neighbor의 이후 화면 확인 후 선택해서 비교하기
 
 새 분석에서는 기본적으로 **모든 neighbor의 t+1, t+2, …, t+6**을 저장합니다.
+그림에서는 `t−2`, `t+4`, `t+5`를 생략해 기본적으로 **t−1, t+0, t+1, t+2, t+3, t+6**만 표시합니다.
+NPZ에는 생략한 시점도 그대로 저장하며, action·reward와 득점 표시는 실제 인접 시점을 기준으로 계산합니다.
+제목·행 이름은 13pt, action·reward 설명은 11pt로 표시하고, 추가 행 간격 20pt를 유지합니다.
+파란색 t=0 테두리는 4pt입니다.
 `events/anchor/point_event.png`, `events/neighbor_01/point_event.png`부터 확인하거나
 `all_point_events.png`에서 전체를 비교하세요. 기본 target 16이면 anchor 1개와 최대 neighbor 15개입니다.
 
@@ -128,6 +134,7 @@ python probing/pong_retrieval_events.py \
 ```
 
 `comparison.png`와 `comparison.pdf`는 `all_point_events.png`와 같은 배치입니다.
+비교 그림에서는 전체 제목 두 줄과 그 제목의 상단 여백을 제거합니다.
 각 행에서 시간은 왼쪽에서 오른쪽으로 진행하고, **anchor / neighbor 02 / neighbor 05 / neighbor 11**을
 위에서 아래로 배치합니다. 기본값이 `--layout rows`이므로 이 옵션은 생략해도 됩니다.
 이전에 사용한 명령에 `--layout columns`가 있다면 삭제하거나 `--layout rows`로 바꾸세요.
@@ -140,6 +147,30 @@ anchor는 항상 포함되며,
 처음 저장한 범위보다 더 긴 시간이 필요하면 원본 분석 디렉터리(`analysis.json`이 있는 곳)를
 `--analysis`로 지정하세요. 해당 checkpoint의 replay에서 같은 인덱스의 더 긴 구간을 읽습니다.
 원본 checkpoint가 이동했다면 `--checkpoint 새경로`를 추가하세요.
+
+## 같은 결과의 그림만 다시 저장하기
+
+열 표시·글자 크기·여백만 변경할 때는 `--redraw`를 사용하세요.
+저장된 `point_events.npz`와 `point_events.json`을 읽고, `selection.json`이 있으면
+그 파일의 선택 순서와 배치도 유지합니다. 기존 PNG/PDF만 다시 저장하며 모델·PCA·검색을 실행하지 않습니다.
+원본 프레임과 선택 인덱스는 그대로이므로 seed를 다시 지정할 필요가 없습니다.
+
+```bash
+python probing/pong_retrieval_events.py --analysis results/pong_retrieval_analysis_3 --redraw
+python probing/pong_retrieval_events.py --analysis results/pong_selected_events --redraw
+```
+
+첫 명령은 `all_point_events.png/pdf`와 개별 event 그림을, 둘째는 `comparison.png/pdf`를 갱신합니다.
+`all_point_events.pdf`는 위·아래 두 페이지로 저장되며, 각 절반의 별도 PNG/PDF도 함께 생성됩니다.
+위·아래 절반 그림과 2페이지 PDF 모두 전체 제목 두 줄과 해당 상단 여백을 제거합니다.
+anchor와 neighbor 15개인 경우 첫 페이지는 anchor와 neighbor 01~07,
+둘째 페이지는 neighbor 08~15입니다. 행 내부의 프레임이나 글자를 자르지 않습니다.
+`--redraw`에는 `--output`, `--neighbors`, 시점 범위, layout 등을 함께 지정하지 않습니다.
+해당 디렉터리에 프레임 아카이브가 있어야 하며, 과거 분석을 새로 실행하는 방식으로 대체하지 않습니다.
+
+PCA·점수·검색 자체를 다시 실행할 경우에는 `analysis.json`의 `seed`를 `--seed`에 지정할 수 있습니다.
+같은 seed라도 코드·장치·정밀도·batch-size 등이 달라지면 검색 결과가 달라질 수 있으므로,
+기존 결과의 시각화만 바꾸려는 경우에는 위의 저장 프레임 재사용 방식이 적합합니다.
 
 ## 선택 옵션
 

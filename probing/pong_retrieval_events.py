@@ -97,73 +97,118 @@ def frame_annotations(data, metadata, rank, column):
     return " / ".join(notes)
 
 
-def render_event_grid(data, metadata, output_stem, ranks, *, layout="rows", title=None):
-    """rows: horizontal timeline per trajectory; columns: trajectories side by side."""
+def render_event_grid(data, metadata, output_stem, ranks, *, layout="rows", title=None,
+                      formats=("png", "pdf"), pdf_pages=None):
+    """Render a grid; title="" removes the heading and its reserved top space."""
     import matplotlib
     matplotlib.use("Agg")
     import matplotlib.pyplot as plt
 
-    steps = len(data["offsets"])
+    # Hide columns only in the figure. Keep the complete archived sequence and
+    # original column indices for action/reward and AFTER POINT annotations.
+    display_columns = [(column, offset) for column, offset in enumerate(data["offsets"])
+                       if int(offset) not in {-2, 4, 5}]
+    if not display_columns:
+        raise ValueError("No visible time offsets remain")
+    steps = len(display_columns)
     columns = len(ranks) if layout == "columns" else steps
     rows = steps if layout == "columns" else len(ranks)
-    # Add two title-font heights between rows, with matching extra canvas height.
+    # Preserve the requested extra 20pt row gap and allow larger multiline text.
     # tight_layout's h_pad is expressed in units of the default font size.
     extra_row_gap_points = 20.0
-    figure_height = 2.35 * rows + .8 + max(0, rows - 1) * extra_row_gap_points / 72.
+    if title is None:
+        title = ("Actual replay trajectories | t=0: retrieved observation\n"
+                 "Actions and rewards belong to the outgoing transition from each image")
+    title_height = .85 if title else 0.
+    figure_height = 2.95 * rows + .15 + title_height + max(0, rows - 1) * extra_row_gap_points / 72.
     row_padding = 1.08 + extra_row_gap_points / float(plt.rcParams["font.size"])
     fig, axes = plt.subplots(rows, columns, figsize=(2.25 * columns + .7, figure_height), squeeze=False)
     labels = metadata.get("action_labels")
     for group, rank in enumerate(ranks):
         record = metadata["records"][rank]
         name = "Anchor" if rank == 0 else f"Neighbor {rank:02d}"
-        for column, offset in enumerate(data["offsets"]):
-            axis = axes[column, group] if layout == "columns" else axes[group, column]
+        for display_column, (column, offset) in enumerate(display_columns):
+            axis = axes[display_column, group] if layout == "columns" else axes[group, display_column]
             axis.set_xticks([])
             axis.set_yticks([])
             for spine in axis.spines.values():
                 spine.set_visible(False)
             frame_title = f"t{int(offset):+d}"
-            if layout == "columns" and column == 0:
+            if layout == "columns" and display_column == 0:
                 frame_title = f"{name} | env={record['env']}\n" + frame_title
-            elif layout == "rows" and column == 0:
-                axis.set_ylabel(f"{name}\nenv={record['env']}", fontsize=10)
+            elif layout == "rows" and display_column == 0:
+                axis.set_ylabel(f"{name}\nenv={record['env']}", fontsize=13)
             if not data["obs_valid"][rank, column]:
                 reason = str(data["missing_reason"][rank, column])
                 caption = "Outside saved replay" if reason.startswith("outside") else "Termination boundary"
                 axis.text(.5, .5, f"Unavailable\n{caption}", ha="center", va="center",
-                          fontsize=9, transform=axis.transAxes)
-                axis.set_title(frame_title, fontsize=10)
+                          fontsize=12, transform=axis.transAxes)
+                axis.set_title(frame_title, fontsize=13)
                 continue
             pointer = int(data["pointers"][rank, column])
             axis.imshow(data["obs"][rank, column], interpolation="nearest")
-            axis.set_title(f"{frame_title} | p={pointer}", fontsize=10)
+            axis.set_title(f"{frame_title} | p={pointer}", fontsize=13)
             action = int(data["actions"][rank, column])
             action_label = f" ({labels[action]})" if labels and 0 <= action < len(labels) else ""
             caption = (f"a={action}{action_label}, r={data['rewards'][rank, column]:+g}\n"
-                       + frame_annotations(data, metadata, rank, column))
-            axis.set_xlabel(caption, fontsize=8)
+                       + frame_annotations(data, metadata, rank, column).replace(" / ", "\n"))
+            axis.set_xlabel(caption, fontsize=11)
             if offset == 0:
                 for spine in axis.spines.values():
                     spine.set_visible(True)
                     spine.set_color("#276FBF")
-                    spine.set_linewidth(2)
-    fig.suptitle(title or "Actual replay trajectories | t=0: retrieved observation\n"
-                 "Actions and rewards belong to the outgoing transition from each image", fontsize=11)
-    fig.tight_layout(h_pad=row_padding, rect=(0, 0, 1, 1 - .65 / figure_height))
+                    spine.set_linewidth(4)
+    if title:
+        fig.suptitle(title, fontsize=14)
+    fig.tight_layout(h_pad=row_padding, rect=(0, 0, 1, 1 - title_height / figure_height))
     output_stem = Path(output_stem)
     output_stem.parent.mkdir(parents=True, exist_ok=True)
-    for extension in ("png", "pdf"):
-        fig.savefig(output_stem.with_suffix("." + extension), dpi=160, bbox_inches="tight")
+    export_padding = .1 if title else 0.
+    for extension in formats:
+        fig.savefig(output_stem.with_suffix("." + extension), dpi=160,
+                    bbox_inches="tight", pad_inches=export_padding)
+    if pdf_pages is not None:
+        pdf_pages.savefig(fig, dpi=160, bbox_inches="tight", pad_inches=export_padding)
     plt.close(fig)
 
 
-def save_all_point_events(data, metadata, output):
-    """Individual strips and one overview, with stable retrieval-order numbering."""
-    save_event_archive(data, metadata, output)
+def render_all_point_events(data, metadata, output):
+    """Full PNG overview, two-page PDF, and separate top/bottom panels."""
     for rank, name in enumerate(metadata["event_ids"]):
         render_event_grid(data, metadata, output / "events" / name / "point_event", [rank], layout="rows")
-    render_event_grid(data, metadata, output / "all_point_events",
-                      list(range(len(metadata["records"]))), layout="rows")
+    ranks = list(range(len(metadata["records"])))
+    render_event_grid(data, metadata, output / "all_point_events", ranks,
+                      layout="rows", formats=("png",))
+    # Split between complete trajectories, never through frames or captions.
+    # Keep original neighbor numbering, and show the anchor only in its own row.
+    from matplotlib.backends.backend_pdf import PdfPages
+    midpoint = (len(ranks) + 1) // 2
+    with PdfPages(output / "all_point_events.pdf") as pages:
+        for suffix, half in (("top", ranks[:midpoint]), ("bottom", ranks[midpoint:])):
+            if half:
+                render_event_grid(data, metadata, output / f"all_point_events_{suffix}",
+                                  half, layout="rows", title="", pdf_pages=pages)
+
+
+def save_all_point_events(data, metadata, output):
+    save_event_archive(data, metadata, output)
+    render_all_point_events(data, metadata, output)
+
+
+def redraw_saved_figures(analysis_dir):
+    """Redraw in place from cached frames and the exact previous selection."""
+    metadata = json.loads((analysis_dir / "point_events.json").read_text())
+    with np.load(analysis_dir / "point_events.npz", allow_pickle=False) as archive:
+        data = {name: archive[name] for name in archive.files}
+    selection_path = analysis_dir / "selection.json"
+    if selection_path.is_file():
+        selection = json.loads(selection_path.read_text())
+        ranks = [metadata["event_ids"].index(name) for name in selection["event_ids"]]
+        render_event_grid(data, metadata, analysis_dir / "comparison", ranks,
+                          layout=selection.get("layout", "rows"), title="")
+    else:
+        render_all_point_events(data, metadata, analysis_dir)
+    print(f"Redrew PNG/PDF figures from saved frames in {analysis_dir}; selection and archives retained")
 
 
 def load_saved_events(analysis_dir, past_steps, future_steps, checkpoint_override=None):
@@ -204,15 +249,28 @@ def load_saved_events(analysis_dir, past_steps, future_steps, checkpoint_overrid
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--analysis", type=Path, required=True, help="Existing analysis output directory")
-    parser.add_argument("--output", type=Path, required=True, help="New empty directory")
+    parser.add_argument("--output", type=Path, help="New empty directory (required unless --redraw)")
+    parser.add_argument("--redraw", action="store_true",
+                        help="Replace figures in --analysis using cached frames and its saved selection/layout")
     parser.add_argument("--neighbors", type=int, nargs="+", help="1-based neighbor IDs; anchor is always included")
-    parser.add_argument("--past-steps", type=int, default=2)
-    parser.add_argument("--future-steps", type=int, default=6)
-    parser.add_argument("--layout", choices=("rows", "columns"), default="rows",
+    parser.add_argument("--past-steps", type=int, default=None, help="Default: 2")
+    parser.add_argument("--future-steps", type=int, default=None, help="Default: 6")
+    parser.add_argument("--layout", choices=("rows", "columns"), default=None,
                         help="rows (default): horizontal timelines, matching all_point_events.png; "
                              "columns: vertical timelines side by side")
     parser.add_argument("--checkpoint", type=Path, help="Replay location if the original checkpoint was moved")
     args = parser.parse_args()
+    if args.redraw:
+        if any(value is not None for value in (args.output, args.neighbors, args.past_steps,
+                                               args.future_steps, args.layout, args.checkpoint)):
+            parser.error("--redraw takes only --analysis and preserves the saved selection and range")
+        redraw_saved_figures(args.analysis.resolve())
+        return
+    if args.output is None:
+        parser.error("--output is required unless --redraw is used")
+    args.past_steps = 2 if args.past_steps is None else args.past_steps
+    args.future_steps = 6 if args.future_steps is None else args.future_steps
+    args.layout = args.layout or "rows"
     if args.past_steps < 0 or args.future_steps < 1:
         parser.error("past-steps must be nonnegative and future-steps positive")
     if args.output.exists() and any(args.output.iterdir()):
@@ -230,7 +288,7 @@ def main():
         parser.error(f"Neighbor IDs must be between 1 and {maximum}")
     ranks = [0, *args.neighbors]
     save_event_archive(data, metadata, args.output)
-    render_event_grid(data, metadata, args.output / "comparison", ranks, layout=args.layout)
+    render_event_grid(data, metadata, args.output / "comparison", ranks, layout=args.layout, title="")
     selection = dict(source_analysis=str(args.analysis.resolve()),
                      event_ids=[metadata["event_ids"][rank] for rank in ranks],
                      records=[metadata["records"][rank] for rank in ranks],
