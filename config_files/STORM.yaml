@@ -38,7 +38,7 @@ JointTrainAgent:
     threshold: 1.0
     z_score_threshold: 3.5 # Used by score_combination: multiply
     additive_z_score_threshold: 4.0 # Used by score_combination: add
-    anchor_offset: -3 # Choose -1 (t-1) or -2 (t-2). action과 value 도출에 prior를 사용하므로 -2로 설정함 
+    anchor_offset: -2 # Signed offset from the surprise-score position t: -2 selects t-2.
     hash_bits: 10
     hash_sample_mode: "probs"
     use_pca: True
