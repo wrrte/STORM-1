@@ -1,0 +1,52 @@
+{
+  "source_analysis": "/home/choemj/STORM-1/results/pong_all_events",
+  "event_ids": [
+    "anchor",
+    "neighbor_06",
+    "neighbor_08"
+  ],
+  "records": [
+    {
+      "role": "anchor",
+      "pointer": 50868,
+      "env": 0,
+      "replay_position": 50868,
+      "approximate_env_step": 50868,
+      "action": 0,
+      "reward": 0.0,
+      "termination": false,
+      "weight": 0.0625,
+      "next_pointer": 50869,
+      "next_observation_unavailable": null
+    },
+    {
+      "role": "neighbor 6",
+      "pointer": 49181,
+      "env": 0,
+      "replay_position": 49181,
+      "approximate_env_step": 49181,
+      "action": 1,
+      "reward": 0.0,
+      "termination": false,
+      "weight": 0.0625,
+      "next_pointer": 49182,
+      "next_observation_unavailable": null
+    },
+    {
+      "role": "neighbor 8",
+      "pointer": 45717,
+      "env": 0,
+      "replay_position": 45717,
+      "approximate_env_step": 45717,
+      "action": 0,
+      "reward": 0.0,
+      "termination": false,
+      "weight": 0.0625,
+      "next_pointer": 45718,
+      "next_observation_unavailable": null
+    }
+  ],
+  "past_steps": 2,
+  "future_steps": 6,
+  "layout": "rows"
+}

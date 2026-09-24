@@ -5,16 +5,19 @@ Run from STORM-1 (see PONG_RETRIEVAL_VISUALIZATION.md)::
     python probing/visualize_pong_retrieval.py \
         --checkpoint ckpt/Pong-9999_Shared --output results/pong_retrieval
 
-The scores and retrieval are newly computed from a frozen checkpoint. They are
-not a reconstruction of historical training queries. Images come directly from
-the saved replay observations, not the world model's image decoder.
+The frozen checkpoint first undergoes a fresh PCA/global hash rebuild. Scores
+and retrieval are then computed without model updates. These are not historical
+training queries. Images come directly from saved replay observations, not the
+world model's image decoder.
 """
 
 import argparse
 import csv
 import json
 import random
+import secrets
 import sys
+import tempfile
 from collections import deque
 from pathlib import Path
 from types import SimpleNamespace
@@ -32,6 +35,7 @@ from agents import ActorCriticAgent
 from retrieval import RetrievalContextManager
 from sub_models.attention_blocks import get_subsequent_mask
 from sub_models.world_models import WorldModel
+from pong_retrieval_events import collect_point_events, save_all_point_events
 
 
 def parse_args():
@@ -39,12 +43,19 @@ def parse_args():
     parser.add_argument("--checkpoint", type=Path, required=True)
     parser.add_argument("--output", type=Path, required=True)
     parser.add_argument("--device", default="auto", help="auto, cpu, cuda, or cuda:N")
-    parser.add_argument("--seed", type=int, default=None)
+    parser.add_argument("--seed", type=int, default=None,
+                        help="Fix the analysis seed; omitted means a fresh random seed each run")
     parser.add_argument("--batch-size", type=int, default=8)
+    parser.add_argument("--rebuild-chunk-size", type=int, default=1024,
+                        help="Global rebuild encoding chunk size; defaults to train.py's 1024")
     parser.add_argument("--score-context-length", type=int, default=None,
                         help="Defaults to the saved BatchLength (64 for this checkpoint)")
     parser.add_argument("--post-score-steps", type=int, default=3,
                         help="Consider the positive-reward transition and this many subsequent transitions")
+    parser.add_argument("--past-steps", type=int, default=2,
+                        help="Saved frames before each retrieved observation in event plots")
+    parser.add_argument("--future-steps", type=int, default=6,
+                        help="Actual replay steps after each anchor/neighbor in event plots")
     parser.add_argument("--latent-mode", choices=("random_sample", "probs"), default="random_sample")
     parser.add_argument("--anchor-offset", type=int, default=None,
                         help="Defaults to saved offset; anchor = surprise transition + 1 + offset")
@@ -52,15 +63,23 @@ def parse_args():
                         help="Retrieved contexts INCLUDING anchor; defaults to checkpoint config")
     parser.add_argument("--multiplier", type=int, default=None)
     parser.add_argument("--min-score", type=float, default=None,
-                        help="Override the saved surprise trigger threshold for selection")
+                        help="Additional score floor; cannot relax the saved trigger threshold")
     parser.add_argument("--reward-pointer", type=int, default=None,
                         help="Restrict selection to this positive-reward replay pointer")
     parser.add_argument("--env-index", type=int, default=0)
     parser.add_argument("--action-labels", nargs="+", default=None,
                         help="Optional labels in action-ID order; otherwise show recorded numeric IDs")
     args = parser.parse_args()
+    if args.seed is not None and not 0 <= args.seed < 2**32:
+        parser.error("seed must be between 0 and 2**32 - 1")
+    if args.min_score is not None and not np.isfinite(args.min_score):
+        parser.error("min-score must be finite")
     if args.batch_size < 1 or args.post_score_steps < 0:
         parser.error("batch-size must be positive and post-score-steps nonnegative")
+    if args.rebuild_chunk_size < 1:
+        parser.error("rebuild-chunk-size must be positive")
+    if args.past_steps < 0 or args.future_steps < 1:
+        parser.error("past-steps must be nonnegative and future-steps positive")
     if args.target is not None and args.target < 2:
         parser.error("target must be at least 2 to display a neighbor")
     if args.multiplier is not None and args.multiplier < 1:
@@ -132,7 +151,6 @@ def load_analysis(args):
         if device.index is None:
             device = torch.device("cuda", torch.cuda.current_device())
         torch.cuda.set_device(device)
-    args.seed = metadata.get("seed", 0) if args.seed is None else args.seed
     seed_all(args.seed)
     # The local checkpoint contains FastHashBucket objects as well as tensors.
     state = torch.load(checkpoint / "training_state.pt", map_location="cpu", weights_only=False)
@@ -161,7 +179,7 @@ def load_analysis(args):
         model.eval().requires_grad_(False)
         model.use_amp = device.type == "cuda"
     retrieval_config = dict(config["JointTrainAgent"]["Retrieval"])
-    retrieval_config.update(enable=True, save_warmup=False,
+    retrieval_config.update(enable=True, save_warmup=False, use_pca=True,
                             context_length=config["JointTrainAgent"]["ImagineContextLength"])
     for key in ("anchor_offset", "target", "multiplier"):
         value = getattr(args, key)
@@ -169,7 +187,7 @@ def load_analysis(args):
             retrieval_config[key] = value
     manager = RetrievalContextManager(replay.num_envs, retrieval_config, latent_dim, device=str(device))
     if state.get("retrieval_state") is None:
-        raise ValueError("Checkpoint has no retrieval state; saved hash buckets and EMA statistics are required")
+        raise ValueError("Checkpoint has no retrieval state; saved EMA statistics are required")
     manager.load_state_dict(state["retrieval_state"])
     # Only the newly selected analysis query is submitted to retrieve_contexts.
     manager.active_anchors.clear()
@@ -177,10 +195,48 @@ def load_analysis(args):
     if not manager.context_length + 2 <= score_length <= wm_config["TransformerMaxLength"]:
         raise ValueError("score-context-length must be between ImagineContextLength + 2 and TransformerMaxLength")
     total_steps = int(state["total_steps"])
+    saved_last_rebuild_step = state.get("last_rebuild_step")
     del state  # Optimizer states are not loaded or used by this analysis.
     return SimpleNamespace(checkpoint=checkpoint, config=config, metadata=metadata, device=device,
                            replay=replay, world_model=world_model, agent=agent, manager=manager,
-                           score_length=score_length, total_steps=total_steps)
+                           score_length=score_length, total_steps=total_steps,
+                           saved_last_rebuild_step=saved_last_rebuild_step)
+
+
+@torch.inference_mode()
+def rebuild_for_analysis(ctx, args):
+    """Run the same PCA/global rebuild used immediately before warmup saving.
+
+    Operates on the in-memory analysis manager; no checkpoint files are written.
+    Candidate selection must follow this call so its anchor keys are fresh.
+    """
+    manager, replay = ctx.manager, ctx.replay
+    frames = replay.length * replay.num_envs
+    pca_samples = min(frames, manager.max_pca_samples)
+    if replay.length < manager.context_length or pca_samples <= manager.hash_bits:
+        raise ValueError("Replay/PCA sample count is too small for a fresh PCA global rebuild")
+    previous_projection = manager.hash_proj
+    seed_all(args.seed)
+    ctx.world_model.eval()
+    print(f"Rebuilding PCA and hash buckets from {frames} saved frames "
+          f"(chunk_size={args.rebuild_chunk_size})...", flush=True)
+    manager.rebuild_all_hash_buckets(replay, ctx.world_model, chunk_size=args.rebuild_chunk_size)
+    # The shared routine leaves the previous projection in place if PCA fails.
+    # Do not silently label such a fallback as a freshly fitted PCA analysis.
+    if manager.hash_proj is previous_projection or manager.hash_mean is None:
+        raise RuntimeError("Global rebuild did not produce a new PCA projection")
+    manager.active_anchors.clear()
+    return dict(
+        performed=True, use_pca=True,
+        method="RetrievalContextManager.rebuild_all_hash_buckets",
+        timing="before candidate scoring, anchor selection, and neighbor retrieval",
+        checkpoint_last_rebuild_step=ctx.saved_last_rebuild_step,
+        seed=args.seed, chunk_size=args.rebuild_chunk_size,
+        encoded_frames=frames, pca_samples=pca_samples,
+        hash_bits=manager.hash_bits, hash_sample_mode=manager.hash_sample_mode,
+        indexed_frames=len(manager.index_to_bucket), bucket_count=len(manager.hash_memory),
+        model_parameters_updated=False, ema_updated=False,
+    )
 
 
 def collect_candidates(ctx, args):
@@ -224,8 +280,9 @@ def collect_candidates(ctx, args):
 def score_candidates(ctx, args, candidates):
     """Use the value features from WorldModel.update, without calling update.
 
-    s is the scored transition. Input ends at s+1, so the last three values give
-    V[s-1], V[s], V[s+1]. The saved EMA is held fixed across all candidates.
+    s is the scored transition. Input ends at s+1. Evaluate every transition
+    after skip_len, just as add_batch_transitions does, and accept s only if it
+    is that sequence's argmax and meets the saved threshold. EMA remains fixed.
     """
     wm, manager, replay = ctx.world_model, ctx.manager, ctx.replay
     seed_all(args.seed)
@@ -242,17 +299,19 @@ def score_candidates(ctx, args, candidates):
             dist_feat = wm.storm_transformer(latent, actions, get_subsequent_mask(latent))
         # train_world_model_step also evaluates the critic outside the WM AMP block.
         values = ctx.agent.value(torch.cat([latent.float(), dist_feat.float()], dim=-1))
-        previous, current, following = values[:, -3], values[:, -2], values[:, -1]
-        reward = torch.tensor([replay.reward_buffer[r["surprise_pointer"], r["env"]] for r in batch],
-                              device=ctx.device)
-        done = torch.tensor([replay.termination_buffer[r["surprise_pointer"], r["env"]] for r in batch],
-                            device=ctx.device)
+        skip_len = manager.context_length
+        previous = values[:, skip_len - 1:-2]
+        current, following = values[:, skip_len:-1], values[:, skip_len + 1:]
+        rewards = np.stack([replay.reward_buffer[ix, row["env"]] for ix, row in zip(indexes, batch)])
+        terminations = np.stack([replay.termination_buffer[ix, row["env"]] for ix, row in zip(indexes, batch)])
+        reward = torch.from_numpy(rewards).to(ctx.device)[:, skip_len:-1]
+        done = torch.from_numpy(terminations).to(ctx.device)[:, skip_len:-1]
         td_error = (reward + ctx.agent.gamma * (1. - done) * following - current).abs()
         difference = current - previous
         signal = difference if manager.value_signal == "value_diff" else current
         envs = torch.tensor([r["env"] for r in batch], device=ctx.device)
-        z_td = manager._z_score(td_error[:, None], "td_error", envs).squeeze(1)
-        z_value = manager._z_score(signal[:, None], manager.value_signal, envs).squeeze(1)
+        z_td = manager._z_score(td_error, "td_error", envs)
+        z_value = manager._z_score(signal, manager.value_signal, envs)
         if manager.trigger_mode == "z_score":
             if manager.score_combination == "add":
                 scores = F.relu(z_td) + F.softplus(z_value)
@@ -264,34 +323,57 @@ def score_candidates(ctx, args, candidates):
                       value=current, value_next=following, value_diff=difference,
                       z_td=z_td, z_value_signal=z_value, reward_at_surprise=reward)
         for name, tensor in fields.items():
-            for row, value in zip(batch, tensor.float().cpu().tolist()):
+            for row, value in zip(batch, tensor[:, -1].float().cpu().tolist()):
                 row[name] = float(value)
+        # Match torch.max's first-index tie break in add_batch_transitions.
+        window_max, window_argmax = scores.max(dim=1)
+        saved_threshold = trigger_threshold(manager)
+        for row, peak, peak_index in zip(batch, window_max.float().cpu().tolist(),
+                                         window_argmax.cpu().tolist()):
+            first = row["surprise_position"] - ctx.score_length + 2
+            row["trigger_window_max_score"] = float(peak)
+            row["trigger_window_max_pointer"] = replay.pointer(first + skip_len + peak_index)
+            row["trigger_is_window_max"] = peak_index == scores.shape[1] - 1
+            row["trigger_threshold"] = float(saved_threshold)
+            row["trigger_passed"] = bool(row["trigger_is_window_max"]
+                                          and np.isfinite(row["score"])
+                                          and row["score"] >= saved_threshold)
         print(f"Scored {min(start + len(batch), len(candidates))}/{len(candidates)} candidates", flush=True)
 
 
-def selection_threshold(manager, args):
-    if args.min_score is not None:
-        return args.min_score
+def trigger_threshold(manager):
     if manager.trigger_mode != "z_score":
         return manager.threshold
     return manager.additive_z_score_threshold if manager.score_combination == "add" else manager.z_score_threshold
 
 
+def selection_threshold(manager, args):
+    saved_threshold = trigger_threshold(manager)
+    return saved_threshold if args.min_score is None else max(saved_threshold, args.min_score)
+
+
 @torch.inference_mode()
 def retrieve_one(ctx, args, candidates, threshold):
-    """Select the highest-scoring candidate that actually returns a neighbor."""
+    """Randomly try triggered anchors and keep the first with a real neighbor."""
     manager = ctx.manager
     target = int(manager.config.get("target", 5))
     multiplier = int(manager.config.get("multiplier", 5))
     max_contexts = int(manager.config.get("max_contexts", 256))
     if target < 2 or multiplier < 1 or max_contexts < 2:
         raise ValueError("Retrieval needs target >= 2, multiplier >= 1 and max_contexts >= 2")
+    # Deduplicate physical anchors so overlapping point windows cannot give a
+    # particular anchor multiple entries in the random selection pool.
+    unique_anchors = {}
+    for row in candidates:
+        if row["trigger_passed"] and np.isfinite(row["score"]) and row["score"] >= threshold:
+            unique_anchors.setdefault((row["anchor_pointer"], row["env"]), row)
+    eligible = list(unique_anchors.values())
+    random.Random(args.seed).shuffle(eligible)
+    # Seed retrieval once, not again for each attempted anchor. Bucket sampling
+    # then advances normally along this run's random stream.
+    seed_all(args.seed)
     attempts = []
-    for row in sorted(candidates, key=lambda item: item["score"], reverse=True):
-        if not np.isfinite(row["score"]) or row["score"] < threshold:
-            continue
-        # Isolate retrieval randomness from how many score batches were computed.
-        seed_all(args.seed)
+    for row in eligible:
         manager.active_anchors = deque([((row["anchor_pointer"], row["env"]), row["hash_key"])])
         result = manager.retrieve_contexts(
             ctx.replay, ctx.world_model, max_anchors=1, multiplier=multiplier,
@@ -302,8 +384,9 @@ def retrieve_one(ctx, args, candidates, threshold):
                              score=row["score"], contexts_returned=len(indices), hit_rate=hit_rate))
         if observations is not None and len(indices) >= 2:
             return row, indices, weights, dict(candidates_before_cap=before_cap,
-                lazy_hash_hit_rate=hit_rate, valid_anchors=valid_anchors, attempts=attempts)
-    return None, [], [], dict(attempts=attempts)
+                lazy_hash_hit_rate=hit_rate, valid_anchors=valid_anchors,
+                eligible_anchor_count=len(eligible), attempts=attempts)
+    return None, [], [], dict(eligible_anchor_count=len(eligible), attempts=attempts)
 
 
 def transition_record(ctx, pointer, env, role, weight=None):
@@ -373,7 +456,7 @@ def save_figures(ctx, args, selected, records, candidates, threshold):
             axes[row, 2].set_title(f"after recorded action | p={record['next_pointer']}", fontsize=10)
         for axis in axes[row]:
             axis.axis("off")
-    fig.suptitle(f"Pong: offline checkpoint retrieval | surprise={selected['score']:.3f}\n"
+    fig.suptitle(f"Pong: offline retrieval after PCA rebuild | surprise={selected['score']:.3f}\n"
                  f"reward p={selected['reward_pointer']} | surprise p={selected['surprise_pointer']} | "
                  f"anchor p={selected['anchor_pointer']}\n"
                  "Saved replay observation  ->  recorded action  ->  next replay observation", fontsize=11)
@@ -433,11 +516,16 @@ def main():
     args = parse_args()
     # Fail early for missing plotting dependencies, before expensive inference.
     import matplotlib  # noqa: F401
+    seed_source = "explicit --seed" if args.seed is not None else "fresh operating-system randomness"
+    if args.seed is None:
+        args.seed = secrets.randbits(32)
     args.output = args.output.resolve()
     if args.output.exists() and any(args.output.iterdir()):
-        raise FileExistsError(f"Choose an empty output directory: {args.output}")
+        args.output = Path(tempfile.mkdtemp(prefix=f"run_seed{args.seed}_", dir=args.output))
+    print(f"Analysis seed: {args.seed} ({seed_source})\nOutput: {args.output}", flush=True)
     ctx = load_analysis(args)
     args.output.mkdir(parents=True, exist_ok=True)
+    rebuild_info = rebuild_for_analysis(ctx, args)
     candidates = collect_candidates(ctx, args)
     if not candidates:
         raise RuntimeError("No positive-reward candidates with intact scoring/retrieval history were found")
@@ -451,11 +539,15 @@ def main():
     report = dict(
         provenance="offline checkpoint recomputation; not historical training retrieval",
         checkpoint=str(ctx.checkpoint), checkpoint_step=ctx.total_steps, seed=args.seed,
+        seed_source=seed_source, checkpoint_training_seed=ctx.metadata.get("seed"),
+        global_rebuild=rebuild_info,
         device=str(ctx.device), amp=ctx.world_model.use_amp, amp_dtype=str(ctx.world_model.amp_dtype),
         scoring_model_mode="eval", latent_mode=args.latent_mode, batch_size=args.batch_size,
         score_context_length=ctx.score_length, selection_threshold=threshold,
+        saved_trigger_threshold=trigger_threshold(ctx.manager), requested_min_score=args.min_score,
         post_score_steps=args.post_score_steps,
-        selection="highest-scoring eligible positive-reward candidate with at least one returned neighbor",
+        selection="random permutation of unique triggered anchors near positive reward; first with a returned neighbor",
+        trigger_condition="candidate is its sequence's first argmax after skip_len and score >= saved trigger threshold",
         score_definition={"td_error": "abs(r[s] + gamma * (1-done[s]) * V[s+1] - V[s])",
                           "value_diff": "V[s] - V[s-1]",
                           "z_score_multiply": "relu(z_td_error) * softplus(z_value_signal)",
@@ -467,7 +559,7 @@ def main():
              for mean, var in [ctx.manager.get_ema_stats(name)]},
         retrieval_config=dict(ctx.manager.config), saved_config=ctx.config,
         anchor_rule="anchor_pointer = surprise_pointer + 1 + anchor_offset (in replay chronology)",
-        retrieval_method="original retrieve_contexts: saved hash bucket, random candidates, lazy hash recheck, final cap",
+        retrieval_method="original retrieve_contexts: freshly PCA-rebuilt hash bucket, random candidates, lazy hash recheck, final cap",
         observation_source="saved uint8 replay observations (resized, frame-skipped/max-pooled); not raw ALE resolution",
         next_observation_policy="adjacent saved observation; unavailable at terminal/newest transition",
         candidate_count=len(candidates), selected=selected, retrieval=retrieval_info,
@@ -475,11 +567,21 @@ def main():
     )
     if selected is None:
         (args.output / "analysis.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
-        raise RuntimeError("No candidate above threshold returned a neighbor. See candidate_scores.csv and "
-                           "analysis.json; use a new output directory when changing --min-score or --multiplier")
+        raise RuntimeError("No triggered anchor returned a neighbor. See candidate_scores.csv and analysis.json. "
+                           "A new random run, a larger --post-score-steps, or a larger --multiplier may find one; "
+                           "the saved trigger condition is never relaxed.")
     report["transitions"] = save_raw_transitions(ctx, indices, weights, args.output)
+    event_data, event_metadata = collect_point_events(
+        ctx.replay, report["transitions"], selected, args.past_steps, args.future_steps)
+    event_metadata.update(checkpoint=str(ctx.checkpoint), action_labels=args.action_labels, seed=args.seed)
+    report["point_events"] = dict(
+        past_steps=args.past_steps, future_steps=args.future_steps,
+        archive="point_events.npz", metadata="point_events.json", overview="all_point_events.png",
+        alignment=event_metadata["alignment"],
+        images={name: f"events/{name}/point_event.png" for name in event_metadata["event_ids"]})
     (args.output / "analysis.json").write_text(json.dumps(report, indent=2), encoding="utf-8")
     save_figures(ctx, args, selected, report["transitions"], candidates, threshold)
+    save_all_point_events(event_data, event_metadata, args.output)
     print(f"Saved {len(indices)-1} neighbors and anchor to {args.output}")
     print(f"Positive reward p={selected['reward_pointer']}; surprise p={selected['surprise_pointer']} "
           f"score={selected['score']:.6g}; anchor p={selected['anchor_pointer']}")
