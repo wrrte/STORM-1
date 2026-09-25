@@ -71,7 +71,7 @@
     "Run Name": "Boxing_manual_2000_O",
     "Run ID": "manual:Boxing:retrieval:2000",
     "State": "finished",
-    "Seed": "2010",
+    "Seed": "2000",
     "Eval Return": "74.85",
     "Retrieval Enable": "True",
     "Warmup Steps": "50000",

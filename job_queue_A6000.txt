@@ -1,5 +1,1 @@
-
-
-python -u train.py -n "Jamesbond-6010" -seed 6010 -config_path "config_files/STORM.yaml" -env_name "ALE/Jamesbond-v5" -trajectory_path "D_TRAJ/Jamesbond.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True JointTrainAgent.SaveEverySteps 2500
-
 python -u train.py --resume_warmup ckpt/UpNDown-6030_Shared JointTrainAgent.Retrieval.enable "['target1', 'value', 'add']"
