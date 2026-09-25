@@ -1,1 +1,4 @@
-python -u train.py --resume_warmup ckpt/Jamesbond-1_Shared JointTrainAgent.Retrieval.enable "['target1', 'value', 'add']"
+python -u train.py --resume_warmup ckpt/Jamesbond-1_Shared JointTrainAgent.Retrieval.enable "['value']"
+python -u train.py --resume_warmup ckpt/Jamesbond-1_Shared JointTrainAgent.Retrieval.enable "['target1', 'add']"
+
+python -u train.py -n "Qbert-10" -seed 10 -config_path "config_files/STORM.yaml" -env_name "ALE/Qbert-v5" -trajectory_path "D_TRAJ/Qbert.pkl" JointTrainAgent.Retrieval.enable "['value', 'add']"
