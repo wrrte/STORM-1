@@ -1,8 +1,3 @@
-python -u train.py --resume_warmup ckpt/RoadRunner-6060_Shared JointTrainAgent.Retrieval.enable "['baseline']"
-python -u train.py --resume_warmup ckpt/RoadRunner-6030_Shared JointTrainAgent.Retrieval.enable "['add']"
-python -u train.py --resume_warmup ckpt/Kangaroo-6030_Shared JointTrainAgent.Retrieval.enable "['target1']"
-python -u train.py --resume_warmup ckpt/Krull-6050_Shared JointTrainAgent.Retrieval.enable "['add']"
-python -u train.py --resume_warmup ckpt/UpNDown-6030_Shared JointTrainAgent.Retrieval.enable "['target1', 'value', 'add']"
 python -u train.py --resume_warmup ckpt/CrazyClimber-6020_Shared JointTrainAgent.Retrieval.enable "['baseline', 'target1']"
 python -u train.py --resume_warmup ckpt/CrazyClimber-6020_Shared JointTrainAgent.Retrieval.enable "['value', 'add']"
 python -u train.py --resume_warmup ckpt/Qbert-6010_Shared JointTrainAgent.Retrieval.enable "['target1', 'value', 'add']"
