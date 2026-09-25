@@ -1,0 +1,1 @@
+python -u train.py --resume_warmup ckpt/Krull-2020_Shared JointTrainAgent.Retrieval.enable "['baseline']"
