@@ -59,6 +59,38 @@ class SchedulerTests(unittest.TestCase):
                               self.queues if queues is None else queues, state or {}, self.config,
                               self.references, excluded or {}, NOW, **kwargs)
 
+    def test_remote_resume_infers_game_and_seed_from_checkpoint_paths(self):
+        for path in (
+            'ckpt/Gopher-9997', 'ckpt/Gopher-9997_Shared',
+            '/remote/STORM/ckpt/Gopher-9997/shared_warmup_50012',
+            '/remote/STORM/ckpt/Gopher-9997_Shared/shared_warmup_50012',
+            'ckpt/Gopher-seed9997',
+        ):
+            with self.subTest(path=path):
+                command = (f'python train.py --resume_warmup={path} '
+                           'JointTrainAgent.Retrieval.enable "[\'retrieval\', \'baseline\']"')
+                parsed = scheduler.parse_command(command, 'titan')
+                self.assertEqual((parsed['game'], parsed['seed']), ('Gopher', 9997))
+                self.assertEqual(parsed['kinds'], ['baseline', 'retrieval'])
+                self.assertTrue(parsed['resume'])
+                self.assertTrue(parsed['warmup'].startswith('ckpt/'))
+        parsed = scheduler.parse_command(command + ' -env_name ALE/Alien-v5 -seed 710', 'titan')
+        self.assertEqual((parsed['game'], parsed['seed']), ('Alien', 710))
+        with self.assertRaisesRegex(ValueError, '게임/시드를 읽을 수 없습니다'):
+            scheduler.parse_command('python train.py --resume_warmup ckpt/unknown', 'titan')
+
+    def test_remote_resume_ablations_count_toward_gpu_workload(self):
+        self.config['gpus']['titan']['count'] = 1
+        queues = {**self.queues, 'titan': (
+            'python train.py --resume_warmup ckpt/Frostbite-9999 '
+            'JointTrainAgent.Retrieval.enable "[\'add\']"\n'
+            'python train.py --resume_warmup ckpt/Gopher-9997 '
+            'JointTrainAgent.Retrieval.enable "[\'target1\', \'value\', \'add\']"'
+        )}
+        _, report = self.plan(rows=[], queues=queues, fill_missing_seeds=False)
+        self.assertEqual(report['gpu_available_hours_before']['titan'], [12])
+        self.assertEqual(report['new_jobs'], [])
+
     def test_two_configs_only_and_old_baseline_is_preserved(self):
         self.assertEqual(row(1, 1, kind='baseline', **{'Created At': '2020-01-01Z'})['kind'], 'baseline')
         for override in ({'Created At': '2026-08-23T00:00:00Z'}, {'Retrieval Target': '1'},

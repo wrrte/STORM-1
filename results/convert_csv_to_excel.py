@@ -109,15 +109,15 @@ def queue_command_row(command, queue_dir):
     else:
         config_path = local_path(args.get('-config_path', 'config_files/STORM.yaml'))
 
-    if config_path.is_file():
-        config = yaml.safe_load(config_path.read_text(encoding='utf-8'))
-        retrieval = dict(config['JointTrainAgent']['Retrieval'])
-    else:
-        # 원격 warmup의 baseline은 retrieval 설정 없이도 행을 확정할 수 있습니다.
-        mode = args.get('JointTrainAgent.Retrieval.enable', '')
-        if not resume or mode.strip().lower() not in {'false', "['baseline']", '["baseline"]'}:
-            raise ValueError(f'설정 파일을 찾을 수 없습니다: {config_path}')
-        retrieval = {}
+    if resume and not config_path.is_file():
+        # 다른 GPU의 warmup은 정상 존재한다고 가정하고 기본 설정 + CLI로 표시합니다.
+        config_path = queue_dir / 'config_files/STORM.yaml'
+        if not config_path.is_file():
+            config_path = HERE.parent / 'config_files/STORM.yaml'
+    if not config_path.is_file():
+        raise ValueError(f'설정 파일을 찾을 수 없습니다: {config_path}')
+    config = yaml.safe_load(config_path.read_text(encoding='utf-8'))
+    retrieval = dict(config['JointTrainAgent']['Retrieval'])
     prefix = 'JointTrainAgent.Retrieval.'
     for key, item in args.items():
         if key.startswith(prefix):
@@ -141,7 +141,9 @@ def queue_command_row(command, queue_dir):
 
     base = args.get('-n', metadata.get('run_name', ''))
     if not base and resume:
-        base = next((part[:-7] for part in Path(resume).parts if part.endswith('_Shared')), '')
+        # Shared warmup과 일반 run 모두 지원하며 하위 checkpoint 경로도 읽습니다.
+        base = next((part.removesuffix('_Shared') for part in reversed(Path(resume).parts)
+                     if part.endswith('_Shared') or re.fullmatch(r'.+-(?:seed)?\d+', part)), '')
     env = args.get('-env_name', metadata.get('env_name', ''))
     game = env.split('/')[-1].removesuffix('-v5') if env else base.split('-')[0]
     seed = args.get('-seed', metadata.get('seed'))

@@ -205,6 +205,48 @@ class RunningRunsTests(unittest.TestCase):
         for config, seed in [('target: 1 (anchor 미설정)', 710), (BASELINE, 710), (BASELINE, 1710)]:
             self.assertEqual(cells['Alien', config, seed].value, 'QUEUED')
 
+    def test_remote_resume_marks_all_experiments_without_local_checkpoints(self):
+        self.export([])
+        paths = [
+            'ckpt/Alien-1710',
+            'ckpt/Alien-2710_Shared',
+            '/remote/STORM/ckpt/Alien-3710/shared_warmup_50012',
+            '/remote/STORM/ckpt/Alien-4710_Shared/shared_warmup_50012',
+            'ckpt/Alien-seed5710',
+        ]
+        Path('job_queue_titan.txt').write_text('\n'.join(
+            f'python train.py --resume_warmup={path} '
+            'JointTrainAgent.Retrieval.enable "[\'baseline\', \'retrieval\', '
+            '\'target1\', \'value\', \'add\']"'
+            for path in paths))
+        with patch.object(converter.warnings, 'warn') as warn:
+            cells = self.workbook_cells()
+        warn.assert_not_called()
+        for seed in (1710, 2710, 3710, 4710, 5710):
+            for config in (BASELINE, TARGET, 'target: 1 (anchor 미설정)',
+                           TARGET + ' [value]', TARGET + ' [add]'):
+                with self.subTest(seed=seed, config=config):
+                    self.assertEqual(cells['Alien', config, seed].value, 'QUEUED')
+                    self.assertIn('job_queue_titan.txt:', cells['Alien', config, seed].comment.text)
+
+    def test_remote_resume_uses_queue_defaults_and_cli_overrides(self):
+        config_path = Path('config_files/STORM.yaml')
+        config_path.parent.mkdir()
+        config = converter.yaml.safe_load(
+            (converter.HERE.parent / 'config_files/STORM.yaml').read_text())
+        config['JointTrainAgent']['Retrieval'].update(target=1, value_signal='value')
+        config_path.write_text(converter.yaml.safe_dump(config))
+        row = converter.queue_command_row(
+            'python train.py --resume_warmup ckpt/Alien-1710 '
+            'JointTrainAgent.Retrieval.target 16', Path.cwd())
+        self.assertEqual(row['Retrieval Enable'], 'Both')
+        self.assertEqual(row['Retrieval Target'], 16)
+        self.assertEqual(row['Value Signal'], 'value')
+        self.assertEqual(row['Warmup Steps'], 50000)
+        with self.assertRaisesRegex(ValueError, '설정 파일을 찾을 수 없습니다'):
+            converter.queue_command_row(
+                'python train.py -n Alien-1710 -config_path missing.yaml', Path.cwd())
+
     def test_invalid_queue_line_reports_source_and_keeps_other_jobs(self):
         self.export([])
         Path('job_queue_3090.txt').write_text('\n'.join([

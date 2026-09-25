@@ -82,5 +82,31 @@
     "Batch Size Reduction": "retrieved",
     "Z Score Threshold": "3.5",
     "Retrieval Target": "1"
+  },
+  {
+    "Run Name": "Kangaroo_manual_6020_X",
+    "Run ID": "manual:Kangaroo:baseline:6020",
+    "State": "finished",
+    "Seed": "6020",
+    "Eval Return": "1770.00",
+    "Retrieval Enable": "False",
+    "Warmup Steps": "N/A",
+    "Hash Bits": "N/A",
+    "Save Warmup": "False",
+    "Created At": "2026-08-11T04:36:35Z",
+    "Source": "manual"
+  },
+  {
+    "Run Name": "Kangaroo_manual_6040_X",
+    "Run ID": "manual:Kangaroo:baseline:6040",
+    "State": "finished",
+    "Seed": "6040",
+    "Eval Return": "1730.00",
+    "Retrieval Enable": "False",
+    "Warmup Steps": "N/A",
+    "Hash Bits": "N/A",
+    "Save Warmup": "False",
+    "Created At": "2026-08-11T04:36:35Z",
+    "Source": "manual"
   }
 ]

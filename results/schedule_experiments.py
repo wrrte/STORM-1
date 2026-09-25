@@ -19,6 +19,7 @@ from itertools import count, chain
 import math
 import os
 from pathlib import Path, PurePosixPath
+import re
 import shlex
 import statistics
 import sys
@@ -184,9 +185,11 @@ def parse_command(line, gpu):
     resume = args.get('--resume_warmup', '')
     base = args.get('-n', '')
     if not base and resume:
+        # 원격 GPU의 파일 존재 여부와 무관하게 경로의 게임/시드를 사용합니다.
         parts = PurePosixPath(resume).parts
-        base = next((p[:-7] for p in parts if p.endswith('_Shared')), '')
-    seed = number(args.get('-seed', base.rsplit('-', 1)[-1]))
+        base = next((part.removesuffix('_Shared') for part in reversed(parts)
+                     if part.endswith('_Shared') or re.fullmatch(r'.+-(?:seed)?\d+', part)), '')
+    seed = number(args.get('-seed', base.rsplit('-', 1)[-1].removeprefix('seed')))
     env = args.get('-env_name', '')
     game = env.split('/')[-1].removesuffix('-v5') if env else base.split('-')[0]
     if not game or seed is None or not seed.is_integer():
