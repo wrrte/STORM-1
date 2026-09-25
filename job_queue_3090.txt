@@ -1,1 +1,0 @@
-STORM_AMP_DTYPE=fp16 python -u train.py -n "Krull-2020" -seed 2020 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
