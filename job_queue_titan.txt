@@ -1,1 +1,3 @@
 python -u train.py -n "Gopher-9993" -seed 9993 -config_path "config_files/STORM.yaml" -env_name "ALE/Gopher-v5" -trajectory_path "D_TRAJ/Gopher.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+python -u train.py --resume_warmup ckpt/Frostbite-9999 JointTrainAgent.Retrieval.enable "['add']"
+python -u train.py --resume_warmup ckpt/Gopher-9997 JointTrainAgent.Retrieval.enable "['target1', 'value', 'add']"
