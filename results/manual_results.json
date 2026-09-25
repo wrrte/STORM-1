@@ -53,5 +53,34 @@
     "Batch Size Reduction": "retrieved",
     "Z Score Threshold": "3.5",
     "Retrieval Target": "16"
+  },
+  {
+    "Run Name": "Qbert_manual_6010_X",
+    "Run ID": "manual:Qbert:baseline:6010",
+    "State": "finished",
+    "Seed": "6010",
+    "Eval Return": "3401.25",
+    "Retrieval Enable": "False",
+    "Warmup Steps": "N/A",
+    "Hash Bits": "N/A",
+    "Save Warmup": "False",
+    "Created At": "2026-08-11T04:36:35Z",
+    "Source": "manual"
+  },
+  {
+    "Run Name": "Boxing_manual_2000_O",
+    "Run ID": "manual:Boxing:retrieval:2000",
+    "State": "finished",
+    "Seed": "2010",
+    "Eval Return": "74.85",
+    "Retrieval Enable": "True",
+    "Warmup Steps": "50000",
+    "Hash Bits": "10",
+    "Save Warmup": "False",
+    "Created At": "2026-09-11T04:36:35Z",
+    "Source": "manual",
+    "Batch Size Reduction": "retrieved",
+    "Z Score Threshold": "3.5",
+    "Retrieval Target": "1"
   }
 ]

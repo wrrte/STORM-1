@@ -18,7 +18,7 @@ EXCLUDED_SEEDS = {
     "Frostbite": {10},
     "BankHeist": {6020, 6030, 6040, 6050},
     "BattleZone": {2000, 6010},
-    "Boxing": {6000, 6030},
+    "Boxing": {10, 6000, 6030},
     "Breakout": {2, 6010},
     "CrazyClimber": {6000, 6040},
     "Freeway": {6030},
