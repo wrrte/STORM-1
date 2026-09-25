@@ -269,7 +269,6 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
                     r'and scores; neighbor retrieval has a separate baseline. ')
     else:
         caption += r'Full FLASH is shown separately where paired seeds or scores differ. '
-    caption += r'A dash indicates unavailable results.'
     table = [
         r'\begin{table}[!htbp]', r'\centering', r'\small',
         r'\setlength{\tabcolsep}{3pt}',
