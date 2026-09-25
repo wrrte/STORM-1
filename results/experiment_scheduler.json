@@ -7,7 +7,7 @@
   "max_new_jobs": null,
   "gpus": {
     "pro6k": {
-      "count": 1,
+      "count": 2,
       "warmup_hours": 1.5,
       "retrieval_hours": 3.0,
       "baseline_hours": 1.5,
