@@ -10,6 +10,7 @@ import subprocess
 import sys
 import tempfile
 import unittest
+from unittest import mock
 
 import pandas as pd
 
@@ -71,6 +72,29 @@ def outside_tables(document):
 
 
 def table_rows(table):
+    # Read physical variant rows, then expose game/metric cells for comparison
+    # with the appendix. Split only the final row terminator: shortstack headers
+    # contain their own LaTeX line breaks.
+    if r'\label{tab:ablation_main}' in table:
+        headers = None
+        values = []
+        for line in table.splitlines():
+            if '&' not in line or line.lstrip().startswith('%'):
+                continue
+            cells = [cell.strip() for cell in line.rsplit(r'\\', 1)[0].split('&')]
+            if cells[0] == 'Variant':
+                headers = [
+                    cell.removeprefix(r'\shortstack{').removesuffix('}').replace(r'\\', ' ')
+                    if cell.startswith(r'\shortstack{') else cell
+                    for cell in cells[1:]
+                ]
+            else:
+                if headers is None or len(cells) != len(headers) + 1:
+                    raise AssertionError(f'Malformed transposed row: {line}')
+                values.append(cells[1:])
+        if headers is None or not values:
+            raise AssertionError('Missing transposed ablation header or variants')
+        return dict(zip(headers, map(list, zip(*values))))
     rows = {}
     for line in table.splitlines():
         if '&' in line and not line.lstrip().startswith('%'):
@@ -97,9 +121,7 @@ class AblationUpdateTests(unittest.TestCase):
 
     def update(self, document=None, games=DISPLAY_GAMES):
         document = self.document if document is None else document
-        for key, ablation in updater.ABLATIONS.items():
-            document = updater.update_ablation_table(document, self.results[key], ablation)
-        return updater.update_main_ablation_table(document, self.results, self.seeds, games)
+        return updater.update_ablation_tables(document, self.results, self.seeds, games)
 
     def assert_metric_parity(self, games, shared=False):
         lines = self.document.splitlines(keepends=True)
@@ -114,6 +136,32 @@ class AblationUpdateTests(unittest.TestCase):
             self.assertEqual(main[label], expected, label)
         self.assertEqual(lines, original_lines, 'Reference performance table was mutated')
         return main
+
+    def test_main_layout_has_variant_rows_and_game_metric_columns(self):
+        table = updater.render_main_ablation_table(
+            self.document.splitlines(keepends=True), self.results, self.seeds, DISPLAY_GAMES)
+        self.assertIn(r'\begin{tabular}{@{}lrrrrrrrr@{}}', table)
+        self.assertIn('Variant & Frostbite & Gopher & Pong & ', table)
+        self.assertIn(r'\shortstack{Optimality\\Gap\\($\downarrow$)}', table)
+        self.assertIn(r'\resizebox{\linewidth}{!}{%', table)
+        for title in ('Neighbor retrieval', 'Value signal', 'Combination'):
+            self.assertIn(r'\multicolumn{9}{@{}l}{\textit{' + title + '}}', table)
+        rows = [line for line in table.splitlines()
+                if '&' in line and not line.startswith('Variant &')]
+        self.assertEqual([line.split('&', 1)[0].strip() for line in rows],
+                         ['Full FLASH', 'No neighbor', 'Full FLASH', 'Absolute value',
+                          'Full FLASH', 'Additive'])
+        self.assertTrue(all(line.count('&') == 8 for line in rows))
+
+    def test_all_tables_reuse_one_calculation_per_comparison(self):
+        with mock.patch.object(updater, 'update_table', wraps=updater.update_table) as calculate:
+            updated = self.update()
+        self.assertEqual(calculate.call_count, 3)
+        main = table_rows(re.search(block_pattern(*MARKERS[0]), updated).group())
+        for index, markers in enumerate(MARKERS[1:]):
+            appendix = table_rows(re.search(block_pattern(*markers), updated).group())
+            for label in [*DISPLAY_GAMES, *METRICS]:
+                self.assertEqual(main[label][2 * index:2 * index + 2], appendix[label][1:])
 
     def test_partial_coverage_matches_all_appendix_cells_and_known_metrics(self):
         main = self.assert_metric_parity(DISPLAY_GAMES)
@@ -147,7 +195,7 @@ class AblationUpdateTests(unittest.TestCase):
             self.assertEqual(main[metric][:2], ['-', '-'])
             self.assertNotIn('-', main[metric][2:])
 
-    def test_identical_baselines_share_columns(self):
+    def test_identical_baselines_share_rows(self):
         self.results['add'] = deepcopy(self.results['value'])
         self.results['add']['Frostbite'][1][0] += 50
         self.seeds['add'] = deepcopy(self.seeds['value'])

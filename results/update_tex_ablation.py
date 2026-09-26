@@ -11,6 +11,8 @@ The main summary shares Full FLASH for value/add only when all paired seed IDs
 and baseline scores agree. Neighbor retrieval always keeps its own baseline.
 Main-summary metrics match the appendix's available-game metrics exactly,
 regardless of the selected game rows (including when fewer than 26 are available).
+Bold marks the best displayed score within each comparison group (including ties),
+with lower scores preferred only for Optimality Gap.
 Only the marked ablation tables are written; the main summary's markers are
 inserted in subsec:ablation_main on the first run. Once installed, the markers
 locate the table independently of surrounding prose, headings, and section labels.
@@ -39,7 +41,7 @@ from update_tex import (
 
 FLASH_CONFIG = 'target: 16 (anchor 미설정)'
 # 본문에 표시할 게임을 원하는 순서로 지정하세요. CLI --main-games로도 변경 가능합니다.
-MAIN_GAMES = ['Jamesbond', 'Gopher', 'Pong']
+MAIN_GAMES = ['Alien', 'Assault', 'BankHeist', 'ChopperCommand', 'CrazyClimber', 'Gopher', 'Jamesbond', 'MsPacman', 'Pong', 'Qbert']
 ATARI_GAME_COUNT = 26
 MAIN_BEGIN_MARKER = '% BEGIN AUTO MAIN ABLATION'
 MAIN_END_MARKER = '% END AUTO MAIN ABLATION'
@@ -104,6 +106,17 @@ BEGIN_MARKER = NEIGHBOR.begin_marker
 END_MARKER = NEIGHBOR.end_marker
 
 
+def bold_best_scores(label, cells):
+    """Highlight displayed maxima (minima for Optimality Gap), including ties."""
+    values = [extract_float(cell) for cell in cells]
+    available = [value for value in values if value is not None]
+    if not available:
+        return cells
+    best = (min if metric_name(label) == 'Optimality Gap' else max)(available)
+    return [rf'\textbf{{{cell}}}' if value == best else cell
+            for cell, value in zip(cells, values)]
+
+
 def render_ablation_table(lines, results, ablation=NEIGHBOR):
     # Reuse the main-table calculation in memory for identical normalization,
     # rounding, and pooled per-seed IQM. Project only the two score columns.
@@ -125,7 +138,9 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
         r'A dash indicates no paired results. Aggregate metrics summarize games with '
         r'paired results using the Random/Human references in Table~\ref{tab:main_performance}. '
         r'Mean, Median, and Optimality Gap use human-normalized game means; IQM pools '
-        r'the unrounded per-seed human-normalized scores.}',
+        r'the unrounded per-seed human-normalized scores. '
+        r'Bold indicates the best score in each pair (lower for Optimality Gap), '
+        r'including ties.}',
         rf'\label{{{ablation.label}}}',
         r'\begin{tabular}{lrrr}',
         r'\toprule',
@@ -140,8 +155,8 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
             table.append(r'\midrule')
             metrics_started = True
         count = '' if is_metric else str(len(results[label][0]) if label in results else 0)
-        full = parts[BASE_COLUMN].strip()
-        variant = parts[OURS_COLUMN].strip()
+        full, variant = bold_best_scores(label, [parts[BASE_COLUMN].strip(),
+                                                parts[OURS_COLUMN].strip()])
         table.append(f'{label} & {count} & {full} & {variant} ' + r'\\')
     # Flush the table before the next subsection or Extended Related Work.
     table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}', r'\FloatBarrier'])
@@ -269,6 +284,8 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
                     r'and scores; neighbor retrieval has a separate baseline. ')
     else:
         caption += r'Full FLASH is shown separately where paired seeds or scores differ. '
+    caption += (r'Bold indicates the best score within each comparison group '
+                r'(lower for Optimality Gap), including ties.')
     table = [
         r'\begin{table}[!htbp]', r'\centering', r'\small',
         r'\setlength{\tabcolsep}{3pt}',
@@ -291,8 +308,9 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
     for label in [*games, *metrics]:
         if games and label == metrics[0]:
             table.append(r'\midrule')
-        values = [cells[key][label][column].strip()
-                  for key, column, _ in columns]
+        values = [value for _, group in groups
+                  for value in bold_best_scores(label, [cells[key][label][column].strip()
+                                                        for key, column, _ in group])]
         table.append(' & '.join([label, *values]) + r' \\')
     table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}', r'\FloatBarrier'])
     return '\n'.join(table) + '\n'
