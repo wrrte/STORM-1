@@ -132,8 +132,7 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
         r'\centering',
         r'\small',
         r'\caption{' + ablation.caption +
-        r'Each game mean is computed over $N$ paired training seeds shared by '
-        r'both variants. The number of training seeds can differ across ablations '
+        r'The number of training seeds can differ across ablations '
         r'and from Table~\ref{tab:main_performance}. '
         r'A dash indicates no paired results. Aggregate metrics summarize games with '
         r'paired results using the Random/Human references in Table~\ref{tab:main_performance}. '
@@ -142,9 +141,9 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
         r'Bold indicates the best score in each pair (lower for Optimality Gap), '
         r'including ties.}',
         rf'\label{{{ablation.label}}}',
-        r'\begin{tabular}{lrrr}',
+        r'\begin{tabular}{lrr}',
         r'\toprule',
-        f'Game & $N$ & {ablation.method_names[0]} & {ablation.method_names[1]} ' + r'\\',
+        f'Game & {ablation.method_names[0]} & {ablation.method_names[1]} ' + r'\\',
         r'\midrule',
     ]
     metrics_started = False
@@ -154,10 +153,9 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
         if is_metric and not metrics_started:
             table.append(r'\midrule')
             metrics_started = True
-        count = '' if is_metric else str(len(results[label][0]) if label in results else 0)
         full, variant = bold_best_scores(label, [parts[BASE_COLUMN].strip(),
                                                 parts[OURS_COLUMN].strip()])
-        table.append(f'{label} & {count} & {full} & {variant} ' + r'\\')
+        table.append(f'{label} & {full} & {variant} ' + r'\\')
     # Flush the table before the next subsection or Extended Related Work.
     table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}', r'\FloatBarrier'])
     return '\n'.join(table) + '\n'
