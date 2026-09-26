@@ -41,7 +41,21 @@ from update_tex import (
 
 FLASH_CONFIG = 'target: 16 (anchor 미설정)'
 # 본문에 표시할 게임을 원하는 순서로 지정하세요. CLI --main-games로도 변경 가능합니다.
-MAIN_GAMES = ['Alien', 'Assault', 'BankHeist', 'ChopperCommand', 'CrazyClimber', 'Gopher', 'Jamesbond', 'MsPacman', 'Pong', 'Qbert']
+# Current selections use two HNS changes per direction and one percentage change;
+# an overlapping percentage choice is replaced by the third HNS change.
+MAIN_GAMES = [
+    'Assault',
+    'BankHeist',
+    'Boxing',
+    'ChopperCommand',
+    'Gopher',
+    'Kangaroo',
+    'Krull',
+    'KungFuMaster',
+    'MsPacman',
+    'Pong',
+    'PrivateEye',
+]
 ATARI_GAME_COUNT = 26
 MAIN_BEGIN_MARKER = '% BEGIN AUTO MAIN ABLATION'
 MAIN_END_MARKER = '% END AUTO MAIN ABLATION'
