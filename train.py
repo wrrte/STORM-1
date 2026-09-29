@@ -17,7 +17,7 @@ import shutil
 import pickle
 import os
 
-from utils import seed_np_torch, Logger, load_config
+from utils import seed_np_torch, Logger, load_config, configure_performance
 from replay_buffer import ReplayBuffer
 import env_wrapper
 import agents
@@ -631,6 +631,7 @@ if __name__ == "__main__":
         launch_storm_warmup_followup(args, extra_args, __file__, load_config)
     conf = load_config(args.config_path)
     branch_commands = configure_storm_retrieval_run(conf, args, extra_args, __file__)
+    configure_performance(conf)
     print(colorama.Fore.RED + str(args) + " extra: " + str(extra_args) + colorama.Style.RESET_ALL)
 
     # # EvalMode가 active인 경우 결정론적(deterministic) 환경 강제 설정
@@ -667,7 +668,8 @@ if __name__ == "__main__":
             num_envs=conf.JointTrainAgent.NumEnvs,
             max_length=conf.JointTrainAgent.BufferMaxLength,
             warmup_length=conf.JointTrainAgent.BufferWarmUp,
-            store_on_gpu=conf.BasicSettings.ReplayBufferOnGPU
+            store_on_gpu=conf.BasicSettings.ReplayBufferOnGPU,
+            vectorized_sampling=conf.Performance.VectorizedReplaySampling
         )
 
         # judge whether to load demonstration trajectory

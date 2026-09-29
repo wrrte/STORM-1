@@ -9,8 +9,9 @@ import pickle
 
 
 class ReplayBuffer():
-    def __init__(self, obs_shape, num_envs, max_length=int(1E6), warmup_length=50000, store_on_gpu=False) -> None:
+    def __init__(self, obs_shape, num_envs, max_length=int(1E6), warmup_length=50000, store_on_gpu=False, vectorized_sampling=False) -> None:
         self.store_on_gpu = store_on_gpu
+        self.vectorized_sampling = vectorized_sampling
         if store_on_gpu:
             self.obs_buffer = torch.empty((max_length//num_envs, num_envs, *obs_shape), dtype=torch.uint8, device="cuda", requires_grad=False)
             self.action_buffer = torch.empty((max_length//num_envs, num_envs), dtype=torch.float32, device="cuda", requires_grad=False)
@@ -38,6 +39,12 @@ class ReplayBuffer():
         self.external_buffer_length = self.external_buffer["obs"].shape[0]
 
     def sample_external(self, batch_size, batch_length, to_device="cuda"):
+        if self.store_on_gpu and self.vectorized_sampling:
+            indexes = np.random.randint(0, self.external_buffer_length+1-batch_length, size=batch_size)
+            return self._gather_gpu_sequences(
+                tuple(self.external_buffer[name] for name in ("obs", "action", "reward", "done")),
+                indexes, batch_length)
+
         indexes = np.random.randint(0, self.external_buffer_length+1-batch_length, size=batch_size)
         if self.store_on_gpu:
             obs = torch.stack([self.external_buffer["obs"][idx:idx+batch_length] for idx in indexes])
@@ -56,6 +63,9 @@ class ReplayBuffer():
 
     @torch.no_grad()
     def sample(self, batch_size, external_batch_size, batch_length, to_device="cuda"):
+        if self.store_on_gpu and self.vectorized_sampling:
+            return self._sample_gpu_vectorized(batch_size, external_batch_size, batch_length, to_device)
+
         if self.store_on_gpu:
             obs, action, reward, termination = [], [], [], []
             base_indexes, base_envs = [], []
@@ -117,6 +127,53 @@ class ReplayBuffer():
             base_indexes = np.concatenate(base_indexes, axis=0)
             base_envs = np.concatenate(base_envs, axis=0)
 
+        return obs, action, reward, termination, base_indexes, base_envs
+
+    @staticmethod
+    def _gather_gpu_sequences(buffers, indexes, batch_length, env_idx=None):
+        # Keep NumPy's existing draws; only replace thousands of Python slices.
+        device = buffers[0].device
+        time_indexes = torch.as_tensor(indexes, device=device)[:, None] + torch.arange(batch_length, device=device)[None, :]
+        if env_idx is None:
+            return tuple(buffer[time_indexes] for buffer in buffers)
+        return tuple(buffer[time_indexes, env_idx] for buffer in buffers)
+
+    def _sample_gpu_vectorized(self, batch_size, external_batch_size, batch_length, to_device):
+        obs, action, reward, termination = [], [], [], []
+        base_indexes, base_envs = [], []
+        buffers = (self.obs_buffer, self.action_buffer, self.reward_buffer, self.termination_buffer)
+        if batch_size > 0:
+            for i in range(self.num_envs):
+                indexes = np.random.randint(0, self.length+1-batch_length, size=batch_size//self.num_envs)
+                base_indexes.append(indexes)
+                base_envs.append(np.full_like(indexes, i))
+                # Match the original empty-stack error for undersized batches.
+                if len(indexes) == 0:
+                    torch.stack([])
+                sampled = self._gather_gpu_sequences(buffers, indexes, batch_length, env_idx=i)
+                obs.append(sampled[0])
+                action.append(sampled[1])
+                reward.append(sampled[2])
+                termination.append(sampled[3])
+
+        if self.external_buffer_length is not None and external_batch_size > 0:
+            external_obs, external_action, external_reward, external_termination = self.sample_external(
+                external_batch_size, batch_length, to_device)
+            obs.append(external_obs)
+            action.append(external_action)
+            reward.append(external_reward)
+            termination.append(external_termination)
+            base_indexes.append(np.full(external_batch_size, -1))
+            base_envs.append(np.full(external_batch_size, -1))
+
+        # Preserve concatenation, normalization, layout and metadata ordering.
+        obs = torch.cat(obs, dim=0).float() / 255
+        obs = rearrange(obs, "B T H W C -> B T C H W")
+        action = torch.cat(action, dim=0)
+        reward = torch.cat(reward, dim=0)
+        termination = torch.cat(termination, dim=0)
+        base_indexes = np.concatenate(base_indexes, axis=0)
+        base_envs = np.concatenate(base_envs, axis=0)
         return obs, action, reward, termination, base_indexes, base_envs
 
     def append(self, obs, action, reward, termination):

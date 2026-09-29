@@ -17,7 +17,7 @@ import shutil
 import pickle
 import os
 
-from utils import seed_np_torch, Logger, load_config
+from utils import seed_np_torch, Logger, load_config, configure_performance
 from replay_buffer import ReplayBuffer
 import env_wrapper
 import agents
@@ -117,6 +117,7 @@ if __name__ == "__main__":
     parser.add_argument("-reverse", action="store_true", help="Evaluate checkpoints in reverse order (latest first)")
     args = parser.parse_args()
     conf = load_config(args.config_path)
+    configure_performance(conf)
     print(colorama.Fore.RED + str(args) + colorama.Style.RESET_ALL)
     # print(colorama.Fore.RED + str(conf) + colorama.Style.RESET_ALL)
 

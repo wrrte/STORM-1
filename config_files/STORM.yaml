@@ -5,6 +5,10 @@ BasicSettings:
   ImageSize: 64
   ReplayBufferOnGPU: True
 
+Performance:
+  VectorizedReplaySampling: False # True: GPU 리플레이 일괄 인덱싱. False: 기존 코드 그대로.
+  DisableDistributionValidation: False # True: 실행 프로세스의 확률분포 검사 해제. False: 기존 기본값 유지.
+
 JointTrainAgent:
   SampleMaxSteps: 102000
   BufferMaxLength: 100000

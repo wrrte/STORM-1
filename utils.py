@@ -23,6 +23,16 @@ def seed_np_torch(seed=20010105):
     torch.backends.cudnn.benchmark = False
 
 
+def configure_performance(conf):
+    """Apply opt-in process settings once, after all config overrides.
+
+    With the legacy setting this is a no-op: do not reset PyTorch's original
+    validation default (including its behavior under python -O).
+    """
+    if conf.Performance.DisableDistributionValidation:
+        torch.distributions.Distribution.set_default_validate_args(False)
+
+
 class Logger():
     def __init__(self, path, config=None, seed=None) -> None:
         self.writer = SummaryWriter(logdir=path, flush_secs=1)
@@ -155,6 +165,11 @@ def load_config(config_path):
     conf.BasicSettings.Seed = 0
     conf.BasicSettings.ImageSize = 0
     conf.BasicSettings.ReplayBufferOnGPU = False
+
+    # Missing options in older configs retain the original execution paths.
+    conf.Performance = CN()
+    conf.Performance.VectorizedReplaySampling = False
+    conf.Performance.DisableDistributionValidation = False
 
     # Under this setting, input 128*128 -> latent 16*16*64
     conf.Models = CN()
