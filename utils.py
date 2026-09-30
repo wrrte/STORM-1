@@ -33,6 +33,26 @@ def configure_performance(conf):
         torch.distributions.Distribution.set_default_validate_args(False)
 
 
+def log_scalar_metrics(logger, metrics, batched=False):
+    """Read scalars without changing their arithmetic, dtype, or log order."""
+    if not batched:
+        for tag, value in metrics.items():
+            logger.log(tag, value.item())
+        return
+
+    items = list(metrics.items())
+    groups = {}
+    for index, (_, value) in enumerate(items):
+        groups.setdefault((value.device, value.dtype), []).append((index, value))
+    values = [None] * len(items)
+    for group in groups.values():
+        packed = torch.stack([value.detach().reshape(()) for _, value in group])
+        for (index, _), value in zip(group, packed.cpu().tolist()):
+            values[index] = value
+    for (tag, _), value in zip(items, values):
+        logger.log(tag, value)
+
+
 class Logger():
     def __init__(self, path, config=None, seed=None) -> None:
         self.writer = SummaryWriter(logdir=path, flush_secs=1)
@@ -170,6 +190,9 @@ def load_config(config_path):
     conf.Performance = CN()
     conf.Performance.VectorizedReplaySampling = False
     conf.Performance.DisableDistributionValidation = False
+    conf.Performance.BatchScalarLogging = False
+    conf.Performance.RetrievalStatisticsMode = "legacy"
+    conf.Performance.ProjectedKVCache = False
 
     # Under this setting, input 128*128 -> latent 16*16*64
     conf.Models = CN()

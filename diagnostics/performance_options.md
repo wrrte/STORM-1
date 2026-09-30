@@ -1,5 +1,9 @@
 # 성능 최적화 옵션
 
+> 이 문서의 구현·측정 기록은 2026-09-29의 기존 두 옵션에 관한 것이다.
+> 현재 YAML은 두 옵션과 추가 실행 최적화를 활성화한다.
+> 2026-09-30 설정과 검증 결과는 [execution_optimizations.md](execution_optimizations.md)를 참고한다.
+
 `config_files/STORM.yaml`에 두 옵션을 추가했다. 기본값과 옵션이 없는 기존 설정 파일의 동작은 모두 기존 버전이다.
 
 ```yaml

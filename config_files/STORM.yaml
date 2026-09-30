@@ -8,6 +8,9 @@ BasicSettings:
 Performance:
   VectorizedReplaySampling: True # True: GPU 리플레이 일괄 인덱싱. False: 기존 코드 그대로.
   DisableDistributionValidation: True # True: 실행 프로세스의 확률분포 검사 해제. False: 기존 기본값 유지.
+  BatchScalarLogging: True # 같은 dtype의 스칼라를 묶어서 CPU로 전송.
+  RetrievalStatisticsMode: "vectorized" # legacy / batched (비트 보존 목표) / vectorized (수학적 동일).
+  ProjectedKVCache: True # 추론 중 투영된 K/V 재사용. 수학적 동일, 비트 동일성 미보장.
 
 JointTrainAgent:
   SampleMaxSteps: 102000

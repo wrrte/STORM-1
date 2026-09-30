@@ -41,6 +41,11 @@ def main():
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.backends.cudnn.allow_tf32 = True
     conf = load_config(str(Path(__file__).resolve().parents[1] / "config_files/STORM.yaml"))
+    # This older benchmark isolates replay indexing and distribution validation.
+    conf.defrost()
+    conf.Performance.ProjectedKVCache = False
+    conf.Performance.BatchScalarLogging = False
+    conf.freeze()
     # Smaller capacity than the full run, with the same observation/batch shapes.
     replay = ReplayBuffer((64, 64, 3), 1, max_length=4096,
                           warmup_length=1024, store_on_gpu=True)

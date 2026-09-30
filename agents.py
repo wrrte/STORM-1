@@ -9,7 +9,7 @@ from torch.cuda.amp import autocast
 
 from sub_models.functions_losses import SymLogTwoHotLoss
 from sub_models.precision import get_amp_dtype
-from utils import EMAScalar
+from utils import EMAScalar, log_scalar_metrics
 
 
 def percentile(x, percentage):
@@ -42,6 +42,7 @@ class ActorCriticAgent(nn.Module):
         self.lambd = lambd
         self.entropy_coef = entropy_coef
         self.use_amp = True
+        self.batch_scalar_logging = False
         self.amp_dtype = get_amp_dtype()
         self.tensor_dtype = self.amp_dtype if self.use_amp else torch.float32
 
@@ -181,9 +182,11 @@ class ActorCriticAgent(nn.Module):
         self.update_slow_critic()
 
         if logger is not None:
-            logger.log('ActorCritic/policy_loss', policy_loss.item())
-            logger.log('ActorCritic/value_loss', value_loss.item())
-            logger.log('ActorCritic/entropy_loss', entropy_loss.item())
-            logger.log('ActorCritic/S', S.item())
-            logger.log('ActorCritic/norm_ratio', norm_ratio.item())
-            logger.log('ActorCritic/total_loss', loss.item())
+            log_scalar_metrics(logger, {
+                'ActorCritic/policy_loss': policy_loss,
+                'ActorCritic/value_loss': value_loss,
+                'ActorCritic/entropy_loss': entropy_loss,
+                'ActorCritic/S': S,
+                'ActorCritic/norm_ratio': norm_ratio,
+                'ActorCritic/total_loss': loss,
+            }, batched=self.batch_scalar_logging)

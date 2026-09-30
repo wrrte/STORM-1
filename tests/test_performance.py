@@ -22,6 +22,18 @@ from replay_buffer import ReplayBuffer
 from utils import configure_performance, load_config, seed_np_torch
 
 
+def legacy_config():
+    conf = load_config(str(ROOT / "config_files/STORM.yaml"))
+    conf.defrost()
+    conf.Performance.VectorizedReplaySampling = False
+    conf.Performance.DisableDistributionValidation = False
+    conf.Performance.BatchScalarLogging = False
+    conf.Performance.RetrievalStatisticsMode = "legacy"
+    conf.Performance.ProjectedKVCache = False
+    conf.freeze()
+    return conf
+
+
 def rng_state():
     return (random.getstate(), np.random.get_state(), torch.get_rng_state(),
             torch.cuda.get_rng_state() if torch.cuda.is_available() else None)
@@ -78,8 +90,8 @@ class ConfigTests(ExactCase):
     def tearDown(self):
         torch.distributions.Distribution.set_default_validate_args(self.previous_validation)
 
-    def test_old_config_and_checked_in_config_default_to_legacy(self):
-        conf = load_config(str(ROOT / "config_files/STORM.yaml"))
+    def test_old_config_without_performance_defaults_to_legacy(self):
+        conf = legacy_config()
         self.assertFalse(conf.Performance.VectorizedReplaySampling)
         self.assertFalse(conf.Performance.DisableDistributionValidation)
         conf.defrost()
@@ -90,9 +102,12 @@ class ConfigTests(ExactCase):
             loaded = load_config(str(path))
         self.assertFalse(loaded.Performance.VectorizedReplaySampling)
         self.assertFalse(loaded.Performance.DisableDistributionValidation)
+        self.assertFalse(loaded.Performance.BatchScalarLogging)
+        self.assertFalse(loaded.Performance.ProjectedKVCache)
+        self.assertEqual(loaded.Performance.RetrievalStatisticsMode, "legacy")
 
     def test_legacy_validation_setting_is_a_noop(self):
-        conf = load_config(str(ROOT / "config_files/STORM.yaml"))
+        conf = legacy_config()
         for original_default in (True, False):
             torch.distributions.Distribution.set_default_validate_args(original_default)
             with mock.patch.object(torch.distributions.Distribution, "set_default_validate_args") as setter:
@@ -101,7 +116,7 @@ class ConfigTests(ExactCase):
             self.assertEqual(torch.distributions.Distribution._validate_args, original_default)
 
     def test_validation_flag_disables_nested_onehot_checks(self):
-        conf = load_config(str(ROOT / "config_files/STORM.yaml"))
+        conf = legacy_config()
         conf.defrost()
         conf.Performance.DisableDistributionValidation = True
         conf.freeze()
@@ -120,6 +135,9 @@ class ConfigTests(ExactCase):
             "-env_name", "ALE/Hero-v5", "-trajectory_path", "D_TRAJ/Hero.pkl",
             "Performance.VectorizedReplaySampling", "True",
             "Performance.DisableDistributionValidation", "True",
+            "Performance.BatchScalarLogging", "True",
+            "Performance.RetrievalStatisticsMode", "vectorized",
+            "Performance.ProjectedKVCache", "True",
         ])
         conf = load_config(args.config_path)
         commands = configure_storm_retrieval_run(conf, args, extras, str(ROOT / "train.py"))
@@ -130,6 +148,9 @@ class ConfigTests(ExactCase):
             loaded = load_config(str(path))
         self.assertTrue(loaded.Performance.VectorizedReplaySampling)
         self.assertTrue(loaded.Performance.DisableDistributionValidation)
+        self.assertTrue(loaded.Performance.BatchScalarLogging)
+        self.assertTrue(loaded.Performance.ProjectedKVCache)
+        self.assertEqual(loaded.Performance.RetrievalStatisticsMode, "vectorized")
 
 
 @unittest.skipUnless(torch.cuda.is_available(), "CUDA GPU required")
@@ -213,7 +234,7 @@ class ModelUpdateParityTests(ExactCase):
             seed_np_torch(3710)
             torch.backends.cuda.matmul.allow_tf32 = True
             torch.backends.cudnn.allow_tf32 = True
-            conf = load_config(str(ROOT / "config_files/STORM.yaml"))
+            conf = legacy_config()
             world = build_world_model(conf, 18)
             agent = build_agent(conf, 18)
             replay = ReplayParityTests().make_replay(obs_shape=(64, 64, 3), capacity=128)
@@ -234,8 +255,9 @@ class ModelUpdateParityTests(ExactCase):
 
             handles = [save_gradients("world", world), save_gradients("agent", agent)]
             baseline = None
-            for vectorized, disable_validation in ((False, False), (False, False),
-                                                    (True, False), (False, True), (True, True)):
+            for vectorized, disable_validation, batch_logging in (
+                    (False, False, False), (False, False, False), (True, False, False),
+                    (False, True, False), (True, True, False), (True, True, True)):
                 for index, module in enumerate((world, agent)):
                     module.load_state_dict(initial_models[index])
                     module.optimizer.load_state_dict(copy.deepcopy(initial_optimizers[index]))
@@ -251,6 +273,8 @@ class ModelUpdateParityTests(ExactCase):
                 conf.freeze()
                 configure_performance(conf)
                 replay.vectorized_sampling = conf.Performance.VectorizedReplaySampling
+                world.batch_scalar_logging = batch_logging
+                agent.batch_scalar_logging = batch_logging
                 restore_rng(initial_rng)
 
                 measurements = []
@@ -292,7 +316,7 @@ class ModelUpdateParityTests(ExactCase):
                     baseline = measurements
                 else:
                     self.assert_exact(baseline, measurements,
-                                      f"vectorized={vectorized}, disable_validation={disable_validation}")
+                                      f"vectorized={vectorized}, disable_validation={disable_validation}, batch_logging={batch_logging}")
                 print(f"Validated flags: vectorized={vectorized}, disable_validation={disable_validation}",
                       flush=True)
             for handle in handles:

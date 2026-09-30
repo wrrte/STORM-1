@@ -1,4 +1,5 @@
 import torch
+from utils import log_scalar_metrics
 import torch.nn as nn
 import torch.nn.functional as F
 from torch.distributions import OneHotCategorical, Normal
@@ -223,6 +224,7 @@ class WorldModel(nn.Module):
         self.stoch_dim = 32
         self.stoch_flattened_dim = self.stoch_dim*self.stoch_dim
         self.use_amp = True
+        self.batch_scalar_logging = False
         self.amp_dtype = get_amp_dtype()
         self.tensor_dtype = self.amp_dtype if self.use_amp else torch.float32
         self.imagine_batch_size = -1
@@ -474,13 +476,15 @@ class WorldModel(nn.Module):
         self.optimizer.zero_grad(set_to_none=True)
 
         if logger is not None:
-            logger.log("WorldModel/reconstruction_loss", reconstruction_loss.item())
-            logger.log("WorldModel/reward_loss", reward_loss.item())
-            logger.log("WorldModel/termination_loss", termination_loss.item())
-            logger.log("WorldModel/dynamics_loss", dynamics_loss.item())
-            logger.log("WorldModel/dynamics_real_kl_div", dynamics_real_kl_div.item())
-            logger.log("WorldModel/representation_loss", representation_loss.item())
-            logger.log("WorldModel/representation_real_kl_div", representation_real_kl_div.item())
-            logger.log("WorldModel/total_loss", total_loss.item())
+            log_scalar_metrics(logger, {
+                "WorldModel/reconstruction_loss": reconstruction_loss,
+                "WorldModel/reward_loss": reward_loss,
+                "WorldModel/termination_loss": termination_loss,
+                "WorldModel/dynamics_loss": dynamics_loss,
+                "WorldModel/dynamics_real_kl_div": dynamics_real_kl_div,
+                "WorldModel/representation_loss": representation_loss,
+                "WorldModel/representation_real_kl_div": representation_real_kl_div,
+                "WorldModel/total_loss": total_loss,
+            }, batched=self.batch_scalar_logging)
 
         return flattened_sample.detach(), dist_feat.detach()

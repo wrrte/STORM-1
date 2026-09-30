@@ -100,6 +100,29 @@ class MultiHeadAttention(nn.Module):
         return q, attn
 
 
+    def forward_with_projected_cache(self, x, cache, position, capacity):
+        """Eval/no-grad only: project the new token, then attend to cached K/V."""
+        batch = x.shape[0]
+        residual = x
+        q = self.w_qs(x).view(batch, 1, self.n_head, self.d_k).transpose(1, 2)
+        k = self.w_ks(x).view(batch, 1, self.n_head, self.d_k)
+        v = self.w_vs(x).view(batch, 1, self.n_head, self.d_v)
+        if cache is None:
+            cache = (k.new_empty(batch, capacity, self.n_head, self.d_k),
+                     v.new_empty(batch, capacity, self.n_head, self.d_v))
+        cache[0][:, position:position+1].copy_(k)
+        cache[1][:, position:position+1].copy_(v)
+        # Eval-only: no dropout. Every cached key is visible to the newest query.
+        # is_causal=True would incorrectly mask this 1-by-T attention to key 0.
+        output = F.scaled_dot_product_attention(
+            q, cache[0][:, :position+1].transpose(1, 2),
+            cache[1][:, :position+1].transpose(1, 2), dropout_p=0.0, is_causal=False)
+        output = output.transpose(1, 2).contiguous().view(batch, 1, -1)
+        output = self.dropout(self.fc(output))
+        output += residual
+        return self.layer_norm(output), cache
+
+
 class PositionwiseFeedForward(nn.Module):
     ''' A two-feed-forward-layer module '''
 

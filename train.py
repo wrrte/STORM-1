@@ -216,7 +216,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         setattr(retrieval_config, 'context_length', imagine_context_length)
         
     latent_dim = 32 * 32 # CategoricalDim * ClassDim for hashing only the single-frame latent
-    retrieval_manager = RetrievalContextManager(num_envs=num_envs, config=retrieval_config, latent_dim=latent_dim)
+    retrieval_manager = RetrievalContextManager(
+        num_envs=num_envs, config=retrieval_config, latent_dim=latent_dim,
+        statistics_mode=getattr(getattr(conf, "Performance", None), "RetrievalStatisticsMode", "legacy"))
     if retrieval_state_resume is not None:
         retrieval_manager.load_state_dict(retrieval_state_resume)
     is_first_step = np.ones(num_envs, dtype=bool)
@@ -526,7 +528,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
 
 
 def build_world_model(conf, action_dim):
-    return WorldModel(
+    model = WorldModel(
         in_channels=conf.Models.WorldModel.InChannels,
         action_dim=action_dim,
         transformer_max_length=conf.Models.WorldModel.TransformerMaxLength,
@@ -535,9 +537,13 @@ def build_world_model(conf, action_dim):
         transformer_num_heads=conf.Models.WorldModel.TransformerNumHeads
     ).cuda()
 
+    model.batch_scalar_logging = conf.Performance.BatchScalarLogging
+    model.storm_transformer.projected_kv_cache = conf.Performance.ProjectedKVCache
+    return model
+
 
 def build_agent(conf, action_dim):
-    return agents.ActorCriticAgent(
+    agent = agents.ActorCriticAgent(
         feat_dim=32*32+conf.Models.WorldModel.TransformerHiddenDim,
         num_layers=conf.Models.Agent.NumLayers,
         hidden_dim=conf.Models.Agent.HiddenDim,
@@ -546,6 +552,9 @@ def build_agent(conf, action_dim):
         lambd=conf.Models.Agent.Lambda,
         entropy_coef=conf.Models.Agent.EntropyCoef,
     ).cuda()
+
+    agent.batch_scalar_logging = conf.Performance.BatchScalarLogging
+    return agent
 
 
 def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, episode_rewards_list, dynamic_warmup_met_step=-1, retrieval_manager=None, shared_warmup=False):
