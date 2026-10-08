@@ -557,6 +557,25 @@ def build_agent(conf, action_dim):
     return agent
 
 
+def load_final_eval_models(ckpt_dir, world_model, agent, checkpoint_step=None):
+    """Select saved evaluation weights without changing final training artifacts."""
+    if checkpoint_step is None:
+        return
+    if type(checkpoint_step) is not int or checkpoint_step < 0:
+        raise ValueError("JointTrainAgent.FinalEvalStep must be a nonnegative integer or null")
+
+    world_model_path = os.path.join(ckpt_dir, f"world_model_{checkpoint_step}.pth")
+    agent_path = os.path.join(ckpt_dir, f"agent_{checkpoint_step}.pth")
+    for path in (world_model_path, agent_path):
+        if not os.path.isfile(path):
+            raise FileNotFoundError(f"Final evaluation checkpoint not found: {path}")
+
+    world_model_state = torch.load(world_model_path, map_location="cpu", weights_only=True)
+    agent_state = torch.load(agent_path, map_location="cpu", weights_only=True)
+    world_model.load_state_dict(world_model_state)
+    agent.load_state_dict(agent_state)
+
+
 def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, episode_rewards_list, dynamic_warmup_met_step=-1, retrieval_manager=None, shared_warmup=False):
     """Save all training state for resume."""
     os.makedirs(ckpt_dir, exist_ok=True)
@@ -749,7 +768,14 @@ if __name__ == "__main__":
             raise RuntimeError("Shared warmup did not reach an episode boundary after the warmup target and before SampleMaxSteps; no branches were started")
 
         if conf.JointTrainAgent.EvalMode in ["active", "final_only"]:
-            print(colorama.Fore.GREEN + f"Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
+            final_eval_step = conf.JointTrainAgent.FinalEvalStep
+            load_final_eval_models(f"ckpt/{args.n}", world_model, agent, final_eval_step)
+            if final_eval_step is not None:
+                print(colorama.Fore.GREEN + f"Final evaluation using checkpoint at step {final_eval_step}..." + colorama.Style.RESET_ALL)
+            else:
+                final_eval_step = conf.JointTrainAgent.SampleMaxSteps // conf.JointTrainAgent.NumEnvs
+                print(colorama.Fore.GREEN + "Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
+            logger.log("eval/checkpoint_step", final_eval_step)
             import eval
             episode_avg_return, individual_returns = eval.eval_episodes(
                 num_episode=conf.JointTrainAgent.EvalEpisodes,

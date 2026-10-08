@@ -33,6 +33,7 @@ JointTrainAgent:
   EvalEverySteps: 50000
   EvalStartStep: 0
   EvalEpisodes: 20
+  FinalEvalStep: 100000 # Checkpoint filename step for final evaluation; null uses end-of-training weights.
 
   Retrieval:
     enable: Both # True, False, "Both" (_O then _X), or an experiment list (shared warmup)

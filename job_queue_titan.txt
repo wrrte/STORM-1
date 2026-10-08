@@ -1,8 +1,16 @@
-python -u train.py --resume_warmup ckpt/Frostbite-9999 JointTrainAgent.Retrieval.enable "['add']"
-python -u train.py --resume_warmup ckpt/BankHeist-9997 JointTrainAgent.Retrieval.enable "['baseline']"
-python -u train.py --resume_warmup ckpt/Gopher-9997 JointTrainAgent.Retrieval.enable "['target1', 'value', 'add']"
-python -u train.py -n "Krull-7000" -seed 7000 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-python -u train.py -n "Krull-7010" -seed 7010 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-python -u train.py -n "Krull-7020" -seed 7020 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-python -u train.py -n "Kangaroo-7000" -seed 7000 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
-python -u train.py -n "Kangaroo-7010" -seed 7010 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['retrieval']" JointTrainAgent.Retrieval.save_warmup True
+python -u train.py -n "Krull-9987" -seed 9987 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Kangaroo-9989" -seed 9989 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9986" -seed 9986 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9985" -seed 9985 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Kangaroo-9988" -seed 9988 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9984" -seed 9984 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9983" -seed 9983 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Kangaroo-9987" -seed 9987 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9982" -seed 9982 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9981" -seed 9981 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Kangaroo-9986" -seed 9986 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9980" -seed 9980 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9979" -seed 9979 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Kangaroo-9985" -seed 9985 -config_path "config_files/STORM.yaml" -env_name "ALE/Kangaroo-v5" -trajectory_path "D_TRAJ/Kangaroo.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9978" -seed 9978 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
+python -u train.py -n "Krull-9977" -seed 9977 -config_path "config_files/STORM.yaml" -env_name "ALE/Krull-v5" -trajectory_path "D_TRAJ/Krull.pkl" JointTrainAgent.Retrieval.enable "['baseline']"
