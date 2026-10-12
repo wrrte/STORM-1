@@ -39,6 +39,7 @@ VARIANTS = {
     'target1': {'Retrieval Enable': 'True', 'Retrieval Target': '1'},
     'value': {'Retrieval Enable': 'True', 'Value Signal': 'value'},
     'add': {'Retrieval Enable': 'True', 'Score Combination': 'add'},
+    'randomneighor': {'Retrieval Enable': 'True', 'Neighbor Source': 'random'},
 }
 
 
@@ -84,9 +85,13 @@ def modes(raw):
     raw = str(raw).strip()
     if raw.startswith('['):
         result = ast.literal_eval(raw)
+        if isinstance(result, list):
+            result = [v.strip().lower() if isinstance(v, str) else v for v in result]
         if not isinstance(result, list) or not result or any(v not in VARIANTS for v in result):
             raise ValueError(f'알 수 없는 실험 목록: {raw}')
         return result
+    if raw.lower() in VARIANTS:
+        return [raw.lower()]
     if raw.lower() == 'both':
         return ['retrieval', 'baseline']
     if raw.lower() in {'true', '1', 't'}:
@@ -112,7 +117,8 @@ def row_kind(row):
             and number(row.get('Retrieval Target')) == 16
             and (not anchor or number(anchor) == 0.0625)
             and value(row, 'Value Signal', 'value_diff') == 'value_diff'
-            and value(row, 'Score Combination', 'multiply') == 'multiply'):
+            and value(row, 'Score Combination', 'multiply') == 'multiply'
+            and value(row, 'Neighbor Source', 'retrieval') == 'retrieval'):
         return 'retrieval'
     return None
 
@@ -203,6 +209,7 @@ def parse_command(line, gpu):
         'Anchor Weight': args.get(PREFIX + 'anchor_weight', '0.0625'),
         'Value Signal': args.get(PREFIX + 'value_signal', 'value_diff'),
         'Score Combination': args.get(PREFIX + 'score_combination', 'multiply'),
+        'Neighbor Source': args.get(PREFIX + 'neighbor_source', 'retrieval'),
         'Created At': '2099-01-01T00:00:00Z',
     }
     kinds = {row_kind({**config, **VARIANTS[name]}) for name in names} - {None}

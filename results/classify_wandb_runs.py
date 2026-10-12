@@ -165,6 +165,7 @@ def parse_pending_retrieval_configs(args):
         'target1': {'Retrieval Enable': True, 'Retrieval Target': 1},
         'value': {'Retrieval Enable': True, 'Value Signal': 'value'},
         'add': {'Retrieval Enable': True, 'Score Combination': 'add'},
+        'randomneighor': {'Retrieval Enable': True, 'Neighbor Source': 'random'},
     }
     if branch not in experiments or any(name not in overrides for name in experiments):
         return []
@@ -175,6 +176,7 @@ def parse_pending_retrieval_configs(args):
         'Retrieval Target': ('target', 16),
         'Value Signal': ('value_signal', 'value_diff'),
         'Score Combination': ('score_combination', 'multiply'),
+        'Neighbor Source': ('neighbor_source', 'retrieval'),
     }
     common = {
         column: values.get(f'JointTrainAgent.Retrieval.{key}', default)
@@ -326,6 +328,7 @@ def main():
 
             value_signal = get_config_val(run.config, 'JointTrainAgent.Retrieval.value_signal')
             score_combination = get_config_val(run.config, 'JointTrainAgent.Retrieval.score_combination')
+            neighbor_source = get_config_val(run.config, 'JointTrainAgent.Retrieval.neighbor_source')
             additive_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.additive_z_score_threshold')
         
             hash_bits = get_config_val(run.config, 'JointTrainAgent.Retrieval.hash_bits')
@@ -357,6 +360,7 @@ def main():
                 "Z Score Threshold": z_score_threshold,
                 "Value Signal": value_signal if value_signal is not None else 'N/A',
                 "Score Combination": score_combination if score_combination is not None else 'N/A',
+                "Neighbor Source": neighbor_source if neighbor_source is not None else 'retrieval',
                 "Additive Z Score Threshold": additive_z_score_threshold if additive_z_score_threshold is not None else 'N/A',
                 "Hash Bits": hash_bits,
                 "Retrieval Target": retrieval_target,
@@ -381,7 +385,7 @@ def main():
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
-        fieldnames += ["Warmup Directory", "Base Run Name", "Training Phase"]
+        fieldnames += ["Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:

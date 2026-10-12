@@ -63,6 +63,21 @@ Following the **Training and Evaluating Instructions** to reproduce the main res
     The `-run_name` option is the same as the `-n` option in `train.sh`. It should be kept the same as in the training script.
 
 ## Additional Useful Information
+
+FLASH supports the `RandomNeighor` ablation: it runs hash retrieval and lazy
+re-verification, then replaces each verified neighbor with a valid random replay
+context while preserving the anchor, final group size, weights and batch rules.
+Set `JointTrainAgent.Retrieval.enable RandomNeighor` on an existing training
+command, or use `enable: [retrieval, RandomNeighor]` in YAML to compare both from
+one shared warmup. From a saved reusable warmup:
+
+```shell
+python -u train.py --resume_warmup ckpt/<run>_Shared JointTrainAgent.Retrieval.enable RandomNeighor
+```
+
+The run suffix is `_randomneighor`. See [the training guide](../retrieval_training.md)
+for sampling, weighting and checkpoint details.
+
 You can use Tensorboard to visualize the training curve and the imagination videos:
 ```shell
  chmod +x TensorBoard.sh

@@ -388,6 +388,38 @@ class RunningRunsTests(unittest.TestCase):
             results = tex_updater.load_results('converted_results.xlsx')
         self.assertNotIn('Alien', results)
 
+    def test_random_neighor_scores_and_queues_are_separate_from_full_flash(self):
+        baseline = make_run('baseline', 2, False, 'finished', 100)
+        full = make_run('full', 2, True, 'finished', 150)
+        control = make_run('random', 2, True, 'finished', 350)
+        control.config['JointTrainAgent']['Retrieval']['neighbor_source'] = 'random'
+        shared = make_run('shared', 17, ['retrieval', 'RandomNeighor'])
+        rows = self.export([baseline, full, control, shared])
+        self.assertEqual(rows['random']['Neighbor Source'], 'random')
+        self.assertIsNone(scheduler.row_kind(rows['random']))
+        Path('job_queue.txt').write_text(self.queue_job(12345, 'RandomNeighor'))
+        cells = self.workbook_cells()
+        random_config = TARGET + ' [RandomNeighor]'
+        self.assertEqual(cells['Alien', TARGET, 2].value, '150.00')
+        self.assertEqual(cells['Alien', random_config, 2].value, '350.00')
+        self.assertEqual(cells['Alien', random_config, 12345].value, 'QUEUED')
+        self.assertIsNone(cells['Alien', TARGET, 12345].value)
+        self.assertEqual(cells['Alien', random_config, 17].value, 'RUNNING')
+        self.assertEqual(cells['Alien', TARGET, 17].value, 'RUNNING')
+        self.assertEqual(scheduler.modes('RandomNeighor'), ['randomneighor'])
+        self.assertEqual(scheduler.modes("['retrieval', 'RandomNeighor']"),
+                         ['retrieval', 'randomneighor'])
+        with contextlib.redirect_stdout(io.StringIO()):
+            self.assertEqual(tex_updater.load_results('converted_results.xlsx')['Alien'],
+                             ([100.], [150.]))
+
+    def test_pending_configs_reset_random_neighbor_source_for_later_full_flash(self):
+        args = ['JointTrainAgent.Retrieval.enable', "['RandomNeighor', 'retrieval']",
+                '--branch_experiment', 'randomneighor']
+        self.assertEqual(classifier.parse_pending_retrieval_configs(args), [
+            {'Retrieval Enable': True, 'Neighbor Source': 'retrieval'},
+        ])
+
     def test_shared_experiment_lists_only_mark_selected_effective_configs(self):
         experiments = ['baseline', 'retrieval', 'target1', 'value', 'add']
         shared = make_run('shared', 2, experiments, score=999)

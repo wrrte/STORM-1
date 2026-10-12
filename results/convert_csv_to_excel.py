@@ -55,6 +55,7 @@ RETRIEVAL_COLUMNS = {
     'target': 'Retrieval Target', 'batch_size_reduction': 'Batch Size Reduction',
     'z_score_threshold': 'Z Score Threshold', 'anchor_weight': 'Anchor Weight',
     'value_signal': 'Value Signal', 'score_combination': 'Score Combination',
+    'neighbor_source': 'Neighbor Source',
     'additive_z_score_threshold': 'Additive Z Score Threshold',
     'hash_bits': 'Hash Bits', 'save_warmup': 'Save Warmup',
 }
@@ -131,9 +132,12 @@ def queue_command_row(command, queue_dir):
     elif '--branch_mode' in args:
         retrieval['enable'] = args['--branch_mode']
     mode = retrieval.get('enable')
+    named_modes = {'baseline', 'retrieval', 'target1', 'value', 'add', 'randomneighor'}
+    if isinstance(mode, str) and mode.strip().lower() in named_modes:
+        mode = [mode.strip().lower()]
     if isinstance(mode, list):
         mode = [str(name).strip().lower() for name in mode]
-        if not mode or any(name not in {'baseline', 'retrieval', 'target1', 'value', 'add'} for name in mode):
+        if not mode or any(name not in named_modes for name in mode):
             raise ValueError(f'알 수 없는 Retrieval.enable 실험 목록: {mode}')
         retrieval['enable'] = repr(mode)
     elif str(mode).lower() not in {'true', 'false', 'both'}:
@@ -195,6 +199,7 @@ def expand_shared_runs(df):
         'target1': {'Retrieval Enable': True, 'Retrieval Target': 1},
         'value': {'Retrieval Enable': True, 'Value Signal': 'value'},
         'add': {'Retrieval Enable': True, 'Score Combination': 'add'},
+        'randomneighor': {'Retrieval Enable': True, 'Neighbor Source': 'random'},
     }
     rows = []
     for row in df.to_dict('records'):
@@ -483,6 +488,9 @@ def main(csv_path=None, output_path=None, queue_dir=None):
 
             value_signal = str(config_value(row, 'Value Signal', 'value_diff')).strip().lower()
             score_combination = str(config_value(row, 'Score Combination', 'multiply')).strip().lower()
+            neighbor_source = str(config_value(row, 'Neighbor Source', 'retrieval')).strip().lower()
+            if neighbor_source not in ('retrieval', 'random'):
+                continue
             if value_signal not in ('value_diff', 'value') or score_combination not in ('multiply', 'add'):
                 continue
             if score_combination == 'add':
@@ -520,6 +528,8 @@ def main(csv_path=None, output_path=None, queue_dir=None):
                         variants.append('value')
                     if score_combination == 'add':
                         variants.append('add')
+                    if neighbor_source == 'random':
+                        variants.append('RandomNeighor')
                     if variants:
                         config += f" [{', '.join(variants)}]"
                 else:
