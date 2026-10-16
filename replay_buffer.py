@@ -61,6 +61,16 @@ class ReplayBuffer():
     def ready(self):
         return self.length * self.num_envs > self.warmup_length
 
+    def retrieval_view(self):
+        """Cache validity metadata for one retrieval call, without changing replay.
+
+        Retrieval runs synchronously between append/update operations. Reading
+        termination flags once avoids a CUDA scalar read for every candidate
+        and history frame. A fresh view also observes direct buffer writes and
+        old-format checkpoint loads; there is no persistent cache to invalidate.
+        """
+        return _RetrievalView(self)
+
     @torch.no_grad()
     def sample(self, batch_size, external_batch_size, batch_length, to_device="cuda"):
         if self.store_on_gpu and self.vectorized_sampling:
@@ -249,3 +259,51 @@ class ReplayBuffer():
 
         self.length = loaded_length
         self.last_pointer = loaded_last_pointer
+
+
+class _RetrievalView:
+    """Call-scoped CPU validity metadata and batched reads of canonical replay."""
+
+    def __init__(self, replay):
+        self._replay = replay
+        self.length = replay.length
+        self.last_pointer = replay.last_pointer
+        termination = replay.termination_buffer[:self.length]
+        self.termination_buffer = (termination.detach().cpu().numpy()
+                                   if replay.store_on_gpu else termination)
+
+    def __getattr__(self, name):
+        return getattr(self._replay, name)
+
+    def is_valid_context(self, pointer, env_idx, context_length):
+        capacity = self.max_length // self.num_envs
+        length = min(self.length, capacity)
+        if not 0 <= env_idx < self.num_envs or not 0 <= pointer < capacity:
+            return False
+        oldest = (self.last_pointer + 1) % capacity if length == capacity else 0
+        position = (pointer - oldest) % capacity
+        if position >= length or position + 1 < context_length:
+            return False
+        # The endpoint's terminal flag is deliberately not part of the history.
+        # Keep the original float32 <= .5 predicate, including NaN handling.
+        return all(self.termination_buffer[(pointer - step) % capacity, env_idx] <= 0.5
+                   for step in range(1, context_length))
+
+    def gather_retrieval_frames(self, indices):
+        """Read candidate endpoints in their original order, including repeats."""
+        indices = np.asarray(indices, dtype=np.int64)
+        if self.store_on_gpu:
+            indices = torch.as_tensor(indices, device=self.obs_buffer.device)
+        return self.obs_buffer[indices[:, 0], indices[:, 1]]
+
+    def gather_retrieval_contexts(self, indices, context_length):
+        """Return the original contiguous [T, B, ...] layout in two gathers."""
+        indices = np.asarray(indices, dtype=np.int64)
+        times = (indices[None, :, 0]
+                 - np.arange(context_length - 1, -1, -1)[:, None])
+        times %= self.max_length // self.num_envs
+        envs = indices[None, :, 1]
+        if self.store_on_gpu:
+            times = torch.as_tensor(times, device=self.obs_buffer.device)
+            envs = torch.as_tensor(envs, device=self.obs_buffer.device)
+        return self.obs_buffer[times, envs], self.action_buffer[times, envs]
