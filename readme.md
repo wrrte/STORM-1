@@ -1,5 +1,14 @@
 # Implementation of STORM: Efficient Stochastic Transformer based World Models for Reinforcement Learning
 
+
+
+export CUDA_VISIBLE_DEVICES=3
+source .bashrc
+cd STORM-1
+conda activate storm
+
+
+
 News: This project is no longer maintained, and we recommend using the new [OC-STORM](https://github.com/weipu-zhang/OC-STORM) repo, which also contains full code for running STORM on Atari games.
 
 This repo contains an implementation of STORM. 
@@ -77,6 +86,11 @@ python -u train.py --resume_warmup ckpt/<run>_Shared JointTrainAgent.Retrieval.e
 
 The run suffix is `_randomneighor`. See [the training guide](../retrieval_training.md)
 for sampling, weighting and checkpoint details.
+
+STORM retrieval uses a per-call CPU snapshot of termination flags and batched
+replay reads to reduce CUDA synchronization while preserving sampling and model
+input order. See [retrieval execution optimizations](diagnostics/retrieval_execution_optimizations.md)
+for equivalence checks, measured timings and reproduction commands.
 
 You can use Tensorboard to visualize the training curve and the imagination videos:
 ```shell
