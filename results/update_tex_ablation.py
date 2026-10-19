@@ -8,7 +8,9 @@ only metrics. Re-running regenerates the entire summary, including its layout.
 Uses the same result loading, duplicate-result parsing, and aggregation as update_tex.py.
 Each variant is paired independently with default FLASH on common training seeds.
 The main summary shares Full FLASH for value/add only when all paired seed IDs
-and baseline scores agree. Neighbor retrieval always keeps its own baseline.
+and baseline scores agree. Neighbor retrieval and random-neighbor comparisons
+always keep their own baselines. RandomNeighor scores match the complete Excel
+config label.
 Main-summary metrics match the appendix's available-game metrics exactly,
 regardless of the selected game rows (including when fewer than 26 are available).
 Bold marks the best displayed score within each comparison group (including ties),
@@ -93,6 +95,16 @@ ABLATIONS = {
         r'Neighbor retrieval ablation on STORM. Full FLASH uses retrieval '
         r'target $n=16$; No neighbor uses $n=1$ (anchor only), both with the default '
         r'anchor setting. ',
+    ),
+    'random': Ablation(
+        FLASH_CONFIG + ' [RandomNeighor]', 'Random neighbors', 'RANDOM NEIGHBOR',
+        'tab:random_neighbor_ablation',
+        r'Neighbor source ablation on STORM. Full FLASH uses hash-matched '
+        r'neighbors; Random neighbors replaces only the valid non-anchor '
+        r'contexts with uniformly sampled valid replay contexts. '
+        r'Both use retrieval target $n=16$ and the default anchor setting. '
+        r'The control retains the triggering, retrieval verification, group size '
+        r'and weighting rules, and Global Rebuild criteria. ',
     ),
     'value': Ablation(
         FLASH_CONFIG + ' [value]', 'Absolute value', 'VALUE SIGNAL',
@@ -268,7 +280,9 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
 
     shared = shared_trigger_baseline(results, paired_seeds)
     groups = [('Neighbor retrieval', [('neighbor', BASE_COLUMN, 'Full FLASH'),
-                                      ('neighbor', OURS_COLUMN, 'No neighbor')])]
+                                      ('neighbor', OURS_COLUMN, 'No neighbor')]),
+              ('Neighbor source', [('random', BASE_COLUMN, 'Full FLASH'),
+                                   ('random', OURS_COLUMN, 'Random neighbors')])]
     if shared:
         groups.append(('Value signal / Combination', [
             ('value', BASE_COLUMN, 'Full FLASH'),
@@ -285,7 +299,8 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
     columns = [column for _, group in groups for column in group]
     caption = (
         r'Ablations on STORM (Tables~\ref{tab:neighbor_retrieval_ablation}, '
-        r'\ref{tab:value_signal_ablation}, and \ref{tab:score_combination_ablation}). '
+        r'\ref{tab:random_neighbor_ablation}, \ref{tab:value_signal_ablation}, '
+        r'and \ref{tab:score_combination_ablation}). '
         r'Game scores use the paired training seeds of each appendix comparison. '
         r'Aggregate metrics match the corresponding appendix tables and use all '
         r'games with paired results for each comparison, independently of the game rows shown; '
@@ -293,7 +308,8 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
     )
     if shared:
         caption += (r'Value and combination ablations share the same Full FLASH seeds '
-                    r'and scores; neighbor retrieval has a separate baseline. ')
+                    r'and scores; neighbor retrieval and neighbor source each '
+                    r'have a separate baseline. ')
     else:
         caption += r'Full FLASH is shown separately where paired seeds or scores differ. '
     caption += (r'Bold indicates the best score within each comparison group '
@@ -302,6 +318,7 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         r'\begin{table}[!htbp]', r'\centering', r'\small',
         r'\setlength{\tabcolsep}{3pt}',
         r'\caption{' + caption + '}', r'\label{tab:ablation_main}',
+        r'\resizebox{\linewidth}{!}{%',
         r'\begin{tabular}{@{}l' + 'r' * len(columns) + r'@{}}', r'\toprule',
         ' & ' + ' & '.join(rf'\multicolumn{{{len(group)}}}{{c}}{{{title}}}'
                           for title, group in groups) + r' \\',
@@ -324,7 +341,7 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
                   for value in bold_best_scores(label, [cells[key][label][column].strip()
                                                         for key, column, _ in group])]
         table.append(' & '.join([label, *values]) + r' \\')
-    table.extend([r'\bottomrule', r'\end{tabular}', r'\end{table}', r'\FloatBarrier'])
+    table.extend([r'\bottomrule', r'\end{tabular}', '}', r'\end{table}', r'\FloatBarrier'])
     return '\n'.join(table) + '\n'
 
 
@@ -355,6 +372,13 @@ def update_main_ablation_table(document, results, paired_seeds, games=MAIN_GAMES
     return ''.join(lines[:stop]) + newline + block.replace('\n', newline) + ''.join(lines[stop:])
 
 
+def update_ablation_tables(document, results, paired_seeds, games=MAIN_GAMES):
+    """Render all comparisons in memory before the caller writes the document."""
+    for key, ablation in ABLATIONS.items():
+        document = update_ablation_table(document, results[key], ablation)
+    return update_main_ablation_table(document, results, paired_seeds, games)
+
+
 def main():
     parser = argparse.ArgumentParser(description=__doc__)
     script_dir = Path(__file__).resolve().parent
@@ -373,8 +397,7 @@ def main():
             args.excel, configs=ablation.configs, method_names=ablation.method_names,
             include_seeds=True,
         )
-        document = update_ablation_table(document, results[key], ablation)
-    document = update_main_ablation_table(document, results, paired_seeds, args.main_games)
+    document = update_ablation_tables(document, results, paired_seeds, args.main_games)
     with args.tex.open('w', encoding='utf-8', newline='') as destination:
         destination.write(document)
     print(f'Successfully updated {args.tex} with appendix and main-text ablation results.')
