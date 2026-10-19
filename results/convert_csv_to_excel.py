@@ -204,6 +204,10 @@ def expand_shared_runs(df):
     rows = []
     for row in df.to_dict('records'):
         enable = str(row['Retrieval Enable']).strip()
+        if enable.lower() == 'randomneighor':
+            # 단독 preset은 완료된 점수도 보존하며 실제 설정으로 변환합니다.
+            row.update(overrides['randomneighor'])
+            enable = str(row['Retrieval Enable'])
         if enable.startswith('['):
             experiments = ast.literal_eval(enable)
             if not isinstance(experiments, list) or not experiments:
@@ -225,7 +229,7 @@ def expand_shared_runs(df):
                 raise ValueError(f'Unknown Retrieval.enable experiment: {name}')
             rows.append({**row, **overrides[name]})
     return pd.DataFrame(rows, columns=list(dict.fromkeys([
-        *df.columns, 'Value Signal', 'Score Combination',
+        *df.columns, 'Value Signal', 'Score Combination', 'Neighbor Source',
     ])))
 
 

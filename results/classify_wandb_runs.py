@@ -3,13 +3,15 @@ import os
 sys.path = [p for p in sys.path if p and p != os.path.dirname(os.path.abspath(__file__))]
 import wandb
 import subprocess
-import os
 import csv
 import io
 import json
 import ast
 import tempfile
+import argparse
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
+from functools import lru_cache
 from tqdm import tqdm
 
 
@@ -64,14 +66,15 @@ def merge_archived_target_1_runs(results):
     return list(results) + [row for row in archived_rows if row["Run ID"] not in live_ids]
 
 
+@lru_cache(maxsize=None)
 def get_logic_for_commit(commit_hash):
     """
-    주어진 커밋 해시에서 train.py 파일을 읽어와 
+    주어진 커밋 해시에서 train.py 파일을 읽어와
     random_batch_size 설정 로직을 파악합니다.
     """
     if not commit_hash:
         return "Unknown (No commit hash)"
-    
+
     try:
         # git show <commit>:train.py 명령어로 해당 커밋 시점의 코드 내용 추출
         result = subprocess.run(
@@ -79,7 +82,7 @@ def get_logic_for_commit(commit_hash):
             capture_output=True, text=True, check=True
         )
         code = result.stdout
-        
+
         # 코드 내용에 따른 분류
         # 최신 코드의 경우 num_valid_anchors와 retrieved_count 조건이 모두 포함될 수 있으므로, 두 개가 다 있을 땐 num_valid_anchors로 분류
         if "random_batch_size = max(0, imagine_batch_size - retrieved_count)" in code and "random_batch_size = max(0, imagine_batch_size - num_valid_anchors)" in code:
@@ -94,7 +97,7 @@ def get_logic_for_commit(commit_hash):
             return "imagine_batch_size (No retrieval deduction)"
         else:
             return "Unknown (Logic not found in code)"
-            
+
     except subprocess.CalledProcessError:
         # 파일이 존재하지 않거나 커밋을 찾을 수 없는 경우
         return "Unknown (Git error or train.py missing)"
@@ -188,7 +191,195 @@ def parse_pending_retrieval_configs(args):
     ]
 
 
-def main():
+def get_config_val(config, key_path):
+    if key_path in config:
+        return config[key_path]
+    keys = key_path.split('.')
+    val = config
+    for k in keys:
+        if isinstance(val, dict) and k in val:
+            val = val[k]
+        else:
+            return None
+    return val
+
+
+def classify_run(run):
+    """단일 run을 기존 CSV 열로 변환하며 제외 대상이면 None을 반환합니다."""
+    if run.state == "killed":
+        return None
+
+    ret_enable = get_config_val(run.config, 'JointTrainAgent.Retrieval.enable')
+    is_random_neighor = str(ret_enable).strip().lower() == 'randomneighor'
+    is_both = (
+        str(ret_enable).strip().lower() == 'both'
+        or str(run.name).lower().endswith('_both')
+    )
+    is_experiment_list = isinstance(ret_enable, list)
+    if (is_both or is_experiment_list) and run.state != "running":
+        return None
+    if is_both:
+        ret_enable = 'Both'
+    elif not is_experiment_list:
+        ret_enable = is_random_neighor or str(ret_enable).strip().lower() in ('true', '1', 't')
+    save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
+    check_save_warmup = str(save_warmup).strip().lower() == 'false'
+    check_pending = run.state == 'running' and not (is_both or is_experiment_list)
+    needs_metadata = (
+        check_save_warmup or check_pending or run.state == 'running'
+        or str(save_warmup).strip().lower() == 'true'
+    )
+    run_args = get_run_args(run) if needs_metadata else None
+    save_warmup_requested = parse_save_warmup_request(run_args) if check_save_warmup else None
+    pending_configs = parse_pending_retrieval_configs(run_args) if check_pending else []
+
+    # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
+    commit_hash = run.commit
+
+    # run.commit이 없는 경우 config나 summary 등 다른 곳에 수동 기록했는지 확인
+    if not commit_hash and 'commit' in run.config:
+        commit_hash = run.config['commit']
+
+    logic_type = get_logic_for_commit(commit_hash)
+
+    eval_return = run.summary.get('eval/episode_avg_return', 'N/A')
+
+    warmup_steps = 'N/A'
+    calculated_warmup_steps = 'N/A'
+    if ret_enable:
+        w_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_steps')
+        warmup_steps = w_steps if w_steps is not None else 'N/A'
+        calculated_warmup_steps = warmup_steps
+
+        # warmup_steps가 -1인 경우, Retrieval/retrieved_contexts 그래프의 첫 스텝에서 가져옴
+        if str(warmup_steps) == '-1':
+            try:
+                # 백엔드 샘플링을 방지하기 위해 samples 값을 크게 설정하여 전체를 가져옵니다.
+                hist_df = run.history(keys=["Retrieval/retrieved_contexts"], samples=1000000)
+                if not hist_df.empty and "_step" in hist_df.columns:
+                    first_step = int(hist_df["_step"].min())
+                    calculated_warmup_steps = first_step + 1024
+                else:
+                    tqdm.write(f"[{run.name}] 히스토리에 '_step' 정보가 없습니다.")
+            except Exception as e:
+                tqdm.write(f"[{run.name}] 히스토리에서 warmup steps를 가져오지 못했습니다: {e}")
+
+    # 1. 런 이름에서 시드 추출 우선 시도 (형식: {env}_{id}_{seed}_{O/X/Both})
+    seed = None
+    parts = str(run.name).split('_')
+    if len(parts) >= 4 and parts[-1].upper() in ['O', 'X', 'BOTH']:
+        try:
+            seed = int(parts[-2])
+        except ValueError:
+            pass
+    elif len(parts) >= 3 and parts[-1].isdigit():
+        # Both 공통 단계의 Logger는 O/X 접미사 없이 이름을 기록합니다.
+        seed = int(parts[-1])
+
+    # 2. 런 이름에서 유추 실패 시 Config에서 읽어오기 ('Seed' 또는 'seed' 확인)
+    if seed is None:
+        seed = get_config_val(run.config, 'Seed')
+        if seed is None:
+            seed = get_config_val(run.config, 'seed')
+
+    seed = seed if seed is not None else 'N/A'
+
+    dynamic_warmup_delay_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_delay_steps')
+    dynamic_warmup_delay_steps = dynamic_warmup_delay_steps if dynamic_warmup_delay_steps is not None else 'N/A'
+
+    dynamic_warmup_target_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_target_steps')
+    dynamic_warmup_target_steps = dynamic_warmup_target_steps if dynamic_warmup_target_steps is not None else 'N/A'
+
+    min_warmup_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.min_warmup_steps')
+    min_warmup_steps = min_warmup_steps if min_warmup_steps is not None else 'N/A'
+
+    batch_size_reduction = get_config_val(run.config, 'JointTrainAgent.Retrieval.batch_size_reduction')
+    batch_size_reduction = batch_size_reduction if batch_size_reduction is not None else 'N/A'
+
+    z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.z_score_threshold')
+    z_score_threshold = z_score_threshold if z_score_threshold is not None else 'N/A'
+
+    value_signal = get_config_val(run.config, 'JointTrainAgent.Retrieval.value_signal')
+    score_combination = get_config_val(run.config, 'JointTrainAgent.Retrieval.score_combination')
+    neighbor_source = get_config_val(run.config, 'JointTrainAgent.Retrieval.neighbor_source')
+    if is_random_neighor:
+        # 이름으로 지정한 preset은 공통 neighbor_source 설정보다 우선합니다.
+        neighbor_source = 'random'
+    additive_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.additive_z_score_threshold')
+
+    hash_bits = get_config_val(run.config, 'JointTrainAgent.Retrieval.hash_bits')
+    hash_bits = hash_bits if hash_bits is not None else 'N/A'
+
+    retrieval_target = get_config_val(run.config, 'JointTrainAgent.Retrieval.target')
+    retrieval_target = retrieval_target if retrieval_target is not None else 'N/A'
+
+    anchor_weight = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight')
+    anchor_weight = anchor_weight if anchor_weight is not None else 'N/A'
+
+    return {
+        "Run Name": run.name,
+        "Run ID": run.id,
+        "State": run.state,
+        "Commit": commit_hash[:7] if commit_hash else "None",
+        "Logic": logic_type,
+        "Eval Return": eval_return,
+        "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
+        "Pending Retrieval Configs": json.dumps(pending_configs),
+        "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
+        "Save Warmup Requested": save_warmup_requested if save_warmup_requested is not None else 'N/A',
+        "Warmup Steps": warmup_steps,
+        "Calculated Warmup Steps": calculated_warmup_steps,
+        "Dynamic Warmup Delay Steps": dynamic_warmup_delay_steps,
+        "Dynamic Warmup Target Steps": dynamic_warmup_target_steps,
+        "Min Warmup Steps": min_warmup_steps,
+        "Batch Size Reduction": batch_size_reduction,
+        "Z Score Threshold": z_score_threshold,
+        "Value Signal": value_signal if value_signal is not None else 'N/A',
+        "Score Combination": score_combination if score_combination is not None else 'N/A',
+        "Neighbor Source": neighbor_source if neighbor_source is not None else 'retrieval',
+        "Additive Z Score Threshold": additive_z_score_threshold if additive_z_score_threshold is not None else 'N/A',
+        "Hash Bits": hash_bits,
+        "Retrieval Target": retrieval_target,
+        "Anchor Weight": anchor_weight,
+        "Seed": seed,
+        "Created At": run.created_at,
+        **scheduling_metadata(run_args, ret_enable),
+    }
+
+
+def classify_runs(runs, workers=100):
+    """run별 조회를 병렬화하고 CSV에는 원래 W&B 목록 순서를 보존합니다."""
+    if workers < 1:
+        raise ValueError('workers는 1 이상이어야 합니다')
+    results = {}
+    with tqdm(
+        total=len(runs), desc="Classifying", unit="run",
+        dynamic_ncols=True, file=sys.stdout,
+    ) as progress, ThreadPoolExecutor(max_workers=workers) as executor:
+        # W&B paginator는 이 스레드에서만 순회하며 각 run은 한 worker만 처리합니다.
+        futures = {executor.submit(classify_run, run): index for index, run in enumerate(runs)}
+        for future in as_completed(futures):
+            row = future.result()
+            if row is not None:
+                results[futures[future]] = row
+                progress.set_postfix_str(
+                    f"Run: {' '.join(str(row['Run Name']).split())}", refresh=False,
+                )
+            progress.update(1)
+    return [results[index] for index in sorted(results)]
+
+
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description='W&B run 분류 결과를 CSV로 저장합니다.')
+    parser.add_argument('--workers', type=int, default=100,
+                        help='동시 처리할 run 수 (기본값: 100, 순차 처리: 1)')
+    args = parser.parse_args(argv)
+    if args.workers < 1:
+        parser.error('--workers는 1 이상이어야 합니다')
+    return args
+
+
+def main(workers=100):
     # 1. 자동 로그인 처리
     api_key_path = os.path.join(os.path.dirname(__file__), '.wandb_api_key')
     if os.path.exists(api_key_path):
@@ -206,169 +397,15 @@ def main():
         entity = "choemj-kaist"
         wandb_path = f"{entity}/STORM"
         print(f"'{wandb_path}' 프로젝트의 run들을 분석합니다...")
-        runs = api.runs(wandb_path)
+        runs = api.runs(wandb_path, per_page=100, lazy=False)
     except Exception as e:
         print(f"WandB API 호출 실패: {e}")
         return
 
-    results = []
-    
     total_runs = len(runs)
-    print(f"총 {total_runs}개의 run을 확인했습니다. 분류를 시작합니다...")
-    
-    def get_config_val(config, key_path):
-        if key_path in config:
-            return config[key_path]
-        keys = key_path.split('.')
-        val = config
-        for k in keys:
-            if isinstance(val, dict) and k in val:
-                val = val[k]
-            else:
-                return None
-        return val
+    print(f"총 {total_runs}개의 run을 확인했습니다. 최대 {workers}개씩 병렬 분류합니다...")
 
-    with tqdm(
-        runs, total=total_runs, desc="Classifying", unit="run",
-        dynamic_ncols=True, file=sys.stdout,
-    ) as progress:
-        for run in progress:
-            progress.set_postfix_str(f"Run: {' '.join(str(run.name).split())}")
-            if run.state == "killed":
-                continue
-
-            ret_enable = get_config_val(run.config, 'JointTrainAgent.Retrieval.enable')
-            is_both = (
-                str(ret_enable).strip().lower() == 'both'
-                or str(run.name).lower().endswith('_both')
-            )
-            is_experiment_list = isinstance(ret_enable, list)
-            if (is_both or is_experiment_list) and run.state != "running":
-                continue
-            if is_both:
-                ret_enable = 'Both'
-            elif not is_experiment_list:
-                ret_enable = str(ret_enable).strip().lower() in ('true', '1', 't')
-            save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
-            check_save_warmup = str(save_warmup).strip().lower() == 'false'
-            check_pending = run.state == 'running' and not (is_both or is_experiment_list)
-            needs_metadata = (
-                check_save_warmup or check_pending or run.state == 'running'
-                or str(save_warmup).strip().lower() == 'true'
-            )
-            run_args = get_run_args(run) if needs_metadata else None
-            save_warmup_requested = parse_save_warmup_request(run_args) if check_save_warmup else None
-            pending_configs = parse_pending_retrieval_configs(run_args) if check_pending else []
-            
-            # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
-            commit_hash = run.commit
-        
-            # run.commit이 없는 경우 config나 summary 등 다른 곳에 수동 기록했는지 확인
-            if not commit_hash and 'commit' in run.config:
-                commit_hash = run.config['commit']
-            
-            logic_type = get_logic_for_commit(commit_hash)
-        
-            eval_return = run.summary.get('eval/episode_avg_return', 'N/A')
-        
-            warmup_steps = 'N/A'
-            calculated_warmup_steps = 'N/A'
-            if ret_enable:
-                w_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_steps')
-                warmup_steps = w_steps if w_steps is not None else 'N/A'
-                calculated_warmup_steps = warmup_steps
-            
-                # warmup_steps가 -1인 경우, Retrieval/retrieved_contexts 그래프의 첫 스텝에서 가져옴
-                if str(warmup_steps) == '-1':
-                    try:
-                        # 백엔드 샘플링을 방지하기 위해 samples 값을 크게 설정하여 전체를 가져옵니다.
-                        hist_df = run.history(keys=["Retrieval/retrieved_contexts"], samples=1000000)
-                        if not hist_df.empty and "_step" in hist_df.columns:
-                            first_step = int(hist_df["_step"].min())
-                            calculated_warmup_steps = first_step + 1024
-                        else:
-                            tqdm.write(f"[{run.name}] 히스토리에 '_step' 정보가 없습니다.")
-                    except Exception as e:
-                        tqdm.write(f"[{run.name}] 히스토리에서 warmup steps를 가져오지 못했습니다: {e}")
-            
-            # 1. 런 이름에서 시드 추출 우선 시도 (형식: {env}_{id}_{seed}_{O/X/Both})
-            seed = None
-            parts = str(run.name).split('_')
-            if len(parts) >= 4 and parts[-1].upper() in ['O', 'X', 'BOTH']:
-                try:
-                    seed = int(parts[-2])
-                except ValueError:
-                    pass
-            elif len(parts) >= 3 and parts[-1].isdigit():
-                # Both 공통 단계의 Logger는 O/X 접미사 없이 이름을 기록합니다.
-                seed = int(parts[-1])
-                
-            # 2. 런 이름에서 유추 실패 시 Config에서 읽어오기 ('Seed' 또는 'seed' 확인)
-            if seed is None:
-                seed = get_config_val(run.config, 'Seed')
-                if seed is None:
-                    seed = get_config_val(run.config, 'seed')
-                
-            seed = seed if seed is not None else 'N/A'
-        
-            dynamic_warmup_delay_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_delay_steps')
-            dynamic_warmup_delay_steps = dynamic_warmup_delay_steps if dynamic_warmup_delay_steps is not None else 'N/A'
-        
-            dynamic_warmup_target_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_target_steps')
-            dynamic_warmup_target_steps = dynamic_warmup_target_steps if dynamic_warmup_target_steps is not None else 'N/A'
-        
-            min_warmup_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.min_warmup_steps')
-            min_warmup_steps = min_warmup_steps if min_warmup_steps is not None else 'N/A'
-        
-            batch_size_reduction = get_config_val(run.config, 'JointTrainAgent.Retrieval.batch_size_reduction')
-            batch_size_reduction = batch_size_reduction if batch_size_reduction is not None else 'N/A'
-        
-            z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.z_score_threshold')
-            z_score_threshold = z_score_threshold if z_score_threshold is not None else 'N/A'
-
-            value_signal = get_config_val(run.config, 'JointTrainAgent.Retrieval.value_signal')
-            score_combination = get_config_val(run.config, 'JointTrainAgent.Retrieval.score_combination')
-            neighbor_source = get_config_val(run.config, 'JointTrainAgent.Retrieval.neighbor_source')
-            additive_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.additive_z_score_threshold')
-        
-            hash_bits = get_config_val(run.config, 'JointTrainAgent.Retrieval.hash_bits')
-            hash_bits = hash_bits if hash_bits is not None else 'N/A'
-        
-            retrieval_target = get_config_val(run.config, 'JointTrainAgent.Retrieval.target')
-            retrieval_target = retrieval_target if retrieval_target is not None else 'N/A'
-        
-            anchor_weight = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight')
-            anchor_weight = anchor_weight if anchor_weight is not None else 'N/A'
-        
-            results.append({
-                "Run Name": run.name,
-                "Run ID": run.id,
-                "State": run.state,
-                "Commit": commit_hash[:7] if commit_hash else "None",
-                "Logic": logic_type,
-                "Eval Return": eval_return,
-                "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
-                "Pending Retrieval Configs": json.dumps(pending_configs),
-                "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
-                "Save Warmup Requested": save_warmup_requested if save_warmup_requested is not None else 'N/A',
-                "Warmup Steps": warmup_steps,
-                "Calculated Warmup Steps": calculated_warmup_steps,
-                "Dynamic Warmup Delay Steps": dynamic_warmup_delay_steps,
-                "Dynamic Warmup Target Steps": dynamic_warmup_target_steps,
-                "Min Warmup Steps": min_warmup_steps,
-                "Batch Size Reduction": batch_size_reduction,
-                "Z Score Threshold": z_score_threshold,
-                "Value Signal": value_signal if value_signal is not None else 'N/A',
-                "Score Combination": score_combination if score_combination is not None else 'N/A',
-                "Neighbor Source": neighbor_source if neighbor_source is not None else 'retrieval',
-                "Additive Z Score Threshold": additive_z_score_threshold if additive_z_score_threshold is not None else 'N/A',
-                "Hash Bits": hash_bits,
-                "Retrieval Target": retrieval_target,
-                "Anchor Weight": anchor_weight,
-                "Seed": seed,
-                "Created At": run.created_at,
-                **scheduling_metadata(run_args, ret_enable),
-            })
+    results = classify_runs(runs, workers=workers)
 
     live_count = len(results)
     results = merge_archived_target_1_runs(results)
@@ -381,7 +418,7 @@ def main():
     for logic, count in logic_counts.most_common():
         print(f"  {logic}: {count} runs")
     print("="*50)
-    
+
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
@@ -390,8 +427,8 @@ def main():
         writer.writeheader()
         for row in results:
             writer.writerow(row)
-            
+
     print(f"\n상세 결과가 '{output_csv}' 파일로 저장되었습니다.")
 
 if __name__ == "__main__":
-    main()
+    main(workers=parse_args().workers)
