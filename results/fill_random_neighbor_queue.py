@@ -1,14 +1,18 @@
-"""2000~3999번 시드의 RandomNeighor 실험을 게임당 2개까지 보충합니다.
+"""2000~3999번 시드의 RandomNeighor 실험을 게임당 4개까지 보충합니다.
 
 STORM-1에서 실행:
     python results/fill_random_neighbor_queue.py          # 계획만 확인
     python results/fill_random_neighbor_queue.py --apply  # 실제 큐에 추가
 
-Krull은 항상 제외합니다. 완료/실행 중/대기 중인 동일 게임·시드는 중복
-등록하지 않습니다. Full 결과가 있는 후보는 논문과의 HNS 차이로 정렬하고,
+각 게임의 3개째 명령을 모두 배치한 뒤 4개째 명령을 배치합니다. 3개보다
+적게 확보한 게임은 앞선 차수부터 보충합니다. Krull은 항상 제외하고,
+Kangaroo의 모든 추가 명령은 다른 게임의 4개째 명령 뒤에 배치합니다.
+완료/실행 중/대기 중인 동일 게임·시드는 중복 등록하지 않습니다.
+Full 결과가 있는 후보는 논문과의 HNS 차이로 정렬하고,
 후보가 부족하면 같은 게임에서 아직 사용하지 않은 시드를 배정합니다.
 취소선 시드는 새 실험 후보에서 제외합니다. Full 중복 점수는 원본 셀의
 첫 번째 완료 점수(최신 순)를 사용합니다. 시드 수는 중복 run을 합쳐 셉니다.
+Freeway는 trajectory 경로를 Freeway.pkl로 지정하고 UseDemonstration을 켭니다.
 
 기존 Excel 변환기의 큐/YAML 파서를 재사용하므로 openpyxl, pandas, PyYAML이
 필요합니다. 학습 명령은 기존 worker가 큐에서 가져가 실행합니다.
@@ -126,11 +130,14 @@ def queue_reservations(queue_texts):
 
 
 def make_command(game, seed):
+    trajectory = "Freeway.pkl" if game == "Freeway" else f"D_TRAJ/{game}.pkl"
     args = [
         "python", "-u", "train.py", "-n", f"{game}-{seed}", "-seed", str(seed),
         "-config_path", "config_files/STORM.yaml", "-env_name", f"ALE/{game}-v5",
-        "-trajectory_path", f"D_TRAJ/{game}.pkl",
+        "-trajectory_path", trajectory,
     ]
+    if game == "Freeway":
+        args.extend(["JointTrainAgent.UseDemonstration", "True"])
     # YAML 기본값이 바뀌어도 요청한 설정 행으로 분류되도록 고정합니다.
     for key, value in {
         "enable": "RandomNeighor", "target": "16", "anchor_weight": "0.0625",
@@ -143,7 +150,7 @@ def make_command(game, seed):
     return shlex.join(args)
 
 
-def plan_jobs(games, references, workbook_used, pending, queue_used, target=2):
+def plan_jobs(games, references, workbook_used, pending, queue_used, target=4):
     if not 1 <= target <= 4:
         raise ValueError("target-seeds는 1~4여야 합니다.")
     jobs, summaries = [], []
@@ -192,7 +199,7 @@ def plan_jobs(games, references, workbook_used, pending, queue_used, target=2):
         summaries.append({"game": game, "completed": sorted(completed),
                           "pending": sorted(reserved - completed), "new_seeds": selected,
                           "expected_seed_count": len(covered) + len(selected)})
-        for seed in selected:
+        for round_target, seed in enumerate(selected, start=len(covered) + 1):
             matched = seed in candidates
             full_score = full[seed].scores[0] if matched else None
             paper_hns = ((reference["paper"] - reference["random"]) /
@@ -200,13 +207,17 @@ def plan_jobs(games, references, workbook_used, pending, queue_used, target=2):
             full_hns = ((full_score - reference["random"]) /
                         (reference["human"] - reference["random"])) if matched else None
             jobs.append({
-                "game": game, "seed": seed,
+                "game": game, "seed": seed, "round_target": round_target,
                 "reason": "Full HNS가 논문에 가까운 순" if matched else "Full 후보가 없어 미사용 시드 배정",
                 "full_score": full_score, "paper_score": reference.get("paper"),
                 "full_hns": full_hns, "paper_hns": paper_hns,
                 "absolute_hns_gap": abs(full_hns - paper_hns) if matched else None,
                 "command": make_command(game, seed),
             })
+    # 모든 게임의 n개째 명령을 배치한 뒤 n+1개째 명령을 배치합니다.
+    # Kangaroo는 모든 차수를 맨 뒤로 옮기고, 같은 차수 안에서는 Excel 순서를 유지합니다.
+    jobs.sort(key=lambda job: (job["game"] == "Kangaroo", job["round_target"]))
+    summaries.sort(key=lambda summary: summary["game"] == "Kangaroo")
     return {"seed_range": [SEED_MIN, SEED_MAX], "target_seeds": target,
             "excluded_games": ["Krull"], "games": summaries, "new_jobs": jobs}
 
@@ -227,7 +238,7 @@ def locked_queues(queue_path):
         yield texts
 
 
-def run(input_path, queue_path, sheet_name="Results", target=2, apply=False):
+def run(input_path, queue_path, sheet_name="Results", target=4, apply=False):
     queue_path = Path(queue_path).resolve()
     if queue_path == Path(input_path).resolve():
         raise ValueError("입력 Excel과 큐는 다른 경로여야 합니다.")
@@ -253,7 +264,7 @@ def main():
     parser.add_argument("--input", type=Path, default=HERE / "converted_results.xlsx")
     parser.add_argument("--queue", type=Path, default=HERE.parent / "job_queue_3090.txt")
     parser.add_argument("--sheet", default="Results")
-    parser.add_argument("--target-seeds", type=int, choices=range(1, 5), default=2)
+    parser.add_argument("--target-seeds", type=int, choices=range(1, 5), default=4)
     parser.add_argument("--apply", action="store_true", help="실제로 큐에 추가 (기본은 계획만 표시)")
     parser.add_argument("--report", type=Path, help="선택 근거와 명령을 JSON으로 저장")
     args = parser.parse_args()
@@ -265,7 +276,7 @@ def main():
               f"신규 {game['new_seeds']} -> 완료 예정 {game['expected_seed_count']}개")
     for job in report["new_jobs"]:
         gap = f", |ΔHNS|={job['absolute_hns_gap']:.6f}" if job["absolute_hns_gap"] is not None else ""
-        print(f"{job['game']}-{job['seed']}: {job['reason']}{gap}")
+        print(f"{job['game']}-{job['seed']} ({job['round_target']}개째): {job['reason']}{gap}")
         print(job["command"])
     verb = "추가 완료" if args.apply else "추가 예정 (계획만 확인)"
     print(f"{verb}: {len(report['new_jobs'])}개 명령, {report['queue']}")
