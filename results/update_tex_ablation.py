@@ -10,6 +10,8 @@ Each variant is paired independently with default FLASH on common training seeds
 With fewer than two common seeds, Random neighbors instead uses all valid scores
 from its exact config row, and Full FLASH uses the scores selected by update_tex.py
 for the main performance table. Either method can have no scores in this fallback.
+Aggregate metrics include only games with scores for both methods, while game
+rows still show every available score.
 The main summary shares Full FLASH for value/add only when all paired seed IDs
 and baseline scores agree. Neighbor retrieval and random-neighbor comparisons
 always keep their own baselines. RandomNeighor scores match the complete Excel
@@ -173,14 +175,21 @@ def load_random_neighbor_results(excel_path):
 
 
 def ablation_table_rows(lines, results):
-    """Reuse main-table metrics independently for each method's available scores."""
+    """Show available game scores; aggregate only games with both methods present."""
     method_rows = []
     for method in (0, 1):
         available = {game: (scores[method], scores[method])
                      for game, scores in results.items() if scores[method]}
         method_rows.append(main_table_rows(update_table(lines, available)))
-    for (_, parts, _), (_, variant_parts, _) in zip(*method_rows, strict=True):
-        parts[OURS_COLUMN] = variant_parts[OURS_COLUMN]
+    common_results = {game: scores for game, scores in results.items() if all(scores)}
+    metric_rows = main_table_rows(update_table(lines, common_results))
+    for (_, parts, _), (_, variant_parts, _), (_, metric_parts, _) in zip(
+            *method_rows, metric_rows, strict=True):
+        if metric_name(parts[0]):
+            parts[BASE_COLUMN] = metric_parts[BASE_COLUMN]
+            parts[OURS_COLUMN] = metric_parts[OURS_COLUMN]
+        else:
+            parts[OURS_COLUMN] = variant_parts[OURS_COLUMN]
     return method_rows[0]
 
 
@@ -201,7 +210,7 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
             r'Random neighbors uses all available non-excluded seeds of its exact configuration; '
             r'the two methods can use different seeds and seed counts. '
             r'A dash indicates no available results for that method. '
-            r"Aggregate metrics use each method's available games and the Random/Human "
+            r'Aggregate metrics use only games with results for both methods and the Random/Human '
             r'references in Table~\ref{tab:main_performance}. '
         )
     else:
@@ -363,7 +372,7 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         r'Full FLASH uses the main-performance seed selection and Random neighbors '
         r'uses all available non-excluded seeds of its exact configuration. '
         r'Aggregate metrics match the corresponding appendix tables and use all '
-        r'available games for each method, independently of the game rows shown; '
+        r'games with results for both methods in each comparison, independently of the game rows shown; '
         r'IQM pools per-seed human-normalized scores. '
     )
     if shared:
