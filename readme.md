@@ -2,7 +2,7 @@
 
 
 
-export CUDA_VISIBLE_DEVICES=3
+export CUDA_VISIBLE_DEVICES=5
 source .bashrc
 cd STORM-1
 conda activate storm

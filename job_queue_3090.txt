@@ -1,13 +1,3 @@
-python -u train.py -n "Frostbite-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/Frostbite-v5" -trajectory_path "D_TRAJ/Frostbite.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "UpNDown-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/UpNDown-v5" -trajectory_path "D_TRAJ/UpNDown.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "Qbert-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/Qbert-v5" -trajectory_path "D_TRAJ/Qbert.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "BattleZone-3010" -seed 3010 -config_path "config_files/STORM.yaml" -env_name "ALE/BattleZone-v5" -trajectory_path "D_TRAJ/BattleZone.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "Alien-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/Alien-v5" -trajectory_path "D_TRAJ/Alien.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "Amidar-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/Amidar-v5" -trajectory_path "D_TRAJ/Amidar.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "Asterix-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/Asterix-v5" -trajectory_path "D_TRAJ/Asterix.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "BankHeist-3010" -seed 3010 -config_path "config_files/STORM.yaml" -env_name "ALE/BankHeist-v5" -trajectory_path "D_TRAJ/BankHeist.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "Breakout-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/Breakout-v5" -trajectory_path "D_TRAJ/Breakout.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "ChopperCommand-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/ChopperCommand-v5" -trajectory_path "D_TRAJ/ChopperCommand.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "CrazyClimber-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/CrazyClimber-v5" -trajectory_path "D_TRAJ/CrazyClimber.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "DemonAttack-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/DemonAttack-v5" -trajectory_path "D_TRAJ/DemonAttack.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
-python -u train.py -n "Hero-3000" -seed 3000 -config_path "config_files/STORM.yaml" -env_name "ALE/Hero-v5" -trajectory_path "D_TRAJ/Hero.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
+python -u train.py -n "CrazyClimber-3020" -seed 3020 -config_path "config_files/STORM.yaml" -env_name "ALE/CrazyClimber-v5" -trajectory_path "D_TRAJ/CrazyClimber.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
+python -u train.py -n "DemonAttack-3020" -seed 3020 -config_path "config_files/STORM.yaml" -env_name "ALE/DemonAttack-v5" -trajectory_path "D_TRAJ/DemonAttack.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
+python -u train.py -n "Hero-3020" -seed 3020 -config_path "config_files/STORM.yaml" -env_name "ALE/Hero-v5" -trajectory_path "D_TRAJ/Hero.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
