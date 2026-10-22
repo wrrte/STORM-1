@@ -1,3 +1,7 @@
+python -u train.py -n Assault-3710 -seed 3710 -config_path config_files/STORM.yaml -env_name ALE/Assault-v5 -trajectory_path D_TRAJ/Assault.pkl JointTrainAgent.Retrieval.enable RandomNeighor 
+python -u train.py -n Boxing-2010 -seed 2010 -config_path config_files/STORM.yaml -env_name ALE/Boxing-v5 -trajectory_path D_TRAJ/Boxing.pkl JointTrainAgent.Retrieval.enable RandomNeighor 
+python -u train.py -n Freeway-2010 -seed 2010 -config_path config_files/STORM.yaml -env_name ALE/Freeway-v5 -trajectory_path Freeway.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration True
+python -u train.py -n Freeway-2020 -seed 2020 -config_path config_files/STORM.yaml -env_name ALE/Freeway-v5 -trajectory_path Freeway.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration True
 python -u train.py -n "CrazyClimber-3020" -seed 3020 -config_path "config_files/STORM.yaml" -env_name "ALE/CrazyClimber-v5" -trajectory_path "D_TRAJ/CrazyClimber.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
 python -u train.py -n "DemonAttack-3020" -seed 3020 -config_path "config_files/STORM.yaml" -env_name "ALE/DemonAttack-v5" -trajectory_path "D_TRAJ/DemonAttack.pkl" JointTrainAgent.Retrieval.enable RandomNeighor
 python -u train.py -n "Hero-3020" -seed 3020 -config_path "config_files/STORM.yaml" -env_name "ALE/Hero-v5" -trajectory_path "D_TRAJ/Hero.pkl" JointTrainAgent.Retrieval.enable RandomNeighor

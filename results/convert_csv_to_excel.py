@@ -661,12 +661,19 @@ def main(csv_path=None, output_path=None, queue_dir=None):
     )
 
     # 시드 그룹 순서. 6020은 결과가 없어도 60*0 그룹 내에 표시합니다.
-    target_columns = [1, 2, 10, 710, 1710, 2710, 3710, ' ', 2000, 2010, '  ', 5090]
+    target_columns = [1, 2, 10, 710, 1710]
     extra_seeds = sorted((set(pivot_df.columns) | {6020}) - set(target_columns))
-    seeds_999 = [seed for seed in extra_seeds if str(seed).startswith('999')]
-    full_columns = target_columns + [seed for seed in extra_seeds if seed not in seeds_999]
-    if seeds_999:
-        full_columns += ['    '] + seeds_999
+    # 2000~3999는 한 구역에, 9000~9999는 마지막 구역에 모아 오름차순으로 표시합니다.
+    seeds_2000_3000 = sorted({2000, 2010, 2710, 3710} | {
+        seed for seed in extra_seeds if 2000 <= seed < 4000
+    })
+    seeds_9000 = [seed for seed in extra_seeds if 9000 <= seed < 10000]
+    target_columns += [' '] + seeds_2000_3000 + ['  ', 5090]
+    full_columns = target_columns + [
+        seed for seed in extra_seeds if seed not in target_columns and seed not in seeds_9000
+    ]
+    if seeds_9000:
+        full_columns += ['    '] + seeds_9000
     
     pivot_df = pivot_df.reindex(columns=full_columns)
     pivot_df = pivot_df.fillna('')

@@ -1,0 +1,93 @@
+{
+  "seed_range": [
+    2000,
+    3999
+  ],
+  "target_seeds": 2,
+  "excluded_games": [
+    "Krull"
+  ],
+  "games": [
+    {
+      "game": "Assault",
+      "completed": [
+        2000
+      ],
+      "pending": [],
+      "new_seeds": [
+        3710
+      ],
+      "expected_seed_count": 2
+    },
+    {
+      "game": "Boxing",
+      "completed": [
+        2000
+      ],
+      "pending": [],
+      "new_seeds": [
+        2010
+      ],
+      "expected_seed_count": 2
+    },
+    {
+      "game": "Freeway",
+      "completed": [],
+      "pending": [],
+      "new_seeds": [
+        2010,
+        2020
+      ],
+      "expected_seed_count": 2
+    }
+  ],
+  "new_jobs": [
+    {
+      "game": "Assault",
+      "seed": 3710,
+      "reason": "Full HNS가 논문에 가까운 순",
+      "full_score": 720.25,
+      "paper_score": 801.0,
+      "full_hns": 0.9581408775981525,
+      "paper_hns": 1.113548883756736,
+      "absolute_hns_gap": 0.15540800615858352,
+      "command": "python -u train.py -n Assault-3710 -seed 3710 -config_path config_files/STORM.yaml -env_name ALE/Assault-v5 -trajectory_path D_TRAJ/Assault.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.Retrieval.target 16 JointTrainAgent.Retrieval.anchor_weight 0.0625 JointTrainAgent.Retrieval.warmup_steps 50000 JointTrainAgent.Retrieval.batch_size_reduction retrieved JointTrainAgent.Retrieval.z_score_threshold 3.5 JointTrainAgent.Retrieval.value_signal value_diff JointTrainAgent.Retrieval.score_combination multiply JointTrainAgent.Retrieval.neighbor_source random JointTrainAgent.Retrieval.hash_bits 10 JointTrainAgent.Retrieval.save_warmup False"
+    },
+    {
+      "game": "Boxing",
+      "seed": 2010,
+      "reason": "Full 후보가 없어 미사용 시드 배정",
+      "full_score": null,
+      "paper_score": 80.0,
+      "full_hns": null,
+      "paper_hns": null,
+      "absolute_hns_gap": null,
+      "command": "python -u train.py -n Boxing-2010 -seed 2010 -config_path config_files/STORM.yaml -env_name ALE/Boxing-v5 -trajectory_path D_TRAJ/Boxing.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.Retrieval.target 16 JointTrainAgent.Retrieval.anchor_weight 0.0625 JointTrainAgent.Retrieval.warmup_steps 50000 JointTrainAgent.Retrieval.batch_size_reduction retrieved JointTrainAgent.Retrieval.z_score_threshold 3.5 JointTrainAgent.Retrieval.value_signal value_diff JointTrainAgent.Retrieval.score_combination multiply JointTrainAgent.Retrieval.neighbor_source random JointTrainAgent.Retrieval.hash_bits 10 JointTrainAgent.Retrieval.save_warmup False"
+    },
+    {
+      "game": "Freeway",
+      "seed": 2010,
+      "reason": "Full 후보가 없어 미사용 시드 배정",
+      "full_score": null,
+      "paper_score": 34.0,
+      "full_hns": null,
+      "paper_hns": null,
+      "absolute_hns_gap": null,
+      "command": "python -u train.py -n Freeway-2010 -seed 2010 -config_path config_files/STORM.yaml -env_name ALE/Freeway-v5 -trajectory_path D_TRAJ/Freeway.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.Retrieval.target 16 JointTrainAgent.Retrieval.anchor_weight 0.0625 JointTrainAgent.Retrieval.warmup_steps 50000 JointTrainAgent.Retrieval.batch_size_reduction retrieved JointTrainAgent.Retrieval.z_score_threshold 3.5 JointTrainAgent.Retrieval.value_signal value_diff JointTrainAgent.Retrieval.score_combination multiply JointTrainAgent.Retrieval.neighbor_source random JointTrainAgent.Retrieval.hash_bits 10 JointTrainAgent.Retrieval.save_warmup False"
+    },
+    {
+      "game": "Freeway",
+      "seed": 2020,
+      "reason": "Full 후보가 없어 미사용 시드 배정",
+      "full_score": null,
+      "paper_score": 34.0,
+      "full_hns": null,
+      "paper_hns": null,
+      "absolute_hns_gap": null,
+      "command": "python -u train.py -n Freeway-2020 -seed 2020 -config_path config_files/STORM.yaml -env_name ALE/Freeway-v5 -trajectory_path D_TRAJ/Freeway.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.Retrieval.target 16 JointTrainAgent.Retrieval.anchor_weight 0.0625 JointTrainAgent.Retrieval.warmup_steps 50000 JointTrainAgent.Retrieval.batch_size_reduction retrieved JointTrainAgent.Retrieval.z_score_threshold 3.5 JointTrainAgent.Retrieval.value_signal value_diff JointTrainAgent.Retrieval.score_combination multiply JointTrainAgent.Retrieval.neighbor_source random JointTrainAgent.Retrieval.hash_bits 10 JointTrainAgent.Retrieval.save_warmup False"
+    }
+  ],
+  "input": "/mnt/hdd_4A/choemj/STORM-1/results/converted_results.xlsx",
+  "queue": "/mnt/hdd_4A/choemj/STORM-1/job_queue_3090.txt",
+  "applied": true
+}
