@@ -12,3 +12,4 @@ experiment_scheduler.lock
 results/experiment_scheduler_state.json
 tests/
 diagnostics/
+results/gpu4_demo_check_20261024/
