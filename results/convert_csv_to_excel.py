@@ -661,10 +661,10 @@ def main(csv_path=None, output_path=None, queue_dir=None):
     )
 
     # 시드 그룹 순서. 6020은 결과가 없어도 60*0 그룹 내에 표시합니다.
-    target_columns = [1, 2, 10, 710, 1710]
+    target_columns = [1, 2, 10, 710, 1710, 2710, 3710]
     extra_seeds = sorted((set(pivot_df.columns) | {6020}) - set(target_columns))
-    # 2000~3999는 한 구역에, 9000~9999는 마지막 구역에 모아 오름차순으로 표시합니다.
-    seeds_2000_3000 = sorted({2000, 2010, 2710, 3710} | {
+    # 2710/3710을 제외한 2000~3999는 한 구역에, 9000~9999는 마지막 구역에 모읍니다.
+    seeds_2000_3000 = sorted({2000, 2010} | {
         seed for seed in extra_seeds if 2000 <= seed < 4000
     })
     seeds_9000 = [seed for seed in extra_seeds if 9000 <= seed < 10000]
