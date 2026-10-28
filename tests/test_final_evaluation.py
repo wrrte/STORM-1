@@ -124,7 +124,9 @@ class FinalEvaluationTests(unittest.TestCase):
                     evaluator.assert_not_called()
                 else:
                     loader.assert_called_once_with("ckpt/unit_run", self.world, self.agent, step)
-                    evaluator.assert_called_once()
+                    self.assertEqual(evaluator.call_count, 2)
+                    self.assertEqual([call.kwargs["precision"] for call in evaluator.call_args_list],
+                                     ["bf16", "fp32"])
                     logger.log.assert_any_call("eval/checkpoint_step", 100000 if step is not None else 102000)
 
 

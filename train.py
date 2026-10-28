@@ -22,7 +22,7 @@ from replay_buffer import ReplayBuffer
 import env_wrapper
 import agents
 from sub_models.functions_losses import symexp
-from sub_models.precision import get_amp_dtype
+from sub_models.precision import get_amp_dtype, evaluation_precisions
 from sub_models.world_models import WorldModel, MSELoss
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
@@ -182,7 +182,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   warmup_finished_resume=False, episode_rewards_resume=None,
                                   dynamic_warmup_met_step_resume=-1,
                                   retrieval_state_resume=None, rng_state_resume=None,
-                                  branch_commands=None):
+                                  branch_commands=None, eval_precision="auto", eval_seed=0):
     if branch_commands is not None and num_envs != 1:
         raise ValueError("Shared warmup episode-boundary branching requires NumEnvs=1; parallel environments cannot be paused independently")
 
@@ -499,18 +499,18 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         if eval_mode == "active" and (total_steps * num_envs) >= eval_start_step and total_steps > 0 and (total_steps * num_envs - eval_start_step) % eval_every_steps == 0:
             print(colorama.Fore.GREEN + f"Intermediate evaluation at total steps {total_steps}..." + colorama.Style.RESET_ALL)
             import eval
-            episode_avg_return, individual_returns = eval.eval_episodes(
+            episode_avg_return, individual_returns = eval.evaluate_and_log(
+                logger=logger,
+                precision=eval_precision,
+                seed=eval_seed,
                 num_episode=eval_episodes,
                 env_name=env_name,
-                num_envs=min(5, eval_episodes),
+                num_envs=eval_episodes,
                 max_steps=max_steps,
                 image_size=image_size,
                 world_model=world_model,
                 agent=agent
             )
-            logger.log("eval/episode_avg_return", episode_avg_return)
-            for i, ret in enumerate(individual_returns):
-                logger.log(f"eval/episode_return_{i}", ret)
 
         # flush all buffered wandb metrics for this step
         logger.flush_wandb()
@@ -659,6 +659,9 @@ if __name__ == "__main__":
         launch_storm_warmup_followup(args, extra_args, __file__, load_config)
     conf = load_config(args.config_path)
     branch_commands = configure_storm_retrieval_run(conf, args, extra_args, __file__)
+    evaluation_precisions(conf.JointTrainAgent.EvalPrecision)
+    if conf.JointTrainAgent.EvalEpisodes <= 0 or not (0 <= conf.JointTrainAgent.EvalSeed <= 2**32 - 1):
+        raise ValueError("EvalEpisodes must be positive and EvalSeed must be between 0 and 2**32 - 1")
     configure_performance(conf)
     print(colorama.Fore.RED + str(args) + " extra: " + str(extra_args) + colorama.Style.RESET_ALL)
 
@@ -753,6 +756,8 @@ if __name__ == "__main__":
             eval_mode=conf.JointTrainAgent.EvalMode,
             eval_every_steps=conf.JointTrainAgent.EvalEverySteps,
             eval_episodes=conf.JointTrainAgent.EvalEpisodes,
+            eval_precision=conf.JointTrainAgent.EvalPrecision,
+            eval_seed=conf.JointTrainAgent.EvalSeed,
             eval_start_step=getattr(conf.JointTrainAgent, 'EvalStartStep', 0),
             resume_step=resume_step,
             resume_last_rebuild_step=resume_last_rebuild_step,
@@ -777,10 +782,13 @@ if __name__ == "__main__":
                 print(colorama.Fore.GREEN + "Evaluating the trained model before finishing..." + colorama.Style.RESET_ALL)
             logger.log("eval/checkpoint_step", final_eval_step)
             import eval
-            episode_avg_return, individual_returns = eval.eval_episodes(
+            episode_avg_return, individual_returns = eval.evaluate_and_log(
+                logger=logger,
+                precision=conf.JointTrainAgent.EvalPrecision,
+                seed=conf.JointTrainAgent.EvalSeed,
                 num_episode=conf.JointTrainAgent.EvalEpisodes,
                 env_name=args.env_name,
-                num_envs=min(5, conf.JointTrainAgent.EvalEpisodes),
+                num_envs=conf.JointTrainAgent.EvalEpisodes,
                 max_steps=conf.JointTrainAgent.SampleMaxSteps,
                 image_size=conf.BasicSettings.ImageSize,
                 world_model=world_model,
@@ -798,9 +806,6 @@ if __name__ == "__main__":
                 print(f"Failed to load baseline scores for {env_base}: {e}")
 
             logger.log("eval/baseline_score_avg", baseline_score_avg)
-            logger.log("eval/episode_avg_return", episode_avg_return)
-            for i, ret in enumerate(individual_returns):
-                logger.log(f"eval/episode_return_{i}", ret)
             logger.flush_wandb()
         else:
             print(colorama.Fore.YELLOW + f"Skipping final evaluation because EvalMode is {conf.JointTrainAgent.EvalMode}" + colorama.Style.RESET_ALL)

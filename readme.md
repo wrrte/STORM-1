@@ -71,6 +71,38 @@ Following the **Training and Evaluating Instructions** to reproduce the main res
 
     The `-run_name` option is the same as the `-n` option in `train.sh`. It should be kept the same as in the training script.
 
+    **BF16 / FP32 evaluation comparison:** `JointTrainAgent.EvalPrecision` accepts
+    `auto`, `bf16`, `fp32`, or `both`. The supplied STORM config uses `both`.
+    Intermediate and final evaluations run both precisions on the same weights.
+    `EvalSeed: 0` fixes the policy RNG and assigns distinct environment seeds
+    `0, 1, ..., EvalEpisodes-1` in both arms. Each environment contributes only its
+    first complete episode, including the terminal reward.
+
+    Existing checkpoints can be compared without starting training:
+
+    ```bash
+    CUDA_VISIBLE_DEVICES=0 python -u eval.py \
+        -config_path config_files/STORM.yaml \
+        -env_name ALE/Krull-v5 -run_name Krull-2170_baseline \
+        -step 100000 -precision both -seed 10000 -episodes 100
+    ```
+
+    Standalone evaluation writes timestamped mean and per-episode CSV files under
+    `eval_result/`, with precision and environment-seed columns. Explicit BF16 and
+    FP32 evaluation disable TF32; FP32 disables autocast in both the world model
+    and the agent. Model precision, train/eval flags, backend settings, and Python,
+    NumPy, CPU/CUDA RNG states are restored afterwards. Training precision and
+    optimizer/scaler settings are preserved. Equal initial RNG states do not imply
+    identical actions or trajectories once numerical results differ.
+
+    Training logs contain `eval/bf16/episode_avg_return`,
+    `eval/fp32/episode_avg_return`, per-episode returns under each prefix, and
+    `eval/fp32_minus_bf16`. The existing `eval/episode_avg_return` and per-episode
+    tags use the BF16 arm when `both` is selected. Override training settings with
+    `JointTrainAgent.EvalPrecision both JointTrainAgent.EvalEpisodes 100
+    JointTrainAgent.EvalSeed 10000` on the training command. `auto` uses the
+    model's existing AMP configuration; older YAML files default to `auto`.
+
 ## Additional Useful Information
 
 FLASH supports the `RandomNeighor` ablation: it runs hash retrieval and lazy
