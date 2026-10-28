@@ -1,9 +1,15 @@
-"""Regression checks for shared-game aggregate metrics in ablation tables."""
+"""Regression checks for seed selection and aggregate metrics in ablation tables."""
 
+import contextlib
 import copy
+import io
+from pathlib import Path
 import re
+from tempfile import TemporaryDirectory
 import unittest
 import warnings
+
+from openpyxl import Workbook
 
 import update_tex_ablation as updater
 
@@ -32,6 +38,53 @@ def table_cells(table):
             for cell in line.partition(r'\\')[0].split('&')[1:]
         ]
     return cells
+
+
+class RandomNeighborSeedSelectionTests(unittest.TestCase):
+    def load_rows(self, rows):
+        workbook = Workbook()
+        sheet = workbook.active
+        sheet.title = 'Results'
+        sheet.append(['Game', 'Config', 1, 2, 3, 4, 5, 6, 5090])
+        for row in rows:
+            sheet.append(row)
+        with TemporaryDirectory() as directory:
+            path = Path(directory) / 'results.xlsx'
+            workbook.save(path)
+            with contextlib.redirect_stdout(io.StringIO()):
+                return updater.load_random_neighbor_results(path)
+
+    def test_multiple_common_seeds_do_not_restrict_either_score_pool(self):
+        full = updater.FLASH_CONFIG
+        random = updater.ABLATIONS['random'].variant_config
+        results = self.load_rows([
+            ['Alien', 'Retrieval 미사용', 100, 200, None, 400, 500, 600, 9000],
+            ['Alien', full, '10, 999', 20, 30, 40, None, 60, 9000],
+            ['Alien', random, None, '200, 999', 300, 400, 500, None, 9000],
+            ['Alien', full + ' [value]', 9999, 9999, 9999, 9999, 9999, 9999, 9999],
+            ['Alien', full + ' [RandomNeighor, value]', 9999, 9999, 9999, 9999, 9999, 9999, 9999],
+        ])
+        # Three FLASH/Random seeds overlap, but FLASH must use its main-table
+        # seeds, including seeds 1 and 6; Random must also retain seeds 3 and 5.
+        # Alien seed 5090 is excluded, and duplicate scores use the first value.
+        self.assertEqual(results, {'Alien': ([10., 20., 40., 60.], [200., 300., 400., 500.])})
+
+    def test_one_sided_results_survive_without_a_main_performance_seed_match(self):
+        full = updater.FLASH_CONFIG
+        random = updater.ABLATIONS['random'].variant_config
+        results = self.load_rows([
+            ['Game0', 'Retrieval 미사용', 100],
+            ['Game0', full, 10],
+            ['Game1', random, None, 200],
+            ['Game2', 'Retrieval 미사용', 100],
+            ['Game2', full, None, 20],
+            ['Game2', random, None, 200],
+        ])
+        self.assertEqual(results, {
+            'Game0': ([10.], []),
+            'Game1': ([], [200.]),
+            'Game2': ([], [200.]),
+        })
 
 
 class SharedGameMetricsTests(unittest.TestCase):

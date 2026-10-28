@@ -6,10 +6,12 @@ Edit MAIN_GAMES below to set the default game rows (in display order). The
 --main-games option overrides that list for one run; --main-games alone shows
 only metrics. Re-running regenerates the entire summary, including its layout.
 Uses the same result loading, duplicate-result parsing, and aggregation as update_tex.py.
-Each variant is paired independently with default FLASH on common training seeds.
-With fewer than two common seeds, Random neighbors instead uses all valid scores
+Neighbor retrieval, value signal, and score combination are paired independently
+with default FLASH on common training seeds. Random neighbors uses all valid scores
 from its exact config row, and Full FLASH uses the scores selected by update_tex.py
-for the main performance table. Either method can have no scores in this fallback.
+for the main performance table (seeds shared with STORM without retrieval).
+The random-neighbor comparison selects each method's seeds independently;
+either method can have no scores.
 Aggregate metrics include only games with scores for both methods, while game
 rows still show every available score.
 The main summary shares Full FLASH for value/add only when all paired seed IDs
@@ -149,10 +151,8 @@ def bold_best_scores(label, cells):
 
 
 def load_random_neighbor_results(excel_path):
-    """Keep two or more matched seeds; otherwise use independent score pools."""
+    """Compare main-performance FLASH scores with all valid RandomNeighor scores."""
     ablation = ABLATIONS['random']
-    paired = load_results(excel_path, configs=ablation.configs,
-                          method_names=ablation.method_names)
     main_results = load_results(excel_path)
     # Pair the exact RandomNeighor row with itself to reuse the main loader's
     # seed exclusions and duplicate-result parsing without requiring a FLASH run.
@@ -160,17 +160,12 @@ def load_random_neighbor_results(excel_path):
         excel_path, configs=(ablation.variant_config, ablation.variant_config),
         method_names=(ablation.variant_name, ablation.variant_name),
     )
-    results = paired.copy()
-    for game in main_results.keys() | random_results.keys() | paired.keys():
-        common_count = len(paired.get(game, ([], []))[0])
-        if common_count >= 2:
-            continue
+    results = {}
+    for game in main_results.keys() | random_results.keys():
         full = main_results.get(game, ([], []))[1]
         random = random_results.get(game, ([], []))[1]
         if full or random:
             results[game] = (full, random)
-        else:
-            results.pop(game, None)
     return results
 
 
@@ -203,31 +198,18 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
     if missing_references:
         raise ValueError(f"Games missing from the main table: {sorted(missing_references)}")
 
-    if ablation == ABLATIONS['random']:
-        availability = (
-            r'With at least two common training seeds, scores use those paired seeds. '
-            r'Otherwise, Full FLASH uses the main-performance seed selection and '
-            r'Random neighbors uses all available non-excluded seeds of its exact configuration; '
-            r'the two methods can use different seeds and seed counts. '
-            r'A dash indicates no available results for that method. '
-            r'Aggregate metrics use only games with results for both methods and the Random/Human '
-            r'references in Table~\ref{tab:main_performance}. '
-        )
-    else:
-        availability = (
-            r'A dash indicates no paired results. Aggregate metrics summarize games with '
-            r'paired results using the Random/Human references in Table~\ref{tab:main_performance}. '
-        )
+    availability = (
+        r'A dash indicates no available results. Aggregate metrics use games with '
+        r'results for both methods and the Random/Human references in '
+        r'Table~\ref{tab:main_performance}. '
+    )
     table = [
         r'\begin{table}[!htbp]',
         r'\centering',
         r'\small',
-        r'\caption{' + ablation.caption +
-        r'The number of training seeds can differ across ablations '
-        r'and from Table~\ref{tab:main_performance}. '
-        + availability +
+        r'\caption{' + ablation.caption + availability +
         r'Mean, Median, and Optimality Gap use human-normalized game means; IQM pools '
-        r'the unrounded per-seed human-normalized scores. '
+        r'the unrounded human-normalized scores. '
         r'Bold indicates the best score in each pair (lower for Optimality Gap), '
         r'including ties.}',
         rf'\label{{{ablation.label}}}',
@@ -367,20 +349,9 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         r'Ablations on STORM (Tables~\ref{tab:neighbor_retrieval_ablation}, '
         r'\ref{tab:random_neighbor_ablation}, \ref{tab:value_signal_ablation}, '
         r'and \ref{tab:score_combination_ablation}). '
-        r'Game scores follow the seed selection of each appendix comparison. '
-        r'Neighbor source uses paired seeds when at least two are common; otherwise, '
-        r'Full FLASH uses the main-performance seed selection and Random neighbors '
-        r'uses all available non-excluded seeds of its exact configuration. '
         r'Aggregate metrics match the corresponding appendix tables and use all '
-        r'games with results for both methods in each comparison, independently of the game rows shown; '
-        r'IQM pools per-seed human-normalized scores. '
+        r'games with results for both methods in each comparison, independently of the game rows shown. '
     )
-    if shared:
-        caption += (r'Value and combination ablations share the same Full FLASH seeds '
-                    r'and scores; neighbor retrieval and neighbor source each '
-                    r'have a separate baseline. ')
-    else:
-        caption += r'Full FLASH is shown separately where paired seeds or scores differ. '
     caption += (r'Bold indicates the best score within each comparison group '
                 r'(lower for Optimality Gap), including ties.')
     table = [
