@@ -119,6 +119,32 @@ python -u train.py --resume_warmup ckpt/<run>_Shared JointTrainAgent.Retrieval.e
 The run suffix is `_randomneighor`. See [the training guide](../retrieval_training.md)
 for sampling, weighting and checkpoint details.
 
+Retrieval groups support fixed or relative anchor weights:
+
+```yaml
+JointTrainAgent:
+  Retrieval:
+    anchor_weight: 0.0625
+    anchor_weight_r: null
+```
+
+With `anchor_weight_r: null` (the default, including older configs), the anchor
+gets `anchor_weight` and each of its `K` final neighbors gets
+`(1 - anchor_weight) / K`. Set `anchor_weight_r` to a finite positive number `r`
+to use `r / (K + r)` for the anchor and `1 / (K + r)` for each neighbor instead.
+The relative setting takes precedence over `anchor_weight`; `r=1` gives equal
+weights and `r=2` makes the anchor twice as heavy as each neighbor. Counts are
+taken after re-verification, validity filtering and `max_contexts` truncation.
+Each group's weights still sum to one; a lone anchor always has weight one.
+The same rules apply to `RandomNeighor`.
+
+Append `JointTrainAgent.Retrieval.anchor_weight_r 2` to a training command,
+including a `--resume_warmup` command, to select relative weights. Append
+`JointTrainAgent.Retrieval.anchor_weight_r None` to return to fixed weights.
+Restoring a checkpoint keeps the receiving run's weighting settings.
+W&B stores `anchor_weight_r`, CSV exports `Anchor Weight R`, and Excel lists relative runs on
+separate rows such as `target: 16 (anchor r: 2)`.
+
 STORM retrieval uses a per-call CPU snapshot of termination flags and batched
 replay reads to reduce CUDA synchronization while preserving sampling and model
 input order. See [retrieval execution optimizations](diagnostics/retrieval_execution_optimizations.md)

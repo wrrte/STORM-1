@@ -1,6 +1,7 @@
 import ast
 import fcntl
 import json
+import math
 import re
 import shlex
 import warnings
@@ -54,6 +55,7 @@ RETRIEVAL_COLUMNS = {
     'enable': 'Retrieval Enable', 'warmup_steps': 'Warmup Steps',
     'target': 'Retrieval Target', 'batch_size_reduction': 'Batch Size Reduction',
     'z_score_threshold': 'Z Score Threshold', 'anchor_weight': 'Anchor Weight',
+    'anchor_weight_r': 'Anchor Weight R',
     'value_signal': 'Value Signal', 'score_combination': 'Score Combination',
     'neighbor_source': 'Neighbor Source',
     'additive_z_score_threshold': 'Additive Z Score Threshold',
@@ -480,7 +482,7 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         # 실험 필터링 및 표기법 변경 로직
         # 1. Retrieval을 사용하지 않은 실험은 'Retrieval 미사용'으로 표기
         # 2. Warmup 50000, BSR retrieved, 적용 임계값(multiply: 3.5 / add: 4.0)만 유지
-        # 3. target 1 또는 16이고 anchor 미설정인 실험만 유지 (기존대로 0.0625도 미설정 취급)
+        # 3. target 1/16의 기존 anchor 미설정 실험과 상대 가중치 실험을 구분합니다.
         # 4. value_signal=value / score_combination=add는 별도 config 행으로 표시
         # ---------------------------------------------------------
         if not ret_enable:
@@ -517,27 +519,38 @@ def main(csv_path=None, output_path=None, queue_dir=None):
                 except (ValueError, TypeError):
                     continue
                 
-                a_weight = row.get('Anchor Weight', 'N/A')
-                try:
-                    anchor_is_unset = float(a_weight) == 0.0625
-                except (ValueError, TypeError):
-                    anchor_is_unset = False
-
-                if (pd.isna(a_weight) or str(a_weight).strip() == '' or
-                        str(a_weight) == 'nan' or str(a_weight) == 'N/A' or
-                        anchor_is_unset):
-                    config = f'target: {int(r_target)} (anchor 미설정)'
-                    variants = []
-                    if value_signal == 'value':
-                        variants.append('value')
-                    if score_combination == 'add':
-                        variants.append('add')
-                    if neighbor_source == 'random':
-                        variants.append('RandomNeighor')
-                    if variants:
-                        config += f" [{', '.join(variants)}]"
+                relative_weight = config_value(row, 'Anchor Weight R', None)
+                if relative_weight is not None:
+                    try:
+                        ratio = float(relative_weight)
+                    except (ValueError, TypeError):
+                        continue
+                    if not math.isfinite(ratio) or ratio <= 0:
+                        continue
+                    ratio_label = str(ratio).removesuffix('.0')
+                    config = f'target: {int(r_target)} (anchor r: {ratio_label})'
                 else:
-                    continue
+                    a_weight = row.get('Anchor Weight', 'N/A')
+                    try:
+                        anchor_is_unset = float(a_weight) == 0.0625
+                    except (ValueError, TypeError):
+                        anchor_is_unset = False
+
+                    if (pd.isna(a_weight) or str(a_weight).strip() == '' or
+                            str(a_weight) == 'nan' or str(a_weight) == 'N/A' or
+                            anchor_is_unset):
+                        config = f'target: {int(r_target)} (anchor 미설정)'
+                    else:
+                        continue
+                variants = []
+                if value_signal == 'value':
+                    variants.append('value')
+                if score_combination == 'add':
+                    variants.append('add')
+                if neighbor_source == 'random':
+                    variants.append('RandomNeighor')
+                if variants:
+                    config += f" [{', '.join(variants)}]"
             else:
                 # 위 경우에 해당하지 않는 실험은 제외
                 continue

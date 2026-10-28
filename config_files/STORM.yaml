@@ -64,6 +64,7 @@ JointTrainAgent:
     multiplier: 16
     target: 16
     anchor_weight: 0.0625
+    anchor_weight_r: null # null: fixed anchor_weight; positive r: anchor r/(K+r), each neighbor 1/(K+r).
     max_contexts: 256
     global_rebuild_enable: True
     global_rebuild_threshold: 0.06

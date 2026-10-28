@@ -315,6 +315,7 @@ def classify_run(run):
 
     anchor_weight = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight')
     anchor_weight = anchor_weight if anchor_weight is not None else 'N/A'
+    anchor_weight_r = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight_r')
 
     return {
         "Run Name": run.name,
@@ -341,6 +342,7 @@ def classify_run(run):
         "Hash Bits": hash_bits,
         "Retrieval Target": retrieval_target,
         "Anchor Weight": anchor_weight,
+        "Anchor Weight R": anchor_weight_r if anchor_weight_r is not None else 'N/A',
         "Seed": seed,
         "Created At": run.created_at,
         **scheduling_metadata(run_args, ret_enable),
@@ -422,7 +424,7 @@ def main(workers=100):
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
-        fieldnames += ["Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase"]
+        fieldnames += ["Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase", "Anchor Weight R"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:
