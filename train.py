@@ -27,6 +27,7 @@ from sub_models.world_models import WorldModel, MSELoss
 import sys
 sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..')))
 from retrieval import RetrievalContextManager
+from storm_dynamic_warmup import DynamicWarmup
 from training_branches import (
     configure_storm_retrieval_run, parse_storm_training_args,
     save_storm_warmup_metadata, launch_storm_warmup_followup,
@@ -207,6 +208,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     warmup_finished = warmup_finished_resume
     dynamic_warmup_met_step = dynamic_warmup_met_step_resume
     episode_rewards = deque(episode_rewards_resume or [], maxlen=200)
+    episode_rewards_changed = True
     
     # retrieval setup
     retrieval_config = conf.JointTrainAgent.Retrieval.clone()
@@ -263,39 +265,47 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     sweep = branch_commands if getattr(branch_commands, "is_warmup_sweep", False) else None
     if sweep is not None:
         sweep.initialize(resume_step)
+        # Raw snapshots mark children ready to train. A resumed collector must
+        # still track its pending targets independently of that child flag.
+        warmup_finished = False
+
+    warmup_steps_config = getattr(retrieval_config, "warmup_steps", 5000)
+    use_dynamic = sweep.has_dynamic if sweep is not None else warmup_steps_config == -1
+    dynamic = DynamicWarmup(retrieval_config, dynamic_warmup_met_step) if use_dynamic else None
 
     # sample and train
     for total_steps in tqdm(range(resume_step, max_steps//num_envs)):
-        warmup_steps_config = getattr(retrieval_config, "warmup_steps", 5000)
-        min_warmup_steps = getattr(retrieval_config, "min_warmup_steps", 0)
-        dynamic_warmup_target_steps = getattr(retrieval_config, "dynamic_warmup_target_steps", 68500)
-        max_warmup_steps = getattr(retrieval_config, "max_warmup_steps", 80000)
+        current_total_steps = total_steps * num_envs
+        dynamic_ready = False
+        if dynamic is not None and (sweep is not None or not warmup_finished):
+            previous_detection = dynamic.detected_step
+            dynamic_ready = dynamic.update(
+                current_total_steps, episode_rewards, check_dynamic_warmup,
+                rewards_changed=episode_rewards_changed,
+            )
+            dynamic_warmup_met_step = dynamic.detected_step
+            if dynamic.detected_step != previous_detection:
+                logger.log("Retrieval/dynamic_warmup_detected_at_step", dynamic.detected_step)
+                logger.log("Retrieval/dynamic_warmup_target_step", dynamic.end_step)
+                print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {dynamic.detected_step}; "
+                      f"target {dynamic.end_step}, then wait for the episode to end." + colorama.Style.RESET_ALL)
 
         if warmup_steps_config == -1:
-            current_total_steps = total_steps * num_envs
-            if not warmup_finished and current_total_steps >= max_warmup_steps:
+            if not warmup_finished and dynamic_ready and at_episode_boundary:
                 warmup_finished = True
                 logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
-                print(colorama.Fore.YELLOW + f"Max warmup steps reached at step {current_total_steps}!" + colorama.Style.RESET_ALL)
-            elif not warmup_finished and current_total_steps >= min_warmup_steps:
-                if dynamic_warmup_met_step == -1 and len(episode_rewards) > 0 and check_dynamic_warmup(episode_rewards):
-                    dynamic_warmup_met_step = current_total_steps
-                    if current_total_steps < dynamic_warmup_target_steps:
-                        wait_steps = dynamic_warmup_target_steps - current_total_steps
-                        print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps}, waiting {wait_steps} steps until target {dynamic_warmup_target_steps}..." + colorama.Style.RESET_ALL)
-                    else:
-                        print(colorama.Fore.YELLOW + f"Dynamic warmup condition met at step {current_total_steps} (>= target {dynamic_warmup_target_steps}), ending warmup immediately." + colorama.Style.RESET_ALL)
-
-                if dynamic_warmup_met_step != -1 and current_total_steps >= max(dynamic_warmup_met_step, dynamic_warmup_target_steps):
-                    warmup_finished = True
-                    logger.log("Retrieval/warmup_ended_at_step", current_total_steps)
-                    print(colorama.Fore.YELLOW + f"Dynamic warmup finished at step {current_total_steps}!" + colorama.Style.RESET_ALL)
+                print(colorama.Fore.YELLOW + f"Dynamic warmup finished at episode boundary {current_total_steps} "
+                      f"(target {dynamic.end_step})." + colorama.Style.RESET_ALL)
+                if branch_commands is None and retrieval_manager.enabled and replay_buffer.ready():
+                    world_model.eval()
+                    retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
+                    last_rebuild_step = total_steps
             is_retrieval_warmup = not warmup_finished
         else:
             is_retrieval_warmup = not warmup_finished and (total_steps * num_envs) < warmup_steps_config
 
         if sweep is not None and at_episode_boundary:
-            targets = sweep.due(total_steps * num_envs)
+            targets = sweep.due(current_total_steps, dynamic_ready=dynamic_ready)
             if targets:
                 from storm_warmup_sweep import validate_branch_step
                 validate_branch_step(conf, total_steps * num_envs)
@@ -311,7 +321,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                         rng_state_override=snapshot_rng,
                     )
                     sweep.register_snapshot(ckpt_dir, total_steps * num_envs, targets,
-                                            conf, args, retrieval_manager.statistics_signals)
+                                            conf, args, retrieval_manager.statistics_signals,
+                                            dynamic_state=dynamic.state_dict() if dynamic is not None else None)
                 finally:
                     restore_rng_state(snapshot_rng)
             if sweep.complete:
@@ -340,7 +351,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             )
             if getattr(retrieval_config, "save_warmup", False):
                 save_storm_warmup_metadata(
-                    ckpt_dir, conf, args, total_steps, retrieval_manager.statistics_signals)
+                    ckpt_dir, conf, args, total_steps, retrieval_manager.statistics_signals,
+                    dynamic_warmup=dynamic.state_dict() if dynamic is not None else None)
             vec_env.close()
             logger.writer.close()
             import wandb
@@ -413,17 +425,19 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
 
         done_flag = np.logical_or(done, truncated)
         at_episode_boundary = bool(done_flag.all())
+        episode_rewards_changed = bool(done_flag.any())
+        # Include the terminal transition in its own episode, before resetting.
+        sum_reward += reward
         if done_flag.any():
             for i in range(num_envs):
                 if done_flag[i]:
                     logger.log(f"sample/{env_name}_reward", sum_reward[i])
-                    logger.log(f"sample/{env_name}_episode_steps", current_info["episode_frame_number"][i]//4)  # framskip=4
+                    logger.log(f"sample/{env_name}_episode_steps", info["episode_frame_number"][i]//4)  # frameskip=4
                     logger.log("replay_buffer/length", len(replay_buffer))
                     episode_rewards.append(sum_reward[i])
                     sum_reward[i] = 0
 
-        # update current_obs, current_info and sum_reward
-        sum_reward += reward
+        # update current_obs and current_info
         current_obs = obs
         current_info = info
         # <<< sample part

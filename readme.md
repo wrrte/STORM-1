@@ -118,12 +118,15 @@ JointTrainAgent:
       - [50000, -2]
       - [50000, 0]
       - [80000, -2]
+      - [dynamic_warmup, -2]
+    dynamic_warmup_multiplier: 2.6
+    dynamic_warmup_delay_steps: 0
 ```
 
 Each entry is `[warmup_steps, anchor_offset]`; these are explicit pairs, not a
 Cartesian product. A nonempty list overrides the single `warmup_steps` for
-collection. The collector trains once without retrieval through the largest
-requested warmup and saves full model/optimizer/replay/statistics/RNG state at
+collection. The collector trains once without retrieval and saves full
+model/optimizer/replay/statistics/RNG state at
 the first episode boundary at or after each target. Targets reaching the same
 boundary share one snapshot. All branches then run sequentially from their own
 snapshot to the original `SampleMaxSteps`, using their specified offset and the
@@ -133,9 +136,30 @@ other common settings, including `anchor_weight_r`.
 requested warmup. Existing named experiment lists also work: each preset is
 combined with each pair, with baseline deduplicated per warmup. An empty pair
 list preserves the original single-run/Both behavior. Only fixed nonnegative
-integer warmups and integer offsets are supported; `-1` dynamic warmup and `.5`
-offsets cannot be used in a pair. `NumEnvs` must be 1, and the actual boundary
+integer warmups and `dynamic_warmup` (also written `-1`) are supported; offsets
+must be integers. `NumEnvs` must be 1, and the actual boundary
 must precede both the training end and the selected final evaluation step.
+
+Dynamic detection runs on the same retrieval-free trajectory, using completed
+episode returns including terminal rewards. After `min_warmup_steps`, the
+detector compares the last five-episode average against the recent smoothed
+mean plus `dynamic_warmup_multiplier` times its standard deviation (at least
+25 completed episodes are required). It checks only when a new episode ends,
+or once on becoming eligible/resuming, and latches the first detection step.
+For detection at step `d`, the dynamic target is:
+
+```text
+min(max_warmup_steps, max(dynamic_warmup_target_steps, d + dynamic_warmup_delay_steps))
+```
+
+Without a detection, the target is `max_warmup_steps`. The collector saves at
+the first real episode end (`terminated` or `truncated`, not a life loss) at or
+after the target. Thus the actual snapshot may exceed the cap. The cap must
+precede the selected final evaluation step. Detection does not enable retrieval
+in the collector: it continues until every fixed and dynamic target has a
+snapshot, then stops immediately. Multiple dynamic offsets share one snapshot;
+fixed and dynamic targets reaching the same boundary also share a snapshot.
+With an empty pair list, `warmup_steps: -1` uses the same delay and boundary rule.
 
 Append this to the usual training command to select pairs from the shell:
 
@@ -146,7 +170,8 @@ JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.warmup_offset_pa
 The collector uses `runs/<name>_WarmupSweep/` and
 `ckpt/<name>_WarmupSweep/`. Its `warmups.json` maps requested targets to actual
 snapshot steps. Branch names include the requested warmup, offset and preset,
-for example `<name>_w50000_offset_m2_retrieval`. Snapshot creation preserves the
+for example `<name>_w50000_offset_m2_retrieval` or
+`<name>_wdynamic_offset_m2_retrieval`. Snapshot creation preserves the
 collector's RNG and hash/PCA state. Hash rebuilding happens after restoring a
 branch, equally for retrieval and baseline. As with Both, branches start a new
 episode; emulator state is not saved.
@@ -162,6 +187,11 @@ python -u train.py --resume_warmup ckpt/Pong-17_WarmupSweep \
 Only targets present in `warmups.json` can be selected; a maximum-step snapshot
 cannot reconstruct an earlier unsaved model. Followups keep the original
 checkpoints/manifests and use separate job names unless `-n` is provided.
+Saved dynamic targets can be reused with new offsets, provided their detection
+settings are unchanged. Changing the multiplier, delay, minimum, target or cap
+requires a new collection. The index and snapshot metadata record the detection,
+target and actual snapshot steps. Pending detection/delay state is also retained
+when resuming an interrupted collector.
 CSV records include `Anchor Offset` and `Warmup Offset Pairs`; Excel keeps
 nondefault warmups/offsets on separate rows. The actual shared boundary is
 recorded separately from the requested warmup. Keep a fresh `-n` for a new

@@ -55,9 +55,11 @@ JointTrainAgent:
     use_pca: True
     max_pca_samples: 100000
     warmup_steps: 50000 # Both splits at the first episode boundary at/after this target; -1 uses dynamic warmup
-    warmup_offset_pairs: [] # Optional paired sweep: [[20000, -4], [50000, -2], [50000, 0], [80000, -2]].
+    warmup_offset_pairs: [[30000, -2], [50000, -4], [50000, -2], [50000, -0], [70000, -2]] # Also accepts ["dynamic_warmup", -2] (or [-1, -2]).
     min_warmup_steps: 5000
     dynamic_warmup_target_steps: 20000
+    dynamic_warmup_multiplier: 2.6 # Reward-rise threshold: mean + multiplier * std.
+    dynamic_warmup_delay_steps: 0 # End target = min(max_warmup_steps, max(target_steps, detected_step + delay)).
     max_warmup_steps: 90000
     ema_alpha: 0.01
     max_bucket_size: 1000000000
@@ -65,7 +67,7 @@ JointTrainAgent:
     multiplier: 16
     target: 16
     anchor_weight: 0.0625
-    anchor_weight_r: null # null: fixed anchor_weight; positive r: anchor r/(K+r), each neighbor 1/(K+r).
+    anchor_weight_r: 1 # null: fixed anchor_weight; positive r: anchor r/(K+r), each neighbor 1/(K+r).
     max_contexts: 256
     global_rebuild_enable: True
     global_rebuild_threshold: 0.06
