@@ -253,6 +253,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.warmup_offset_pairs = []
     conf.JointTrainAgent.Retrieval.min_warmup_steps = 0
     conf.JointTrainAgent.Retrieval.dynamic_warmup_target_steps = 1000
+    conf.JointTrainAgent.Retrieval.dynamic_warmup_multiplier = 2.6
     conf.JointTrainAgent.Retrieval.dynamic_warmup_delay_steps = 3000
     conf.JointTrainAgent.Retrieval.max_warmup_steps = 80000
     conf.JointTrainAgent.Retrieval.threshold = 1.0
