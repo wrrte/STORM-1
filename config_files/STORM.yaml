@@ -38,7 +38,7 @@ JointTrainAgent:
   FinalEvalStep: 100000 # Checkpoint filename step for final evaluation; null uses end-of-training weights.
 
   Retrieval:
-    enable: Both # True, False, "Both" (_O then _X), RandomNeighor, or an experiment list (shared warmup)
+    enable: True # True, False, "Both" (_O then _X), RandomNeighor, or an experiment list (shared warmup)
     # Example: enable: [retrieval, RandomNeighor] (runs in list order)
     save_warmup: False # Save both value statistics + reusable warmup for later --resume_warmup jobs
     neighbor_source: "retrieval" # RandomNeighor overrides this to "random" after shared warmup.
@@ -55,6 +55,7 @@ JointTrainAgent:
     use_pca: True
     max_pca_samples: 100000
     warmup_steps: 50000 # Both splits at the first episode boundary at/after this target; -1 uses dynamic warmup
+    warmup_offset_pairs: [] # Optional paired sweep: [[20000, -4], [50000, -2], [50000, 0], [80000, -2]].
     min_warmup_steps: 5000
     dynamic_warmup_target_steps: 20000
     max_warmup_steps: 90000

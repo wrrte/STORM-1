@@ -13,6 +13,7 @@ results/experiment_scheduler_state.json
 tests/*
 !tests/test_anchor_weights.py
 !tests/test_anchor_weight_reporting.py
+!tests/test_warmup_offset_sweep.py
 diagnostics/
 results/gpu4_demo_check_20261024/
 eval_result/

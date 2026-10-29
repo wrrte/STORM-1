@@ -105,6 +105,69 @@ Following the **Training and Evaluating Instructions** to reproduce the main res
 
 ## Additional Useful Information
 
+### Paired warmup and anchor-offset experiments
+
+Set `JointTrainAgent.Retrieval.warmup_offset_pairs` to the exact pairs to run:
+
+```yaml
+JointTrainAgent:
+  Retrieval:
+    enable: True
+    warmup_offset_pairs:
+      - [20000, -4]
+      - [50000, -2]
+      - [50000, 0]
+      - [80000, -2]
+```
+
+Each entry is `[warmup_steps, anchor_offset]`; these are explicit pairs, not a
+Cartesian product. A nonempty list overrides the single `warmup_steps` for
+collection. The collector trains once without retrieval through the largest
+requested warmup and saves full model/optimizer/replay/statistics/RNG state at
+the first episode boundary at or after each target. Targets reaching the same
+boundary share one snapshot. All branches then run sequentially from their own
+snapshot to the original `SampleMaxSteps`, using their specified offset and the
+other common settings, including `anchor_weight_r`.
+
+`enable: Both` runs retrieval for each pair and one baseline per distinct
+requested warmup. Existing named experiment lists also work: each preset is
+combined with each pair, with baseline deduplicated per warmup. An empty pair
+list preserves the original single-run/Both behavior. Only fixed nonnegative
+integer warmups and integer offsets are supported; `-1` dynamic warmup and `.5`
+offsets cannot be used in a pair. `NumEnvs` must be 1, and the actual boundary
+must precede both the training end and the selected final evaluation step.
+
+Append this to the usual training command to select pairs from the shell:
+
+```shell
+JointTrainAgent.Retrieval.enable True JointTrainAgent.Retrieval.warmup_offset_pairs "[[20000, -4], [50000, -2], [50000, 0], [80000, -2]]"
+```
+
+The collector uses `runs/<name>_WarmupSweep/` and
+`ckpt/<name>_WarmupSweep/`. Its `warmups.json` maps requested targets to actual
+snapshot steps. Branch names include the requested warmup, offset and preset,
+for example `<name>_w50000_offset_m2_retrieval`. Snapshot creation preserves the
+collector's RNG and hash/PCA state. Hash rebuilding happens after restoring a
+branch, equally for retrieval and baseline. As with Both, branches start a new
+episode; emulator state is not saved.
+
+Saved targets can be reused later with new offsets:
+
+```shell
+python -u train.py --resume_warmup ckpt/Pong-17_WarmupSweep \
+  JointTrainAgent.Retrieval.enable True \
+  JointTrainAgent.Retrieval.warmup_offset_pairs "[[20000, -1], [50000, -3]]"
+```
+
+Only targets present in `warmups.json` can be selected; a maximum-step snapshot
+cannot reconstruct an earlier unsaved model. Followups keep the original
+checkpoints/manifests and use separate job names unless `-n` is provided.
+CSV records include `Anchor Offset` and `Warmup Offset Pairs`; Excel keeps
+nondefault warmups/offsets on separate rows. The actual shared boundary is
+recorded separately from the requested warmup. Keep a fresh `-n` for a new
+collection; `--resume_from` with the same collector name/config can continue a
+saved collection checkpoint if all earlier target snapshots are available.
+
 FLASH supports the `RandomNeighor` ablation: it runs hash retrieval and lazy
 re-verification, then replaces each verified neighbor with a valid random replay
 context while preserving the anchor, final group size, weights and batch rules.

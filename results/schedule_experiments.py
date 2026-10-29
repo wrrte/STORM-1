@@ -115,6 +115,7 @@ def row_kind(row):
             and value(row, 'Batch Size Reduction') == 'retrieved'
             and number(row.get('Z Score Threshold')) == 3.5
             and number(row.get('Retrieval Target')) == 16
+            and number(value(row, 'Anchor Offset', '-2')) == -2
             and not value(row, 'Anchor Weight R')
             and (not anchor or number(anchor) == 0.0625)
             and value(row, 'Value Signal', 'value_diff') == 'value_diff'
@@ -209,6 +210,7 @@ def parse_command(line, gpu):
         'Z Score Threshold': args.get(PREFIX + 'z_score_threshold', '3.5'),
         'Anchor Weight': args.get(PREFIX + 'anchor_weight', '0.0625'),
         'Anchor Weight R': args.get(PREFIX + 'anchor_weight_r', ''),
+        'Anchor Offset': args.get(PREFIX + 'anchor_offset', '-2'),
         'Value Signal': args.get(PREFIX + 'value_signal', 'value_diff'),
         'Score Combination': args.get(PREFIX + 'score_combination', 'multiply'),
         'Neighbor Source': args.get(PREFIX + 'neighbor_source', 'retrieval'),

@@ -56,6 +56,7 @@ RETRIEVAL_COLUMNS = {
     'target': 'Retrieval Target', 'batch_size_reduction': 'Batch Size Reduction',
     'z_score_threshold': 'Z Score Threshold', 'anchor_weight': 'Anchor Weight',
     'anchor_weight_r': 'Anchor Weight R',
+    'anchor_offset': 'Anchor Offset', 'warmup_offset_pairs': 'Warmup Offset Pairs',
     'value_signal': 'Value Signal', 'score_combination': 'Score Combination',
     'neighbor_source': 'Neighbor Source',
     'additive_z_score_threshold': 'Additive Z Score Threshold',
@@ -159,7 +160,8 @@ def queue_command_row(command, queue_dir):
     if not game or seed is None or not str(seed).isdigit():
         raise ValueError('게임/시드를 읽을 수 없습니다')
     return {
-        **{column: retrieval.get(key, 'N/A') for key, column in RETRIEVAL_COLUMNS.items()},
+        **{column: (json.dumps(retrieval.get(key, [])) if key == 'warmup_offset_pairs'
+                    else retrieval.get(key, 'N/A')) for key, column in RETRIEVAL_COLUMNS.items()},
         'Run Name': f'{game}_queued_{seed}', 'Seed': int(seed),
         'State': 'queued', 'Eval Return': 'N/A',
         'Created At': pd.Timestamp.now(tz='UTC').isoformat(),
@@ -205,6 +207,9 @@ def expand_shared_runs(df):
     }
     rows = []
     for row in df.to_dict('records'):
+        pair_value = row.get('Warmup Offset Pairs')
+        pairs = pair_value if isinstance(pair_value, list) else ast.literal_eval(
+            str(config_value(row, 'Warmup Offset Pairs', '[]')))
         enable = str(row['Retrieval Enable']).strip()
         if enable.lower() == 'randomneighor':
             # 단독 preset은 완료된 점수도 보존하며 실제 설정으로 변환합니다.
@@ -217,6 +222,8 @@ def expand_shared_runs(df):
             experiments = [str(name).strip().lower() for name in experiments]
         elif enable.lower() == 'both' or str(row['Run Name']).lower().endswith('_both'):
             experiments = ['baseline', 'retrieval']
+        elif pairs:
+            experiments = ['retrieval' if enable.lower() in ('true', '1', 't') else 'baseline']
         else:
             rows.append(row)
             if row['State'] == 'running':
@@ -226,12 +233,22 @@ def expand_shared_runs(df):
 
         if row['State'] not in {'running', 'queued'}:
             continue
-        for name in dict.fromkeys(experiments):
-            if name not in overrides:
-                raise ValueError(f'Unknown Retrieval.enable experiment: {name}')
-            rows.append({**row, **overrides[name]})
+        seen_baselines = set()
+        for warmup, offset in (pairs or [(None, None)]):
+            for name in dict.fromkeys(experiments):
+                if name not in overrides:
+                    raise ValueError(f'Unknown Retrieval.enable experiment: {name}')
+                if name == 'baseline' and warmup in seen_baselines:
+                    continue
+                if name == 'baseline':
+                    seen_baselines.add(warmup)
+                expanded = {**row, **overrides[name]}
+                if warmup is not None:
+                    expanded.update({'Warmup Steps': warmup, 'Calculated Warmup Steps': warmup,
+                                     'Anchor Offset': offset, 'Warmup Offset Pairs': '[]'})
+                rows.append(expanded)
     return pd.DataFrame(rows, columns=list(dict.fromkeys([
-        *df.columns, 'Value Signal', 'Score Combination', 'Neighbor Source',
+        *df.columns, 'Value Signal', 'Score Combination', 'Neighbor Source', 'Anchor Offset',
     ])))
 
 
@@ -481,12 +498,14 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         # ---------------------------------------------------------
         # 실험 필터링 및 표기법 변경 로직
         # 1. Retrieval을 사용하지 않은 실험은 'Retrieval 미사용'으로 표기
-        # 2. Warmup 50000, BSR retrieved, 적용 임계값(multiply: 3.5 / add: 4.0)만 유지
+        # 2. 고정 warmup과 offset을 구분하고 BSR/임계값 필터는 유지합니다.
         # 3. target 1/16의 기존 anchor 미설정 실험과 상대 가중치 실험을 구분합니다.
         # 4. value_signal=value / score_combination=add는 별도 config 행으로 표시
         # ---------------------------------------------------------
         if not ret_enable:
             config = 'Retrieval 미사용'
+            if isinstance(warmup_steps, int) and warmup_steps >= 0 and warmup_steps != 50000:
+                config += f' [warmup: {warmup_steps}]'
         else:
             bsr = row.get('Batch Size Reduction', 'N/A')
             if pd.isna(bsr) or str(bsr).strip() == '' or str(bsr) == 'nan':
@@ -510,7 +529,8 @@ def main(csv_path=None, output_path=None, queue_dir=None):
             except (ValueError, TypeError):
                 z_score_float = None
 
-            if warmup_steps == 50000 and str(bsr) == 'retrieved' and z_score_float == expected_z_score:
+            if (isinstance(warmup_steps, int) and warmup_steps >= 0
+                    and str(bsr) == 'retrieved' and z_score_float == expected_z_score):
                 r_target = row.get('Retrieval Target', 'N/A')
                 try:
                     r_target = float(r_target)
@@ -549,6 +569,16 @@ def main(csv_path=None, output_path=None, queue_dir=None):
                     variants.append('add')
                 if neighbor_source == 'random':
                     variants.append('RandomNeighor')
+                try:
+                    anchor_offset = float(config_value(row, 'Anchor Offset', -2))
+                except (TypeError, ValueError):
+                    continue
+                if not math.isfinite(anchor_offset) or not anchor_offset.is_integer():
+                    continue
+                if warmup_steps != 50000:
+                    variants.append(f'warmup: {warmup_steps}')
+                if anchor_offset != -2:
+                    variants.append(f'offset: {int(anchor_offset)}')
                 if variants:
                     config += f" [{', '.join(variants)}]"
             else:

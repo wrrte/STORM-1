@@ -246,10 +246,11 @@ def classify_run(run):
 
     warmup_steps = 'N/A'
     calculated_warmup_steps = 'N/A'
-    if ret_enable:
+    shared_warmup_step = run.summary.get('Retrieval/shared_warmup_ended_at_step')
+    if ret_enable or shared_warmup_step is not None:
         w_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_steps')
         warmup_steps = w_steps if w_steps is not None else 'N/A'
-        calculated_warmup_steps = warmup_steps
+        calculated_warmup_steps = shared_warmup_step if shared_warmup_step is not None else warmup_steps
 
         # warmup_steps가 -1인 경우, Retrieval/retrieved_contexts 그래프의 첫 스텝에서 가져옴
         if str(warmup_steps) == '-1':
@@ -316,6 +317,8 @@ def classify_run(run):
     anchor_weight = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight')
     anchor_weight = anchor_weight if anchor_weight is not None else 'N/A'
     anchor_weight_r = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight_r')
+    anchor_offset = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_offset')
+    warmup_offset_pairs = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_offset_pairs')
 
     return {
         "Run Name": run.name,
@@ -343,6 +346,8 @@ def classify_run(run):
         "Retrieval Target": retrieval_target,
         "Anchor Weight": anchor_weight,
         "Anchor Weight R": anchor_weight_r if anchor_weight_r is not None else 'N/A',
+        "Anchor Offset": anchor_offset if anchor_offset is not None else 'N/A',
+        "Warmup Offset Pairs": json.dumps(warmup_offset_pairs or []),
         "Seed": seed,
         "Created At": run.created_at,
         **scheduling_metadata(run_args, ret_enable),
@@ -424,7 +429,7 @@ def main(workers=100):
     output_csv = "wandb_runs_classification.csv"
     with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
         fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
-        fieldnames += ["Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase", "Anchor Weight R"]
+        fieldnames += ["Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase", "Anchor Weight R", "Anchor Offset", "Warmup Offset Pairs"]
         writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
         writer.writeheader()
         for row in results:

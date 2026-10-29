@@ -182,7 +182,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   warmup_finished_resume=False, episode_rewards_resume=None,
                                   dynamic_warmup_met_step_resume=-1,
                                   retrieval_state_resume=None, rng_state_resume=None,
-                                  branch_commands=None, eval_precision="auto", eval_seed=0):
+                                  branch_commands=None, eval_precision="auto", eval_seed=0,
+                                  rebuild_retrieval_on_resume=False):
     if branch_commands is not None and num_envs != 1:
         raise ValueError("Shared warmup episode-boundary branching requires NumEnvs=1; parallel environments cannot be paused independently")
 
@@ -224,7 +225,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     is_first_step = np.ones(num_envs, dtype=bool)
 
     # Rebuild retrieval hash buckets if resuming with retrieval enabled
-    if resume_step > 0 and retrieval_state_resume is None and retrieval_manager.enabled and replay_buffer.ready():
+    if (resume_step > 0 and retrieval_state_resume is None and retrieval_manager.enabled
+            and replay_buffer.ready() and not rebuild_retrieval_on_resume):
         print(colorama.Fore.CYAN + "Rebuilding retrieval hash buckets from replay buffer..." + colorama.Style.RESET_ALL)
         retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
 
@@ -242,6 +244,25 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
     # randomness. Restore last, so both branches start with the identical state.
     if rng_state_resume is not None:
         restore_rng_state(rng_state_resume)
+
+    if rebuild_retrieval_on_resume:
+        # Raw sweep snapshots leave the collector's PCA/hash and RNG untouched.
+        # Prepare every branch from the restored RNG, including the baseline,
+        # so all variants of one checkpoint start after the same preparation.
+        if replay_buffer.ready():
+            enabled = retrieval_manager.enabled
+            retrieval_manager.enabled = True
+            world_model.eval()
+            try:
+                retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
+            finally:
+                retrieval_manager.enabled = enabled
+            last_rebuild_step = resume_step
+        logger.log("Retrieval/shared_warmup_ended_at_step", resume_step * num_envs)
+
+    sweep = branch_commands if getattr(branch_commands, "is_warmup_sweep", False) else None
+    if sweep is not None:
+        sweep.initialize(resume_step)
 
     # sample and train
     for total_steps in tqdm(range(resume_step, max_steps//num_envs)):
@@ -273,7 +294,34 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         else:
             is_retrieval_warmup = not warmup_finished and (total_steps * num_envs) < warmup_steps_config
 
-        if branch_commands is not None and not is_retrieval_warmup and at_episode_boundary:
+        if sweep is not None and at_episode_boundary:
+            targets = sweep.due(total_steps * num_envs)
+            if targets:
+                from storm_warmup_sweep import validate_branch_step
+                validate_branch_step(conf, total_steps * num_envs)
+                ckpt_dir = os.path.abspath(f"ckpt/{args.n}/shared_warmup_{total_steps}")
+                snapshot_rng = capture_rng_state()
+                try:
+                    logger.log("Retrieval/shared_warmup_ended_at_step", total_steps * num_envs)
+                    logger.flush_wandb()
+                    save_full_checkpoint(
+                        ckpt_dir, world_model, agent, replay_buffer, total_steps, logger,
+                        last_rebuild_step, True, list(episode_rewards), dynamic_warmup_met_step,
+                        retrieval_manager=retrieval_manager, shared_warmup=True,
+                        rng_state_override=snapshot_rng,
+                    )
+                    sweep.register_snapshot(ckpt_dir, total_steps * num_envs, targets,
+                                            conf, args, retrieval_manager.statistics_signals)
+                finally:
+                    restore_rng_state(snapshot_rng)
+            if sweep.complete:
+                vec_env.close()
+                logger.writer.close()
+                import wandb
+                wandb.finish()
+                sweep.launch()
+
+        if sweep is None and branch_commands is not None and not is_retrieval_warmup and at_episode_boundary:
             # The previous iteration collected and trained on the episode's
             # final transition. Resume at this next step without inventing a
             # terminal label. Zero warmup can branch before the first action.
@@ -576,7 +624,7 @@ def load_final_eval_models(ckpt_dir, world_model, agent, checkpoint_step=None):
     agent.load_state_dict(agent_state)
 
 
-def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, episode_rewards_list, dynamic_warmup_met_step=-1, retrieval_manager=None, shared_warmup=False):
+def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_steps, logger, last_rebuild_step, warmup_finished, episode_rewards_list, dynamic_warmup_met_step=-1, retrieval_manager=None, shared_warmup=False, rng_state_override=None):
     """Save all training state for resume."""
     os.makedirs(ckpt_dir, exist_ok=True)
 
@@ -595,7 +643,7 @@ def save_full_checkpoint(ckpt_dir, world_model, agent, replay_buffer, total_step
         'warmup_finished': warmup_finished,
         'dynamic_warmup_met_step': dynamic_warmup_met_step,
         'episode_rewards': episode_rewards_list,
-        'random_states': capture_rng_state(),
+        'random_states': capture_rng_state() if rng_state_override is None else rng_state_override,
         'retrieval_state': retrieval_manager.state_dict() if retrieval_manager is not None else None,
         'shared_warmup': shared_warmup,
         'shared_warmup_logdir': os.path.abspath(f"runs/{args.n}") if shared_warmup else None,
@@ -716,6 +764,7 @@ if __name__ == "__main__":
         episode_rewards_resume = []
         retrieval_state_resume = None
         rng_state_resume = None
+        rebuild_retrieval_on_resume = False
         if args.resume_from:
             print(colorama.Fore.CYAN + f"Resuming from checkpoint: {args.resume_from}" + colorama.Style.RESET_ALL)
             (resume_step, logger_tag_step, resume_last_rebuild_step,
@@ -724,6 +773,10 @@ if __name__ == "__main__":
                 args.resume_from, world_model, agent, replay_buffer
             )
             logger.tag_step = logger_tag_step
+            warmup_metadata_path = os.path.join(args.resume_from, "warmup_metadata.json")
+            if os.path.isfile(warmup_metadata_path):
+                with open(warmup_metadata_path) as metadata_file:
+                    rebuild_retrieval_on_resume = json.load(metadata_file).get("rebuild_on_resume", False)
             if shared_warmup_logdir:
                 with open(f"runs/{args.n}/shared_warmup.json", "w") as shared_info:
                     json.dump({"checkpoint_dir": os.path.abspath(args.resume_from),
@@ -767,6 +820,7 @@ if __name__ == "__main__":
             retrieval_state_resume=retrieval_state_resume,
             rng_state_resume=rng_state_resume,
             branch_commands=branch_commands,
+            rebuild_retrieval_on_resume=rebuild_retrieval_on_resume,
         )
 
         if branch_commands is not None:
