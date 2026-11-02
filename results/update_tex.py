@@ -242,8 +242,10 @@ def load_results(
     method_names=('STORM', 'STORM+ours'),
     include_seeds=False,
 ):
-    """Load paired scores, optionally returning their training-seed IDs as well."""
-    df = pd.read_excel(excel_path, sheet_name='Results', index_col=[0, 1])
+    """Load historical table inputs, falling back to Results in older workbooks."""
+    with pd.ExcelFile(excel_path) as workbook:
+        sheet = 'Ablation Results' if 'Ablation Results' in workbook.sheet_names else 'Results'
+        df = pd.read_excel(workbook, sheet_name=sheet, index_col=[0, 1])
     df = df.reset_index()
     
     df.rename(columns={df.columns[0]: 'Game', df.columns[1]: 'Config'}, inplace=True)

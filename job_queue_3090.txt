@@ -1,20 +1,3 @@
-
-python -u train.py -n Freeway-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Freeway-v5 -trajectory_path Freeway.pkl JointTrainAgent.UseDemonstration True
-python -u train.py -n Alien-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Alien-v5 -trajectory_path D_TRAJ/Alien.pkl
-python -u train.py -n Amidar-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Amidar-v5 -trajectory_path D_TRAJ/Amidar.pkl
-python -u train.py -n Assault-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Assault-v5 -trajectory_path D_TRAJ/Assault.pkl
-python -u train.py -n Asterix-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Asterix-v5 -trajectory_path D_TRAJ/Asterix.pkl
-python -u train.py -n BankHeist-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/BankHeist-v5 -trajectory_path D_TRAJ/BankHeist.pkl
-python -u train.py -n BattleZone-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/BattleZone-v5 -trajectory_path D_TRAJ/BattleZone.pkl
-python -u train.py -n Boxing-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Boxing-v5 -trajectory_path D_TRAJ/Boxing.pkl
-python -u train.py -n Breakout-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Breakout-v5 -trajectory_path D_TRAJ/Breakout.pkl
-python -u train.py -n ChopperCommand-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/ChopperCommand-v5 -trajectory_path D_TRAJ/ChopperCommand.pkl
-python -u train.py -n CrazyClimber-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/CrazyClimber-v5 -trajectory_path D_TRAJ/CrazyClimber.pkl
-python -u train.py -n DemonAttack-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/DemonAttack-v5 -trajectory_path D_TRAJ/DemonAttack.pkl
-python -u train.py -n Frostbite-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Frostbite-v5 -trajectory_path D_TRAJ/Frostbite.pkl
-python -u train.py -n Gopher-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Gopher-v5 -trajectory_path D_TRAJ/Gopher.pkl
-python -u train.py -n Hero-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Hero-v5 -trajectory_path D_TRAJ/Hero.pkl
-python -u train.py -n Jamesbond-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Jamesbond-v5 -trajectory_path D_TRAJ/Jamesbond.pkl
 python -u train.py -n Kangaroo-2235 -seed 2235 -config_path config_files/STORM.yaml -env_name ALE/Kangaroo-v5 -trajectory_path D_TRAJ/Kangaroo.pkl
 python -u train.py -n Krull-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/Krull-v5 -trajectory_path D_TRAJ/Krull.pkl
 python -u train.py -n KungFuMaster-3333 -seed 3333 -config_path config_files/STORM.yaml -env_name ALE/KungFuMaster-v5 -trajectory_path D_TRAJ/KungFuMaster.pkl

@@ -260,6 +260,21 @@ def config_value(row, column, default):
     return value
 
 
+def ablation_config_label(config):
+    """Preserve the pre-sweep grouping of fixed-weight offsets -2 and -3."""
+    base, separator, suffix = config.partition(' [')
+    if base not in {'target: 1 (anchor 미설정)', 'target: 16 (anchor 미설정)'}:
+        return config
+    if not separator or not suffix.endswith(']'):
+        return config
+    variants = suffix[:-1].split(', ')
+    if (variants[-1] != 'offset: -3'
+            or any(item not in {'value', 'add', 'RandomNeighor'} for item in variants[:-1])):
+        return config
+    variants.pop()
+    return base + (f" [{', '.join(variants)}]" if variants else '')
+
+
 def load_excluded_seeds():
     """update_tex.py를 실행하지 않고 현재 EXCLUDED_SEEDS 설정을 읽습니다."""
     source_path = Path(__file__).resolve().with_name('update_tex.py')
@@ -690,6 +705,11 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         })
 
     agg_df = parsed_df.groupby(['Game', 'Config', 'Seed']).apply(aggregate_cell, include_groups=False).reset_index()
+    # Aggregate before pivoting so the historical latest-run and hash-bit
+    # priorities also apply when one seed appears in both offset rows.
+    ablation_df = parsed_df.assign(Config=parsed_df['Config'].map(ablation_config_label))
+    ablation_agg_df = ablation_df.groupby(['Game', 'Config', 'Seed']).apply(
+        aggregate_cell, include_groups=False).reset_index()
     highlighted_cells = set(
         agg_df.loc[agg_df['Save Warmup'], ['Game', 'Config', 'Seed']]
         .itertuples(index=False, name=None)
@@ -720,6 +740,9 @@ def main(csv_path=None, output_path=None, queue_dir=None):
     
     pivot_df = pivot_df.reindex(columns=full_columns)
     pivot_df = pivot_df.fillna('')
+    ablation_pivot = ablation_agg_df.pivot_table(
+        index=['Game', 'Config'], columns='Seed', values='Final Eval Return', aggfunc='first',
+    ).reindex(columns=full_columns).fillna('')
 
     # 논문 점수는 시드별 실험값과 구분하여 Config 열의 별도 첫 행에 표시합니다.
     reference_index = pd.MultiIndex.from_tuples(
@@ -755,6 +778,10 @@ def main(csv_path=None, output_path=None, queue_dir=None):
 
     with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
         pivot_df.to_excel(writer, sheet_name='Results')
+        # Keep the visible offset-separated results and the historical table
+        # inputs in the same workbook, without changing the reporting UI.
+        ablation_pivot.to_excel(writer, sheet_name='Ablation Results')
+        writer.sheets['Ablation Results'].sheet_state = 'hidden'
         
         workbook = writer.book
         worksheet = writer.sheets['Results']

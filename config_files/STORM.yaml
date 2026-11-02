@@ -36,6 +36,8 @@ JointTrainAgent:
   EvalPrecision: "both" # auto / bf16 / fp32 / both (evaluation only)
   EvalSeed: 0 # Both precisions use the same policy RNG seed and environment seeds.
   FinalEvalStep: 100000 # Checkpoint filename step for final evaluation; null uses end-of-training weights.
+  SeedScreenSteps: 0 # Disabled by default; e.g. 20000 screens fresh baseline runs.
+  SeedScreenMinReturn: 500.0 # Must be strictly exceeded by the deadline, including unfinished episodes.
 
   Retrieval:
     enable: True # True, False, "Both" (_O then _X), RandomNeighor, or an experiment list (shared warmup)

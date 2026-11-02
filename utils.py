@@ -235,6 +235,8 @@ def load_config(config_path):
     conf.JointTrainAgent.EvalSeed = 0
     conf.JointTrainAgent.EvalStartStep = 0
     conf.JointTrainAgent.FinalEvalStep = None
+    conf.JointTrainAgent.SeedScreenSteps = 0
+    conf.JointTrainAgent.SeedScreenMinReturn = 500.0
     
     conf.JointTrainAgent.Retrieval = CN()
     conf.JointTrainAgent.Retrieval.enable = False

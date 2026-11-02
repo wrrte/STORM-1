@@ -198,16 +198,11 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
     if missing_references:
         raise ValueError(f"Games missing from the main table: {sorted(missing_references)}")
 
-    availability = (
-        r'A dash indicates no available results. Aggregate metrics use games with '
-        r'results for both methods and the Random/Human references in '
-        r'Table~\ref{tab:main_performance}. '
-    )
     table = [
         r'\begin{table}[!htbp]',
         r'\centering',
         r'\small',
-        r'\caption{' + ablation.caption + availability +
+        r'\caption{' + ablation.caption +
         r'Mean, Median, and Optimality Gap use human-normalized game means; IQM pools '
         r'the unrounded human-normalized scores. '
         r'Bold indicates the best score in each pair (lower for Optimality Gap), '
@@ -349,8 +344,7 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         r'Ablations on STORM (Tables~\ref{tab:neighbor_retrieval_ablation}, '
         r'\ref{tab:random_neighbor_ablation}, \ref{tab:value_signal_ablation}, '
         r'and \ref{tab:score_combination_ablation}). '
-        r'Aggregate metrics match the corresponding appendix tables and use all '
-        r'games with results for both methods in each comparison, independently of the game rows shown. '
+        r'Aggregate metrics match the corresponding appendix tables. '
     )
     caption += (r'Bold indicates the best score within each comparison group '
                 r'(lower for Optimality Gap), including ties.')
