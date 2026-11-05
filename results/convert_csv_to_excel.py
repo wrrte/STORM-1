@@ -47,6 +47,55 @@ REFERENCE_SCORES = {
     'UpNDown': (533.4, 11693.2, 7985),
 }
 
+# 사용자 제공 이미지 및 results/MoW.pdf의 Table 11 (p. 27),
+# STORM (reproduced) 열의 표시값을 그대로 사용합니다.
+# 원 논문 점수와 Random/Human 참조값은 위 REFERENCE_SCORES에 보존합니다.
+REPRODUCED_SCORES = {
+    'Alien': 748,
+    'Amidar': 144,
+    'Assault': 1377,
+    'Asterix': 1318,
+    'BankHeist': 990,
+    'BattleZone': 5830,
+    'Boxing': 81,
+    'Breakout': 41,
+    'ChopperCommand': 1644,
+    'CrazyClimber': 79196,
+    'DemonAttack': 324,
+    'Freeway': 0,
+    'Frostbite': 366,
+    'Gopher': 5307,
+    'Hero': 11434,
+    'Jamesbond': 408,
+    'Kangaroo': 3512,
+    'Krull': 6522,
+    'KungFuMaster': 20046,
+    'MsPacman': 1490,
+    'Pong': 18,
+    'PrivateEye': 100,
+    'Qbert': 2910,
+    'RoadRunner': 14841,
+    'Seaquest': 557,
+    'UpNDown': 6128,
+}
+REPRODUCED_SCORE_SOURCE = (
+    'Mixture-of-World Models: Scaling Multi-Task Reinforcement Learning with '
+    'Modular Latent Dynamics, arXiv:2602.01270v1, Table 11 (p. 27), '
+    'STORM (reproduced) column. Local source: results/MoW.pdf. '
+    'https://arxiv.org/abs/2602.01270'
+)
+
+
+def reference_rows(game):
+    """논문/재현 점수는 시드별 실험값과 구분된 참조 행으로 표시합니다."""
+    rows = []
+    if game in REFERENCE_SCORES:
+        rows.append((f'STORM (논문): {REFERENCE_SCORES[game][2]}', REFERENCE_SCORES[game][2]))
+    if game in REPRODUCED_SCORES:
+        rows.append((f'STORM (reproduced): {REPRODUCED_SCORES[game]}', REPRODUCED_SCORES[game]))
+    return rows
+
+
 PAIRED_MEAN_COLUMN = 'Mean (공통 시드)'
 SCORE_DELTA_COLUMN = 'Δ Score (행별 비교)'
 HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
@@ -295,7 +344,7 @@ def mark_excluded_seeds(worksheet, pivot_df, start_row, excluded_seeds):
     """점수와 시드 열 이름을 보존하면서 제외된 실험 셀의 서식만 변경합니다."""
     excluded_fill = PatternFill(fill_type='solid', fgColor='E7E6E6')
     for row_idx, (game, config) in enumerate(pivot_df.index):
-        if config.startswith('STORM (논문)'):
+        if config.startswith(('STORM (논문)', 'STORM (reproduced)')):
             continue
         for seed in excluded_seeds.get(game, set()):
             if seed not in pivot_df.columns:
@@ -388,7 +437,7 @@ def mark_queued_runs(worksheet, pivot_df, start_row, agg_df):
 
 
 def add_paired_baseline_mean(pivot_df, excluded_seeds):
-    """제외 목록을 반영한 공통 시드 평균과 논문/target 16 행의 baseline 대비 비교를 추가."""
+    """공통 시드 평균과 논문/재현/target 16 행의 baseline 대비 비교를 추가."""
     seed_columns = [column for column in pivot_df.columns if str(column).strip().isdigit()]
     columns = list(pivot_df.columns)
     columns += [
@@ -416,20 +465,22 @@ def add_paired_baseline_mean(pivot_df, excluded_seeds):
             pivot_df.at[target_key, PAIRED_MEAN_COLUMN] = target_mean
             pivot_df.at[target_key, SCORE_DELTA_COLUMN] = abs(target_delta)
             if game in REFERENCE_SCORES:
-                random_score, human_score, paper_score = REFERENCE_SCORES[game]
-                paper_key = (game, f'STORM (논문): {paper_score}')
-                score_delta = baseline_mean - paper_score
-                if paper_key in pivot_df.index:
-                    pivot_df.at[paper_key, SCORE_DELTA_COLUMN] = score_delta
+                random_score, human_score, _ = REFERENCE_SCORES[game]
+                for label, reference_score in reference_rows(game):
+                    reference_key = (game, label)
+                    if reference_key not in pivot_df.index:
+                        continue
+                    score_delta = baseline_mean - reference_score
+                    pivot_df.at[reference_key, SCORE_DELTA_COLUMN] = score_delta
+                    if human_score != random_score:
+                        pivot_df.at[reference_key, HNS_DELTA_COLUMN] = (
+                            score_delta / (human_score - random_score)
+                        )
                 if human_score != random_score:
                     # HNS는 Random=0, Human=1 기준의 정규화 점수이며 백분율이 아닙니다.
                     pivot_df.at[target_key, HNS_DELTA_COLUMN] = (
                         target_delta / (human_score - random_score)
                     )
-                    if paper_key in pivot_df.index:
-                        pivot_df.at[paper_key, HNS_DELTA_COLUMN] = (
-                            score_delta / (human_score - random_score)
-                        )
     return pivot_df
 
 
@@ -744,11 +795,11 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         index=['Game', 'Config'], columns='Seed', values='Final Eval Return', aggfunc='first',
     ).reindex(columns=full_columns).fillna('')
 
-    # 논문 점수는 시드별 실험값과 구분하여 Config 열의 별도 첫 행에 표시합니다.
+    # 논문 및 재현 점수는 Config 열의 별도 참조 행에 표시합니다.
     reference_index = pd.MultiIndex.from_tuples(
-        [(game, f'STORM (논문): {REFERENCE_SCORES[game][2]}')
+        [(game, label)
          for game in pivot_df.index.get_level_values('Game').unique()
-         if game in REFERENCE_SCORES],
+         for label, _ in reference_rows(game)],
         names=['Game', 'Config'],
     )
     reference_df = pd.DataFrame('', index=reference_index, columns=pivot_df.columns)
@@ -757,6 +808,7 @@ def main(csv_path=None, output_path=None, queue_dir=None):
     # Sorting Index
     base_order = [
         'STORM (논문)',
+        'STORM (reproduced)',
         'Retrieval 미사용',
         'target'
     ]
@@ -810,11 +862,13 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         )
         worksheet.cell(row=1, column=mean_col + 1).comment = Comment(
             'STORM (논문) 행: Retrieval 미사용의 공통 시드 평균 − STORM 논문 점수.\n'
+            'STORM (reproduced) 행: Retrieval 미사용의 공통 시드 평균 − MoW 논문의 STORM 재현 점수.\n'
             'target: 16 행: |target: 16의 공통 시드 평균 − Retrieval 미사용의 공통 시드 평균|.',
             'STORM',
         )
         worksheet.cell(row=1, column=mean_col + 2).comment = Comment(
             'STORM (논문) 행: (Retrieval 미사용 평균 − STORM 논문 점수) / (Human − Random).\n'
+            'STORM (reproduced) 행: (Retrieval 미사용 평균 − STORM 재현 점수) / (Human − Random).\n'
             'target: 16 행: (target: 16 평균 − Retrieval 미사용 평균) / (Human − Random).\n'
             '모든 평균은 EXCLUDED_SEEDS를 제외한 공통 시드 기준이며 '
             'HNS 차이는 부호를 유지합니다. 백분율이 아닙니다.',
@@ -825,6 +879,13 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         game_row_counts = pivot_df.groupby(level='Game').size()
         for row_idx, (game, config) in enumerate(pivot_df.index):
             excel_row = row_idx + start_row
+            if config.startswith('STORM (reproduced)'):
+                worksheet.cell(row=excel_row, column=2).comment = Comment(
+                    REPRODUCED_SCORE_SOURCE + '\n'
+                    '재현 열의 표시값을 전사했으며, 시드별 실험값이 아닙니다.\n'
+                    'HNS 비교에는 게임 셀의 기존 Random/Human 참조값을 사용합니다.',
+                    'STORM',
+                )
             if config == 'target: 16 (anchor 미설정)':
                 worksheet.cell(row=excel_row, column=mean_col + 1).number_format = '0.00'
             # 병합된 게임 셀의 세 줄이 모두 보이도록 높이와 줄바꿈 설정.
