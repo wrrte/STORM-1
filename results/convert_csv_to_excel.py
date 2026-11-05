@@ -99,6 +99,11 @@ def reference_rows(game):
 PAIRED_MEAN_COLUMN = 'Mean (공통 시드)'
 SCORE_DELTA_COLUMN = 'Δ Score (행별 비교)'
 HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
+PRIORITY_CONFIGS = (
+    'target: 16 (anchor r: 1)',
+    'target: 16 (anchor r: 1) [warmup: 30000]',
+    'target: 16 (anchor r: 1) [warmup: 70000]',
+)
 HERE = Path(__file__).resolve().parent
 RETRIEVAL_COLUMNS = {
     'enable': 'Retrieval Enable', 'warmup_steps': 'Warmup Steps',
@@ -827,6 +832,21 @@ def main(csv_path=None, output_path=None, queue_dir=None):
     sorted_index = sorted(pivot_df.index, key=lambda x: (x[0], get_sort_key(x[1])))
     pivot_df = pivot_df.reindex(sorted_index)
     pivot_df = add_paired_baseline_mean(pivot_df, excluded_seeds)
+
+    # 세 warmup 설정 중 하나라도 학습이 있는 시드를 앞에 모읍니다.
+    # 완료 점수뿐 아니라 RUNNING/QUEUED도 포함하며 각 시드 그룹의 기존 순서를 유지합니다.
+    priority_rows = pivot_df.loc[pivot_df.index.get_level_values('Config').isin(PRIORITY_CONFIGS)]
+    priority_seeds = [
+        column for column in pivot_df.columns
+        if str(column).strip().isdigit()
+        and priority_rows[column].fillna('').astype(str).str.strip().ne('').any()
+    ]
+    metric_columns = [PAIRED_MEAN_COLUMN, SCORE_DELTA_COLUMN, HNS_DELTA_COLUMN]
+    remaining_columns = [
+        column for column in pivot_df.columns
+        if column not in priority_seeds and column not in metric_columns and column != '   '
+    ]
+    pivot_df = pivot_df.reindex(columns=[*priority_seeds, *metric_columns, *remaining_columns])
 
     with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
         pivot_df.to_excel(writer, sheet_name='Results')
