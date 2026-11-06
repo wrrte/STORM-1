@@ -3,4 +3,4 @@ set -euo pipefail
 
 export CUDA_VISIBLE_DEVICES=0
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
-exec bash baseline_train.sh "$CUDA_VISIBLE_DEVICES" "$@"
+exec bash queue_train.sh "$CUDA_VISIBLE_DEVICES" "$@"

@@ -1,0 +1,3056 @@
+{
+  "created_date": "2026-11-07",
+  "timezone": "Asia/Seoul",
+  "source": "results/main_performance_seeds.xlsx",
+  "source_sha256": "c04827cc3ddfdbc726cbbf675e95cb7f55d01674cb157ec4dc201bcb7dc00337",
+  "queue": "job_queue_3090.txt",
+  "status": "queued",
+  "total_jobs": 103,
+  "counts": {
+    "fresh": 73,
+    "resume_warmup": 30
+  },
+  "config_path": "config_files/STORM.paper_random_neighbor_20261107.yaml",
+  "config_sha256": "a35f5c5ba627508a464bc7f421f6c382006430328fb66dbfc9de2d1d12751d68",
+  "neighbor_source": "random",
+  "warmup_steps": 50000,
+  "anchor_offset": -2,
+  "anchor_weight": 0.0625,
+  "anchor_weight_r": null,
+  "target": 16,
+  "evaluation": {
+    "checkpoint_step": 100000,
+    "episodes": 20,
+    "precision": "both",
+    "seed": 0
+  },
+  "notes": [
+    "All 103 selected main-table seeds receive new ablation runs, including seeds with historical random-neighbor results. Existing run artifacts are preserved.",
+    "Resume uses inspected pre-retrieval shared warmups for the same game and training seed, retaining model, optimizer, replay, statistics and RNG state. Final retrieval-trained weights are never used.",
+    "Older snapshots lack warmup_metadata.json; --resume_from plus --branch_experiment randomneighor selects a single ablation branch with the frozen configuration.",
+    "Reused same-seed warmups are not claimed to be the exact original paper trajectory when the original directory is absent.",
+    "The historical hidden sheet groups fixed-weight offsets -2 and -3 together. This queue uses the user-requested offset -2 throughout.",
+    "Freeway loads Freeway.pkl with UseDemonstration=True. Other trajectory paths are unused with UseDemonstration=False."
+  ],
+  "preflight": {
+    "argument_and_child_config_checks": 103,
+    "unique_seed_pairs": 103,
+    "warmup_archives_inspected": 37,
+    "atari_roms_loaded": 26,
+    "real_training_started": false
+  },
+  "jobs": [
+    {
+      "game": "Alien",
+      "seed": 1,
+      "mode": "fresh",
+      "run_base": "Alien-paper-random-w50000-m2-seed1-20261107",
+      "final_run_name": "Alien-paper-random-w50000-m2-seed1-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Alien-paper-random-w50000-m2-seed1-20261107 -seed 1 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Alien-v5 -trajectory_path D_TRAJ/Alien.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 1510,
+      "paper_source_run_ids": [
+        "w86l96dk"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Alien-paper-random-w50000-m2-seed1-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Alien",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Alien-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Alien-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Alien-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Alien-v5 -trajectory_path D_TRAJ/Alien.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Alien-2000_Shared/shared_warmup_50590 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Alien-2000_Shared/shared_warmup_50590",
+      "resume_step": 50590,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 743.5,
+      "paper_source_run_ids": [
+        "6canyrhp"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Alien-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50590,
+          "last_pointer": 50589,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Alien",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Alien-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Alien-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Alien-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Alien-v5 -trajectory_path D_TRAJ/Alien.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 1400,
+      "paper_source_run_ids": [
+        "gnk3r4hj"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Alien-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Alien",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "Alien-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "Alien-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Alien-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Alien-v5 -trajectory_path D_TRAJ/Alien.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 938,
+      "paper_source_run_ids": [
+        "i1tixf0v"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Alien-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Amidar",
+      "seed": 1,
+      "mode": "fresh",
+      "run_base": "Amidar-paper-random-w50000-m2-seed1-20261107",
+      "final_run_name": "Amidar-paper-random-w50000-m2-seed1-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Amidar-paper-random-w50000-m2-seed1-20261107 -seed 1 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Amidar-v5 -trajectory_path D_TRAJ/Amidar.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 169.45,
+      "paper_source_run_ids": [
+        "udoyarw1"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Amidar-paper-random-w50000-m2-seed1-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Amidar",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Amidar-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Amidar-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Amidar-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Amidar-v5 -trajectory_path D_TRAJ/Amidar.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Amidar-2000_Shared/shared_warmup_50287 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Amidar-2000_Shared/shared_warmup_50287",
+      "resume_step": 50287,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 129.4,
+      "paper_source_run_ids": [
+        "9e32wvx1"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Amidar-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50287,
+          "last_pointer": 50286,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Amidar",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Amidar-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Amidar-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Amidar-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Amidar-v5 -trajectory_path D_TRAJ/Amidar.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 155.25,
+      "paper_source_run_ids": [
+        "o3f8dl63"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Amidar-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Amidar",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "Amidar-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "Amidar-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Amidar-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Amidar-v5 -trajectory_path D_TRAJ/Amidar.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 222.5,
+      "paper_source_run_ids": [
+        "1cpuzx5g"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Amidar-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Assault",
+      "seed": 1,
+      "mode": "fresh",
+      "run_base": "Assault-paper-random-w50000-m2-seed1-20261107",
+      "final_run_name": "Assault-paper-random-w50000-m2-seed1-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Assault-paper-random-w50000-m2-seed1-20261107 -seed 1 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Assault-v5 -trajectory_path D_TRAJ/Assault.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 779.45,
+      "paper_source_run_ids": [
+        "u76ki0du"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Assault-paper-random-w50000-m2-seed1-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Assault",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Assault-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Assault-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Assault-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Assault-v5 -trajectory_path D_TRAJ/Assault.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Assault-2000_Shared/shared_warmup_50465 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Assault-2000_Shared/shared_warmup_50465",
+      "resume_step": 50465,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 666.55,
+      "paper_source_run_ids": [
+        "ik8yz2lw"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Assault-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50465,
+          "last_pointer": 50464,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Assault",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Assault-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Assault-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Assault-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Assault-v5 -trajectory_path D_TRAJ/Assault.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 724.8,
+      "paper_source_run_ids": [
+        "yrbdrk1u"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Assault-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Assault",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "Assault-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "Assault-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Assault-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Assault-v5 -trajectory_path D_TRAJ/Assault.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 723.85,
+      "paper_source_run_ids": [
+        "pv8b0vnz"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Assault-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Asterix",
+      "seed": 10,
+      "mode": "fresh",
+      "run_base": "Asterix-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "Asterix-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Asterix-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Asterix-v5 -trajectory_path D_TRAJ/Asterix.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 600,
+      "paper_source_run_ids": [
+        "fojusqfp"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Asterix-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Asterix",
+      "seed": 3710,
+      "mode": "resume_warmup",
+      "run_base": "Asterix-paper-random-w50000-m2-seed3710-20261107",
+      "final_run_name": "Asterix-paper-random-w50000-m2-seed3710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Asterix-paper-random-w50000-m2-seed3710-20261107 -seed 3710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Asterix-v5 -trajectory_path D_TRAJ/Asterix.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Asterix-3710_Shared/shared_warmup_50039 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Asterix-3710_Shared/shared_warmup_50039",
+      "resume_step": 50039,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 545,
+      "paper_source_run_ids": [
+        "ct94v1iw"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Asterix-paper-random-w50000-m2-seed3710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50039,
+          "last_pointer": 50038,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Asterix",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Asterix-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Asterix-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Asterix-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Asterix-v5 -trajectory_path D_TRAJ/Asterix.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 887.5,
+      "paper_source_run_ids": [
+        "adt0ckio"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Asterix-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Asterix",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "Asterix-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "Asterix-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Asterix-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Asterix-v5 -trajectory_path D_TRAJ/Asterix.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 1005,
+      "paper_source_run_ids": [
+        "lcno3yxj"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Asterix-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "BankHeist",
+      "seed": 2010,
+      "mode": "resume_warmup",
+      "run_base": "BankHeist-paper-random-w50000-m2-seed2010-20261107",
+      "final_run_name": "BankHeist-paper-random-w50000-m2-seed2010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n BankHeist-paper-random-w50000-m2-seed2010-20261107 -seed 2010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/BankHeist-v5 -trajectory_path D_TRAJ/BankHeist.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/BankHeist-2010_Shared/shared_warmup_50139 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/BankHeist-2010_Shared/shared_warmup_50139",
+      "resume_step": 50139,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 633.5,
+      "paper_source_run_ids": [
+        "t2tchay5"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/BankHeist-paper-random-w50000-m2-seed2010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50139,
+          "last_pointer": 50138,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "BankHeist",
+      "seed": 9997,
+      "mode": "fresh",
+      "run_base": "BankHeist-paper-random-w50000-m2-seed9997-20261107",
+      "final_run_name": "BankHeist-paper-random-w50000-m2-seed9997-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n BankHeist-paper-random-w50000-m2-seed9997-20261107 -seed 9997 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/BankHeist-v5 -trajectory_path D_TRAJ/BankHeist.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 404,
+      "paper_source_run_ids": [
+        "j8vxpt7u"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/BankHeist-paper-random-w50000-m2-seed9997-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "BankHeist",
+      "seed": 9998,
+      "mode": "fresh",
+      "run_base": "BankHeist-paper-random-w50000-m2-seed9998-20261107",
+      "final_run_name": "BankHeist-paper-random-w50000-m2-seed9998-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n BankHeist-paper-random-w50000-m2-seed9998-20261107 -seed 9998 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/BankHeist-v5 -trajectory_path D_TRAJ/BankHeist.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 566,
+      "paper_source_run_ids": [
+        "b18t371r"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/BankHeist-paper-random-w50000-m2-seed9998-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "BankHeist",
+      "seed": 9999,
+      "mode": "fresh",
+      "run_base": "BankHeist-paper-random-w50000-m2-seed9999-20261107",
+      "final_run_name": "BankHeist-paper-random-w50000-m2-seed9999-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n BankHeist-paper-random-w50000-m2-seed9999-20261107 -seed 9999 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/BankHeist-v5 -trajectory_path D_TRAJ/BankHeist.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 565,
+      "paper_source_run_ids": [
+        "gi4bfbrx"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/BankHeist-paper-random-w50000-m2-seed9999-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "BattleZone",
+      "seed": 2010,
+      "mode": "resume_warmup",
+      "run_base": "BattleZone-paper-random-w50000-m2-seed2010-20261107",
+      "final_run_name": "BattleZone-paper-random-w50000-m2-seed2010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n BattleZone-paper-random-w50000-m2-seed2010-20261107 -seed 2010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/BattleZone-v5 -trajectory_path D_TRAJ/BattleZone.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/BattleZone-2010_Shared/shared_warmup_50014 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/BattleZone-2010_Shared/shared_warmup_50014",
+      "resume_step": 50014,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 14250,
+      "paper_source_run_ids": [
+        "3ng2kldu"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/BattleZone-paper-random-w50000-m2-seed2010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50014,
+          "last_pointer": 50013,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "BattleZone",
+      "seed": 5090,
+      "mode": "fresh",
+      "run_base": "BattleZone-paper-random-w50000-m2-seed5090-20261107",
+      "final_run_name": "BattleZone-paper-random-w50000-m2-seed5090-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n BattleZone-paper-random-w50000-m2-seed5090-20261107 -seed 5090 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/BattleZone-v5 -trajectory_path D_TRAJ/BattleZone.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 13050,
+      "paper_source_run_ids": [
+        "p81hm0xr"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/BattleZone-paper-random-w50000-m2-seed5090-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "BattleZone",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "BattleZone-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "BattleZone-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n BattleZone-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/BattleZone-v5 -trajectory_path D_TRAJ/BattleZone.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 14350,
+      "paper_source_run_ids": [
+        "lssk1135"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/BattleZone-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "BattleZone",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "BattleZone-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "BattleZone-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n BattleZone-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/BattleZone-v5 -trajectory_path D_TRAJ/BattleZone.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 10850,
+      "paper_source_run_ids": [
+        "7ejjjrg1"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/BattleZone-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Boxing",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Boxing-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Boxing-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Boxing-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Boxing-v5 -trajectory_path D_TRAJ/Boxing.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Boxing-2000_Shared/shared_warmup_50058 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Boxing-2000_Shared/shared_warmup_50058",
+      "resume_step": 50058,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 78.5,
+      "paper_source_run_ids": [
+        "ut7qlpz8"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Boxing-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50058,
+          "last_pointer": 50057,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Boxing",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "Boxing-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "Boxing-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Boxing-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Boxing-v5 -trajectory_path D_TRAJ/Boxing.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 85.05,
+      "paper_source_run_ids": [
+        "5hl3tsox"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Boxing-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Boxing",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "Boxing-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "Boxing-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Boxing-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Boxing-v5 -trajectory_path D_TRAJ/Boxing.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 87.9,
+      "paper_source_run_ids": [
+        "ykhthbew"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Boxing-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "mode": "fresh",
+      "run_base": "Boxing-paper-random-w50000-m2-seed6040-20261107",
+      "final_run_name": "Boxing-paper-random-w50000-m2-seed6040-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Boxing-paper-random-w50000-m2-seed6040-20261107 -seed 6040 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Boxing-v5 -trajectory_path D_TRAJ/Boxing.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 82.65,
+      "paper_source_run_ids": [
+        "sq9rmczm"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Boxing-paper-random-w50000-m2-seed6040-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Breakout",
+      "seed": 10,
+      "mode": "fresh",
+      "run_base": "Breakout-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "Breakout-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Breakout-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Breakout-v5 -trajectory_path D_TRAJ/Breakout.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 12.7,
+      "paper_source_run_ids": [
+        "25pg963s"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Breakout-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Breakout",
+      "seed": 3710,
+      "mode": "resume_warmup",
+      "run_base": "Breakout-paper-random-w50000-m2-seed3710-20261107",
+      "final_run_name": "Breakout-paper-random-w50000-m2-seed3710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Breakout-paper-random-w50000-m2-seed3710-20261107 -seed 3710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Breakout-v5 -trajectory_path D_TRAJ/Breakout.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Breakout-3710_Shared/shared_warmup_50099 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Breakout-3710_Shared/shared_warmup_50099",
+      "resume_step": 50099,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 15.1,
+      "paper_source_run_ids": [
+        "jzgh0p3a"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Breakout-paper-random-w50000-m2-seed3710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50099,
+          "last_pointer": 50098,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Breakout",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Breakout-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Breakout-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Breakout-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Breakout-v5 -trajectory_path D_TRAJ/Breakout.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Breakout-2000_Shared/shared_warmup_50063 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Breakout-2000_Shared/shared_warmup_50063",
+      "resume_step": 50063,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 11.2,
+      "paper_source_run_ids": [],
+      "paper_source_anchor_offsets": [],
+      "final_evaluation_path": "runs/Breakout-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50063,
+          "last_pointer": 50062,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Breakout",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Breakout-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Breakout-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Breakout-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Breakout-v5 -trajectory_path D_TRAJ/Breakout.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 12,
+      "paper_source_run_ids": [
+        "thfg8mth"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Breakout-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "ChopperCommand",
+      "seed": 10,
+      "mode": "fresh",
+      "run_base": "ChopperCommand-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "ChopperCommand-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n ChopperCommand-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/ChopperCommand-v5 -trajectory_path D_TRAJ/ChopperCommand.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2025,
+      "paper_source_run_ids": [
+        "zcmfmtbw"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/ChopperCommand-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "ChopperCommand",
+      "seed": 710,
+      "mode": "fresh",
+      "run_base": "ChopperCommand-paper-random-w50000-m2-seed710-20261107",
+      "final_run_name": "ChopperCommand-paper-random-w50000-m2-seed710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n ChopperCommand-paper-random-w50000-m2-seed710-20261107 -seed 710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/ChopperCommand-v5 -trajectory_path D_TRAJ/ChopperCommand.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 970,
+      "paper_source_run_ids": [
+        "6rblogus"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/ChopperCommand-paper-random-w50000-m2-seed710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "ChopperCommand",
+      "seed": 3710,
+      "mode": "resume_warmup",
+      "run_base": "ChopperCommand-paper-random-w50000-m2-seed3710-20261107",
+      "final_run_name": "ChopperCommand-paper-random-w50000-m2-seed3710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n ChopperCommand-paper-random-w50000-m2-seed3710-20261107 -seed 3710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/ChopperCommand-v5 -trajectory_path D_TRAJ/ChopperCommand.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/ChopperCommand-3710_Shared/shared_warmup_50115 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/ChopperCommand-3710_Shared/shared_warmup_50115",
+      "resume_step": 50115,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 1445,
+      "paper_source_run_ids": [
+        "fhlq8r7s"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/ChopperCommand-paper-random-w50000-m2-seed3710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50115,
+          "last_pointer": 50114,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "ChopperCommand",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "ChopperCommand-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "ChopperCommand-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n ChopperCommand-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/ChopperCommand-v5 -trajectory_path D_TRAJ/ChopperCommand.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/ChopperCommand-2000_Shared/shared_warmup_50211 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/ChopperCommand-2000_Shared/shared_warmup_50211",
+      "resume_step": 50211,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 1260,
+      "paper_source_run_ids": [
+        "nh0sgtk0"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/ChopperCommand-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50211,
+          "last_pointer": 50210,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 10,
+      "mode": "fresh",
+      "run_base": "CrazyClimber-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "CrazyClimber-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n CrazyClimber-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/CrazyClimber-v5 -trajectory_path D_TRAJ/CrazyClimber.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 56795,
+      "paper_source_run_ids": [
+        "4ngtu7az"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/CrazyClimber-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 3710,
+      "mode": "resume_warmup",
+      "run_base": "CrazyClimber-paper-random-w50000-m2-seed3710-20261107",
+      "final_run_name": "CrazyClimber-paper-random-w50000-m2-seed3710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n CrazyClimber-paper-random-w50000-m2-seed3710-20261107 -seed 3710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/CrazyClimber-v5 -trajectory_path D_TRAJ/CrazyClimber.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/CrazyClimber-3710_Shared/shared_warmup_50617 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/CrazyClimber-3710_Shared/shared_warmup_50617",
+      "resume_step": 50617,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 53655,
+      "paper_source_run_ids": [
+        "jaj4v6zz"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/CrazyClimber-paper-random-w50000-m2-seed3710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50617,
+          "last_pointer": 50616,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "CrazyClimber-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "CrazyClimber-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n CrazyClimber-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/CrazyClimber-v5 -trajectory_path D_TRAJ/CrazyClimber.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/CrazyClimber-2000_Shared/shared_warmup_50250 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/CrazyClimber-2000_Shared/shared_warmup_50250",
+      "resume_step": 50250,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 63275,
+      "paper_source_run_ids": [
+        "k526n304"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/CrazyClimber-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50250,
+          "last_pointer": 50249,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "CrazyClimber-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "CrazyClimber-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n CrazyClimber-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/CrazyClimber-v5 -trajectory_path D_TRAJ/CrazyClimber.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 60805,
+      "paper_source_run_ids": [
+        "psz02qu1"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/CrazyClimber-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "DemonAttack",
+      "seed": 10,
+      "mode": "fresh",
+      "run_base": "DemonAttack-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "DemonAttack-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n DemonAttack-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/DemonAttack-v5 -trajectory_path D_TRAJ/DemonAttack.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 150.75,
+      "paper_source_run_ids": [
+        "6liiyoxb"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/DemonAttack-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "DemonAttack",
+      "seed": 710,
+      "mode": "fresh",
+      "run_base": "DemonAttack-paper-random-w50000-m2-seed710-20261107",
+      "final_run_name": "DemonAttack-paper-random-w50000-m2-seed710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n DemonAttack-paper-random-w50000-m2-seed710-20261107 -seed 710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/DemonAttack-v5 -trajectory_path D_TRAJ/DemonAttack.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 149.25,
+      "paper_source_run_ids": [
+        "f2pmdl67"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/DemonAttack-paper-random-w50000-m2-seed710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "DemonAttack",
+      "seed": 3710,
+      "mode": "resume_warmup",
+      "run_base": "DemonAttack-paper-random-w50000-m2-seed3710-20261107",
+      "final_run_name": "DemonAttack-paper-random-w50000-m2-seed3710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n DemonAttack-paper-random-w50000-m2-seed3710-20261107 -seed 3710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/DemonAttack-v5 -trajectory_path D_TRAJ/DemonAttack.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/DemonAttack-3710_Shared/shared_warmup_50224 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/DemonAttack-3710_Shared/shared_warmup_50224",
+      "resume_step": 50224,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 128.25,
+      "paper_source_run_ids": [
+        "n33lvnjj"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/DemonAttack-paper-random-w50000-m2-seed3710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50224,
+          "last_pointer": 50223,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "DemonAttack",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "DemonAttack-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "DemonAttack-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n DemonAttack-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/DemonAttack-v5 -trajectory_path D_TRAJ/DemonAttack.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/DemonAttack-2000_Shared/shared_warmup_51033 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/DemonAttack-2000_Shared/shared_warmup_51033",
+      "resume_step": 51033,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 192.25,
+      "paper_source_run_ids": [
+        "38jfqwlr"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/DemonAttack-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 51033,
+          "last_pointer": 51032,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Freeway",
+      "seed": 1,
+      "mode": "fresh",
+      "run_base": "Freeway-paper-random-w50000-m2-seed1-20261107",
+      "final_run_name": "Freeway-paper-random-w50000-m2-seed1-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Freeway-paper-random-w50000-m2-seed1-20261107 -seed 1 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Freeway-v5 -trajectory_path Freeway.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration True",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 21.5,
+      "paper_source_run_ids": [
+        "nv5ms6q5"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Freeway-paper-random-w50000-m2-seed1-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Freeway",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Freeway-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Freeway-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Freeway-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Freeway-v5 -trajectory_path Freeway.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration True",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 33.55,
+      "paper_source_run_ids": [
+        "cofe2vbz"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Freeway-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Freeway",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "Freeway-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "Freeway-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Freeway-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Freeway-v5 -trajectory_path Freeway.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration True",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 32.75,
+      "paper_source_run_ids": [
+        "bctqzwwt"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Freeway-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "Freeway-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "Freeway-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Freeway-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Freeway-v5 -trajectory_path Freeway.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration True",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 33.75,
+      "paper_source_run_ids": [
+        "wq5mxpwt"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Freeway-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Frostbite",
+      "seed": 710,
+      "mode": "fresh",
+      "run_base": "Frostbite-paper-random-w50000-m2-seed710-20261107",
+      "final_run_name": "Frostbite-paper-random-w50000-m2-seed710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Frostbite-paper-random-w50000-m2-seed710-20261107 -seed 710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Frostbite-v5 -trajectory_path D_TRAJ/Frostbite.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2443,
+      "paper_source_run_ids": [
+        "jlidh3jn"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Frostbite-paper-random-w50000-m2-seed710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Frostbite",
+      "seed": 3710,
+      "mode": "resume_warmup",
+      "run_base": "Frostbite-paper-random-w50000-m2-seed3710-20261107",
+      "final_run_name": "Frostbite-paper-random-w50000-m2-seed3710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Frostbite-paper-random-w50000-m2-seed3710-20261107 -seed 3710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Frostbite-v5 -trajectory_path D_TRAJ/Frostbite.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Frostbite-3710_Shared/shared_warmup_50537 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Frostbite-3710_Shared/shared_warmup_50537",
+      "resume_step": 50537,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2779,
+      "paper_source_run_ids": [
+        "5oxxgf7p"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Frostbite-paper-random-w50000-m2-seed3710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50537,
+          "last_pointer": 50536,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Frostbite",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Frostbite-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Frostbite-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Frostbite-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Frostbite-v5 -trajectory_path D_TRAJ/Frostbite.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2746.5,
+      "paper_source_run_ids": [],
+      "paper_source_anchor_offsets": [],
+      "final_evaluation_path": "runs/Frostbite-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Frostbite",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "Frostbite-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "Frostbite-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Frostbite-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Frostbite-v5 -trajectory_path D_TRAJ/Frostbite.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 251,
+      "paper_source_run_ids": [
+        "vdgyhl39"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Frostbite-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Gopher",
+      "seed": 9994,
+      "mode": "fresh",
+      "run_base": "Gopher-paper-random-w50000-m2-seed9994-20261107",
+      "final_run_name": "Gopher-paper-random-w50000-m2-seed9994-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Gopher-paper-random-w50000-m2-seed9994-20261107 -seed 9994 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Gopher-v5 -trajectory_path D_TRAJ/Gopher.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 8044,
+      "paper_source_run_ids": [
+        "cmplkx69"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Gopher-paper-random-w50000-m2-seed9994-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Gopher",
+      "seed": 9997,
+      "mode": "fresh",
+      "run_base": "Gopher-paper-random-w50000-m2-seed9997-20261107",
+      "final_run_name": "Gopher-paper-random-w50000-m2-seed9997-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Gopher-paper-random-w50000-m2-seed9997-20261107 -seed 9997 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Gopher-v5 -trajectory_path D_TRAJ/Gopher.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 8373,
+      "paper_source_run_ids": [
+        "l9krtk4x"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Gopher-paper-random-w50000-m2-seed9997-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Gopher",
+      "seed": 9998,
+      "mode": "fresh",
+      "run_base": "Gopher-paper-random-w50000-m2-seed9998-20261107",
+      "final_run_name": "Gopher-paper-random-w50000-m2-seed9998-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Gopher-paper-random-w50000-m2-seed9998-20261107 -seed 9998 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Gopher-v5 -trajectory_path D_TRAJ/Gopher.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 7531,
+      "paper_source_run_ids": [
+        "ucbghg6p"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Gopher-paper-random-w50000-m2-seed9998-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Hero",
+      "seed": 1,
+      "mode": "fresh",
+      "run_base": "Hero-paper-random-w50000-m2-seed1-20261107",
+      "final_run_name": "Hero-paper-random-w50000-m2-seed1-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Hero-paper-random-w50000-m2-seed1-20261107 -seed 1 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Hero-v5 -trajectory_path D_TRAJ/Hero.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 13108.75,
+      "paper_source_run_ids": [
+        "imsipumu"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Hero-paper-random-w50000-m2-seed1-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Hero",
+      "seed": 10,
+      "mode": "fresh",
+      "run_base": "Hero-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "Hero-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Hero-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Hero-v5 -trajectory_path D_TRAJ/Hero.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 13251.25,
+      "paper_source_run_ids": [
+        "asyvz492"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Hero-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Hero",
+      "seed": 710,
+      "mode": "fresh",
+      "run_base": "Hero-paper-random-w50000-m2-seed710-20261107",
+      "final_run_name": "Hero-paper-random-w50000-m2-seed710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Hero-paper-random-w50000-m2-seed710-20261107 -seed 710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Hero-v5 -trajectory_path D_TRAJ/Hero.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 13231.5,
+      "paper_source_run_ids": [
+        "kztho94s"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Hero-paper-random-w50000-m2-seed710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Hero",
+      "seed": 3710,
+      "mode": "resume_warmup",
+      "run_base": "Hero-paper-random-w50000-m2-seed3710-20261107",
+      "final_run_name": "Hero-paper-random-w50000-m2-seed3710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Hero-paper-random-w50000-m2-seed3710-20261107 -seed 3710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Hero-v5 -trajectory_path D_TRAJ/Hero.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Hero-3710_Shared/shared_warmup_50130 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Hero-3710_Shared/shared_warmup_50130",
+      "resume_step": 50130,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 13325.5,
+      "paper_source_run_ids": [
+        "w35503nf"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Hero-paper-random-w50000-m2-seed3710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50130,
+          "last_pointer": 50129,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 1,
+      "mode": "fresh",
+      "run_base": "Jamesbond-paper-random-w50000-m2-seed1-20261107",
+      "final_run_name": "Jamesbond-paper-random-w50000-m2-seed1-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Jamesbond-paper-random-w50000-m2-seed1-20261107 -seed 1 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Jamesbond-v5 -trajectory_path D_TRAJ/Jamesbond.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 522.5,
+      "paper_source_run_ids": [
+        "4z04vnr3"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Jamesbond-paper-random-w50000-m2-seed1-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Jamesbond-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Jamesbond-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Jamesbond-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Jamesbond-v5 -trajectory_path D_TRAJ/Jamesbond.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Jamesbond-2000_Shared/shared_warmup_50974 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Jamesbond-2000_Shared/shared_warmup_50974",
+      "resume_step": 50974,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 567.5,
+      "paper_source_run_ids": [
+        "jaw7ayeo"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Jamesbond-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50974,
+          "last_pointer": 50973,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 2010,
+      "mode": "resume_warmup",
+      "run_base": "Jamesbond-paper-random-w50000-m2-seed2010-20261107",
+      "final_run_name": "Jamesbond-paper-random-w50000-m2-seed2010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Jamesbond-paper-random-w50000-m2-seed2010-20261107 -seed 2010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Jamesbond-v5 -trajectory_path D_TRAJ/Jamesbond.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Jamesbond-2010_Shared/shared_warmup_50383 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Jamesbond-2010_Shared/shared_warmup_50383",
+      "resume_step": 50383,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 660,
+      "paper_source_run_ids": [],
+      "paper_source_anchor_offsets": [],
+      "final_evaluation_path": "runs/Jamesbond-paper-random-w50000-m2-seed2010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50383,
+          "last_pointer": 50382,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Jamesbond-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Jamesbond-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Jamesbond-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Jamesbond-v5 -trajectory_path D_TRAJ/Jamesbond.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 665,
+      "paper_source_run_ids": [
+        "3skbblgn"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Jamesbond-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Kangaroo-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Kangaroo-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Kangaroo-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Kangaroo-v5 -trajectory_path D_TRAJ/Kangaroo.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 1670,
+      "paper_source_run_ids": [
+        "11ljxy0l"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Kangaroo-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "Kangaroo-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "Kangaroo-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Kangaroo-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Kangaroo-v5 -trajectory_path D_TRAJ/Kangaroo.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2080,
+      "paper_source_run_ids": [
+        "e5mq9v22"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Kangaroo-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "mode": "fresh",
+      "run_base": "Kangaroo-paper-random-w50000-m2-seed6030-20261107",
+      "final_run_name": "Kangaroo-paper-random-w50000-m2-seed6030-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Kangaroo-paper-random-w50000-m2-seed6030-20261107 -seed 6030 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Kangaroo-v5 -trajectory_path D_TRAJ/Kangaroo.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2900,
+      "paper_source_run_ids": [
+        "o9joyx5v"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Kangaroo-paper-random-w50000-m2-seed6030-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6040,
+      "mode": "fresh",
+      "run_base": "Kangaroo-paper-random-w50000-m2-seed6040-20261107",
+      "final_run_name": "Kangaroo-paper-random-w50000-m2-seed6040-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Kangaroo-paper-random-w50000-m2-seed6040-20261107 -seed 6040 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Kangaroo-v5 -trajectory_path D_TRAJ/Kangaroo.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2385,
+      "paper_source_run_ids": [
+        "vzgi4ob3"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Kangaroo-paper-random-w50000-m2-seed6040-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Krull",
+      "seed": 10,
+      "mode": "resume_warmup",
+      "run_base": "Krull-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "Krull-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Krull-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Krull-v5 -trajectory_path D_TRAJ/Krull.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Krull-10_Shared/shared_warmup_50454 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Krull-10_Shared/shared_warmup_50454",
+      "resume_step": 50454,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 6576.5,
+      "paper_source_run_ids": [
+        "otjw8tfq"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Krull-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50454,
+          "last_pointer": 50453,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Krull",
+      "seed": 2020,
+      "mode": "resume_warmup",
+      "run_base": "Krull-paper-random-w50000-m2-seed2020-20261107",
+      "final_run_name": "Krull-paper-random-w50000-m2-seed2020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Krull-paper-random-w50000-m2-seed2020-20261107 -seed 2020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Krull-v5 -trajectory_path D_TRAJ/Krull.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Krull-2020_Shared/shared_warmup_50648 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Krull-2020_Shared/shared_warmup_50648",
+      "resume_step": 50648,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 7019.5,
+      "paper_source_run_ids": [
+        "fjq1tysh"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Krull-paper-random-w50000-m2-seed2020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50648,
+          "last_pointer": 50647,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Krull",
+      "seed": 6020,
+      "mode": "resume_warmup",
+      "run_base": "Krull-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "Krull-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Krull-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Krull-v5 -trajectory_path D_TRAJ/Krull.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Krull-6020_Shared/shared_warmup_50348 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Krull-6020_Shared/shared_warmup_50348",
+      "resume_step": 50348,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 6828.5,
+      "paper_source_run_ids": [
+        "ejh0ml1s"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Krull-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50348,
+          "last_pointer": 50347,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Krull",
+      "seed": 6050,
+      "mode": "resume_warmup",
+      "run_base": "Krull-paper-random-w50000-m2-seed6050-20261107",
+      "final_run_name": "Krull-paper-random-w50000-m2-seed6050-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Krull-paper-random-w50000-m2-seed6050-20261107 -seed 6050 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Krull-v5 -trajectory_path D_TRAJ/Krull.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Krull-6050_Shared/shared_warmup_50404 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Krull-6050_Shared/shared_warmup_50404",
+      "resume_step": 50404,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 6783.5,
+      "paper_source_run_ids": [
+        "2ak68ev3"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Krull-paper-random-w50000-m2-seed6050-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50404,
+          "last_pointer": 50403,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Krull",
+      "seed": 9999,
+      "mode": "fresh",
+      "run_base": "Krull-paper-random-w50000-m2-seed9999-20261107",
+      "final_run_name": "Krull-paper-random-w50000-m2-seed9999-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Krull-paper-random-w50000-m2-seed9999-20261107 -seed 9999 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Krull-v5 -trajectory_path D_TRAJ/Krull.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 6796.5,
+      "paper_source_run_ids": [
+        "9ftvmfee"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Krull-paper-random-w50000-m2-seed9999-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "KungFuMaster",
+      "seed": 10,
+      "mode": "fresh",
+      "run_base": "KungFuMaster-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "KungFuMaster-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n KungFuMaster-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/KungFuMaster-v5 -trajectory_path D_TRAJ/KungFuMaster.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 30110,
+      "paper_source_run_ids": [
+        "z8em68fp"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/KungFuMaster-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "KungFuMaster",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "KungFuMaster-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "KungFuMaster-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n KungFuMaster-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/KungFuMaster-v5 -trajectory_path D_TRAJ/KungFuMaster.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/KungFuMaster-2000_Shared/shared_warmup_50492 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/KungFuMaster-2000_Shared/shared_warmup_50492",
+      "resume_step": 50492,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 20245,
+      "paper_source_run_ids": [
+        "fbbwodgs"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/KungFuMaster-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50492,
+          "last_pointer": 50491,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "KungFuMaster",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "KungFuMaster-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "KungFuMaster-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n KungFuMaster-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/KungFuMaster-v5 -trajectory_path D_TRAJ/KungFuMaster.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 24960,
+      "paper_source_run_ids": [
+        "d4b34vu3"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/KungFuMaster-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "MsPacman",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "MsPacman-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "MsPacman-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n MsPacman-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/MsPacman-v5 -trajectory_path D_TRAJ/MsPacman.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/MsPacman-2000_Shared/shared_warmup_50288 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/MsPacman-2000_Shared/shared_warmup_50288",
+      "resume_step": 50288,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2250,
+      "paper_source_run_ids": [
+        "cp2xxx38"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/MsPacman-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50288,
+          "last_pointer": 50287,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "MsPacman",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "MsPacman-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "MsPacman-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n MsPacman-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/MsPacman-v5 -trajectory_path D_TRAJ/MsPacman.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 1886.5,
+      "paper_source_run_ids": [
+        "fejunles"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/MsPacman-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "MsPacman",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "MsPacman-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "MsPacman-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n MsPacman-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/MsPacman-v5 -trajectory_path D_TRAJ/MsPacman.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 1885,
+      "paper_source_run_ids": [
+        "qsmngfp3"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/MsPacman-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "MsPacman",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "MsPacman-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "MsPacman-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n MsPacman-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/MsPacman-v5 -trajectory_path D_TRAJ/MsPacman.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2042,
+      "paper_source_run_ids": [
+        "gnozbsjs"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/MsPacman-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Pong",
+      "seed": 710,
+      "mode": "fresh",
+      "run_base": "Pong-paper-random-w50000-m2-seed710-20261107",
+      "final_run_name": "Pong-paper-random-w50000-m2-seed710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Pong-paper-random-w50000-m2-seed710-20261107 -seed 710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Pong-v5 -trajectory_path D_TRAJ/Pong.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 8.2,
+      "paper_source_run_ids": [
+        "oyz74kav"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Pong-paper-random-w50000-m2-seed710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Pong",
+      "seed": 3710,
+      "mode": "resume_warmup",
+      "run_base": "Pong-paper-random-w50000-m2-seed3710-20261107",
+      "final_run_name": "Pong-paper-random-w50000-m2-seed3710-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Pong-paper-random-w50000-m2-seed3710-20261107 -seed 3710 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Pong-v5 -trajectory_path D_TRAJ/Pong.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Pong-3710_Shared/shared_warmup_52668 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Pong-3710_Shared/shared_warmup_52668",
+      "resume_step": 52668,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 14.45,
+      "paper_source_run_ids": [
+        "kf2fcl7g"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Pong-paper-random-w50000-m2-seed3710-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 52668,
+          "last_pointer": 52667,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Pong",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Pong-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Pong-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Pong-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Pong-v5 -trajectory_path D_TRAJ/Pong.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Pong-2000_Shared/shared_warmup_52171 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Pong-2000_Shared/shared_warmup_52171",
+      "resume_step": 52171,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 9.8,
+      "paper_source_run_ids": [
+        "0p0mw23k"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Pong-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 52171,
+          "last_pointer": 52170,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Pong",
+      "seed": 9999,
+      "mode": "fresh",
+      "run_base": "Pong-paper-random-w50000-m2-seed9999-20261107",
+      "final_run_name": "Pong-paper-random-w50000-m2-seed9999-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Pong-paper-random-w50000-m2-seed9999-20261107 -seed 9999 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Pong-v5 -trajectory_path D_TRAJ/Pong.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 16.3,
+      "paper_source_run_ids": [
+        "36m2817w"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Pong-paper-random-w50000-m2-seed9999-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "PrivateEye-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "PrivateEye-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n PrivateEye-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/PrivateEye-v5 -trajectory_path D_TRAJ/PrivateEye.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/PrivateEye-2000_Shared/shared_warmup_51262 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/PrivateEye-2000_Shared/shared_warmup_51262",
+      "resume_step": 51262,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 191.95,
+      "paper_source_run_ids": [
+        "46iof219"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/PrivateEye-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 51262,
+          "last_pointer": 51261,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "PrivateEye-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "PrivateEye-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n PrivateEye-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/PrivateEye-v5 -trajectory_path D_TRAJ/PrivateEye.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 100,
+      "paper_source_run_ids": [
+        "owtnrzqp"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/PrivateEye-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "PrivateEye-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "PrivateEye-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n PrivateEye-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/PrivateEye-v5 -trajectory_path D_TRAJ/PrivateEye.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 166.8,
+      "paper_source_run_ids": [
+        "fjqs5btr"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/PrivateEye-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6040,
+      "mode": "fresh",
+      "run_base": "PrivateEye-paper-random-w50000-m2-seed6040-20261107",
+      "final_run_name": "PrivateEye-paper-random-w50000-m2-seed6040-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n PrivateEye-paper-random-w50000-m2-seed6040-20261107 -seed 6040 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/PrivateEye-v5 -trajectory_path D_TRAJ/PrivateEye.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": -593.85,
+      "paper_source_run_ids": [
+        "4zv95kq8"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/PrivateEye-paper-random-w50000-m2-seed6040-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 9999,
+      "mode": "fresh",
+      "run_base": "PrivateEye-paper-random-w50000-m2-seed9999-20261107",
+      "final_run_name": "PrivateEye-paper-random-w50000-m2-seed9999-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n PrivateEye-paper-random-w50000-m2-seed9999-20261107 -seed 9999 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/PrivateEye-v5 -trajectory_path D_TRAJ/PrivateEye.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 153.2,
+      "paper_source_run_ids": [
+        "i66zzcmm"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/PrivateEye-paper-random-w50000-m2-seed9999-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Qbert",
+      "seed": 10,
+      "mode": "fresh",
+      "run_base": "Qbert-paper-random-w50000-m2-seed10-20261107",
+      "final_run_name": "Qbert-paper-random-w50000-m2-seed10-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Qbert-paper-random-w50000-m2-seed10-20261107 -seed 10 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Qbert-v5 -trajectory_path D_TRAJ/Qbert.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 4056.25,
+      "paper_source_run_ids": [
+        "c73nxpik"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Qbert-paper-random-w50000-m2-seed10-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Qbert",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Qbert-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Qbert-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Qbert-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Qbert-v5 -trajectory_path D_TRAJ/Qbert.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Qbert-2000_Shared/shared_warmup_50309 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Qbert-2000_Shared/shared_warmup_50309",
+      "resume_step": 50309,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2608.75,
+      "paper_source_run_ids": [
+        "x6t8pgi6"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Qbert-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50309,
+          "last_pointer": 50308,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Qbert",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Qbert-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Qbert-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Qbert-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Qbert-v5 -trajectory_path D_TRAJ/Qbert.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 2895,
+      "paper_source_run_ids": [
+        "xp0j5gtz"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Qbert-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Qbert",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "Qbert-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "Qbert-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Qbert-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Qbert-v5 -trajectory_path D_TRAJ/Qbert.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 4157.5,
+      "paper_source_run_ids": [
+        "e2f6yq7e"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/Qbert-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 6020,
+      "mode": "fresh",
+      "run_base": "RoadRunner-paper-random-w50000-m2-seed6020-20261107",
+      "final_run_name": "RoadRunner-paper-random-w50000-m2-seed6020-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n RoadRunner-paper-random-w50000-m2-seed6020-20261107 -seed 6020 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/RoadRunner-v5 -trajectory_path D_TRAJ/RoadRunner.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 16980,
+      "paper_source_run_ids": [
+        "1w9lne9b"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/RoadRunner-paper-random-w50000-m2-seed6020-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 6030,
+      "mode": "fresh",
+      "run_base": "RoadRunner-paper-random-w50000-m2-seed6030-20261107",
+      "final_run_name": "RoadRunner-paper-random-w50000-m2-seed6030-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n RoadRunner-paper-random-w50000-m2-seed6030-20261107 -seed 6030 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/RoadRunner-v5 -trajectory_path D_TRAJ/RoadRunner.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 16410,
+      "paper_source_run_ids": [
+        "qowzlagw"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/RoadRunner-paper-random-w50000-m2-seed6030-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 6040,
+      "mode": "fresh",
+      "run_base": "RoadRunner-paper-random-w50000-m2-seed6040-20261107",
+      "final_run_name": "RoadRunner-paper-random-w50000-m2-seed6040-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n RoadRunner-paper-random-w50000-m2-seed6040-20261107 -seed 6040 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/RoadRunner-v5 -trajectory_path D_TRAJ/RoadRunner.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 18865,
+      "paper_source_run_ids": [
+        "ek32tjk9"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/RoadRunner-paper-random-w50000-m2-seed6040-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 6060,
+      "mode": "fresh",
+      "run_base": "RoadRunner-paper-random-w50000-m2-seed6060-20261107",
+      "final_run_name": "RoadRunner-paper-random-w50000-m2-seed6060-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n RoadRunner-paper-random-w50000-m2-seed6060-20261107 -seed 6060 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/RoadRunner-v5 -trajectory_path D_TRAJ/RoadRunner.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 15125,
+      "paper_source_run_ids": [
+        "odx8yohf"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/RoadRunner-paper-random-w50000-m2-seed6060-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Seaquest",
+      "seed": 1,
+      "mode": "fresh",
+      "run_base": "Seaquest-paper-random-w50000-m2-seed1-20261107",
+      "final_run_name": "Seaquest-paper-random-w50000-m2-seed1-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Seaquest-paper-random-w50000-m2-seed1-20261107 -seed 1 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Seaquest-v5 -trajectory_path D_TRAJ/Seaquest.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 475,
+      "paper_source_run_ids": [
+        "13nccjbt"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Seaquest-paper-random-w50000-m2-seed1-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Seaquest",
+      "seed": 2000,
+      "mode": "resume_warmup",
+      "run_base": "Seaquest-paper-random-w50000-m2-seed2000-20261107",
+      "final_run_name": "Seaquest-paper-random-w50000-m2-seed2000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Seaquest-paper-random-w50000-m2-seed2000-20261107 -seed 2000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Seaquest-v5 -trajectory_path D_TRAJ/Seaquest.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False --resume_from ckpt/Seaquest-2000_Shared/shared_warmup_50141 --branch_experiment randomneighor",
+      "checkpoint": "ckpt/Seaquest-2000_Shared/shared_warmup_50141",
+      "resume_step": 50141,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 521,
+      "paper_source_run_ids": [
+        "rr8l3es2"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Seaquest-paper-random-w50000-m2-seed2000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": {
+        "shared_warmup": true,
+        "warmup_finished": true,
+        "active_anchors": 0,
+        "retrieval_fields": [
+          "hash_proj",
+          "hash_mean",
+          "ema_mean",
+          "ema_var",
+          "ema_vd_mean",
+          "ema_vd_var",
+          "ema_value_mean",
+          "ema_value_var",
+          "hash_memory",
+          "index_to_bucket",
+          "prev_v",
+          "prev_keys",
+          "active_anchors",
+          "random_neighbor_rng_state"
+        ],
+        "rng_fields": [
+          "python",
+          "numpy",
+          "torch",
+          "cuda_all"
+        ],
+        "replay_metadata": {
+          "length": 50141,
+          "last_pointer": 50140,
+          "num_envs": 1,
+          "max_length": 100000
+        }
+      }
+    },
+    {
+      "game": "Seaquest",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "Seaquest-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "Seaquest-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Seaquest-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Seaquest-v5 -trajectory_path D_TRAJ/Seaquest.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 450,
+      "paper_source_run_ids": [
+        "mta98lm1"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Seaquest-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "Seaquest",
+      "seed": 9999,
+      "mode": "fresh",
+      "run_base": "Seaquest-paper-random-w50000-m2-seed9999-20261107",
+      "final_run_name": "Seaquest-paper-random-w50000-m2-seed9999-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n Seaquest-paper-random-w50000-m2-seed9999-20261107 -seed 9999 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/Seaquest-v5 -trajectory_path D_TRAJ/Seaquest.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 545,
+      "paper_source_run_ids": [
+        "2esxm1h6"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/Seaquest-paper-random-w50000-m2-seed9999-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "UpNDown",
+      "seed": 6000,
+      "mode": "fresh",
+      "run_base": "UpNDown-paper-random-w50000-m2-seed6000-20261107",
+      "final_run_name": "UpNDown-paper-random-w50000-m2-seed6000-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n UpNDown-paper-random-w50000-m2-seed6000-20261107 -seed 6000 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/UpNDown-v5 -trajectory_path D_TRAJ/UpNDown.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 6043,
+      "paper_source_run_ids": [
+        "n9qrg0xz"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/UpNDown-paper-random-w50000-m2-seed6000-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "UpNDown",
+      "seed": 6010,
+      "mode": "fresh",
+      "run_base": "UpNDown-paper-random-w50000-m2-seed6010-20261107",
+      "final_run_name": "UpNDown-paper-random-w50000-m2-seed6010-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n UpNDown-paper-random-w50000-m2-seed6010-20261107 -seed 6010 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/UpNDown-v5 -trajectory_path D_TRAJ/UpNDown.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 6658,
+      "paper_source_run_ids": [
+        "n7mei9h1"
+      ],
+      "paper_source_anchor_offsets": [
+        "-2"
+      ],
+      "final_evaluation_path": "runs/UpNDown-paper-random-w50000-m2-seed6010-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    },
+    {
+      "game": "UpNDown",
+      "seed": 6030,
+      "mode": "fresh",
+      "run_base": "UpNDown-paper-random-w50000-m2-seed6030-20261107",
+      "final_run_name": "UpNDown-paper-random-w50000-m2-seed6030-20261107_randomneighor",
+      "command": "/home/choemj/miniconda3/envs/storm/bin/python -u train.py -n UpNDown-paper-random-w50000-m2-seed6030-20261107 -seed 6030 -config_path config_files/STORM.paper_random_neighbor_20261107.yaml -env_name ALE/UpNDown-v5 -trajectory_path D_TRAJ/UpNDown.pkl JointTrainAgent.Retrieval.enable RandomNeighor JointTrainAgent.UseDemonstration False",
+      "checkpoint": null,
+      "resume_step": 0,
+      "checkpoint_matches_paper_source_directory": false,
+      "paper_retrieval_score": 7972.5,
+      "paper_source_run_ids": [
+        "22u5ouqe"
+      ],
+      "paper_source_anchor_offsets": [
+        "-3"
+      ],
+      "final_evaluation_path": "runs/UpNDown-paper-random-w50000-m2-seed6030-20261107_randomneighor/final_evaluation.json",
+      "checkpoint_validation": null
+    }
+  ],
+  "added_jobs": 103,
+  "previous_queue_lines": 0,
+  "queue_lines_after_append": 103,
+  "queue_sha256_at_enqueue": "f6cf89fc33c230f1ebfb44cd6efb622ba9b8f6185eefb44716dc99a339725d92"
+}

@@ -105,6 +105,29 @@ Following the **Training and Evaluating Instructions** to reproduce the main res
 
 ## Additional Useful Information
 
+### GPU job queues
+
+Activate the STORM Python environment, then run `bash 0_train.sh` (or
+`1_train.sh` through `7_train.sh`) to consume ordinary shell commands, one per
+line. Workers select `job_queue_A6000.txt`, `job_queue_3090.txt`,
+`job_queue_titan.txt`, `job_queue_pro6k.txt`, or `job_queue_default.txt` from the
+GPU name. Relative paths in jobs resolve from the STORM-1 directory. Queue pops
+use the corresponding `.lock` file, so multiple GPUs can share a queue.
+Blank lines and comments are skipped. Failed jobs are reported and the worker
+continues; each job has its own shell environment and working directory.
+
+Pass a queue path to select a separate queue, for example:
+
+```bash
+bash 0_train.sh job_queue_random_neighbor.txt
+bash 0_train.sh job_queue_random_neighbor.txt --once
+```
+
+`--once` executes at most one queued job and exits, including when the queue is
+empty. `--max-jobs N` exits after N jobs. These options return the last job's
+exit status. To run the baseline-first campaign, use `bash baseline_train.sh 0`
+instead; its `job_queue_baseline_first.txt` contains campaign reservations.
+
 ### Paired warmup and anchor-offset experiments
 
 Set `JointTrainAgent.Retrieval.warmup_offset_pairs` to the exact pairs to run:
