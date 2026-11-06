@@ -15,3 +15,5 @@ diagnostics/
 results/gpu4_demo_check_20261024/
 eval_result/
 results/warmup_comparison/
+results/baseline_campaign/
+job_queue_baseline_first.lock

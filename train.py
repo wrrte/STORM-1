@@ -897,6 +897,18 @@ if __name__ == "__main__":
             )
 
             env_base = args.env_name.split('/')[1].split('-')[0]
+            # A local result lets queue workers make decisions without W&B polling.
+            from training_branches import _write_json
+            from pathlib import Path
+            _write_json(Path(f"runs/{args.n}/final_evaluation.json"), {
+                "run_name": args.n, "seed": args.seed, "env_name": args.env_name,
+                "checkpoint_step": final_eval_step,
+                "sample_max_steps": conf.JointTrainAgent.SampleMaxSteps,
+                "precision": "bf16" if conf.JointTrainAgent.EvalPrecision == "both"
+                             else conf.JointTrainAgent.EvalPrecision,
+                "episode_avg_return": float(episode_avg_return),
+                "episode_returns": [float(value) for value in individual_returns],
+            })
             baseline_score_avg = 0.0
             try:
                 with open("results/storm.json", "r") as f:
