@@ -17,3 +17,4 @@ eval_result/
 results/warmup_comparison/
 results/baseline_campaign/
 job_queue_baseline_first.lock
+analysis/
