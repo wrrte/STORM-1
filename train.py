@@ -34,7 +34,7 @@ from training_branches import (
     capture_rng_state, launch_training_branches, save_final_models, restore_rng_state,
 )
 import pandas as pd
-from seed_screening import SeedScreen, SCREEN_REJECTED_EXIT_CODE
+from seed_screening import configure_seed_screen, SCREEN_REJECTED_EXIT_CODE
 
 def check_dynamic_warmup(episode_rewards, window_size=20, multiplier=2.6):
     if len(episode_rewards) < window_size + 5: 
@@ -732,18 +732,7 @@ if __name__ == "__main__":
         launch_storm_warmup_followup(args, extra_args, __file__, load_config)
     conf = load_config(args.config_path)
     branch_commands = configure_storm_retrieval_run(conf, args, extra_args, __file__)
-    seed_screen = None
-    if conf.JointTrainAgent.SeedScreenSteps != 0:
-        if (conf.Task != "JointTrainAgent" or branch_commands is not None or args.resume_from
-                or conf.JointTrainAgent.Retrieval.enable is not False
-                or conf.JointTrainAgent.NumEnvs != 1):
-            raise ValueError("Seed screening requires a fresh baseline with NumEnvs=1, "
-                             "Retrieval.enable=False, save_warmup=False and warmup_offset_pairs=[]")
-        if conf.JointTrainAgent.SeedScreenSteps > conf.JointTrainAgent.SampleMaxSteps:
-            raise ValueError("SeedScreenSteps cannot exceed SampleMaxSteps")
-        seed_screen = SeedScreen(conf.JointTrainAgent.SeedScreenSteps,
-                                 conf.JointTrainAgent.SeedScreenMinReturn,
-                                 f"runs/{args.n}", args.seed, args.n)
+    seed_screen, branch_commands = configure_seed_screen(conf, args, branch_commands)
     evaluation_precisions(conf.JointTrainAgent.EvalPrecision)
     if conf.JointTrainAgent.EvalEpisodes <= 0 or not (0 <= conf.JointTrainAgent.EvalSeed <= 2**32 - 1):
         raise ValueError("EvalEpisodes must be positive and EvalSeed must be between 0 and 2**32 - 1")

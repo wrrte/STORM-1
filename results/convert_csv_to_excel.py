@@ -14,6 +14,7 @@ import yaml
 from openpyxl.comments import Comment
 from openpyxl.styles import Alignment, Border, Side, Font, PatternFill
 from openpyxl.utils import get_column_letter
+from neighbor_reuse import STUDY as REUSE_STUDY, load_reuse_plan, reuse_control_names, reuse_study_table
 
 # (Random, Human, STORM 논문) 고정 참조 점수.
 # Random/Human: iclr2027_conference.tex의 tab:main_performance (2026-09-17).
@@ -217,6 +218,10 @@ def queue_command_row(command, queue_dir):
         **{column: (json.dumps(retrieval.get(key, [])) if key == 'warmup_offset_pairs'
                     else retrieval.get(key, 'N/A')) for key, column in RETRIEVAL_COLUMNS.items()},
         'Run Name': f'{game}_queued_{seed}', 'Seed': int(seed),
+        'Base Run Name': base,
+        'Local Run Name': f'{base}_{mode[0]}' if isinstance(mode, list) and len(mode) == 1 else '',
+        'Training Phase': 'queued',
+        'Warmup Directory': args.get('--resume_from', resume or ''),
         'State': 'queued', 'Eval Return': 'N/A',
         'Created At': pd.Timestamp.now(tz='UTC').isoformat(),
         'Calculated Warmup Steps': metadata.get('step', retrieval.get('warmup_steps', 'N/A')),
@@ -246,6 +251,124 @@ def read_queued_runs(queue_dir):
                 row['Queue Details'] = f'{source}\n{command.strip()}'
                 rows.append(row)
     return rows
+
+
+def read_paper_plans(queue_dir):
+    for path in sorted((Path(queue_dir)/'results').glob('paper_random_neighbor_*/plan.json')):
+        plan = json.loads(path.read_text(encoding='utf-8'))
+        for job in plan['jobs']:
+            yield path.parent.name, plan, job
+    reuse = load_reuse_plan(queue_dir)
+    if reuse:
+        for job in reuse['training_jobs']:
+            yield REUSE_STUDY, reuse, job
+
+
+def read_local_paper_results(queue_dir):
+    """Read final evaluations of exactly the runs reserved by the paper study."""
+    queue_dir = Path(queue_dir)
+    rows = []
+    for study, plan, job in read_paper_plans(queue_dir):
+        path = queue_dir/job['final_evaluation_path']
+        if not path.is_file():
+            continue
+        try:
+            result = json.loads(path.read_text(encoding='utf-8'))
+            if (result['run_name'] != job['final_run_name'] or result['seed'] != job['seed']
+                    or result['env_name'] != f"ALE/{job['game']}-v5"
+                    or result['checkpoint_step'] != plan['evaluation']['checkpoint_step']):
+                raise ValueError('final evaluation identity/checkpoint does not match the study')
+            returns = result['episode_returns']
+            score = float(result['episode_avg_return'])
+            if (len(returns) != plan['evaluation']['episodes'] or not math.isfinite(score)
+                    or not all(math.isfinite(float(x)) for x in returns)
+                    or not math.isclose(sum(returns)/len(returns), score, rel_tol=1e-7, abs_tol=1e-5)):
+                raise ValueError('invalid final episode returns or mean')
+            if result['precision'] != 'bf16':
+                raise ValueError('paper random study expects the BF16 primary evaluation')
+            row = queue_command_row(job['command'], queue_dir)
+            row = expand_shared_runs(pd.DataFrame([row])).iloc[0].to_dict()
+            actual_config = path.parent/'config.yaml'
+            if actual_config.is_file():
+                retrieval = yaml.safe_load(actual_config.read_text())['JointTrainAgent']['Retrieval']
+                expected = {'neighbor_source': plan.get('neighbor_source', 'random'), 'warmup_steps': 50000,
+                            'anchor_offset': -2, 'target': 16,
+                            'anchor_weight': .0625, 'anchor_weight_r': None}
+                if any(retrieval.get(key) != value for key, value in expected.items()):
+                    raise ValueError('saved run configuration differs from the paper ablation')
+            shared = path.parent/'shared_warmup.json'
+            actual_warmup = (json.loads(shared.read_text())['resume_step'] if shared.is_file()
+                             else job['resume_step'] or plan['warmup_steps'])
+            row.update({
+                'Run Name': f"{job['game']}_local_{job['seed']}",
+                'Run ID': f"local:{job['final_run_name']}",
+                'State': 'finished', 'Eval Return': score, 'Eval Return BF16': score,
+                'Eval Checkpoint Step': result['checkpoint_step'],
+                'Base Run Name': job['run_base'], 'Local Run Name': job['final_run_name'],
+                'Training Phase': 'branch', 'Study': study, 'Queue Details': '',
+                'Calculated Warmup Steps': actual_warmup,
+                'Created At': pd.Timestamp(path.stat().st_mtime, unit='s', tz='UTC').isoformat(),
+                'Local Evaluation': str(path),
+            })
+            rows.append(row)
+        except (ValueError, TypeError, KeyError, OSError, yaml.YAMLError) as error:
+            warnings.warn(f'{path}: 로컬 평가를 건너뜁니다: {error}', stacklevel=2)
+    return rows
+
+
+def merge_local_paper_results(df, queue_dir):
+    """One row per study run; keep W&B provenance and prefer its local final mean."""
+    records = df.to_dict('records')
+    for local in read_local_paper_results(queue_dir):
+        matches = [row for row in records if (
+            row.get('Local Run Name') == local['Local Run Name'] or (
+                row.get('Base Run Name') == local['Base Run Name']
+                and row.get('Training Phase') != 'warmup'))]
+        remote = max(matches, key=lambda row: str(row.get('Created At', '')), default={})
+        if remote and pd.to_datetime(remote.get('Created At'), utc=True, errors='coerce') > pd.to_datetime(local['Created At']):
+            continue  # A later retry must not inherit the previous run's result.
+        records = [row for row in records if row not in matches and not (
+            row.get('Base Run Name') == local['Base Run Name']
+            and row.get('Training Phase') == 'warmup')]
+        merged = {**remote, **local}
+        for key in ('Run Name', 'Run ID', 'Commit', 'Logic', 'Eval Return FP32'):
+            if key in remote and not pd.isna(remote[key]):
+                merged[key] = remote[key]
+        records.append(merged)
+    return pd.DataFrame(records)
+
+
+def paper_study_table(df, queue_dir, queued_rows):
+    """Expose the 103 new study jobs independently of older same-seed scores."""
+    reuse = load_reuse_plan(queue_dir)
+    if reuse:
+        return reuse_study_table(df, queue_dir, queued_rows, reuse)
+    records = df.to_dict('records')
+    pending = {row.get('Base Run Name') for row in queued_rows}
+    output = []
+    for study, plan, job in read_paper_plans(queue_dir):
+        matches = [row for row in records if row.get('Local Run Name') == job['final_run_name']
+                   or row.get('Base Run Name') == job['run_base']]
+        completed = [row for row in matches if str(row.get('State')).lower() == 'finished'
+                     and pd.notna(pd.to_numeric(row.get('Eval Return'), errors='coerce'))]
+        selected = max(completed or matches, key=lambda row: str(row.get('Created At', '')), default={})
+        score = float(selected['Eval Return']) if completed else None
+        status = ('FINISHED' if completed else str(selected['State']).upper() if selected
+                  else 'QUEUED' if job['run_base'] in pending
+                  else 'STARTED / NO FINAL RESULT' if (Path(queue_dir)/'runs'/job['final_run_name']).exists()
+                  or (Path(queue_dir)/'runs'/(job['run_base']+'_Shared')).exists()
+                  else 'NOT IN QUEUE')
+        output.append({'Study': study, 'Game': job['game'], 'Seed': job['seed'],
+                       'Status': status, 'Paper Full FLASH': job['paper_retrieval_score'],
+                       'Random Neighbor': score,
+                       'Random minus FLASH': score-job['paper_retrieval_score'] if score is not None else None,
+                       'Mode': job['mode'], 'Local Run Name': job['final_run_name'],
+                       'W&B Run ID': selected.get('Run ID', ''),
+                       'Eval Checkpoint Step': selected.get('Eval Checkpoint Step', ''),
+                       'Eval Return FP32': selected.get('Eval Return FP32', ''),
+                       'Warmup Steps': plan['warmup_steps'], 'Anchor Offset': plan['anchor_offset'],
+                       'Final Evaluation': job['final_evaluation_path']})
+    return pd.DataFrame(output)
 
 
 def expand_shared_runs(df):
@@ -499,17 +622,27 @@ def main(csv_path=None, output_path=None, queue_dir=None):
     if 'State' not in df:
         df['State'] = ''
     df['State'] = df['State'].fillna('').astype(str).str.strip().str.lower()
+    df = merge_local_paper_results(df, queue_dir)
 
     # W&B에 누락된 수동 점수는 스케줄러와 같은 원본을 사용합니다.
     manual_path = Path(__file__).resolve().with_name('manual_results.json')
     manual_rows = json.loads(manual_path.read_text(encoding='utf-8'))
     queued_rows = read_queued_runs(queue_dir)
+    study_table = paper_study_table(df, queue_dir, queued_rows)
+    recorded_names = set(df.get('Local Run Name', pd.Series(dtype=str)).dropna())
+    queued_rows = [row for row in queued_rows if not row.get('Local Run Name')
+                   or row['Local Run Name'] not in recorded_names]
     df = pd.concat([df, pd.DataFrame(manual_rows), pd.DataFrame(queued_rows)], ignore_index=True)
     df = expand_shared_runs(df)
 
     # Data extraction
     data = []
+    controls = reuse_control_names(load_reuse_plan(queue_dir))
     for idx, row in df.iterrows():
+        # Dedicated paired controls are reported in Paper Random Neighbor. Do
+        # not add their extra seeds/reruns to the historical main-table inputs.
+        if row.get('Local Run Name') in controls:
+            continue
         run_name = str(row['Run Name'])
         parts = run_name.split('_')
         game = parts[0]
@@ -854,6 +987,10 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         # inputs in the same workbook, without changing the reporting UI.
         ablation_pivot.to_excel(writer, sheet_name='Ablation Results')
         writer.sheets['Ablation Results'].sheet_state = 'hidden'
+        if not study_table.empty:
+            study_table.to_excel(writer, sheet_name='Paper Random Neighbor', index=False)
+            writer.sheets['Paper Random Neighbor'].freeze_panes = 'D2'
+            writer.sheets['Paper Random Neighbor'].auto_filter.ref = writer.sheets['Paper Random Neighbor'].dimensions
         
         workbook = writer.book
         worksheet = writer.sheets['Results']

@@ -86,7 +86,10 @@ class Logger():
             seed_str = f"_{seed}" if seed is not None else ""
             run_name = f"{pure_env_name}_{run_id}{seed_str}{suffix}"
             
-            wandb.init(project="STORM", name=run_name, id=run_id, config=config)
+            wandb_run = wandb.init(project="STORM", name=run_name, id=run_id, config=config)
+            wandb_run.config.update({"RunMetadata": {
+                "local_run_name": base_name, "game": pure_env_name, "seed": seed,
+            }})
         except Exception as e:
             print(f"Failed to initialize wandb: {e}")
 

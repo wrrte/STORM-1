@@ -1,7 +1,9 @@
 import sys
 import os
+_original_path = sys.path[:]
 sys.path = [p for p in sys.path if p and p != os.path.dirname(os.path.abspath(__file__))]
 import wandb
+sys.path = _original_path
 import subprocess
 import csv
 import io
@@ -9,10 +11,12 @@ import json
 import ast
 import tempfile
 import argparse
-from collections import Counter
+from pathlib import Path
 from concurrent.futures import ThreadPoolExecutor, as_completed
 from functools import lru_cache
 from tqdm import tqdm
+
+HERE = Path(__file__).resolve().parent
 
 
 # W&B에서 삭제된 target: 1 (anchor 미설정) run 37개의 고정 백업.
@@ -138,10 +142,22 @@ def scheduling_metadata(args, retrieval_enable):
             values[key] = value
     checkpoint = values.get('--resume_from', '')
     shared = isinstance(retrieval_enable, list) or str(retrieval_enable).lower() == 'both'
+    base = values.get('-n', '')
+    experiment = values.get('--branch_experiment')
+    branch_mode = values.get('--branch_mode')
+    if experiment:
+        local_name = f'{base}_{experiment.lower()}' if base else ''
+    elif branch_mode:
+        local_name = f"{base}_{'O' if branch_mode.lower() == 'true' else 'X'}" if base else ''
+    elif shared:
+        local_name = f"{base}_{'Both' if str(retrieval_enable).lower() == 'both' else 'Shared'}" if base else ''
+    else:
+        local_name = ''
     return {
         'Warmup Directory': checkpoint or values.get('--resume_warmup', ''),
         'Base Run Name': values.get('-n', ''),
         'Training Phase': 'warmup' if shared else ('branch' if checkpoint else ''),
+        'Local Run Name': local_name,
     }
 
 
@@ -242,7 +258,8 @@ def classify_run(run):
 
     logic_type = get_logic_for_commit(commit_hash)
 
-    eval_return = run.summary.get('eval/episode_avg_return', 'N/A')
+    eval_return = run.summary.get('eval/episode_avg_return',
+                                  run.summary.get('eval/bf16/episode_avg_return', 'N/A'))
 
     warmup_steps = 'N/A'
     calculated_warmup_steps = 'N/A'
@@ -279,7 +296,9 @@ def classify_run(run):
 
     # 2. 런 이름에서 유추 실패 시 Config에서 읽어오기 ('Seed' 또는 'seed' 확인)
     if seed is None:
-        seed = get_config_val(run.config, 'Seed')
+        seed = get_config_val(run.config, 'RunMetadata.seed')
+        if seed is None:
+            seed = get_config_val(run.config, 'Seed')
         if seed is None:
             seed = get_config_val(run.config, 'seed')
 
@@ -320,6 +339,10 @@ def classify_run(run):
     anchor_offset = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_offset')
     warmup_offset_pairs = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_offset_pairs')
 
+    scheduling = scheduling_metadata(run_args, ret_enable)
+    local_name = get_config_val(run.config, 'RunMetadata.local_run_name')
+    if local_name:
+        scheduling['Local Run Name'] = local_name
     return {
         "Run Name": run.name,
         "Run ID": run.id,
@@ -327,6 +350,9 @@ def classify_run(run):
         "Commit": commit_hash[:7] if commit_hash else "None",
         "Logic": logic_type,
         "Eval Return": eval_return,
+        "Eval Return BF16": run.summary.get('eval/bf16/episode_avg_return', 'N/A'),
+        "Eval Return FP32": run.summary.get('eval/fp32/episode_avg_return', 'N/A'),
+        "Eval Checkpoint Step": run.summary.get('eval/checkpoint_step', 'N/A'),
         "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
         "Pending Retrieval Configs": json.dumps(pending_configs),
         "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
@@ -350,7 +376,7 @@ def classify_run(run):
         "Warmup Offset Pairs": json.dumps(warmup_offset_pairs or []),
         "Seed": seed,
         "Created At": run.created_at,
-        **scheduling_metadata(run_args, ret_enable),
+        **scheduling,
     }
 
 
@@ -380,13 +406,43 @@ def parse_args(argv=None):
     parser = argparse.ArgumentParser(description='W&B run 분류 결과를 CSV로 저장합니다.')
     parser.add_argument('--workers', type=int, default=100,
                         help='동시 처리할 run 수 (기본값: 100, 순차 처리: 1)')
+    parser.add_argument('--output', type=Path, default=HERE/'wandb_runs_classification.csv')
+    parser.add_argument('--offline', action='store_true', help='기존 CSV와 로컬 최종 평가만 반영')
+    parser.add_argument('--excel', action='store_true', help='CSV 저장 후 converted_results.xlsx도 갱신')
     args = parser.parse_args(argv)
     if args.workers < 1:
         parser.error('--workers는 1 이상이어야 합니다')
     return args
 
 
-def main(workers=100):
+def main(workers=100, output_path=None, offline=False):
+    output_csv = Path(output_path) if output_path is not None else HERE/'wandb_runs_classification.csv'
+    if offline:
+        with output_csv.open(newline='', encoding='utf-8') as source:
+            results = list(csv.DictReader(source))
+    else:
+        results = fetch_results(workers)
+    live_count = len(results)
+    results = merge_archived_target_1_runs(results)
+    print(f'고정 백업에서 target: 1 run {len(results)-live_count}개를 추가했습니다.')
+    # A completed local evaluation also survives delayed or unavailable W&B sync.
+    import pandas as pd
+    from convert_csv_to_excel import merge_local_paper_results
+    frame = merge_local_paper_results(pd.DataFrame(results), HERE.parent)
+    frame = frame.replace('nan', None)
+    results = frame.astype(object).where(pd.notna(frame), None).to_dict('records')
+    fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At", "Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase", "Anchor Weight R", "Anchor Offset", "Warmup Offset Pairs", "Local Run Name", "Eval Return BF16", "Eval Return FP32", "Eval Checkpoint Step"]
+    fieldnames += sorted({key for row in results for key in row} - set(fieldnames))
+    output_csv.parent.mkdir(parents=True, exist_ok=True)
+    with output_csv.open('w', newline='', encoding='utf-8') as target:
+        writer = csv.DictWriter(target, fieldnames=fieldnames, lineterminator='\n')
+        writer.writeheader()
+        writer.writerows(results)
+    print(f'상세 결과: {output_csv} ({len(results)} runs)')
+    return output_csv
+
+
+def fetch_results(workers):
     # 1. 자동 로그인 처리
     api_key_path = os.path.join(os.path.dirname(__file__), '.wandb_api_key')
     if os.path.exists(api_key_path):
@@ -407,35 +463,16 @@ def main(workers=100):
         runs = api.runs(wandb_path, per_page=100, lazy=False)
     except Exception as e:
         print(f"WandB API 호출 실패: {e}")
-        return
+        raise RuntimeError('W&B 조회에 실패했습니다. 로컬 결과는 --offline으로 갱신할 수 있습니다.') from e
 
     total_runs = len(runs)
     print(f"총 {total_runs}개의 run을 확인했습니다. 최대 {workers}개씩 병렬 분류합니다...")
 
-    results = classify_runs(runs, workers=workers)
-
-    live_count = len(results)
-    results = merge_archived_target_1_runs(results)
-    print(f"\n고정 백업에서 target: 1 (anchor 미설정) run {len(results) - live_count}개를 추가했습니다.")
-    logic_counts = Counter(row["Logic"] for row in results)
-
-    # 요약 및 저장
-    print("\n" + "="*50)
-    print("분류 요약:")
-    for logic, count in logic_counts.most_common():
-        print(f"  {logic}: {count} runs")
-    print("="*50)
-
-    output_csv = "wandb_runs_classification.csv"
-    with open(output_csv, 'w', newline='', encoding='utf-8') as csvfile:
-        fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At"]
-        fieldnames += ["Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase", "Anchor Weight R", "Anchor Offset", "Warmup Offset Pairs"]
-        writer = csv.DictWriter(csvfile, fieldnames=fieldnames)
-        writer.writeheader()
-        for row in results:
-            writer.writerow(row)
-
-    print(f"\n상세 결과가 '{output_csv}' 파일로 저장되었습니다.")
+    return classify_runs(runs, workers=workers)
 
 if __name__ == "__main__":
-    main(workers=parse_args().workers)
+    args = parse_args()
+    output = main(workers=args.workers, output_path=args.output, offline=args.offline)
+    if args.excel:
+        from convert_csv_to_excel import main as convert_excel
+        convert_excel(csv_path=output)

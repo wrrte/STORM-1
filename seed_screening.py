@@ -8,6 +8,37 @@ from pathlib import Path
 SCREEN_REJECTED_EXIT_CODE = 75
 
 
+def configure_seed_screen(conf, args, branch_commands):
+    """Screen a fresh baseline or the common prefix of fixed-warmup branches.
+
+    A shared prefix is screened once. Its resumed children must not screen
+    again: they start beyond the deadline and intentionally diverge afterward.
+    """
+    steps = conf.JointTrainAgent.SeedScreenSteps
+    if steps == 0:
+        return None, branch_commands
+    retrieval = conf.JointTrainAgent.Retrieval
+    shared = isinstance(branch_commands, (dict, tuple))
+    if (conf.Task != "JointTrainAgent" or args.resume_from
+            or conf.JointTrainAgent.NumEnvs != 1
+            or (branch_commands is not None and not shared)
+            or (not shared and retrieval.enable is not False)):
+        raise ValueError("Seed screening requires a fresh baseline or fixed shared warmup with NumEnvs=1")
+    if steps > conf.JointTrainAgent.SampleMaxSteps:
+        raise ValueError("SeedScreenSteps cannot exceed SampleMaxSteps")
+    if shared:
+        if retrieval.warmup_steps < steps:
+            raise ValueError("Shared warmup must reach SeedScreenSteps before branching")
+        def child(command):
+            return [*command, "JointTrainAgent.SeedScreenSteps", "0"]
+        branch_commands = ({name: child(command) for name, command in branch_commands.items()}
+                           if isinstance(branch_commands, dict)
+                           else tuple(child(command) for command in branch_commands))
+    screen = SeedScreen(steps, conf.JointTrainAgent.SeedScreenMinReturn,
+                        f"runs/{args.n}", args.seed, args.n)
+    return screen, branch_commands
+
+
 class SeedScreen:
     def __init__(self, steps, min_return, run_dir, seed, run_name):
         if type(steps) is not int or steps <= 0:

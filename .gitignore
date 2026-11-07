@@ -18,3 +18,5 @@ results/warmup_comparison/
 results/baseline_campaign/
 job_queue_baseline_first.lock
 analysis/
+results/main_performance_bootstrap
+results/neighbor_reuse_20261107

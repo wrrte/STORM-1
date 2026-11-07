@@ -1,0 +1,84 @@
+# Matched Full FLASH controls for completed historical random-neighbor runs.
+Task: JointTrainAgent
+BasicSettings:
+  Seed: 0
+  ImageSize: 64
+  ReplayBufferOnGPU: true
+Performance:
+  VectorizedReplaySampling: true
+  DisableDistributionValidation: true
+  BatchScalarLogging: true
+  RetrievalStatisticsMode: vectorized
+  ProjectedKVCache: true
+JointTrainAgent:
+  SampleMaxSteps: 102000
+  BufferMaxLength: 100000
+  BufferWarmUp: 1024
+  NumEnvs: 1
+  BatchSize: 16
+  DemonstrationBatchSize: 4
+  BatchLength: 64
+  ImagineBatchSize: 1024
+  ImagineDemonstrationBatchSize: 256
+  ImagineContextLength: 8
+  ImagineBatchLength: 16
+  TrainDynamicsEverySteps: 1
+  TrainAgentEverySteps: 1
+  UseDemonstration: false
+  SaveEverySteps: 50000
+  EvalMode: final_only
+  EvalEverySteps: 50000
+  EvalStartStep: 0
+  EvalEpisodes: 20
+  EvalPrecision: both
+  EvalSeed: 0
+  FinalEvalStep: 100000
+  SeedScreenSteps: 0
+  SeedScreenMinReturn: 500.0
+  Retrieval:
+    enable: true
+    save_warmup: false
+    neighbor_source: retrieval
+    batch_size_reduction: retrieved
+    trigger_mode: z_score
+    value_signal: value_diff
+    score_combination: multiply
+    threshold: 1.0
+    z_score_threshold: 3.5
+    additive_z_score_threshold: 4.0
+    anchor_offset: -2
+    hash_bits: 10
+    hash_sample_mode: probs
+    use_pca: true
+    max_pca_samples: 100000
+    warmup_steps: 50000
+    warmup_offset_pairs: []
+    min_warmup_steps: 5000
+    dynamic_warmup_target_steps: 20000
+    dynamic_warmup_multiplier: 2.6
+    dynamic_warmup_delay_steps: 0
+    max_warmup_steps: 90000
+    ema_alpha: 0.01
+    max_bucket_size: 1000000000
+    max_anchors: 16
+    multiplier: 16
+    target: 16
+    anchor_weight: 0.0625
+    anchor_weight_r: null
+    max_contexts: 256
+    global_rebuild_enable: true
+    global_rebuild_threshold: 0.06
+    global_rebuild_cooldown: 2000
+Models:
+  WorldModel:
+    InChannels: 3
+    TransformerMaxLength: 64
+    TransformerHiddenDim: 512
+    TransformerNumLayers: 2
+    TransformerNumHeads: 8
+  Agent:
+    NumLayers: 2
+    HiddenDim: 512
+    Gamma: 0.985
+    Lambda: 0.95
+    EntropyCoef: 0.0003

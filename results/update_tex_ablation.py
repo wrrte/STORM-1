@@ -1,23 +1,21 @@
 """Update appendix ablations and a compact main-text summary from Excel seed scores.
 
-Usage: python STORM/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
-       [--main-games Frostbite Gopher KungFuMaster]
+Usage: python STORM-1/results/update_tex_ablation.py [--excel PATH] [--tex PATH]
+       [--main-games Frostbite Gopher KungFuMaster] [--random-study STUDY]
 Edit MAIN_GAMES below to set the default game rows (in display order). The
 --main-games option overrides that list for one run; --main-games alone shows
 only metrics. Re-running regenerates the entire summary, including its layout.
 Uses the same result loading, duplicate-result parsing, and aggregation as update_tex.py.
 Neighbor retrieval, value signal, and score combination are paired independently
-with default FLASH on common training seeds. Random neighbors uses all valid scores
-from its exact config row, and Full FLASH uses the scores selected by update_tex.py
-for the main performance table (seeds shared with STORM without retrieval).
-The random-neighbor comparison selects each method's seeds independently;
-either method can have no scores.
+with default FLASH on common training seeds. Random neighbors reads the current
+study's Paper Random Neighbor worksheet. Only completed study runs are paired
+with their same-game/seed Full FLASH scores. Audited historical results may be
+explicitly reused by the selected study; intermediate evaluations are excluded.
 Aggregate metrics include only games with scores for both methods, while game
 rows still show every available score.
 The main summary shares Full FLASH for value/add only when all paired seed IDs
 and baseline scores agree. Neighbor retrieval and random-neighbor comparisons
-always keep their own baselines. RandomNeighor scores match the complete Excel
-config label.
+always keep their own baselines.
 Main-summary metrics match the appendix's available-game metrics exactly,
 regardless of the selected game rows (including when fewer than 26 are available).
 Bold marks the best displayed score within each comparison group (including ties),
@@ -37,6 +35,8 @@ import math
 from pathlib import Path
 import re
 
+import pandas as pd
+
 from update_tex import (
     BASE_COLUMN,
     OURS_COLUMN,
@@ -49,6 +49,7 @@ from update_tex import (
 
 
 FLASH_CONFIG = 'target: 16 (anchor 미설정)'
+RANDOM_STUDY = 'neighbor_reuse_20261107'
 # 본문에 표시할 게임을 원하는 순서로 지정하세요. CLI --main-games로도 변경 가능합니다.
 # Current selections use two HNS changes per direction and one percentage change;
 # an overlapping percentage choice is replaced by the third HNS change.
@@ -107,11 +108,10 @@ ABLATIONS = {
         FLASH_CONFIG + ' [RandomNeighor]', 'Random neighbors', 'RANDOM NEIGHBOR',
         'tab:random_neighbor_ablation',
         r'Neighbor source ablation on STORM. Full FLASH uses hash-matched '
-        r'neighbors; Random neighbors replaces only the valid non-anchor '
-        r'contexts with uniformly sampled valid replay contexts. '
-        r'Both use retrieval target $n=16$ and the default anchor setting. '
-        r'The control retains the triggering, retrieval verification, group size '
-        r'and weighting rules, and Global Rebuild criteria. ',
+        r'neighbors; Random neighbors replaces the non-anchor contexts with '
+        r'uniformly sampled valid replay contexts. Both use retrieval target '
+        r'$n=16$ and the same anchor-selection and weighting rules. '
+        r'Scores are averaged over matched training seeds. ',
     ),
     'value': Ablation(
         FLASH_CONFIG + ' [value]', 'Absolute value', 'VALUE SIGNAL',
@@ -150,23 +150,44 @@ def bold_best_scores(label, cells):
             for cell, value in zip(cells, values)]
 
 
-def load_random_neighbor_results(excel_path):
-    """Compare main-performance FLASH scores with all valid RandomNeighor scores."""
-    ablation = ABLATIONS['random']
-    main_results = load_results(excel_path)
-    # Pair the exact RandomNeighor row with itself to reuse the main loader's
-    # seed exclusions and duplicate-result parsing without requiring a FLASH run.
-    random_results = load_results(
-        excel_path, configs=(ablation.variant_config, ablation.variant_config),
-        method_names=(ablation.variant_name, ablation.variant_name),
-    )
-    results = {}
-    for game in main_results.keys() | random_results.keys():
-        full = main_results.get(game, ([], []))[1]
-        random = random_results.get(game, ([], []))[1]
-        if full or random:
-            results[game] = (full, random)
-    return results
+def load_random_neighbor_results(excel_path, study=RANDOM_STUDY, include_seeds=False):
+    """Pair the selected study's completed scores by game and training seed."""
+    try:
+        frame = pd.read_excel(excel_path, sheet_name='Paper Random Neighbor')
+    except ValueError as error:
+        raise ValueError('Missing Paper Random Neighbor worksheet. Refresh the workbook '
+                         'with classify_wandb_runs.py --offline --excel first.') from error
+    flash_column = 'Full FLASH' if 'Full FLASH' in frame else 'Paper Full FLASH'
+    required = {'Study', 'Game', 'Seed', 'Status', flash_column, 'Random Neighbor',
+                'Warmup Steps', 'Anchor Offset', 'Local Run Name', 'Eval Checkpoint Step'}
+    if not required.issubset(frame.columns):
+        raise ValueError(f'Paper Random Neighbor columns missing: {sorted(required-set(frame.columns))}')
+    frame = frame.loc[frame.Study.eq(study)].copy()
+    if frame.empty:
+        raise ValueError(f'Random-neighbor study not found in workbook: {study}')
+    frame['Seed'] = pd.to_numeric(frame.Seed, errors='raise')
+    if any(not math.isfinite(seed) or seed < 0 or seed % 1 for seed in frame.Seed):
+        raise ValueError('Random-neighbor study seeds must be nonnegative integers')
+    frame['Seed'] = frame.Seed.astype(int)
+    if frame.duplicated(['Game', 'Seed']).any() or frame['Local Run Name'].duplicated().any():
+        raise ValueError('Duplicate game/seed or run in the random-neighbor study')
+    if (not pd.to_numeric(frame['Warmup Steps'], errors='coerce').eq(50000).all()
+            or not pd.to_numeric(frame['Anchor Offset'], errors='coerce').eq(-2).all()):
+        raise ValueError('Expected random-neighbor warmup_steps=50000 and anchor_offset=-2')
+    frame = frame.loc[frame.Status.astype(str).str.upper().eq('FINISHED')].copy()
+    for column in (flash_column, 'Random Neighbor'):
+        frame[column] = pd.to_numeric(frame[column], errors='raise')
+        if not all(math.isfinite(score) for score in frame[column]):
+            raise ValueError(f'Completed random-neighbor result has no finite {column} score')
+    checkpoints = pd.to_numeric(frame['Eval Checkpoint Step'], errors='raise').dropna()
+    if not checkpoints.eq(100000).all():
+        raise ValueError('Random-neighbor results must evaluate the 100k checkpoint')
+    results, paired_seeds = {}, {}
+    for game, rows in frame.sort_values(['Game', 'Seed']).groupby('Game', sort=True):
+        results[game] = (rows[flash_column].tolist(), rows['Random Neighbor'].tolist())
+        paired_seeds[game] = rows.Seed.tolist()
+    print(f'Random neighbors ({study}): {len(frame)} paired scores across {len(results)} games.')
+    return (results, paired_seeds) if include_seeds else results
 
 
 def ablation_table_rows(lines, results):
@@ -217,6 +238,8 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
     for _, parts, _ in calculated_rows:
         label = parts[0].strip()
         is_metric = metric_name(label) is not None
+        if ablation == ABLATIONS['random'] and not is_metric and label not in results:
+            continue
         if is_metric and not metrics_started:
             table.append(r'\midrule')
             metrics_started = True
@@ -418,6 +441,8 @@ def main():
     script_dir = Path(__file__).resolve().parent
     parser.add_argument('--excel', type=Path, default=script_dir / 'converted_results.xlsx')
     parser.add_argument('--tex', type=Path, default=script_dir.parent.parent / 'iclr2027_conference.tex')
+    parser.add_argument('--random-study', default=RANDOM_STUDY,
+                        help='Study ID in the Paper Random Neighbor worksheet')
     parser.add_argument('--main-games', nargs='*', default=MAIN_GAMES, metavar='GAME',
                         help='Game rows in display order; overrides MAIN_GAMES for this run. '
                              'Pass no names to show only the appendix aggregate metrics.')
@@ -428,7 +453,8 @@ def main():
     results, paired_seeds = {}, {}
     for key, ablation in ABLATIONS.items():
         if key == 'random':
-            results[key] = load_random_neighbor_results(args.excel)
+            results[key], paired_seeds[key] = load_random_neighbor_results(
+                args.excel, study=args.random_study, include_seeds=True)
             continue
         results[key], paired_seeds[key] = load_results(
             args.excel, configs=ablation.configs, method_names=ablation.method_names,
