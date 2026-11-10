@@ -7,16 +7,18 @@ Edit MAIN_GAMES below to set the default game rows (in display order). The
 only metrics. Re-running regenerates the entire summary, including its layout.
 Uses the same result loading, duplicate-result parsing, and aggregation as update_tex.py.
 Neighbor retrieval, value signal, and score combination are paired independently
-with default FLASH on common training seeds. Random neighbors uses all valid
-scores from its exact config row, and Full FLASH uses the scores selected by
-update_tex.py for the main performance table (seeds shared with STORM without
-retrieval). These two seed sets are selected independently; their seed IDs and
-counts need not agree. Both use the historical exclusions and duplicate parsing.
+with default FLASH on common training seeds. Random-neighbor candidates come
+from its exact config row, and Full FLASH candidates come from update_tex.py's
+main-performance selection (seeds shared with STORM without retrieval).
+For every game, both methods use the smaller available seed count and retain
+their highest-scoring seeds independently; ties use ascending seed IDs. Seed
+IDs may differ, but counts always agree. Historical exclusions and within-cell
+duplicate parsing apply to both methods.
 For Gopher only, Random neighbors also accepts the anchor r=1 configuration,
 keeps the higher score per seed across the two configurations, and averages
 at most the four highest-scoring distinct seeds (ties use ascending seed IDs).
-Aggregate metrics include only games with scores for both methods, while game
-rows still show every available score.
+Games without scores for either method are omitted from the random-neighbor
+comparison. Aggregate metrics include only games with scores for both methods.
 The main summary shares Full FLASH for value/add only when all paired seed IDs
 and baseline scores agree. Neighbor retrieval and random-neighbor comparisons
 always keep their own baselines.
@@ -113,13 +115,14 @@ ABLATIONS = {
         r'Neighbor source ablation on STORM. Full FLASH uses hash-matched '
         r'neighbors; Random neighbors replaces the non-anchor contexts with '
         r'uniformly sampled valid replay contexts. Both use retrieval target '
-        r'$n=16$. Full FLASH uses the default anchor setting and the '
-        r'main-performance seed selection; Random neighbors '
-        r'uses all valid seeds for its default configuration, except Gopher: '
+        r'$n=16$. Full FLASH candidates use the default anchor setting and the '
+        r'main-performance seed selection; Random-neighbor candidates '
+        r'use the default configuration, except Gopher: '
         r'the default and $r=1$ anchor settings are pooled, the higher score is '
         r'kept per seed, and at most the four highest-scoring distinct seeds are used. '
-        r'Scores are averaged over '
-        r"each method's independently selected training seeds. ",
+        r'For each game, both methods average the same number of seeds, set by '
+        r'the smaller candidate set, and independently retain their highest-scoring '
+        r'seeds (ties use ascending seed IDs). ',
     ),
     'value': Ablation(
         FLASH_CONFIG + ' [value]', 'Absolute value', 'VALUE SIGNAL',
@@ -159,9 +162,9 @@ def bold_best_scores(label, cells):
 
 
 def load_random_neighbor_results(excel_path):
-    """Compare main-performance FLASH with independently selected random seeds."""
+    """Use equally many top-scoring seeds per method, selected independently."""
     ablation = ABLATIONS['random']
-    main_results = load_results(excel_path)
+    main_results, main_seeds = load_results(excel_path, include_seeds=True)
     # Loading the exact random config against itself retains every valid seed
     # under the historical exclusions and first-score duplicate parsing.
     random_results, random_seeds = load_results(
@@ -185,14 +188,26 @@ def load_random_neighbor_results(excel_path):
         selected = sorted(candidates, key=lambda seed: (-candidates[seed], seed))[:GOPHER_RANDOM_SEED_LIMIT]
         scores = [candidates[seed] for seed in selected]
         random_results['Gopher'] = (scores, scores)
-        print(f'[Gopher] Random neighbors: top {len(selected)} distinct seeds '
+        random_seeds['Gopher'] = tuple(selected)
+        print(f'[Gopher] Random-neighbor candidate pool: top {len(selected)} distinct seeds '
               f'{selected} -> scores {scores}')
     results = {}
     for game in sorted(main_results.keys() | random_results.keys()):
         full = main_results.get(game, ([], []))[1]
         random = random_results.get(game, ([], []))[1]
-        if full or random:
-            results[game] = (full, random)
+        count = min(len(full), len(random))
+        if not count:
+            print(f'[{game}] Neighbor source: skipped; Full FLASH has {len(full)} seeds, '
+                  f'Random neighbors has {len(random)} seeds.')
+            continue
+        full_selected = sorted(zip(main_seeds[game], full, strict=True),
+                               key=lambda item: (-item[1], item[0]))[:count]
+        random_selected = sorted(zip(random_seeds[game], random, strict=True),
+                                 key=lambda item: (-item[1], item[0]))[:count]
+        results[game] = ([score for _, score in full_selected],
+                         [score for _, score in random_selected])
+        print(f'[{game}] Neighbor source: {count} seeds per method; '
+              f'Full FLASH {full_selected}; Random neighbors {random_selected}')
     return results
 
 
@@ -341,9 +356,7 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         if unknown_results:
             raise ValueError(f'Games missing from the main table: {sorted(unknown_results)}')
         for game, scores in results[key].items():
-            if (len(scores) != 2
-                    or (not any(scores) if key == 'random' else
-                        not scores[0] or len(scores[0]) != len(scores[1]))
+            if (len(scores) != 2 or not scores[0] or len(scores[0]) != len(scores[1])
                     or any(not math.isfinite(score) for method in scores for score in method)):
                 raise ValueError(f'Invalid scores for {key}: {game}.')
         # Never pass the selected display games to the aggregation routine.
