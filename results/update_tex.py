@@ -98,7 +98,10 @@ def main_table_rows(lines):
         body, separator, tail = line.partition(r"\\")
         parts = body.split("&")
         if parts[0].strip() == "Game":
-            if [part.strip() for part in parts] != expected_header:
+            actual_header = [part.strip() for part in parts]
+            if actual_header == expected_header + ["TWISTER", "TWISTER+ours", r"$\Delta$"]:
+                expected_header = actual_header
+            if actual_header != expected_header:
                 raise ValueError("Unexpected column layout in tab:main_performance.")
             header_found = True
         elif header_found:

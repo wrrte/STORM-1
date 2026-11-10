@@ -1,0 +1,59 @@
+{
+  "ddof": 1,
+  "game_rows": 52,
+  "seed_pairs": 205,
+  "metric_rows": 8,
+  "output": "/mnt/hdd_4A/choemj/main_performance_std.xlsx",
+  "sources": [
+    {
+      "Backbone": "STORM",
+      "Source": "/mnt/hdd_4A/choemj/STORM-1/results/main_performance_seeds.xlsx",
+      "SHA256": "c04827cc3ddfdbc726cbbf675e95cb7f55d01674cb157ec4dc201bcb7dc00337"
+    },
+    {
+      "Backbone": "STORM",
+      "Source": "/mnt/hdd_4A/choemj/STORM-1/results/main_performance_bootstrap/selected_scores.csv",
+      "SHA256": "34b452acd4f111896474c5bd0dcee00d0fb8f956554842b8d7c89b519b5e94de"
+    },
+    {
+      "Backbone": "STORM",
+      "Source": "/mnt/hdd_4A/choemj/STORM-1/results/main_performance_bootstrap/metadata.json",
+      "SHA256": "1679f13c5ac718ed9914a5f20d2d3fa47ecefede517ade115142b8f2d79e0745"
+    },
+    {
+      "Backbone": "STORM",
+      "Source": "/mnt/hdd_4A/choemj/STORM-1/results/main_performance_bootstrap/summary.csv",
+      "SHA256": "d02d93483e4b2dae927281f48af55970c81bcfc3fbd53f1ab4af936c0ca36aee"
+    },
+    {
+      "Backbone": "STORM",
+      "Source": "/mnt/hdd_4A/choemj/STORM-1/results/main_performance_bootstrap/bootstrap_samples.npz",
+      "SHA256": "ed0eba7923700ad509c5d9df331c8c0677b533c0d3eceed782fcae91f8f5cb1c"
+    },
+    {
+      "Backbone": "DRAMA",
+      "Source": "/mnt/hdd_4A/choemj/Drama/results/main_performance_sources.json",
+      "SHA256": "7225c54c302e8fcb56702b6a646e4b4832d16320927fea0f67869068c0362f30"
+    },
+    {
+      "Backbone": "DRAMA",
+      "Source": "/mnt/hdd_4A/choemj/Drama/results/main_performance_bootstrap/selected_scores.csv",
+      "SHA256": "630a06b6e80fbfed50eabd683b31a951fc3416c5b2cf308ce94a36e9ddf67f18"
+    },
+    {
+      "Backbone": "DRAMA",
+      "Source": "/mnt/hdd_4A/choemj/Drama/results/main_performance_bootstrap/metadata.json",
+      "SHA256": "c44a36d146d9fc7e990ff7b4a3663150085d2e040cf7416c422cdb125ed3bdd9"
+    },
+    {
+      "Backbone": "DRAMA",
+      "Source": "/mnt/hdd_4A/choemj/Drama/results/main_performance_bootstrap/summary.csv",
+      "SHA256": "f23d681d713f5f472905a0b615868c481cadf88428a5b59c7e15a4b5710974c2"
+    },
+    {
+      "Backbone": "DRAMA",
+      "Source": "/mnt/hdd_4A/choemj/Drama/results/main_performance_bootstrap/bootstrap_samples.npz",
+      "SHA256": "8a4189975b227ef76bf2b5f400c7aa10e01956a362aa50092c3f768d05e3d8e8"
+    }
+  ]
+}

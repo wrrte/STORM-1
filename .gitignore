@@ -20,3 +20,4 @@ job_queue_baseline_first.lock
 analysis/
 results/main_performance_bootstrap
 results/neighbor_reuse_20261107
+results/ram_verification/
