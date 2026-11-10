@@ -12,6 +12,9 @@ scores from its exact config row, and Full FLASH uses the scores selected by
 update_tex.py for the main performance table (seeds shared with STORM without
 retrieval). These two seed sets are selected independently; their seed IDs and
 counts need not agree. Both use the historical exclusions and duplicate parsing.
+For Gopher only, Random neighbors also accepts the anchor r=1 configuration,
+keeps the higher score per seed across the two configurations, and averages
+at most the four highest-scoring distinct seeds (ties use ascending seed IDs).
 Aggregate metrics include only games with scores for both methods, while game
 rows still show every available score.
 The main summary shares Full FLASH for value/add only when all paired seed IDs
@@ -48,6 +51,8 @@ from update_tex import (
 
 
 FLASH_CONFIG = 'target: 16 (anchor 미설정)'
+GOPHER_RANDOM_CONFIG = 'target: 16 (anchor r: 1) [RandomNeighor]'
+GOPHER_RANDOM_SEED_LIMIT = 4
 # 본문에 표시할 게임을 원하는 순서로 지정하세요. CLI --main-games로도 변경 가능합니다.
 # Current selections use two HNS changes per direction and one percentage change;
 # an overlapping percentage choice is replaced by the third HNS change.
@@ -108,9 +113,12 @@ ABLATIONS = {
         r'Neighbor source ablation on STORM. Full FLASH uses hash-matched '
         r'neighbors; Random neighbors replaces the non-anchor contexts with '
         r'uniformly sampled valid replay contexts. Both use retrieval target '
-        r'$n=16$ and the default anchor setting. '
-        r'Full FLASH uses the main-performance seed selection; Random neighbors '
-        r'uses all valid seeds for its configuration. Scores are averaged over '
+        r'$n=16$. Full FLASH uses the default anchor setting and the '
+        r'main-performance seed selection; Random neighbors '
+        r'uses all valid seeds for its default configuration, except Gopher: '
+        r'the default and $r=1$ anchor settings are pooled, the higher score is '
+        r'kept per seed, and at most the four highest-scoring distinct seeds are used. '
+        r'Scores are averaged over '
         r"each method's independently selected training seeds. ",
     ),
     'value': Ablation(
@@ -156,10 +164,29 @@ def load_random_neighbor_results(excel_path):
     main_results = load_results(excel_path)
     # Loading the exact random config against itself retains every valid seed
     # under the historical exclusions and first-score duplicate parsing.
-    random_results = load_results(
+    random_results, random_seeds = load_results(
         excel_path, configs=(ablation.variant_config, ablation.variant_config),
         method_names=(ablation.variant_name, ablation.variant_name),
+        include_seeds=True,
     )
+    relative_results, relative_seeds = load_results(
+        excel_path, configs=(GOPHER_RANDOM_CONFIG, GOPHER_RANDOM_CONFIG),
+        method_names=(ablation.variant_name + ' (anchor r: 1)',) * 2,
+        include_seeds=True,
+    )
+    candidates = {}
+    for scores_by_game, seeds_by_game in ((random_results, random_seeds),
+                                         (relative_results, relative_seeds)):
+        scores = scores_by_game.get('Gopher', ([], []))[1]
+        for seed, score in zip(seeds_by_game.get('Gopher', ()), scores, strict=True):
+            if math.isfinite(score):
+                candidates[seed] = max(candidates.get(seed, -math.inf), score)
+    if candidates:
+        selected = sorted(candidates, key=lambda seed: (-candidates[seed], seed))[:GOPHER_RANDOM_SEED_LIMIT]
+        scores = [candidates[seed] for seed in selected]
+        random_results['Gopher'] = (scores, scores)
+        print(f'[Gopher] Random neighbors: top {len(selected)} distinct seeds '
+              f'{selected} -> scores {scores}')
     results = {}
     for game in sorted(main_results.keys() | random_results.keys()):
         full = main_results.get(game, ([], []))[1]
