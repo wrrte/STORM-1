@@ -1,0 +1,255 @@
+{
+  "runs": [
+    {
+      "game": "seaquest",
+      "run_id": "2esxm1h6",
+      "run_name": "Seaquest_2esxm1h6_9999_O",
+      "checkpoint": "Seaquest-myserver-9999_O",
+      "step": "final",
+      "wandb_url": "https://wandb.ai/choemj-kaist/STORM/runs/2esxm1h6",
+      "recorded_return": 545,
+      "config": {
+        "Task": "JointTrainAgent",
+        "Models": {
+          "Agent": {
+            "Gamma": 0.985,
+            "Lambda": 0.95,
+            "HiddenDim": 512,
+            "NumLayers": 2,
+            "EntropyCoef": 0.0003
+          },
+          "WorldModel": {
+            "InChannels": 3,
+            "TransformerNumHeads": 8,
+            "TransformerHiddenDim": 512,
+            "TransformerMaxLength": 64,
+            "TransformerNumLayers": 2
+          }
+        },
+        "BasicSettings": {
+          "Seed": 0,
+          "ImageSize": 64,
+          "ReplayBufferOnGPU": true
+        },
+        "JointTrainAgent": {
+          "NumEnvs": 1,
+          "EvalMode": "final_only",
+          "BatchSize": 16,
+          "Retrieval": {
+            "enable": true,
+            "target": 16,
+            "use_pca": true,
+            "ema_alpha": 0.01,
+            "hash_bits": 10,
+            "threshold": 1,
+            "multiplier": 16,
+            "max_anchors": 16,
+            "max_contexts": 256,
+            "trigger_mode": "z_score",
+            "warmup_steps": 50000,
+            "anchor_offset": -3,
+            "anchor_weight": 0.0625,
+            "max_bucket_size": 1000000000,
+            "max_pca_samples": 100000,
+            "hash_sample_mode": "probs",
+            "max_warmup_steps": 90000,
+            "min_warmup_steps": 5000,
+            "z_score_threshold": 3.5,
+            "batch_size_reduction": "retrieved",
+            "global_rebuild_enable": true,
+            "global_rebuild_cooldown": 2000,
+            "global_rebuild_threshold": 0.06,
+            "dynamic_warmup_delay_steps": 3000,
+            "dynamic_warmup_target_steps": 20000
+          },
+          "BatchLength": 64,
+          "BufferWarmUp": 1024,
+          "EvalEpisodes": 20,
+          "EvalStartStep": 0,
+          "EvalEverySteps": 50000,
+          "SampleMaxSteps": 102000,
+          "SaveEverySteps": 50000,
+          "BufferMaxLength": 100000,
+          "ImagineBatchSize": 1024,
+          "UseDemonstration": false,
+          "ImagineBatchLength": 16,
+          "ImagineContextLength": 8,
+          "TrainAgentEverySteps": 1,
+          "DemonstrationBatchSize": 4,
+          "TrainDynamicsEverySteps": 1,
+          "ImagineDemonstrationBatchSize": 256
+        }
+      }
+    },
+    {
+      "game": "frostbite",
+      "run_id": "0vmkg20q",
+      "run_name": "Frostbite_0vmkg20q_9999",
+      "checkpoint": "Frostbite-9999_value",
+      "step": "final",
+      "wandb_url": "https://wandb.ai/choemj-kaist/STORM/runs/0vmkg20q",
+      "recorded_return": 3081,
+      "config": {
+        "Task": "JointTrainAgent",
+        "Models": {
+          "Agent": {
+            "Gamma": 0.985,
+            "Lambda": 0.95,
+            "HiddenDim": 512,
+            "NumLayers": 2,
+            "EntropyCoef": 0.0003
+          },
+          "WorldModel": {
+            "InChannels": 3,
+            "TransformerNumHeads": 8,
+            "TransformerHiddenDim": 512,
+            "TransformerMaxLength": 64,
+            "TransformerNumLayers": 2
+          }
+        },
+        "BasicSettings": {
+          "Seed": 0,
+          "ImageSize": 64,
+          "ReplayBufferOnGPU": true
+        },
+        "JointTrainAgent": {
+          "NumEnvs": 1,
+          "EvalMode": "final_only",
+          "BatchSize": 16,
+          "Retrieval": {
+            "enable": true,
+            "target": 16,
+            "use_pca": true,
+            "ema_alpha": 0.01,
+            "hash_bits": 10,
+            "threshold": 1,
+            "multiplier": 16,
+            "max_anchors": 16,
+            "save_warmup": false,
+            "max_contexts": 256,
+            "trigger_mode": "z_score",
+            "value_signal": "value",
+            "warmup_steps": 50000,
+            "anchor_offset": -3,
+            "anchor_weight": 0.0625,
+            "max_bucket_size": 1000000000,
+            "max_pca_samples": 100000,
+            "hash_sample_mode": "probs",
+            "max_warmup_steps": 90000,
+            "min_warmup_steps": 5000,
+            "score_combination": "multiply",
+            "z_score_threshold": 3.5,
+            "batch_size_reduction": "retrieved",
+            "global_rebuild_enable": true,
+            "global_rebuild_cooldown": 2000,
+            "global_rebuild_threshold": 0.06,
+            "additive_z_score_threshold": 4,
+            "dynamic_warmup_delay_steps": 3000,
+            "dynamic_warmup_target_steps": 20000
+          },
+          "BatchLength": 64,
+          "BufferWarmUp": 1024,
+          "EvalEpisodes": 20,
+          "EvalStartStep": 0,
+          "EvalEverySteps": 50000,
+          "SampleMaxSteps": 102000,
+          "SaveEverySteps": 50000,
+          "BufferMaxLength": 100000,
+          "ImagineBatchSize": 1024,
+          "UseDemonstration": false,
+          "ImagineBatchLength": 16,
+          "ImagineContextLength": 8,
+          "TrainAgentEverySteps": 1,
+          "DemonstrationBatchSize": 4,
+          "TrainDynamicsEverySteps": 1,
+          "ImagineDemonstrationBatchSize": 256
+        }
+      }
+    },
+    {
+      "game": "pong",
+      "run_id": "36m2817w",
+      "run_name": "Pong_36m2817w_9999",
+      "checkpoint": "Pong-9999_retrieval",
+      "step": "final",
+      "wandb_url": "https://wandb.ai/choemj-kaist/STORM/runs/36m2817w",
+      "recorded_return": 16.3,
+      "config": {
+        "Task": "JointTrainAgent",
+        "Models": {
+          "Agent": {
+            "Gamma": 0.985,
+            "Lambda": 0.95,
+            "HiddenDim": 512,
+            "NumLayers": 2,
+            "EntropyCoef": 0.0003
+          },
+          "WorldModel": {
+            "InChannels": 3,
+            "TransformerNumHeads": 8,
+            "TransformerHiddenDim": 512,
+            "TransformerMaxLength": 64,
+            "TransformerNumLayers": 2
+          }
+        },
+        "BasicSettings": {
+          "Seed": 0,
+          "ImageSize": 64,
+          "ReplayBufferOnGPU": true
+        },
+        "JointTrainAgent": {
+          "NumEnvs": 1,
+          "EvalMode": "final_only",
+          "BatchSize": 16,
+          "Retrieval": {
+            "enable": true,
+            "target": 16,
+            "use_pca": true,
+            "ema_alpha": 0.01,
+            "hash_bits": 10,
+            "threshold": 1,
+            "multiplier": 16,
+            "max_anchors": 16,
+            "save_warmup": false,
+            "max_contexts": 256,
+            "trigger_mode": "z_score",
+            "value_signal": "value_diff",
+            "warmup_steps": 50000,
+            "anchor_offset": -3,
+            "anchor_weight": 0.0625,
+            "max_bucket_size": 1000000000,
+            "max_pca_samples": 100000,
+            "hash_sample_mode": "probs",
+            "max_warmup_steps": 90000,
+            "min_warmup_steps": 5000,
+            "score_combination": "multiply",
+            "z_score_threshold": 3.5,
+            "batch_size_reduction": "retrieved",
+            "global_rebuild_enable": true,
+            "global_rebuild_cooldown": 2000,
+            "global_rebuild_threshold": 0.06,
+            "additive_z_score_threshold": 4,
+            "dynamic_warmup_delay_steps": 3000,
+            "dynamic_warmup_target_steps": 20000
+          },
+          "BatchLength": 64,
+          "BufferWarmUp": 1024,
+          "EvalEpisodes": 20,
+          "EvalStartStep": 0,
+          "EvalEverySteps": 50000,
+          "SampleMaxSteps": 102000,
+          "SaveEverySteps": 50000,
+          "BufferMaxLength": 100000,
+          "ImagineBatchSize": 1024,
+          "UseDemonstration": false,
+          "ImagineBatchLength": 16,
+          "ImagineContextLength": 8,
+          "TrainAgentEverySteps": 1,
+          "DemonstrationBatchSize": 4,
+          "TrainDynamicsEverySteps": 1,
+          "ImagineDemonstrationBatchSize": 256
+        }
+      }
+    }
+  ]
+}

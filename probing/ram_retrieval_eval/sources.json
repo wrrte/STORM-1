@@ -1,0 +1,7 @@
+{
+  "retrieval_source": "STORM-1 sibling retrieval.py",
+  "retrieval_sha256": "f2d0dc439845c9ef013f49d5fd2939a7a60986fec746c27f3228b3d3558ccc2c",
+  "snapshot_note": "Only training_branches enable parser import replaced; class bodies unchanged.",
+  "ram_states_sha256": "30df48c90130ffa7def7f911d67bf5a7b4dfe321f00cfb2ff621ba496f896d48",
+  "preset_source": "W&B online query 2026-11-10; run config from run_selection_20261110/wandb_snapshot.json"
+}
