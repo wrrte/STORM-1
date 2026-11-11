@@ -83,12 +83,32 @@ python probing/ram_retrieval_eval/evaluate.py --game all \
 ```
 
 `--steps`는 action decision 수다. 한 decision은 최대 4 ALE 프레임을 진행한다.
-세 게임과 seed들을 순서대로 실행한다. `--buffer-size 20000`이면 최근 20000개
+`evaluate.py --game all`은 세 게임과 seed들을 순서대로 실행한다. `--buffer-size 20000`이면 최근 20000개
 transition을 후보로 유지하면서 100000 decision 전체에 걸쳐 통계를 모은다.
 64×64 RGB replay는 이 설정에서 게임/seed당 약 246MB이며 별도 RAM/결과 파일도 생긴다.
 전체 데이터가 후보로 남아야 한다면 `--buffer-size 100000`으로 지정한다.
 큰 객체 집합을 반복 매칭할 때 SciPy가 설치되어 있으면 빠른 backend를 사용한다.
 SciPy가 없어도 포함된 NumPy Hungarian 구현으로 같은 최적 매칭을 계산한다.
+
+세 게임을 동시에 실행하려면 `run_parallel.py`를 쓴다. 게임당 한 프로세스가 실행되고,
+각 게임 안에서는 지정한 seed들을 순서대로 평가한 뒤 `summary_all_seeds.json`을 만든다.
+
+```bash
+python probing/ram_retrieval_eval/run_parallel.py \
+  --devices cuda:0 \
+  --steps 100000 --buffer-size 20000 \
+  --seeds 2027 2028 2029 2030 2031 \
+  --random-repeats 5 --bootstrap-samples 5000 \
+  --output results/ram_verification/retrieval_9999_parallel
+```
+
+`--devices cuda:0`은 세 프로세스가 GPU 한 장을 공유한다. GPU 세 장에 나누려면
+`--devices cuda:0 cuda:1 cuda:2`로 바꾼다. 배정 순서는 Seaquest/Frostbite/Pong이다.
+GPU 한 장에서는 메모리와 연산 자원을 공유하므로 속도 향상은 실제 사용률에 따라 달라진다.
+게임별 출력은 `output/logs/seaquest.log`, `frostbite.log`, `pong.log`에 저장된다.
+`--dry-run`으로 실행 명령만 확인할 수 있다. Ctrl+C는 실행한 자식 프로세스도 중단한다.
+기존 `--game all` 실행을 대체한다면 먼저 해당 실행을 중단하고 새 output을 지정한다.
+이 실행기는 기존 seed 결과를 이어서 실행하지 않으며, 같은 결과 폴더가 있으면 시작 전에 거부한다.
 
 `--precision auto`는 그 서버 모델 코드의 기본 AMP dtype을 사용한다. 재현 비교에는
 `--precision fp32` 또는 GPU가 지원하는 `bf16`/`fp16`을 명시할 수 있다.
