@@ -180,7 +180,12 @@ def collect(paths, games=None):
 
 
 def sample_sd(values):
-    return float(np.std(values, ddof=1)) if len(values) >= 2 else None
+    values = np.asarray(values)
+    if len(values) < 2:
+        return None
+    # np.std([0.1, 0.1, 0.1]) can return ~1e-17 due to rounding of the mean.
+    # Identical observations must not produce an enormous, spurious t statistic.
+    return 0. if np.all(values == values[0]) else float(np.std(values, ddof=1))
 
 
 def t_two_sided_p(statistic, df):
@@ -534,16 +539,16 @@ def main(argv=None):
     last = None
     try:
         while True:
-            paths = discover(args.inputs)
-            current = fingerprint(paths)
-            if current != last or not args.output.exists():
-                try:
+            try:
+                paths = discover(args.inputs)
+                current = fingerprint(paths)
+                if current != last or not args.output.exists():
                     export_workbook(args, paths)
                     last = current
-                except (ValueError, OSError) as error:
-                    if not args.watch:
-                        parser.exit(1, f"Error: {error}\n")
-                    print(f"Report not updated: {error}", file=sys.stderr, flush=True)
+            except (ValueError, OSError) as error:
+                if not args.watch:
+                    parser.exit(1, f"Error: {error}\n")
+                print(f"Report not updated: {error}", file=sys.stderr, flush=True)
             if not args.watch:
                 return 0
             print(f"Watching for completed evaluations; check again in {args.watch:g}s. Ctrl+C to stop.", flush=True)

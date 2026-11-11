@@ -222,6 +222,72 @@ python probing/ram_retrieval_eval/aggregate.py \
 이 경우 input status도 결과에 표시한다. 이전 결과 보호를 위해 evaluator는 이미
 존재하는 게임/seed 폴더에 덮어쓰지 않는다. 재실행은 새 output 경로를 사용한다.
 
+## 7. 누적 결과를 엑셀로 자동 정리
+
+```bash
+cd ~/STORM-1
+python probing/ram_retrieval_eval/export_statistics.py
+```
+
+`results/ram_verification/` 아래의 평가를 재귀 검색해 **완료된 실행만** 읽고,
+`results/ram_verification/retrieval_statistics.xlsx`를 생성/갱신한다. GPU는 필요 없다.
+기존 raw data와 평가 파일은 읽기만 한다. 현재 storm 환경에는 필요한 패키지가 있다.
+다른 환경에서 패키지가 없다면 다음 명령으로 설치한다.
+
+```bash
+python -m pip install -r probing/ram_retrieval_eval/requirements_statistics.txt
+```
+
+앞으로 완료되는 결과도 자동 반영하려면 다음 프로세스를 실행해 둔다.
+60초마다 입력 상태를 검사하고 변경이 있을 때 보고서를 다시 만든다.
+
+```bash
+python probing/ram_retrieval_eval/export_statistics.py --watch 60
+```
+
+분석 폴더나 출력 파일을 직접 지정할 수도 있다.
+
+```bash
+python probing/ram_retrieval_eval/export_statistics.py \
+  --inputs results/ram_verification/retrieval_9999_long \
+           results/ram_verification/frostbite_pong_3seeds \
+  --output results/ram_verification/three_games_statistics.xlsx
+```
+
+엑셀 시트:
+
+- `Summary`: 게임/모델/프로토콜별 retrieval/random 유사도, seed 간 SD, 차이, 95% CI,
+  양측 paired t-test와 seed 부호반전 검정 p-value, coverage와 승률.
+- `Statistics`: seed 동일 가중 평균과 기존 query 동일 가중 평균을 구분한 상세 통계.
+  t 구간, seed bootstrap 구간, query 가중 cluster bootstrap 구간 및 검정 정보를 포함한다.
+- `Seeds`: 각 seed의 query 수, 평균, 앵커 간 표준편차.
+- `Queries_001` 등: 앵커별 원자료와 점수. 제외 앵커도 사유와 함께 남긴다.
+  Excel의 행 수 제한에 도달하면 다음 시트로 나눈다. `--no-queries`로 생략할 수 있다.
+- `Runs`: 발견한 모든 실행과 포함 여부, 제외 사유, 입력 파일 hash.
+- `Groups`: 결과를 묶는 모델/프로토콜 정보.
+- `Methods`: 계산 정의, 통계 가정, 한계, 재표집 횟수, 출처.
+
+주 추론 단위는 독립 **평가 rollout seed**다. seed 하나이면 seed 간 SD/CI/p-value는
+빈칸으로 둔다. seed별 차이가 정규분포를 따른다는 가정의 t-test와, 귀무가설 아래
+차이의 부호 교환 가능성을 가정하는 sign-flip 검정을 함께 기록한다. seed 3개의
+exact sign-flip 검정은 양측 최소 p-value가 0.25여서 작은 t-test p와 다르게 해석해야 한다.
+이는 한 학습 모델의 평가 변동이며 training seed 간 변동을 추정하지 않는다.
+
+다른 모델·metric·retrieval 구현·precision·replay 크기·실행 길이·평가 설정은 별도
+그룹으로 분리한다. 같은 그룹의 같은 seed 원자료가 동일하면 한 복사본만 포함한다.
+같은 seed의 원자료가 다른 복사본들이 있으면 임의 선택하지 않고 모두 제외해
+`Runs`에 표시한다. 이 경우 `--inputs`로 사용할 실행 폴더를 명시하면 된다.
+
+기본 bootstrap은 5,000회이며, 독립 seed가 16개 이하일 때 모든 부호 조합을 열거한다.
+그보다 많으면 100,000회 Monte Carlo 검정을 수행한다. 재표집 난수는 고정되어 있고
+그룹별로 분리되어 있다. 여러 그룹의 p-value는 다중 비교 보정 전 값이다.
+
+검증:
+
+```bash
+python -m unittest probing.ram_retrieval_eval.test_export_statistics -v
+```
+
 ## 검증 범위
 
 이 기기에서 세 게임의 RAM 진단을 실행했고 모두 잘못된 기본 API를 감지하여 버퍼
