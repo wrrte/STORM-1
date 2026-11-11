@@ -21,3 +21,5 @@ analysis/
 results/main_performance_bootstrap
 results/neighbor_reuse_20261107
 results/ram_verification/
+results/anchor_frequency/
+*/test_*
