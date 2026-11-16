@@ -1,0 +1,93 @@
+# TD-error-only first-pass campaign: one final 100k evaluation per game.
+Task: "JointTrainAgent"
+
+BasicSettings:
+  Seed: 0
+  ImageSize: 64
+  ReplayBufferOnGPU: True
+
+Performance:
+  VectorizedReplaySampling: True # True: GPU 리플레이 일괄 인덱싱. False: 기존 코드 그대로.
+  DisableDistributionValidation: True # True: 실행 프로세스의 확률분포 검사 해제. False: 기존 기본값 유지.
+  BatchScalarLogging: True # 같은 dtype의 스칼라를 묶어서 CPU로 전송.
+  RetrievalStatisticsMode: "vectorized" # legacy / batched (비트 보존 목표) / vectorized (수학적 동일).
+  ProjectedKVCache: True # 추론 중 투영된 K/V 재사용. 수학적 동일, 비트 동일성 미보장.
+
+JointTrainAgent:
+  SampleMaxSteps: 102000
+  BufferMaxLength: 100000
+  BufferWarmUp: 1024
+  NumEnvs: 1
+  BatchSize: 16
+  DemonstrationBatchSize: 4
+  BatchLength: 64
+  ImagineBatchSize: 1024
+  ImagineDemonstrationBatchSize: 256
+  ImagineContextLength: 8
+  ImagineBatchLength: 16
+  TrainDynamicsEverySteps: 1
+  TrainAgentEverySteps: 1
+  UseDemonstration: False
+  SaveEverySteps: 50000
+
+  EvalMode: "final_only" # "active" for periodic, "inactive" for none, "final_only" for end only
+  EvalEverySteps: 50000
+  EvalStartStep: 0
+  EvalEpisodes: 20
+  EvalPrecision: "both" # auto / bf16 / fp32 / both (evaluation only)
+  EvalSeed: 0 # Both precisions use the same policy RNG seed and environment seeds.
+  FinalEvalStep: 100000 # Checkpoint filename step for final evaluation; null uses end-of-training weights.
+  SeedScreenSteps: 0 # Disabled by default; e.g. 20000 screens fresh baseline runs.
+  SeedScreenMinReturn: 500.0 # Must be strictly exceeded by the deadline, including unfinished episodes.
+
+  Retrieval:
+    enable: True # True, False, "Both" (_O then _X), RandomNeighor, td_error_only, or an experiment list
+    # Example: enable: [retrieval, RandomNeighor] (runs in list order)
+    save_warmup: False # Save both value statistics + reusable warmup for later --resume_warmup jobs
+    neighbor_source: "retrieval" # RandomNeighor overrides this to "random" after shared warmup.
+    batch_size_reduction: "retrieved" # "anchors" or "retrieved"
+    trigger_mode: "z_score" # "absolute" or "z_score"
+    value_signal: "value_diff" # "value_diff" (V_t - V_{t-1}) or "value" (V_t); used by z_score
+    score_combination: "td_error_only" # ReLU(z(abs(TD error))); tune the threshold below
+    threshold: 1.0
+    z_score_threshold: 3.5 # Used by score_combination: multiply
+    additive_z_score_threshold: 4.0 # Used by score_combination: add
+    td_error_z_score_threshold: 3.5 # Used by score_combination: td_error_only; calibrate to match trigger frequency
+    anchor_offset: -2 # Signed offset from the surprise-score position t: -2 selects t-2.
+    hash_bits: 10
+    hash_sample_mode: "probs"
+    use_pca: True
+    max_pca_samples: 100000
+    warmup_steps: 50000 # Both splits at the first episode boundary at/after this target; -1 uses dynamic warmup
+    warmup_offset_pairs: [] # One 50k warmup per game; no warmup sweep.
+    min_warmup_steps: 5000
+    dynamic_warmup_target_steps: 20000
+    dynamic_warmup_multiplier: 2.6 # Reward-rise threshold: mean + multiplier * std.
+    dynamic_warmup_delay_steps: 0 # End target = min(max_warmup_steps, max(target_steps, detected_step + delay)).
+    max_warmup_steps: 90000
+    ema_alpha: 0.01
+    max_bucket_size: 1000000000
+    max_anchors: 16
+    multiplier: 16
+    target: 16
+    anchor_weight: 0.0625
+    anchor_weight_r: 1 # null: fixed anchor_weight; positive r: anchor r/(K+r), each neighbor 1/(K+r).
+    max_contexts: 256
+    global_rebuild_enable: True
+    global_rebuild_threshold: 0.06
+    global_rebuild_cooldown: 2000
+
+Models:
+  WorldModel:
+    InChannels: 3
+    TransformerMaxLength: 64
+    TransformerHiddenDim: 512
+    TransformerNumLayers: 2
+    TransformerNumHeads: 8
+
+  Agent:
+    NumLayers: 2
+    HiddenDim: 512
+    Gamma: 0.985
+    Lambda: 0.95
+    EntropyCoef: 3E-4

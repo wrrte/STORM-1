@@ -109,9 +109,8 @@ Following the **Training and Evaluating Instructions** to reproduce the main res
 
 Activate the STORM Python environment, then run `bash 0_train.sh` (or
 `1_train.sh` through `7_train.sh`) to consume ordinary shell commands, one per
-line. Workers select `job_queue_A6000.txt`, `job_queue_3090.txt`,
-`job_queue_titan.txt`, `job_queue_pro6k.txt`, or `job_queue_default.txt` from the
-GPU name. Relative paths in jobs resolve from the STORM-1 directory. Queue pops
+line. All workers default to the shared `job_queue_td_error_only.txt`,
+regardless of GPU model. Relative paths in jobs resolve from the STORM-1 directory. Queue pops
 use the corresponding `.lock` file, so multiple GPUs can share a queue.
 Blank lines and comments are skipped. Failed jobs are reported and the worker
 continues; each job has its own shell environment and working directory.
@@ -127,6 +126,50 @@ bash 0_train.sh job_queue_random_neighbor.txt --once
 empty. `--max-jobs N` exits after N jobs. These options return the last job's
 exit status. To run the baseline-first campaign, use `bash baseline_train.sh 0`
 instead; its `job_queue_baseline_first.txt` contains campaign reservations.
+
+### First TD-error-only result for every game
+
+Use the dedicated `config_files/STORM.td_error_only.yaml`. It disables the
+warmup/offset sweep, uses a single 50k retrieval warmup, and evaluates the 100k
+checkpoint. Edit `td_error_z_score_threshold` there before preparing the queue:
+
+```shell
+../miniconda3/envs/storm/bin/python td_error_only_queue.py prepare
+bash 0_train.sh
+```
+
+Additional GPUs use the same default queue, for example `bash 1_train.sh`.
+Passing a queue path explicitly selects that queue instead.
+Run the preparation command with the STORM Python
+environment; its executable is saved in every queue command.
+
+Preparation adds exactly one selected seed per game, with no second-seed jobs.
+It chooses the smallest existing Full FLASH seed number for each game from
+`results/main_performance_std/paired_scores.csv`, without inspecting its score.
+Use `prepare --seed 7` to explicitly select one common seed instead. Same seed
+numbers alone do not establish identical warmup trajectories.
+
+The preparation output gives a manifest path under
+`results/td_error_only_queue/<campaign>/manifest.json`. Inspect progress with:
+
+```shell
+../miniconda3/envs/storm/bin/python td_error_only_queue.py status \
+  --manifest results/td_error_only_queue/<campaign>/manifest.json
+```
+
+Failed jobs, including zero-exit jobs without a valid final evaluation, are
+appended after the remaining games. The default limit is three attempts per
+game, set by `prepare --max-attempts`. Each retry starts a fresh run with a new
+attempt name and log. A valid local `final_evaluation.json`, rather than an
+exit code alone, establishes completion. Per-game locks prevent simultaneous
+duplicate jobs when workers share the same filesystem. Repeating `prepare`
+adds missing jobs while skipping completed, currently locked, and queued jobs.
+Failures reaching the attempt limit remain visible in `status` and their logs.
+
+Preparation freezes the effective YAML in the campaign directory. Edit the
+source YAML and run `prepare` again for a new threshold/configuration campaign;
+use a separate `--queue` if the previous campaign still has pending work.
+The existing GPU-specific queues are separate from this dedicated queue.
 
 ### Paired warmup and anchor-offset experiments
 

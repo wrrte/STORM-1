@@ -32,14 +32,13 @@ class QueueWorkerTests(unittest.TestCase):
                               cwd="/tmp", env=self.env, capture_output=True,
                               text=True, timeout=15, **kwargs)
 
-    def test_default_gpu_queues_and_all_wrapper_device_ids(self):
+    def test_default_shared_queue_and_all_wrapper_device_ids(self):
         names = ["NVIDIA RTX A6000", "NVIDIA GeForce RTX 3090", "NVIDIA TITAN RTX",
                  "NVIDIA RTX PRO 6000 Blackwell Workstation Edition", "Other GPU"]
-        suffixes = ["A6000", "3090", "titan", "pro6k", "default"]
         for gpu in range(8):
             with self.subTest(gpu=gpu):
                 self.env["QUEUE_TEST_GPU_NAME"] = names[gpu % len(names)]
-                queue = self.root / f"job_queue_{suffixes[gpu % len(names)]}.txt"
+                queue = self.root / "job_queue_td_error_only.txt"
                 queue.write_text('printf "%s:%s\\n" "$CUDA_VISIBLE_DEVICES" "$PWD" > result\n')
                 result = self.worker("--once", gpu=gpu)
                 self.assertEqual(result.returncode, 0, result.stderr)
@@ -73,11 +72,11 @@ class QueueWorkerTests(unittest.TestCase):
         self.assertEqual(self.worker(str(queue), "--once").returncode, 0)
 
     def test_two_workers_claim_each_job_once(self):
-        queue = self.root / "jobs.txt"
+        queue = self.root / "job_queue_td_error_only.txt"
         output = shlex.quote(str(self.root / "claimed jobs.txt"))
         queue.write_text("".join(f"printf '%s\\n' {job} >> {output}\n" for job in range(8)))
         workers = [subprocess.Popen(
-            ["bash", str(self.root / f"{gpu}_train.sh"), str(queue), "--max-jobs", "4"],
+            ["bash", str(self.root / f"{gpu}_train.sh"), "--max-jobs", "4"],
             cwd="/tmp", env=self.env, stdout=subprocess.PIPE, stderr=subprocess.PIPE,
             text=True) for gpu in (0, 1)]
         try:

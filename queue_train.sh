@@ -59,14 +59,8 @@ if [[ -z "$queue_gpu_name" ]]; then
     echo "No GPU name returned for GPU $queue_gpu." >&2
     exit 1
 fi
-case "${queue_gpu_name,,}" in
-    *a6000*) queue_suffix="A6000" ;;
-    *3090*) queue_suffix="3090" ;;
-    *"titan rtx"*) queue_suffix="titan" ;;
-    *blackwell*6000*|*6000*blackwell*) queue_suffix="pro6k" ;;
-    *) queue_suffix="default" ;;
-esac
-queue_path="${queue_path:-job_queue_${queue_suffix}.txt}"
+# Every N_train.sh shares the TD-only queue unless a queue is passed explicitly.
+queue_path="${queue_path:-job_queue_td_error_only.txt}"
 queue_lock="${queue_path%.txt}.lock"
 touch -- "$queue_path"
 echo "Worker started on GPU $queue_gpu ($queue_gpu_name). Waiting for jobs in $queue_path..."
