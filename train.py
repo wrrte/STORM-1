@@ -185,7 +185,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   dynamic_warmup_met_step_resume=-1,
                                   retrieval_state_resume=None, rng_state_resume=None,
                                   branch_commands=None, eval_precision="auto", eval_seed=0,
-                                  rebuild_retrieval_on_resume=False, seed_screen=None):
+                                  rebuild_retrieval_on_resume=False, seed_screen=None,
+                                  on_world_model_update=None, save_final_checkpoint=True):
     if branch_commands is not None and num_envs != 1:
         raise ValueError("Shared warmup episode-boundary branching requires NumEnvs=1; parallel environments cannot be paused independently")
 
@@ -481,6 +482,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             )
             
             logger.log("Retrieval/triggered_anchors_step", num_trig)
+            if on_world_model_update is not None:
+                on_world_model_update(current_total_steps, num_trig, is_retrieval_warmup)
             if retrieval_manager is not None and retrieval_manager.enabled:
                 for signal in retrieval_manager.statistics_signals:
                     signal_mean, signal_var = retrieval_manager.get_ema_stats(signal)
@@ -595,7 +598,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             save_requested = False
 
     vec_env.close()
-    if branch_commands is None:
+    if branch_commands is None and save_final_checkpoint:
         save_final_models(f"ckpt/{args.n}", world_model, agent, max_steps // num_envs)
     return True
 

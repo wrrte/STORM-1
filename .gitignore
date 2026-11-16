@@ -22,6 +22,8 @@ results/main_performance_bootstrap
 results/neighbor_reuse_20261107
 results/ram_verification/
 results/anchor_frequency/
+results/td_error_only_anchor_stats/
 results/td_error_only_queue/
 job_queue_td_error_only.lock
 */test_*
+snap/
