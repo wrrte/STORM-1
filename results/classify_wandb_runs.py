@@ -184,6 +184,7 @@ def parse_pending_retrieval_configs(args):
         'target1': {'Retrieval Enable': True, 'Retrieval Target': 1},
         'value': {'Retrieval Enable': True, 'Value Signal': 'value'},
         'add': {'Retrieval Enable': True, 'Score Combination': 'add'},
+        'td_error_only': {'Retrieval Enable': True, 'Score Combination': 'td_error_only'},
         'randomneighor': {'Retrieval Enable': True, 'Neighbor Source': 'random'},
     }
     if branch not in experiments or any(name not in overrides for name in experiments):
@@ -326,6 +327,7 @@ def classify_run(run):
         # 이름으로 지정한 preset은 공통 neighbor_source 설정보다 우선합니다.
         neighbor_source = 'random'
     additive_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.additive_z_score_threshold')
+    td_error_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.td_error_z_score_threshold')
 
     hash_bits = get_config_val(run.config, 'JointTrainAgent.Retrieval.hash_bits')
     hash_bits = hash_bits if hash_bits is not None else 'N/A'
@@ -368,6 +370,7 @@ def classify_run(run):
         "Score Combination": score_combination if score_combination is not None else 'N/A',
         "Neighbor Source": neighbor_source if neighbor_source is not None else 'retrieval',
         "Additive Z Score Threshold": additive_z_score_threshold if additive_z_score_threshold is not None else 'N/A',
+        "TD Error Z Score Threshold": td_error_z_score_threshold if td_error_z_score_threshold is not None else 'N/A',
         "Hash Bits": hash_bits,
         "Retrieval Target": retrieval_target,
         "Anchor Weight": anchor_weight,

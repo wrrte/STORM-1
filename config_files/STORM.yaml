@@ -40,17 +40,18 @@ JointTrainAgent:
   SeedScreenMinReturn: 500.0 # Must be strictly exceeded by the deadline, including unfinished episodes.
 
   Retrieval:
-    enable: True # True, False, "Both" (_O then _X), RandomNeighor, or an experiment list (shared warmup)
+    enable: True # True, False, "Both" (_O then _X), RandomNeighor, td_error_only, or an experiment list
     # Example: enable: [retrieval, RandomNeighor] (runs in list order)
     save_warmup: False # Save both value statistics + reusable warmup for later --resume_warmup jobs
     neighbor_source: "retrieval" # RandomNeighor overrides this to "random" after shared warmup.
     batch_size_reduction: "retrieved" # "anchors" or "retrieved"
     trigger_mode: "z_score" # "absolute" or "z_score"
     value_signal: "value_diff" # "value_diff" (V_t - V_{t-1}) or "value" (V_t); used by z_score
-    score_combination: "multiply" # "multiply" or "add"; combines ReLU(z_TD) and softplus(z_value)
+    score_combination: "multiply" # multiply / add / td_error_only; td_error_only uses only ReLU(z_TD)
     threshold: 1.0
     z_score_threshold: 3.5 # Used by score_combination: multiply
     additive_z_score_threshold: 4.0 # Used by score_combination: add
+    td_error_z_score_threshold: 3.5 # Used by score_combination: td_error_only; calibrate to match trigger frequency
     anchor_offset: -2 # Signed offset from the surprise-score position t: -2 selects t-2.
     hash_bits: 10
     hash_sample_mode: "probs"

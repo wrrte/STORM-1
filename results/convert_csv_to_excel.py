@@ -115,6 +115,7 @@ RETRIEVAL_COLUMNS = {
     'value_signal': 'Value Signal', 'score_combination': 'Score Combination',
     'neighbor_source': 'Neighbor Source',
     'additive_z_score_threshold': 'Additive Z Score Threshold',
+    'td_error_z_score_threshold': 'TD Error Z Score Threshold',
     'hash_bits': 'Hash Bits', 'save_warmup': 'Save Warmup',
 }
 
@@ -190,7 +191,7 @@ def queue_command_row(command, queue_dir):
     elif '--branch_mode' in args:
         retrieval['enable'] = args['--branch_mode']
     mode = retrieval.get('enable')
-    named_modes = {'baseline', 'retrieval', 'target1', 'value', 'add', 'randomneighor'}
+    named_modes = {'baseline', 'retrieval', 'target1', 'value', 'add', 'td_error_only', 'randomneighor'}
     if isinstance(mode, str) and mode.strip().lower() in named_modes:
         mode = [mode.strip().lower()]
     if isinstance(mode, list):
@@ -380,6 +381,7 @@ def expand_shared_runs(df):
         'target1': {'Retrieval Enable': True, 'Retrieval Target': 1},
         'value': {'Retrieval Enable': True, 'Value Signal': 'value'},
         'add': {'Retrieval Enable': True, 'Score Combination': 'add'},
+        'td_error_only': {'Retrieval Enable': True, 'Score Combination': 'td_error_only'},
         'randomneighor': {'Retrieval Enable': True, 'Neighbor Source': 'random'},
     }
     rows = []
@@ -704,7 +706,7 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         # 1. Retrieval을 사용하지 않은 실험은 'Retrieval 미사용'으로 표기
         # 2. 고정 warmup과 offset을 구분하고 BSR/임계값 필터는 유지합니다.
         # 3. target 1/16의 기존 anchor 미설정 실험과 상대 가중치 실험을 구분합니다.
-        # 4. value_signal=value / score_combination=add는 별도 config 행으로 표시
+        # 4. value / add / td_error_only는 별도 config 행으로 표시
         # ---------------------------------------------------------
         if not ret_enable:
             config = 'Retrieval 미사용'
@@ -720,9 +722,12 @@ def main(csv_path=None, output_path=None, queue_dir=None):
             neighbor_source = str(config_value(row, 'Neighbor Source', 'retrieval')).strip().lower()
             if neighbor_source not in ('retrieval', 'random'):
                 continue
-            if value_signal not in ('value_diff', 'value') or score_combination not in ('multiply', 'add'):
+            if value_signal not in ('value_diff', 'value') or score_combination not in ('multiply', 'add', 'td_error_only'):
                 continue
-            if score_combination == 'add':
+            if score_combination == 'td_error_only':
+                z_score = config_value(row, 'TD Error Z Score Threshold', 3.5)
+                expected_z_score = None  # Keep every configured ablation threshold on a separate row.
+            elif score_combination == 'add':
                 z_score = config_value(row, 'Additive Z Score Threshold', 4.0)
                 expected_z_score = 4.0
             else:
@@ -734,7 +739,9 @@ def main(csv_path=None, output_path=None, queue_dir=None):
                 z_score_float = None
 
             if (isinstance(warmup_steps, int) and warmup_steps >= 0
-                    and str(bsr) == 'retrieved' and z_score_float == expected_z_score):
+                    and str(bsr) == 'retrieved' and z_score_float is not None
+                    and math.isfinite(z_score_float) and z_score_float >= 0
+                    and (expected_z_score is None or z_score_float == expected_z_score)):
                 r_target = row.get('Retrieval Target', 'N/A')
                 try:
                     r_target = float(r_target)
@@ -767,10 +774,13 @@ def main(csv_path=None, output_path=None, queue_dir=None):
                     else:
                         continue
                 variants = []
-                if value_signal == 'value':
+                if value_signal == 'value' and score_combination != 'td_error_only':
                     variants.append('value')
                 if score_combination == 'add':
                     variants.append('add')
+                if score_combination == 'td_error_only':
+                    threshold_label = str(z_score_float).removesuffix('.0')
+                    variants.append(f'td_error_only, threshold: {threshold_label}')
                 if neighbor_source == 'random':
                     variants.append('RandomNeighor')
                 try:

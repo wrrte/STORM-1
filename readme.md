@@ -235,6 +235,60 @@ python -u train.py --resume_warmup ckpt/<run>_Shared JointTrainAgent.Retrieval.e
 The run suffix is `_randomneighor`. See [the training guide](../retrieval_training.md)
 for sampling, weighting and checkpoint details.
 
+### TD-error-only anchor ablation
+
+Set `score_combination: td_error_only` to select anchors using only
+`ReLU(z_TD)`, where `z_TD` normalizes the absolute one-step TD error with the
+preceding per-environment EMA mean and variance. The value-difference term is
+omitted. Sequence-maximum selection, anchor offsets, hash-neighbor retrieval,
+group weights and imagination-batch allocation follow the existing settings.
+
+```yaml
+JointTrainAgent:
+  Retrieval:
+    enable: True
+    trigger_mode: z_score
+    score_combination: td_error_only
+    td_error_z_score_threshold: 3.5
+    warmup_steps: 50000
+    warmup_offset_pairs: []
+```
+
+Edit `td_error_z_score_threshold` in `config_files/STORM.yaml` to tune this
+mode's threshold. `z_score_threshold` and `additive_z_score_threshold` continue
+to control the multiplicative and additive modes, respectively. The value 3.5
+is a starting setting; it does not establish a matched trigger frequency.
+Use `Retrieval/triggered_anchors_step` to compare counts with Full FLASH.
+
+For a paired comparison from one 50k warmup, leave the common
+`score_combination: multiply` and set:
+
+```yaml
+JointTrainAgent:
+  Retrieval:
+    enable: [retrieval, td_error_only]
+    score_combination: multiply
+    td_error_z_score_threshold: 3.5
+    warmup_steps: 50000
+    warmup_offset_pairs: []
+```
+
+The `td_error_only` preset overrides only `enable` and `score_combination`.
+Its run suffix is `_td_error_only`. A saved reusable warmup can also launch it:
+
+```shell
+python -u train.py --resume_warmup ckpt/<run>_Shared \
+  JointTrainAgent.Retrieval.enable td_error_only \
+  JointTrainAgent.Retrieval.td_error_z_score_threshold 3.5
+```
+
+TD-error-only needs only TD-error EMA statistics when resuming. Shared warmup
+collection still saves the union needed by its selected experiments;
+`save_warmup: True` retains both value statistics for future comparisons.
+W&B records the scoring mode and threshold in the effective config. CSV exports
+`TD Error Z Score Threshold`, and Excel separates TD-error-only results by
+threshold so threshold sweeps are not averaged together.
+
 Retrieval groups support fixed or relative anchor weights:
 
 ```yaml
