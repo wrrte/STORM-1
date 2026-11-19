@@ -228,6 +228,7 @@ def classify_run(run):
 
     ret_enable = get_config_val(run.config, 'JointTrainAgent.Retrieval.enable')
     is_random_neighor = str(ret_enable).strip().lower() == 'randomneighor'
+    is_td_error_only = str(ret_enable).strip().lower() == 'td_error_only'
     is_both = (
         str(ret_enable).strip().lower() == 'both'
         or str(run.name).lower().endswith('_both')
@@ -238,7 +239,7 @@ def classify_run(run):
     if is_both:
         ret_enable = 'Both'
     elif not is_experiment_list:
-        ret_enable = is_random_neighor or str(ret_enable).strip().lower() in ('true', '1', 't')
+        ret_enable = is_random_neighor or is_td_error_only or str(ret_enable).strip().lower() in ('true', '1', 't')
     save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
     check_save_warmup = str(save_warmup).strip().lower() == 'false'
     check_pending = run.state == 'running' and not (is_both or is_experiment_list)
@@ -322,6 +323,8 @@ def classify_run(run):
 
     value_signal = get_config_val(run.config, 'JointTrainAgent.Retrieval.value_signal')
     score_combination = get_config_val(run.config, 'JointTrainAgent.Retrieval.score_combination')
+    if is_td_error_only:
+        score_combination = 'td_error_only'
     neighbor_source = get_config_val(run.config, 'JointTrainAgent.Retrieval.neighbor_source')
     if is_random_neighor:
         # 이름으로 지정한 preset은 공통 neighbor_source 설정보다 우선합니다.
@@ -430,11 +433,11 @@ def main(workers=100, output_path=None, offline=False):
     print(f'고정 백업에서 target: 1 run {len(results)-live_count}개를 추가했습니다.')
     # A completed local evaluation also survives delayed or unavailable W&B sync.
     import pandas as pd
-    from convert_csv_to_excel import merge_local_paper_results
-    frame = merge_local_paper_results(pd.DataFrame(results), HERE.parent)
+    from convert_csv_to_excel import merge_local_results
+    frame = merge_local_results(pd.DataFrame(results), HERE.parent)
     frame = frame.replace('nan', None)
     results = frame.astype(object).where(pd.notna(frame), None).to_dict('records')
-    fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At", "Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase", "Anchor Weight R", "Anchor Offset", "Warmup Offset Pairs", "Local Run Name", "Eval Return BF16", "Eval Return FP32", "Eval Checkpoint Step"]
+    fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "TD Error Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At", "Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase", "Anchor Weight R", "Anchor Offset", "Warmup Offset Pairs", "Local Run Name", "Eval Return BF16", "Eval Return FP32", "Eval Checkpoint Step"]
     fieldnames += sorted({key for row in results for key in row} - set(fieldnames))
     output_csv.parent.mkdir(parents=True, exist_ok=True)
     with output_csv.open('w', newline='', encoding='utf-8') as target:

@@ -1,0 +1,445 @@
+{
+  "completed": 16,
+  "total": 16,
+  "results": [
+    {
+      "candidate": {
+        "run_name": "Frostbite-6010_Shared",
+        "checkpoint": "shared_warmup_50294",
+        "source": {
+          "kind": "shared",
+          "training_state": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_Shared/shared_warmup_50294/training_state.pt",
+            "size": 231334744,
+            "mtime_ns": 1789980027726115599
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6010_Shared/config.yaml",
+        "config_sha256": "fa3b9ae7a64d12cb4e0f24b427ca9692410d50bb9287c89ae7c37fc0401f56ae",
+        "fingerprint": "61ebff515829f4e7eb85421518c69a3ee522fbd4efae313a314a7104f902eef1",
+        "id": "Frostbite-6010_Shared__shared_warmup_50294__61ebff5158"
+      },
+      "gpu": "4",
+      "episode_avg_return": 226.0,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6010_Shared",
+        "checkpoint": "50000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_Shared/world_model_50000.pth",
+            "size": 66100659,
+            "mtime_ns": 1789979975875577691
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_Shared/agent_50000.pth",
+            "size": 13699795,
+            "mtime_ns": 1789979975891577548
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6010_Shared/config.yaml",
+        "config_sha256": "fa3b9ae7a64d12cb4e0f24b427ca9692410d50bb9287c89ae7c37fc0401f56ae",
+        "fingerprint": "6924d733faedf70abfb96247cc63d6fe30aff78c9d334b806ef34ef7dea59bf2",
+        "id": "Frostbite-6010_Shared__50000__6924d733fa"
+      },
+      "gpu": "5",
+      "episode_avg_return": 228.0,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6010_add",
+        "checkpoint": "final",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_add/world_model_final.pth",
+            "size": 66101095,
+            "mtime_ns": 1790025948410541246
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_add/agent_final.pth",
+            "size": 13699915,
+            "mtime_ns": 1790025948425541134
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6010_add/config.yaml",
+        "config_sha256": "52899af5bec4ab6fca6f7a8d68dbd36dd2a5ffaa03b0fc057e694a852ad476e8",
+        "fingerprint": "d3b94a3fd18a1134a945a868c49303b75c8e7e95a7091bb7ceec8dd002b3fbd8",
+        "id": "Frostbite-6010_add__final__d3b94a3fd1"
+      },
+      "gpu": "5",
+      "episode_avg_return": 233.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6010_value",
+        "checkpoint": "100000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_value/world_model_100000.pth",
+            "size": 66100768,
+            "mtime_ns": 1789999779819221899
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_value/agent_100000.pth",
+            "size": 13699825,
+            "mtime_ns": 1789999779837221662
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6010_value/config.yaml",
+        "config_sha256": "530200e5ef2d6af461beb97792061a94194f8980cbab98222eeff86d6ad320a1",
+        "fingerprint": "15f9b0df231fea08a8f469b307e8bbae7f050c5a1ac51e89f2e20c028fe21455",
+        "id": "Frostbite-6010_value__100000__15f9b0df23"
+      },
+      "gpu": "1",
+      "episode_avg_return": 235.0,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6010_add",
+        "checkpoint": "100000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_add/world_model_100000.pth",
+            "size": 66100768,
+            "mtime_ns": 1790024895775193433
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_add/agent_100000.pth",
+            "size": 13699825,
+            "mtime_ns": 1790024895791193293
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6010_add/config.yaml",
+        "config_sha256": "52899af5bec4ab6fca6f7a8d68dbd36dd2a5ffaa03b0fc057e694a852ad476e8",
+        "fingerprint": "ad7accf694b62d4d5665ade7ce213c1eee5ee1b062d09ea5ddea2392f03f87e4",
+        "id": "Frostbite-6010_add__100000__ad7accf694"
+      },
+      "gpu": "3",
+      "episode_avg_return": 235.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6010_value",
+        "checkpoint": "final",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_value/world_model_final.pth",
+            "size": 66101095,
+            "mtime_ns": 1790000601815825037
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_value/agent_final.pth",
+            "size": 13699915,
+            "mtime_ns": 1790000601832824860
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6010_value/config.yaml",
+        "config_sha256": "530200e5ef2d6af461beb97792061a94194f8980cbab98222eeff86d6ad320a1",
+        "fingerprint": "bea0b6eb3ed0dc5b45e10d148102498563419a4e78abf42fc39454bc754e968f",
+        "id": "Frostbite-6010_value__final__bea0b6eb3e"
+      },
+      "gpu": "2",
+      "episode_avg_return": 236.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-life_done-wm_2L512D8H-100k-seed6010_O",
+        "checkpoint": "100000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-life_done-wm_2L512D8H-100k-seed6010_O/world_model_100000.pth",
+            "size": 66100768,
+            "mtime_ns": 1788974454385182917
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-life_done-wm_2L512D8H-100k-seed6010_O/agent_100000.pth",
+            "size": 13699825,
+            "mtime_ns": 1788974454430182546
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-life_done-wm_2L512D8H-100k-seed6010_O/config.yaml",
+        "config_sha256": "4c677359238fbecfb1677f6d3b5a961a40bd11529912ea8d4a47d1c606eb2975",
+        "fingerprint": "233394aa96b6b1ed08da1673e835a4749619d866801f0714198b76e37eb258b5",
+        "id": "Frostbite-life_done-wm_2L512D8H-100k-seed6010_O__100000__233394aa96"
+      },
+      "gpu": "0",
+      "episode_avg_return": 250.0,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-life_done-wm_2L512D8H-100k-seed6010_X",
+        "checkpoint": "100000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/world_model_100000.pth",
+            "size": 66100768,
+            "mtime_ns": 1788367362343080805
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/agent_100000.pth",
+            "size": 13699825,
+            "mtime_ns": 1788367362377080631
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/config.yaml",
+        "config_sha256": "8d7e5e001a9d3da6800e780aa75950c6ec07aedeb018eeae7e9a0b7a08c0ee2a",
+        "fingerprint": "31f4476273cbbaaeb3eab03bc97911a24d7463d9d8d1a8aa35c47e0875b255de",
+        "id": "Frostbite-life_done-wm_2L512D8H-100k-seed6010_X__100000__31f4476273"
+      },
+      "gpu": "3",
+      "episode_avg_return": 254.0,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6000_add",
+        "checkpoint": "100000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_add/world_model_100000.pth",
+            "size": 66100768,
+            "mtime_ns": 1789950101646626582
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_add/agent_100000.pth",
+            "size": 13699825,
+            "mtime_ns": 1789950101661626389
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6000_add/config.yaml",
+        "config_sha256": "52899af5bec4ab6fca6f7a8d68dbd36dd2a5ffaa03b0fc057e694a852ad476e8",
+        "fingerprint": "14184d50156bc2ddfa766f3b3f8c2e3fcc06e0c5a1bc97d9d244a8f3e8b2d19f",
+        "id": "Frostbite-6000_add__100000__14184d5015"
+      },
+      "gpu": "2",
+      "episode_avg_return": 259.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6000_Shared",
+        "checkpoint": "shared_warmup_50304",
+        "source": {
+          "kind": "shared",
+          "training_state": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_Shared/shared_warmup_50304/training_state.pt",
+            "size": 231330712,
+            "mtime_ns": 1789908960882835249
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6000_Shared/config.yaml",
+        "config_sha256": "fa3b9ae7a64d12cb4e0f24b427ca9692410d50bb9287c89ae7c37fc0401f56ae",
+        "fingerprint": "2e35ba4dcd0e05689a341a4473d77bc824f69ec168ed8b132e16a6725cb7c3a2",
+        "id": "Frostbite-6000_Shared__shared_warmup_50304__2e35ba4dcd"
+      },
+      "gpu": "1",
+      "episode_avg_return": 261.0,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6000_Shared",
+        "checkpoint": "50000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_Shared/world_model_50000.pth",
+            "size": 66100659,
+            "mtime_ns": 1789908907235497036
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_Shared/agent_50000.pth",
+            "size": 13699795,
+            "mtime_ns": 1789908907252496931
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6000_Shared/config.yaml",
+        "config_sha256": "fa3b9ae7a64d12cb4e0f24b427ca9692410d50bb9287c89ae7c37fc0401f56ae",
+        "fingerprint": "e2f834d373ad7048c1d957add7d7b5f1c4438de7d24e9d8b99748a4ec5f607b3",
+        "id": "Frostbite-6000_Shared__50000__e2f834d373"
+      },
+      "gpu": "0",
+      "episode_avg_return": 264.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-td_only-b3f54884d761-seed710-attempt1_O",
+        "checkpoint": "50000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/world_model_50000.pth",
+            "size": 66100659,
+            "mtime_ns": 1794809299565665856
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/agent_50000.pth",
+            "size": 13699795,
+            "mtime_ns": 1794809299579665753
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/config.yaml",
+        "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+        "fingerprint": "f9c9c6971a530e951af17a8ce654ea70088535e9f46fdd7b18853e71d951bde9",
+        "id": "Frostbite-td_only-b3f54884d761-seed710-attempt1_O__50000__f9c9c6971a"
+      },
+      "gpu": "4",
+      "episode_avg_return": 267.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-td_only-b3f54884d761-seed710-attempt1_O",
+        "checkpoint": "100000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/world_model_100000.pth",
+            "size": 66100768,
+            "mtime_ns": 1794816375585674628
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/agent_100000.pth",
+            "size": 13699825,
+            "mtime_ns": 1794816375599674572
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/config.yaml",
+        "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+        "fingerprint": "a6932621acdbb94c7dc143999adaa991791c0f9255c8362d7cc5429bffd94b59",
+        "id": "Frostbite-td_only-b3f54884d761-seed710-attempt1_O__100000__a6932621ac"
+      },
+      "gpu": "2",
+      "episode_avg_return": 274.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6000_value",
+        "checkpoint": "final",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_value/world_model_final.pth",
+            "size": 66101095,
+            "mtime_ns": 1789928506222945383
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_value/agent_final.pth",
+            "size": 13699915,
+            "mtime_ns": 1789928506236945256
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6000_value/config.yaml",
+        "config_sha256": "530200e5ef2d6af461beb97792061a94194f8980cbab98222eeff86d6ad320a1",
+        "fingerprint": "868b716f69da7e146023627e4a906d5ec39f612059468fc41c5d314ca483edb1",
+        "id": "Frostbite-6000_value__final__868b716f69"
+      },
+      "gpu": "4",
+      "episode_avg_return": 275.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-6000_value",
+        "checkpoint": "100000",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_value/world_model_100000.pth",
+            "size": 66100768,
+            "mtime_ns": 1789927798084617096
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_value/agent_100000.pth",
+            "size": 13699825,
+            "mtime_ns": 1789927798101616928
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-6000_value/config.yaml",
+        "config_sha256": "530200e5ef2d6af461beb97792061a94194f8980cbab98222eeff86d6ad320a1",
+        "fingerprint": "8289f9ff13c1ce16ede00eac9d44cdf586ec1ea2d6f504f199df00cfae258c63",
+        "id": "Frostbite-6000_value__100000__8289f9ff13"
+      },
+      "gpu": "3",
+      "episode_avg_return": 277.0,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    },
+    {
+      "candidate": {
+        "run_name": "Frostbite-td_only-b3f54884d761-seed710-attempt1_O",
+        "checkpoint": "final",
+        "source": {
+          "kind": "weights",
+          "world_model": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/world_model_final.pth",
+            "size": 66101095,
+            "mtime_ns": 1794816655571317939
+          },
+          "agent": {
+            "path": "/home/choemj/STORM-1/ckpt/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/agent_final.pth",
+            "size": 13699915,
+            "mtime_ns": 1794816655589317838
+          }
+        },
+        "config": "/home/choemj/STORM-1/runs/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/config.yaml",
+        "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+        "fingerprint": "fa82578fe7e9fdff39b5a9abfa7cbe8313e4a55dccb978d6c71ba71f7068a625",
+        "id": "Frostbite-td_only-b3f54884d761-seed710-attempt1_O__final__fa82578fe7"
+      },
+      "gpu": "1",
+      "episode_avg_return": 277.5,
+      "qualified": false,
+      "alignment": null,
+      "status": "below_threshold"
+    }
+  ],
+  "qualified": []
+}

@@ -1,0 +1,84 @@
+BasicSettings:
+  ImageSize: 64
+  ReplayBufferOnGPU: true
+  Seed: 0
+JointTrainAgent:
+  BatchLength: 64
+  BatchSize: 16
+  BufferMaxLength: 100000
+  BufferWarmUp: 1024
+  DemonstrationBatchSize: 4
+  EvalEpisodes: 20
+  EvalEverySteps: 50000
+  EvalMode: inactive
+  EvalPrecision: auto
+  EvalSeed: 0
+  EvalStartStep: 0
+  FinalEvalStep: null
+  ImagineBatchLength: 16
+  ImagineBatchSize: 1024
+  ImagineContextLength: 8
+  ImagineDemonstrationBatchSize: 256
+  NumEnvs: 1
+  Retrieval:
+    additive_z_score_threshold: 3.5
+    anchor_offset: -3
+    anchor_weight: 0.0625
+    anchor_weight_r: null
+    batch_size_reduction: retrieved
+    dynamic_warmup_delay_steps: 3000
+    dynamic_warmup_multiplier: 2.6
+    dynamic_warmup_target_steps: 20000
+    ema_alpha: 0.01
+    enable: true
+    global_rebuild_cooldown: 2000
+    global_rebuild_enable: true
+    global_rebuild_threshold: 0.06
+    hash_bits: 10
+    hash_sample_mode: probs
+    max_anchors: 16
+    max_bucket_size: 1000000000
+    max_contexts: 256
+    max_pca_samples: 100000
+    max_warmup_steps: 90000
+    min_warmup_steps: 5000
+    multiplier: 16
+    neighbor_source: retrieval
+    save_warmup: false
+    score_combination: td_error_only
+    target: 16
+    td_error_z_score_threshold: 3.7
+    threshold: 1.0
+    trigger_mode: z_score
+    use_pca: true
+    value_signal: value_diff
+    warmup_offset_pairs: []
+    warmup_steps: 50000
+    z_score_threshold: 3.5
+  SampleMaxSteps: 50548
+  SaveEverySteps: 50549
+  SeedScreenMinReturn: 500.0
+  SeedScreenSteps: 0
+  TrainAgentEverySteps: 1
+  TrainDynamicsEverySteps: 1
+  UseDemonstration: false
+Models:
+  Agent:
+    EntropyCoef: 0.0003
+    Gamma: 0.985
+    HiddenDim: 512
+    Lambda: 0.95
+    NumLayers: 2
+  WorldModel:
+    InChannels: 3
+    TransformerHiddenDim: 512
+    TransformerMaxLength: 64
+    TransformerNumHeads: 8
+    TransformerNumLayers: 2
+Performance:
+  BatchScalarLogging: false
+  DisableDistributionValidation: false
+  ProjectedKVCache: false
+  RetrievalStatisticsMode: legacy
+  VectorizedReplaySampling: false
+Task: JointTrainAgent

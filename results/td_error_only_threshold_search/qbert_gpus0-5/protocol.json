@@ -1,0 +1,54 @@
+{
+  "jobs": [
+    {
+      "checkpoint": "/home/choemj/STORM-1/ckpt/Qbert-6010_Shared/shared_warmup_50559",
+      "config": "/home/choemj/STORM-1/ckpt/Qbert-6010_Shared/shared_warmup_50559/config.yaml",
+      "env": "ALE/Qbert-v5",
+      "seed": 6010,
+      "batch_size": 16,
+      "config_sha256": "41160ab39ff05385931b31e708046c7bdd034d792c98457901ada1d73a1ab7d5",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/ckpt/Qbert-6010_Shared/shared_warmup_50559/training_state.pt",
+          "size": 231199512,
+          "mtime_ns": 1790240133493201267
+        },
+        {
+          "path": "/home/choemj/STORM-1/ckpt/Qbert-6010_Shared/shared_warmup_50559/replay_buffer.npz",
+          "size": 9698966,
+          "mtime_ns": 1790240136334190510
+        }
+      ]
+    }
+  ],
+  "settings": {
+    "target": 5.99,
+    "lower": 3.5,
+    "upper": 6.0,
+    "coarse_points": 11,
+    "refinement_rounds": 4,
+    "tolerance": 0.05,
+    "steps": 100,
+    "validation_steps": 1000,
+    "block_size": 10,
+    "bootstrap_samples": 10000,
+    "bootstrap_seed": 0,
+    "gpu": null,
+    "gpus": [
+      0,
+      1,
+      2,
+      3,
+      4,
+      5
+    ]
+  },
+  "code_sha256": {
+    "/home/choemj/STORM-1/results/find_td_error_threshold.py": "c4f4ac02cde3cd467ebd3523cefa92ee0d9e82435ab0fa352eaf03d423b03ba6",
+    "/home/choemj/measure_additive_anchors.py": "e8f54f5d23c7829251d2a8a23e09d4a1f529f03dd5432e21546f59898c9af79c",
+    "/home/choemj/STORM-1/train.py": "b73eb29e212b83deca3833c24fa6ac5e7f9fa6c54bb45a3eb64a77e5175fa3bf",
+    "/home/choemj/STORM-1/utils.py": "b55657badd285c638318e8d2b997d1fda1446fc42bbefd2237ac5018d9428549",
+    "/home/choemj/retrieval.py": "1469c43e7fae6bb657e0c2f94ca160c831064edb8c1ebd02e56b76d74f51473d",
+    "/home/choemj/STORM-1/results/td_error_only_anchor_stats.py": "4dac615f24bafb7c99d513eca6a4b5dc4cd23b1378b3c3097074be6ca330f3e6"
+  }
+}

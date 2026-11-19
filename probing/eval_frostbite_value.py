@@ -190,7 +190,8 @@ def evaluate_values(world_model, agent, data, templates, valid_blocks, seed):
 
 
 def main():
-    parser = argparse.ArgumentParser(description="Paired Frostbite critic analysis (no training).")
+    parser = argparse.ArgumentParser(description="Single-model or paired Frostbite critic analysis (no training).")
+    parser.add_argument("--run", dest="model_run", help="Evaluate one checkpoint without a comparison model.")
     parser.add_argument("--baseline-run", "--run_name", dest="baseline_run")
     parser.add_argument("--flash-run")
     parser.add_argument("--step", type=int, default=100000)
@@ -198,11 +199,11 @@ def main():
     parser.add_argument("--seed", type=int, default=2027)
     parser.add_argument("--config", default="config_files/STORM.yaml")
     parser.add_argument("--template-dir", default="frostbite_igloo_templates")
-    parser.add_argument("--data", help="Shared NPZ; loaded if present, otherwise collected with baseline and saved.")
+    parser.add_argument("--data", help="Context NPZ; loaded if present, otherwise collected with --run or baseline and saved.")
     parser.add_argument("--output", default="results/frostbite_value_comparison")
     parser.add_argument("--bootstrap", type=int, default=10000)
     parser.add_argument("--bootstrap-unit", choices=["episode", "block"], default="episode")
-    parser.add_argument("--analyze-only", action="store_true", help="Recompute statistics from saved paired_values.npz; no GPU evaluation.")
+    parser.add_argument("--analyze-only", action="store_true", help="Recompute statistics from saved model_values.npz or paired_values.npz; no GPU evaluation.")
     args = parser.parse_args()
     if args.bootstrap < 100 or args.frames < 9:
         parser.error("--bootstrap must be >=100 and --frames >=9")
@@ -212,9 +213,15 @@ def main():
     if args.analyze_only:
         analyze_values(output, args.bootstrap, args.seed, args.bootstrap_unit)
         return
-    if not args.baseline_run or not args.flash_run:
-        parser.error("Both --baseline-run and --flash-run are required")
-    if (output / "paired_values.npz").exists():
+    if args.model_run:
+        if args.baseline_run or args.flash_run:
+            parser.error("Use --run alone, or --baseline-run together with --flash-run")
+        runs = [args.model_run]
+    else:
+        if not args.baseline_run or not args.flash_run:
+            parser.error("Specify --run, or both --baseline-run and --flash-run")
+        runs = [args.baseline_run, args.flash_run]
+    if any((output / name).exists() for name in ("model_values.npz", "paired_values.npz")):
         parser.error("Results already exist: use --analyze-only or a new --output directory")
     templates = {}
     for stage in range(17):
@@ -228,8 +235,8 @@ def main():
     global conf
     from utils import load_config
     conf = load_config(args.config)
-    # Check both checkpoint pairs before any expensive collection.
-    for run in (args.baseline_run, args.flash_run):
+    # Check every requested checkpoint before any expensive collection.
+    for run in runs:
         for kind in ("world_model", "agent"):
             path = Path("ckpt") / run / f"{kind}_{args.step}.pth"
             if not path.is_file():
@@ -237,13 +244,13 @@ def main():
     output.mkdir(parents=True, exist_ok=True)
     data_path = Path(args.data) if args.data else output / "shared_contexts.npz"
     seed_all(args.seed)
-    world_model, agent = load_models(args.baseline_run, args.step, "ALE/Frostbite-v5")
+    world_model, agent = load_models(runs[0], args.step, "ALE/Frostbite-v5")
     if data_path.exists():
         with np.load(data_path, allow_pickle=False) as stored:
             data = {key: stored[key] for key in stored.files}
     else:
         data = collect_episodes_data("ALE/Frostbite-v5", world_model, agent, args.frames, args.seed)
-        data["collection_run"] = np.array(args.baseline_run)
+        data["collection_run"] = np.array(runs[0])
         data["collection_step"] = np.array(args.step)
         data["collection_seed"] = np.array(args.seed)
         data_path.parent.mkdir(parents=True, exist_ok=True)
@@ -259,21 +266,26 @@ def main():
     blocks = make_blocks(stages, data["episode_id"])
     if not blocks:
         raise ValueError("No valid blocks of >=9 frames; collect more frames")
-    baseline = evaluate_values(world_model, agent, data, templates, blocks, args.seed)
-    print("Baseline 평가 완료. 같은 문맥으로 FLASH를 평가합니다.")
-    del world_model, agent
-    torch.cuda.empty_cache()
-    seed_all(args.seed)
-    world_model, agent = load_models(args.flash_run, args.step, "ALE/Frostbite-v5")
-    flash = evaluate_values(world_model, agent, data, templates, blocks, args.seed)
+    values = evaluate_values(world_model, agent, data, templates, blocks, args.seed)
     frame_ids = np.concatenate([np.arange(start + 8, end) for start, end in blocks])
     block_ids = np.concatenate([np.full(end - start - 8, i) for i, (start, end) in enumerate(blocks)])
-    np.savez_compressed(output / "paired_values.npz", baseline=baseline, flash=flash,
-                        frame_id=frame_ids, block_id=block_ids,
-                        episode_id=data["episode_id"][frame_ids],
-                        episode_step=data["episode_step"][frame_ids])
+    metadata = dict(frame_id=frame_ids, block_id=block_ids,
+                    episode_id=data["episode_id"][frame_ids],
+                    episode_step=data["episode_step"][frame_ids])
+    if args.model_run:
+        np.savez_compressed(output / "model_values.npz", values=values,
+                            run_name=np.array(args.model_run), **metadata)
+    else:
+        print("Baseline 평가 완료. 같은 문맥으로 FLASH를 평가합니다.")
+        del world_model, agent
+        torch.cuda.empty_cache()
+        seed_all(args.seed)
+        world_model, agent = load_models(args.flash_run, args.step, "ALE/Frostbite-v5")
+        flash = evaluate_values(world_model, agent, data, templates, blocks, args.seed)
+        np.savez_compressed(output / "paired_values.npz", baseline=values, flash=flash, **metadata)
     np.savez_compressed(output / "used_templates.npz", templates=np.stack([templates[i] for i in range(17)]))
-    protocol = dict(vars(args), data_path=str(data_path.resolve()),
+    protocol = dict(vars(args), evaluation_mode="single" if args.model_run else "paired",
+                    data_path=str(data_path.resolve()),
                     collection_run=str(data.get("collection_run", "unknown")),
                     collection_step=int(data["collection_step"]) if "collection_step" in data else None,
                     collection_seed=int(data["collection_seed"]) if "collection_seed" in data else None,
@@ -282,7 +294,7 @@ def main():
                     context_warmup=8, max_block_length=64,
                     latent_sampling="random_sample; reset seed per block, shared across stages/models",
                     background="Uncorrupted shared rollout; replace igloo throughout each context block",
-                    uncertainty_scope="Evaluation contexts of two fixed checkpoints, not training-seed variation")
+                    uncertainty_scope="Evaluation contexts of fixed checkpoints, not training-seed variation")
     (output / "protocol.json").write_text(json.dumps(protocol, indent=2), encoding="utf-8")
     analyze_values(output, args.bootstrap, args.seed, args.bootstrap_unit)
 

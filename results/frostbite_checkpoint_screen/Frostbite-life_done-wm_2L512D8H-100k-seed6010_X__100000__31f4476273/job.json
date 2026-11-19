@@ -1,0 +1,43 @@
+{
+  "candidate": {
+    "run_name": "Frostbite-life_done-wm_2L512D8H-100k-seed6010_X",
+    "checkpoint": "100000",
+    "source": {
+      "kind": "weights",
+      "world_model": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/world_model_100000.pth",
+        "size": 66100768,
+        "mtime_ns": 1788367362343080805
+      },
+      "agent": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/agent_100000.pth",
+        "size": 13699825,
+        "mtime_ns": 1788367362377080631
+      }
+    },
+    "config": "/home/choemj/STORM-1/runs/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/config.yaml",
+    "config_sha256": "8d7e5e001a9d3da6800e780aa75950c6ec07aedeb018eeae7e9a0b7a08c0ee2a",
+    "fingerprint": "31f4476273cbbaaeb3eab03bc97911a24d7463d9d8d1a8aa35c47e0875b255de",
+    "id": "Frostbite-life_done-wm_2L512D8H-100k-seed6010_X__100000__31f4476273"
+  },
+  "options": {
+    "episodes": 20,
+    "return_seed": 0,
+    "value_seed": 2027,
+    "precision": "bf16",
+    "min_return": 1000.0,
+    "bootstrap": 10000,
+    "data": "/home/choemj/STORM-1/results/old/seed_3710/shared_contexts.npz",
+    "data_stamp": {
+      "path": "/home/choemj/STORM-1/results/old/seed_3710/shared_contexts.npz",
+      "size": 6956121,
+      "mtime_ns": 1789711190283333902
+    },
+    "template_dir": "/home/choemj/STORM-1/frostbite_igloo_templates",
+    "templates_sha256": "461a54e9fc6c4d6a130e25b92c7c1c9c979cb129b511e9e6829c7cd0ecbbb7f0",
+    "eval_code_sha256": "8c1da8a88662d33791117f221580234a3345435a7c649959eae6177f09600b1d",
+    "value_code_sha256": "6c5da35e50c3089463010593a67580d0a0fe9b410f38aae3be3515952b0f0517"
+  },
+  "directory": "/home/choemj/STORM-1/results/frostbite_checkpoint_screen/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X__100000__31f4476273",
+  "gpu": "3"
+}

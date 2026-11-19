@@ -22,6 +22,80 @@ conda run -n storm python STORM-1/results/find_td_error_threshold.py \
 GPU 번호는 사용할 GPU에 맞게 지정합니다. `--gpu`를 생략하면 현재
 `CUDA_VISIBLE_DEVICES` 설정을 상속합니다. 실행하면 GPU 재개 학습이 시작됩니다.
 
+### GPU 0~5에서 3.5부터 0.25 간격으로 병렬 실행
+
+아래 명령은 **실제 GPU 재개 학습**을 실행합니다. 초기 threshold는
+`3.5, 3.75, 4.0, 4.25, 4.5, 4.75, 5.0, 5.25, 5.5, 5.75, 6.0`의 11개입니다.
+
+```bash
+cd /home/choemj
+conda run --no-capture-output -n storm python STORM-1/results/find_td_error_threshold.py \
+  --checkpoint STORM-1/ckpt/Qbert-6010_Shared \
+  --gpus 0 1 2 3 4 5 \
+  --lower 3.5 --upper 6.0 --coarse-points 11 \
+  --target 5.99 --tolerance 0.05 \
+  --steps 100 --validation-steps 1000 \
+  --output STORM-1/results/td_error_only_threshold_search/qbert_gpus0-5
+```
+
+처음 여섯 후보는 GPU 0~5에 순서대로 배정합니다. GPU마다 한 후보씩 실행하며,
+먼저 끝난 GPU가 다음 후보를 실행합니다. 여러 checkpoint를 지정하면 한 후보의
+checkpoint들은 해당 GPU에서 순차 실행한 뒤 집계합니다. 각 후보에는 별도 프로세스와
+`CUDA_VISIBLE_DEVICES`를 지정하므로 GPU 메모리를 서로 공유하지 않습니다.
+이 GPU 번호는 호스트의 CUDA GPU ID이며, 기존 `CUDA_VISIBLE_DEVICES`는 각 자식
+프로세스에서 덮어씁니다. `--gpu`와 `--gpus`는 함께 사용할 수 없습니다.
+
+초기 11개를 모두 측정한 뒤 목표 오차를 만족하지 못하면 기본 최대 4회 더 좁은
+간격으로 세분화합니다. **0.25 간격의 11개 후보만 비교**하려면
+`--refinement-rounds 0`을 추가합니다. 상한을 바꿀 때는
+`coarse-points = (upper - lower) / 0.25 + 1`로 맞추면 0.25 간격이 유지됩니다.
+
+선택된 후보는 GPU 0에서 추가 1,000 update로 확인합니다.
+`report.md`에 **선택된 threshold, 후보별 평균·목표와의 차이·SE·95% CI,
+후속 확인 결과와 허용 오차 충족 여부**가 함께 기록됩니다.
+후속 확인에서 목표를 벗어나면 그 사실을 보고하며 성공으로 표시하지 않습니다.
+
+완료한 후보는 즉시 저장하고, 같은 명령과 출력 경로로 재실행하면 재사용합니다.
+후보 실패 시 새 작업 배정을 중단하고 이미 실행 중인 후보의 종료를 기다립니다.
+수정된 코드와 기존 측정 결과가 섞이지 않도록 위 예시는 새 출력 경로를 사용합니다.
+
+### 다른 checkpoint에서 threshold 3.5 이상으로 실행
+
+`Boxing-6040_Shared`에는 50,048 step의 전체 checkpoint, replay buffer, EMA 통계가
+저장되어 있습니다. 이를 사용하는 실행 스크립트는 다음과 같습니다.
+
+```bash
+cd /home/choemj
+conda run --no-capture-output -n storm bash STORM-1/results/run_td_error_threshold_boxing.sh
+```
+
+이 명령은 GPU 0~5에서 **3.5~4.0을 0.1 간격(6개)**으로 측정합니다.
+`3.5, 3.6, 3.7, 3.8, 3.9, 4.0`을 GPU 0~5에 하나씩 배정하고,
+각 후보를 같은 checkpoint에서 재개해 **모두 500 update씩** 측정합니다.
+각 후보의 평균과 **Within-run SD across updates**를 같은 500개 앵커 수로 계산합니다.
+이번 실행은 `--refinement-rounds 0`으로 추가 세분화를 하지 않습니다.
+`--validation-steps 0`으로 별도의 후속 확인도 생략하므로 총 측정량은 6 × 500 updates입니다.
+실행 스크립트의 하한은 **3.5로 고정**되어 있습니다.
+결과는 `STORM-1/results/td_error_only_threshold_search/boxing_gpus0-5_3.5-4.0_step0.1_500updates/`의
+`report.md`, `result.json`, `search.csv`에 저장합니다.
+
+`report.md`와 `search.csv`에는 후보별 평균, Within-run SD, 목표와의 차이, SE, 95% CI가
+함께 기록됩니다. Within-run SD는 0개 앵커 update를 포함한 500개 관측치의
+**표본 표준편차(ddof=1)**이며, 평균의 SE와는 다른 통계입니다.
+개별 `anchors.csv`와 `summary.json`도 보존됩니다.
+
+목표에 도달하지 않아도 하한은 유지하고, 가장 가까운 실측 후보와 목표와의 차이를
+보고합니다. 다른 checkpoint에서도 5.99에 가까워지는지는 실측으로 확인합니다.
+
+스크립트 뒤에 옵션을 붙이면 하한을 제외한 기본값을 바꿀 수 있습니다. 예를 들어
+Boxing에서도 상한을 8.0까지 넓히려면 새 결과 경로와 함께 실행합니다.
+
+```bash
+conda run --no-capture-output -n storm bash STORM-1/results/run_td_error_threshold_boxing.sh \
+  --upper 8.0 --coarse-points 19 --refinement-rounds 4 \
+  --output STORM-1/results/td_error_only_threshold_search/boxing_gpus0-5_from3.5_to8
+```
+
 먼저 **GPU 학습 없이** checkpoint·설정·최대 실행량을 확인할 수 있습니다.
 아래 명령의 `--dry-run`을 제거하고 같은 `--output`으로 실제 탐색을 시작하면 됩니다.
 
@@ -89,8 +163,9 @@ summary를 검증한 뒤 재사용하고, 중단된 probe는 새 attempt 디렉�
 ## 결과
 
 - `protocol.json`: checkpoint·설정·코드 fingerprint와 탐색 조건.
-- `search.csv`: 실측 threshold별 평균, 오차, SE, 95% CI.
+- `search.csv`: 실측 threshold별 평균, Within-run SD across updates, 오차, SE, 95% CI.
 - `result.json`: 가장 가까운 실측 threshold, 탐색/후속 구간의 결과와 허용 오차 충족 여부.
+- `report.md`: 선택된 threshold와 모든 후보의 평균·Within-run SD·SE·95% CI 및 후속 확인 결과를 정리한 표.
 - `probes/`, `validation/`: 각 run의 `anchors.csv`, 실제 적용 config, summary, 실행 로그.
 
 학습 YAML·큐·원본 checkpoint는 자동 변경하지 않습니다.

@@ -1,0 +1,42 @@
+{
+  "mean_anchors_per_update": 6.87,
+  "se": 0.1718945964107875,
+  "ci95": [
+    6.54,
+    7.21
+  ],
+  "uncertainty_unit": "consecutive updates within this one resumed run (block bootstrap)",
+  "games": 1,
+  "runs": 1,
+  "threshold": 3.625,
+  "per_run": [
+    {
+      "updates": 100,
+      "total_anchor_insertions": 687,
+      "mean_anchors_per_update": 6.87,
+      "within_run_sd_across_updates": 1.9676936199058486,
+      "mean_se": 0.1718945964107875,
+      "mean_ci95": [
+        6.54,
+        7.21
+      ],
+      "ci_method": "circular moving-block percentile bootstrap",
+      "block_size_updates": 10,
+      "bootstrap_samples": 10000,
+      "bootstrap_seed": 0,
+      "checkpoint": "/home/choemj/STORM-1/ckpt/Boxing-6040_Shared/shared_warmup_50048",
+      "source_config": "/home/choemj/STORM-1/ckpt/Boxing-6040_Shared/shared_warmup_50048/config.yaml",
+      "env": "ALE/Boxing-v5",
+      "seed": 6040,
+      "score_combination": "td_error_only",
+      "threshold": 3.625,
+      "env_step_start": 50048,
+      "env_step_stop_exclusive": 50148,
+      "probe_env_step_start": 50048,
+      "burn_in_updates": 0,
+      "environment_reset_at_resume": true,
+      "rebuild_retrieval_on_resume": false,
+      "scope": "Within this short resumed run; not uncertainty across games or training seeds."
+    }
+  ]
+}

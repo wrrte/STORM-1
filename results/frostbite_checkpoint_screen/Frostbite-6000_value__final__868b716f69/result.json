@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "run_name": "Frostbite-6000_value",
+    "checkpoint": "final",
+    "source": {
+      "kind": "weights",
+      "world_model": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_value/world_model_final.pth",
+        "size": 66101095,
+        "mtime_ns": 1789928506222945383
+      },
+      "agent": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_value/agent_final.pth",
+        "size": 13699915,
+        "mtime_ns": 1789928506236945256
+      }
+    },
+    "config": "/home/choemj/STORM-1/runs/Frostbite-6000_value/config.yaml",
+    "config_sha256": "530200e5ef2d6af461beb97792061a94194f8980cbab98222eeff86d6ad320a1",
+    "fingerprint": "868b716f69da7e146023627e4a906d5ec39f612059468fc41c5d314ca483edb1",
+    "id": "Frostbite-6000_value__final__868b716f69"
+  },
+  "gpu": "4",
+  "episode_avg_return": 275.5,
+  "qualified": false,
+  "alignment": null,
+  "status": "below_threshold"
+}

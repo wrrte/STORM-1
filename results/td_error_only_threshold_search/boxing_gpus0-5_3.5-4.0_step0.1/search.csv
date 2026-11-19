@@ -1,0 +1,7 @@
+threshold,mean_anchors_per_update,absolute_error,se,ci95,uncertainty_unit,games,runs
+3.5,7.52,1.5299999999999994,0.20341188832177692,"[7.13, 7.92]",consecutive updates within this one resumed run (block bootstrap),1,1
+3.6,6.96,0.9699999999999998,0.19090744757697128,"[6.61, 7.35]",consecutive updates within this one resumed run (block bootstrap),1,1
+3.7,6.41,0.41999999999999993,0.2890368429208577,"[5.84, 6.97]",consecutive updates within this one resumed run (block bootstrap),1,1
+3.8,6.07,0.08000000000000007,0.2210911073715446,"[5.65, 6.51]",consecutive updates within this one resumed run (block bootstrap),1,1
+3.9,5.63,0.3600000000000003,0.165502007850238,"[5.319750000000001, 5.97]",consecutive updates within this one resumed run (block bootstrap),1,1
+4.0,5.06,0.9300000000000006,0.18572023057385115,"[4.7, 5.42]",consecutive updates within this one resumed run (block bootstrap),1,1

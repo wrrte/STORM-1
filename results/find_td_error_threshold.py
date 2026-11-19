@@ -7,6 +7,7 @@ from __future__ import annotations
 
 import argparse
 from collections import defaultdict
+from concurrent.futures import FIRST_COMPLETED, ThreadPoolExecutor, wait
 import csv
 from datetime import datetime, timezone
 import hashlib
@@ -51,7 +52,7 @@ def normalized_config(value):
 
 
 def search_thresholds(evaluate, target=5.99, lower=0.0, upper=6.0, coarse_points=7,
-                      rounds=4, tolerance=0.05):
+                      rounds=4, tolerance=0.05, *, evaluate_many=None):
     """Coarse grid followed by local refinement; no monotonicity assumption."""
     if (not all(math.isfinite(x) for x in (target, lower, upper, tolerance))
             or target < 0 or lower < 0 or upper <= lower or tolerance < 0
@@ -59,10 +60,17 @@ def search_thresholds(evaluate, target=5.99, lower=0.0, upper=6.0, coarse_points
         raise ValueError('Invalid target, search range, grid size, rounds or tolerance')
     measured = {}
 
-    def measure(threshold):
-        threshold = float(f'{threshold:.12g}')
-        if threshold not in measured:
-            record = dict(evaluate(threshold))
+    def measure(thresholds):
+        pending = list(dict.fromkeys(float(f'{value:.12g}') for value in thresholds))
+        pending = [value for value in pending if value not in measured]
+        if not pending:
+            return
+        records = (evaluate_many(pending) if evaluate_many is not None
+                   else {value: evaluate(value) for value in pending})
+        if set(records) != set(pending):
+            raise ValueError('Batch evaluator must return every requested threshold exactly once')
+        for threshold in pending:
+            record = dict(records[threshold])
             mean = record['mean_anchors_per_update']
             if not math.isfinite(mean) or mean < 0:
                 raise ValueError('Probe returned an invalid mean')
@@ -72,8 +80,7 @@ def search_thresholds(evaluate, target=5.99, lower=0.0, upper=6.0, coarse_points
     def best():
         return min(measured.values(), key=lambda row: (row['absolute_error'], row['threshold']))
 
-    for threshold in np.linspace(lower, upper, coarse_points):
-        measure(float(threshold))
+    measure(np.linspace(lower, upper, coarse_points))
     spacing = (upper - lower) / (coarse_points - 1)
     for _ in range(rounds):
         center = best()['threshold']
@@ -81,9 +88,8 @@ def search_thresholds(evaluate, target=5.99, lower=0.0, upper=6.0, coarse_points
             break
         spacing /= 2
         before = len(measured)
-        for threshold in (center - spacing, center + spacing):
-            if lower <= threshold <= upper:
-                measure(threshold)
+        measure(value for value in (center - spacing, center + spacing)
+                if lower <= value <= upper)
         if len(measured) == before:
             break
     return best(), sorted(measured.values(), key=lambda row: row['threshold'])
@@ -144,7 +150,10 @@ def aggregate_probes(records, bootstrap_samples, bootstrap_seed):
                                                bootstrap_samples=bootstrap_samples, seed=bootstrap_seed)
             se, ci = estimate['se'], [estimate['ci_low'], estimate['ci_high']]
             unit = 'independent training runs within this game (run bootstrap)'
-    return {'mean_anchors_per_update': float(np.mean(means)), 'se': se, 'ci95': ci,
+    # A within-run SD is defined for one update trace, not for run/game means.
+    within_run_sd = records[0]['within_run_sd_across_updates'] if len(records) == 1 else None
+    return {'mean_anchors_per_update': float(np.mean(means)),
+            'within_run_sd_across_updates': within_run_sd, 'se': se, 'ci95': ci,
             'uncertainty_unit': unit, 'games': len(games), 'runs': len(records)}
 
 
@@ -169,6 +178,8 @@ def validate_probe(directory, job, threshold, steps, burn_in):
     measured = counts[burn_in:]
     if (sum(measured) != summary['total_anchor_insertions']
             or not math.isclose(float(np.mean(measured)), summary['mean_anchors_per_update'], abs_tol=1e-12)
+            or not math.isclose(float(np.std(measured, ddof=1)),
+                                summary['within_run_sd_across_updates'], abs_tol=1e-12)
             or not math.isfinite(summary['mean_se']) or summary['mean_se'] < 0):
         raise ValueError(f'{directory}: summary differs from recorded counts')
     return summary
@@ -208,7 +219,8 @@ def measure_candidate(threshold, jobs, args, output, *, validation=False):
             if args.gpu is not None:
                 environment['CUDA_VISIBLE_DEVICES'] = args.gpu
             log_path = run_dir / f'attempt_{attempt:03d}.log'
-            print(f"  {job['env']}, seed {job['seed']}; log: {log_path}", flush=True)
+            print(f"  threshold={threshold:g}, {job['env']}, seed {job['seed']}, "
+                  f"GPU={args.gpu if args.gpu is not None else 'inherited'}; log: {log_path}", flush=True)
             with log_path.open('w') as stream:
                 result = subprocess.run(command, cwd=STORM.parent, env=environment,
                                         stdout=stream, stderr=subprocess.STDOUT)
@@ -216,20 +228,124 @@ def measure_candidate(threshold, jobs, args, output, *, validation=False):
                 raise RuntimeError(f'Probe failed with exit code {result.returncode}; see {log_path}')
             record = validate_probe(destination, job, threshold, steps, burn_in)
         records.append(record)
-        print(f"  mean={record['mean_anchors_per_update']:.5f}, SE={record['mean_se']:.5f}", flush=True)
+        print(f"  mean={record['mean_anchors_per_update']:.5f}, "
+              f"within-run SD={record['within_run_sd_across_updates']:.5f}, "
+              f"SE={record['mean_se']:.5f}", flush=True)
     combined = aggregate_probes(records, args.bootstrap_samples, args.bootstrap_seed)
     write_json(parent / 'aggregate.json', {**combined, 'threshold': threshold, 'per_run': records})
     print(f"  Game-balanced mean={combined['mean_anchors_per_update']:.5f}", flush=True)
     return combined
 
 
+def measure_candidates(thresholds, jobs, args, output, *, on_result=None):
+    """Run each candidate on one GPU; schedule the next on whichever GPU finishes."""
+    results = {}
+
+    def completed(threshold, record):
+        results[threshold] = record
+        if on_result is not None:
+            on_result(threshold, record)
+
+    gpus = getattr(args, 'gpus', None)
+    if not gpus:
+        for threshold in thresholds:
+            completed(threshold, measure_candidate(threshold, jobs, args, output))
+        return results
+
+    pending = iter(thresholds)
+    with ThreadPoolExecutor(max_workers=len(gpus)) as executor:
+        futures = {}
+
+        def submit(gpu):
+            threshold = next(pending, None)
+            if threshold is not None:
+                worker_args = SimpleNamespace(**{**vars(args), 'gpu': str(gpu)})
+                future = executor.submit(measure_candidate, threshold, jobs, worker_args, output)
+                futures[future] = (threshold, gpu)
+
+        for gpu in gpus:
+            submit(gpu)
+        try:
+            while futures:
+                done, _ = wait(futures, return_when=FIRST_COMPLETED)
+                available = []
+                for future in done:
+                    threshold, gpu = futures.pop(future)
+                    completed(threshold, future.result())
+                    available.append(gpu)
+                for gpu in available:
+                    submit(gpu)
+        except BaseException:
+            # Keep completed traces for resume and stop launching new candidates.
+            for future in futures:
+                future.cancel()
+            raise
+    return results
+
+
 def save_curve(output, rows):
     with (output / 'search.csv').open('w', newline='') as stream:
-        fields = ['threshold', 'mean_anchors_per_update', 'absolute_error', 'se', 'ci95',
+        fields = ['threshold', 'mean_anchors_per_update', 'within_run_sd_across_updates',
+                  'absolute_error', 'se', 'ci95',
                   'uncertainty_unit', 'games', 'runs']
         writer = csv.DictWriter(stream, fieldnames=fields)
         writer.writeheader()
         writer.writerows(rows)
+
+
+def write_report(output, result, curve, args, jobs):
+    def number(value):
+        return f'{value:.5f}' if value is not None else '—'
+
+    def ci(record):
+        bounds = record['ci95']
+        return f'[{number(bounds[0])}, {number(bounds[1])}]' if bounds else '—'
+
+    best = result['calibration']
+    lines = [
+        '# TD-error-only threshold 탐색 결과', '',
+        f"선택된 threshold: **{result['best_tested_threshold']:g}**. "
+        f"목표: **{result['target']:g} anchors/update**, 허용 오차: {result['tolerance']:g}.", '',
+        '선택 기준은 측정한 후보 중 목표와 평균 앵커 수의 절대 차이가 가장 작은 값입니다. '
+        '동률이면 더 작은 threshold를 선택합니다.', '',
+        '| 구간 | 측정 updates/run | 평균 anchors/update | Within-run SD across updates | 목표와 절대 차이 | SE | 평균의 95% CI | 허용 오차 충족 |',
+        '|---|---:|---:|---:|---:|---:|---|---|',
+        f"| 탐색 | {args.steps} | {number(best['mean_anchors_per_update'])} | "
+        f"{number(best['within_run_sd_across_updates'])} | "
+        f"{number(best['absolute_error'])} | {number(best['se'])} | {ci(best)} | "
+        f"{result['calibration_within_tolerance']} |",
+    ]
+    validation = result['validation']
+    if validation:
+        lines.append(f"| 후속 확인 | {args.validation_steps} | "
+                     f"{number(validation['mean_anchors_per_update'])} | "
+                     f"{number(validation['within_run_sd_across_updates'])} | "
+                     f"{number(validation['absolute_error'])} | {number(validation['se'])} | "
+                     f"{ci(validation)} | {result['validation_within_tolerance']} |")
+    lines += ['', '## 측정한 후보', '',
+              '| Threshold | 평균 anchors/update | Within-run SD across updates | 목표와 절대 차이 | SE | 평균의 95% CI |',
+              '|---:|---:|---:|---:|---:|---|']
+    lines += [f"| {row['threshold']:g} | {number(row['mean_anchors_per_update'])} | "
+              f"{number(row['within_run_sd_across_updates'])} | "
+              f"{number(row['absolute_error'])} | {number(row['se'])} | {ci(row)} |" for row in curve]
+    lines += ['', '## 측정 조건', '',
+              *[f"- {job['env']}, seed {job['seed']}: `{job['checkpoint']}`" for job in jobs],
+              f"- 탐색 범위: [{args.lower:g}, {args.upper:g}], 초기 후보 {args.coarse_points}개, "
+              f"최대 세분화 {args.refinement_rounds}회.",
+              f"- CI/SE의 재표집 단위: {best['uncertainty_unit']}.",
+              '- Within-run SD across updates는 같은 run의 측정 구간 내 앵커 수의 표본 표준편차(ddof=1)입니다. '
+              '평균의 SE 또는 게임·학습 seed 간 표준편차가 아닙니다.',
+              '- 매 후보마다 같은 checkpoint를 복원하며, 앵커가 0개인 update도 평균에 포함합니다.']
+    if len(jobs) > 1:
+        lines.append('- 여러 run을 집계할 때 단일 Within-run SD는 표시하지 않습니다. '
+                     '각 run의 SD는 probes/의 summary.json과 aggregate.json의 per_run에 기록됩니다.')
+    if validation:
+        lines.append(f'- 후속 확인은 checkpoint 복원 후 처음 {args.steps} updates를 제외하고 '
+                     f'그 다음 {args.validation_steps} updates를 측정합니다. 독립 학습 run은 아닙니다.')
+    lines += ['', '허용 오차 충족 여부는 평균과 목표의 절대 차이로 판정합니다. '
+              '후속 확인이 허용 오차를 벗어나면 탐색 구간의 빈도 매칭이 유지되지 않은 것입니다. '
+              '이 결과는 지정한 checkpoint의 짧은 재개 학습에 한정되며, 전체 학습의 평균을 보장하지 않습니다.', '']
+    (output / 'report.md').write_text('\n'.join(lines), encoding='utf-8')
 
 
 def main(argv=None):
@@ -250,10 +366,15 @@ def main(argv=None):
     parser.add_argument('--block-size', type=int, default=10)
     parser.add_argument('--bootstrap-samples', type=int, default=10000)
     parser.add_argument('--bootstrap-seed', type=int, default=0)
-    parser.add_argument('--gpu', help='CUDA_VISIBLE_DEVICES value for child probes')
+    gpu_options = parser.add_mutually_exclusive_group()
+    gpu_options.add_argument('--gpu', help='CUDA_VISIBLE_DEVICES value for sequential child probes')
+    gpu_options.add_argument('--gpus', type=int, nargs='+',
+                             help='Parallel GPU IDs, one candidate per GPU, e.g. 0 1 2 3 4 5')
     parser.add_argument('--output', type=Path, help='Output directory; reusing it resumes matching completed probes')
     parser.add_argument('--dry-run', action='store_true', help='Validate inputs and write the execution plan; no training')
     args = parser.parse_args(argv)
+    if args.gpus and (min(args.gpus) < 0 or len(set(args.gpus)) != len(args.gpus)):
+        parser.error('--gpus requires distinct, nonnegative GPU IDs')
     if (args.steps < 2 or args.validation_steps < 0 or args.validation_steps == 1
             or not 1 <= args.block_size <= args.steps // 2
             or (args.validation_steps and args.block_size > args.validation_steps // 2)
@@ -284,23 +405,34 @@ def main(argv=None):
                            if args.validation_steps else 'disabled')
         print(f'Plan: up to {maximum} thresholds × {len(jobs)} runs × {args.steps} updates; '
               f'validation: {validation_plan}.', flush=True)
+        print('Initial thresholds: ' + ', '.join(f'{value:.12g}' for value in
+              np.linspace(args.lower, args.upper, args.coarse_points)), flush=True)
+        if args.gpus:
+            print(f'Parallel workers: {len(args.gpus)}; GPUs: {args.gpus}; '
+                  'one candidate per GPU. Validation uses the first GPU.', flush=True)
         print(f'Results: {output}', flush=True)
         if args.dry_run:
             return 0
         history = []
 
-        def evaluate(threshold):
-            record = measure_candidate(threshold, jobs, args, output)
+        def record_result(threshold, record):
             history.append({**record, 'threshold': threshold,
                             'absolute_error': abs(record['mean_anchors_per_update'] - args.target)})
-            save_curve(output, history)
-            return record
+            save_curve(output, sorted(history, key=lambda row: row['threshold']))
 
-        best, curve = search_thresholds(evaluate, args.target, args.lower, args.upper,
-                                       args.coarse_points, args.refinement_rounds, args.tolerance)
+        def evaluate_many(thresholds):
+            return measure_candidates(thresholds, jobs, args, output, on_result=record_result)
+
+        best, curve = search_thresholds(None, args.target, args.lower, args.upper,
+                                       args.coarse_points, args.refinement_rounds, args.tolerance,
+                                       evaluate_many=evaluate_many)
         save_curve(output, curve)
+        if args.gpus:
+            args.gpu = str(args.gpus[0])
         validation = (measure_candidate(best['threshold'], jobs, args, output, validation=True)
                       if args.validation_steps else None)
+        if validation:
+            validation['absolute_error'] = abs(validation['mean_anchors_per_update'] - args.target)
         result = {
             'target': args.target, 'tolerance': args.tolerance,
             'best_tested_threshold': best['threshold'], 'calibration': best, 'validation': validation,
@@ -315,7 +447,11 @@ def main(argv=None):
             'training_override': {'JointTrainAgent.Retrieval.td_error_z_score_threshold': best['threshold']},
         }
         write_json(output / 'result.json', result)
+        write_report(output, result, curve, args, jobs)
         print(json.dumps(result, indent=2, ensure_ascii=False), flush=True)
+        print(f"Selected threshold: {best['threshold']:g}; mean anchors/update: "
+              f"{best['mean_anchors_per_update']:.5f}; absolute error: {best['absolute_error']:.5f}.", flush=True)
+        print(f"Report: {output / 'report.md'}", flush=True)
         return 0
     except (ValueError, OSError, KeyError, RuntimeError) as error:
         parser.exit(1, f'Error: {error}\n')

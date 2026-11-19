@@ -1,0 +1,204 @@
+{
+  "created_at_utc": "2026-11-18T05:43:20.751957+00:00",
+  "arguments": {
+    "csv": "/home/choemj/STORM-1/results/wandb_runs_classification.csv",
+    "references": "/home/choemj/STORM-1/results/convert_csv_to_excel.py",
+    "repo": "/home/choemj/STORM-1",
+    "output_dir": "STORM-1/results/hyperparameter_sensitivity_metadata",
+    "comparison": "all",
+    "min_seeds": 2,
+    "reps": 50000,
+    "confidence": 0.95,
+    "seed": 2027,
+    "equivalence_margin_hns": null,
+    "metadata_only": true,
+    "audit_only": false
+  },
+  "input_sha256": {
+    "/home/choemj/STORM-1/results/wandb_runs_classification.csv": "63c03f2f933f345328e60930fc85f5fa5dee83aa80ece3ecc4f334085db3122d",
+    "/home/choemj/STORM-1/results/convert_csv_to_excel.py": "d0f28e3d5861a5cf89999066a4f85a4619490af6ec9f3850c3728212665ac390",
+    "/home/choemj/STORM-1/results/hyperparameter_sensitivity.py": "091d5450564303be33526868cb1d8cdfecfdf8163dfd1da48b7a1bf8b58cc4ae"
+  },
+  "coverage": {
+    "threshold": {
+      "games": {
+        "Alien": 2,
+        "Assault": 2,
+        "Asterix": 2,
+        "BattleZone": 4,
+        "Breakout": 2,
+        "Frostbite": 5,
+        "Krull": 2,
+        "Qbert": 4,
+        "UpNDown": 3
+      },
+      "exclusion_counts": {
+        "missing_or_nonfinite_evaluation": 19,
+        "invalid_game_seed_or_creation_time": 35,
+        "retrieval_not_enabled": 350,
+        "wrong_batch_size_reduction": 51,
+        "duplicate_older_created_run": 14,
+        "no_common_metadata_or_code_across_all_settings": 109,
+        "insufficient_common_seeds_in_game": 9,
+        "outside_comparison_settings": 16,
+        "wrong_anchor_offset": 182,
+        "wrong_retrieval_target": 82,
+        "wrong_value_signal": 10,
+        "wrong_score_combination": 10,
+        "wrong_neighbor_source": 153,
+        "wrong_warmup_steps": 81,
+        "wrong_calculated_warmup_steps": 40,
+        "not_finished": 8
+      }
+    },
+    "hash_bits": {
+      "games": {
+        "Asterix": 2,
+        "BattleZone": 2,
+        "Frostbite": 3,
+        "Krull": 2,
+        "Qbert": 3
+      },
+      "exclusion_counts": {
+        "missing_or_nonfinite_evaluation": 19,
+        "invalid_game_seed_or_creation_time": 35,
+        "retrieval_not_enabled": 350,
+        "wrong_batch_size_reduction": 51,
+        "duplicate_older_created_run": 12,
+        "no_common_metadata_or_code_across_all_settings": 109,
+        "insufficient_common_seeds_in_game": 8,
+        "outside_comparison_settings": 73,
+        "wrong_anchor_offset": 182,
+        "wrong_retrieval_target": 82,
+        "wrong_value_signal": 10,
+        "wrong_score_combination": 10,
+        "wrong_neighbor_source": 153,
+        "wrong_warmup_steps": 81,
+        "wrong_calculated_warmup_steps": 40,
+        "not_finished": 8
+      }
+    }
+  },
+  "normalization": {
+    "Alien": [
+      227.8,
+      7127.7
+    ],
+    "Amidar": [
+      5.8,
+      1719.5
+    ],
+    "Assault": [
+      222.4,
+      742.0
+    ],
+    "Asterix": [
+      210.0,
+      8503.3
+    ],
+    "BankHeist": [
+      14.2,
+      753.1
+    ],
+    "BattleZone": [
+      2360.0,
+      37187.5
+    ],
+    "Boxing": [
+      0.1,
+      12.1
+    ],
+    "Breakout": [
+      1.7,
+      30.5
+    ],
+    "ChopperCommand": [
+      811.0,
+      7387.8
+    ],
+    "CrazyClimber": [
+      10780.5,
+      35829.4
+    ],
+    "DemonAttack": [
+      152.1,
+      1971.0
+    ],
+    "Freeway": [
+      0.0,
+      29.6
+    ],
+    "Frostbite": [
+      65.2,
+      4334.7
+    ],
+    "Gopher": [
+      257.6,
+      2412.5
+    ],
+    "Hero": [
+      1027.0,
+      30826.4
+    ],
+    "Jamesbond": [
+      29.0,
+      302.8
+    ],
+    "Kangaroo": [
+      52.0,
+      3035.0
+    ],
+    "Krull": [
+      1598.0,
+      2665.5
+    ],
+    "KungFuMaster": [
+      258.5,
+      22736.3
+    ],
+    "MsPacman": [
+      307.3,
+      6951.6
+    ],
+    "Pong": [
+      -20.7,
+      14.6
+    ],
+    "PrivateEye": [
+      24.9,
+      69571.3
+    ],
+    "Qbert": [
+      163.9,
+      13455.0
+    ],
+    "RoadRunner": [
+      11.5,
+      7845.0
+    ],
+    "Seaquest": [
+      68.4,
+      42054.7
+    ],
+    "UpNDown": [
+      533.4,
+      11693.2
+    ]
+  },
+  "notes": [
+    "Exploratory historical development-run analysis; all reported differences are variant minus reference.",
+    "All settings in each comparison share exactly the same games and seed IDs; groups need >= min-seeds.",
+    "One observation is a training run's evaluation mean, never an independent evaluation episode.",
+    "Duplicate runs: latest creation time, then lexicographically largest Run ID; never highest return.",
+    "Fixed games; jointly resample matched training seeds within each game; pointwise percentile CIs.",
+    "With two seeds bootstrap CIs may be unstable; CIs do not account for selection of development settings.",
+    "Mean/Median/Gap use game mean HNS; IQM pools seed HNS and trims floor(N/4) from each tail.",
+    "Missing metadata match only other missing values and remain unverified; current defaults are not imputed.",
+    "Default matching requires identical eval.py, agents.py, replay_buffer.py and utils.py Git blobs.",
+    "train.py may differ; its Git blob is exported for manual review. CSV omits other training/evaluation knobs and dirty working-tree changes.",
+    "Dynamic-warmup settings are inactive: fixed and calculated warmup must both equal 50000.",
+    "11-bit target=1 runs are excluded because retrieval target must equal 16.",
+    "A CI containing zero is not evidence of equivalence. Optional margin applies only to mean HNS.",
+    "A post-hoc equivalence margin is descriptive, not a prespecified confirmatory equivalence test."
+  ]
+}

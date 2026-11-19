@@ -100,11 +100,6 @@ def reference_rows(game):
 PAIRED_MEAN_COLUMN = 'Mean (공통 시드)'
 SCORE_DELTA_COLUMN = 'Δ Score (행별 비교)'
 HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
-PRIORITY_CONFIGS = (
-    'target: 16 (anchor r: 1)',
-    'target: 16 (anchor r: 1) [warmup: 30000]',
-    'target: 16 (anchor r: 1) [warmup: 70000]',
-)
 HERE = Path(__file__).resolve().parent
 RETRIEVAL_COLUMNS = {
     'enable': 'Retrieval Enable', 'warmup_steps': 'Warmup Steps',
@@ -127,6 +122,35 @@ def queue_command_row(command, queue_dir):
         return None
     if any(token in {';', '&&', '||', '|', '&', '>', '>>', '<'} for token in tokens):
         raise ValueError('복합 셸 명령은 지원하지 않습니다')
+    td_queue_index = next((i for i, token in enumerate(tokens)
+                           if Path(token).name == 'td_error_only_queue.py'), None)
+    if td_queue_index is not None:
+        arguments = tokens[td_queue_index + 1:]
+        if not arguments or arguments[0] != 'run-job':
+            raise ValueError('TD-error only run-job 명령이 아닙니다')
+        values = {}
+        index = 1
+        while index < len(arguments):
+            key = arguments[index]
+            if '=' in key:
+                key, value = key.split('=', 1)
+                index += 1
+            else:
+                if index + 1 == len(arguments):
+                    raise ValueError(f'{key}: 값이 없습니다')
+                value = arguments[index + 1]
+                index += 2
+            values[key] = value
+        manifest_path = Path(values['--manifest'])
+        if not manifest_path.is_absolute():
+            manifest_path = Path(queue_dir) / manifest_path
+        elif not manifest_path.is_file() and 'results' in manifest_path.parts:
+            manifest_path = Path(queue_dir).joinpath(*manifest_path.parts[manifest_path.parts.index('results'):])
+        game = values['--game']
+        state_path = manifest_path.with_name(f'{game}.json')
+        state = json.loads(state_path.read_text()) if state_path.is_file() else {}
+        attempt = state.get('attempts', 0) + (state.get('status') != 'running')
+        return td_error_only_job_row(manifest_path, game, queue_dir, max(1, attempt))
     train_index = next((i for i, token in enumerate(tokens) if Path(token).name == 'train.py'), None)
     if train_index is None:
         raise ValueError('train.py 명령이 아닙니다')
@@ -229,6 +253,76 @@ def queue_command_row(command, queue_dir):
     }
 
 
+def td_error_only_job_row(manifest_path, game, queue_dir, attempt):
+    """전용 큐의 고정 설정과 시드를 읽으며 학습 명령은 실행하지 않습니다."""
+    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+    seed = manifest['seeds'][game]
+    base = f"{game}-td_only-{manifest['id']}-seed{seed}-attempt{attempt}"
+    config_path = Path(manifest['config'])
+    if not config_path.is_file():
+        config_path = manifest_path.with_name('config.yaml')
+    row = queue_command_row(shlex.join([
+        'python', 'train.py', '-n', base, '-seed', str(seed),
+        '-config_path', str(config_path), '-env_name', f'ALE/{game}-v5',
+    ]), queue_dir)
+    row['Local Run Name'] = f'{base}_O'
+    return row
+
+
+def read_local_td_error_only_runs(queue_dir):
+    """W&B 동기화 전에도 전용 campaign의 완료 결과와 실행 상태를 읽습니다."""
+    queue_dir = Path(queue_dir)
+    rows = []
+    for manifest_path in sorted((queue_dir / 'results/td_error_only_queue').glob('*/manifest.json')):
+        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
+        config = yaml.safe_load(manifest_path.with_name('config.yaml').read_text())['JointTrainAgent']
+        for game, seed in manifest['seeds'].items():
+            state_path = manifest_path.with_name(f'{game}.json')
+            state = json.loads(state_path.read_text()) if state_path.is_file() else {}
+            for attempt in range(1, state.get('attempts', 0) + 1):
+                row = td_error_only_job_row(manifest_path, game, queue_dir, attempt)
+                path = queue_dir / 'runs' / row['Local Run Name'] / 'final_evaluation.json'
+                if not path.is_file():
+                    if attempt != state['attempts'] or state.get('status') != 'running':
+                        continue
+                    row.update({'State': 'running', 'Training Phase': 'training'})
+                    timestamp_path = state_path
+                else:
+                    try:
+                        result = json.loads(path.read_text(encoding='utf-8'))
+                        returns = result['episode_returns']
+                        score = float(result['episode_avg_return'])
+                        precision = 'bf16' if config['EvalPrecision'] == 'both' else config['EvalPrecision']
+                        if (result['run_name'] != row['Local Run Name'] or result['seed'] != seed
+                                or result['env_name'] != f'ALE/{game}-v5'
+                                or result['checkpoint_step'] != config['FinalEvalStep']
+                                or result['sample_max_steps'] != config['SampleMaxSteps']
+                                or result['precision'] != precision
+                                or len(returns) != config['EvalEpisodes']
+                                or not math.isfinite(score)
+                                or not all(math.isfinite(float(value)) for value in returns)
+                                or not math.isclose(sum(returns) / len(returns), score,
+                                                    rel_tol=1e-7, abs_tol=1e-5)):
+                            raise ValueError('TD-error only final evaluation does not match the campaign')
+                        row.update({'State': 'finished', 'Eval Return': score,
+                                    'Eval Checkpoint Step': result['checkpoint_step'],
+                                    'Training Phase': 'training', 'Local Evaluation': str(path)})
+                        if precision == 'bf16':
+                            row['Eval Return BF16'] = score
+                        elif precision == 'fp32':
+                            row['Eval Return FP32'] = score
+                    except (ValueError, TypeError, KeyError, OSError, ZeroDivisionError) as error:
+                        warnings.warn(f'{path}: 로컬 평가를 건너뜁니다: {error}', stacklevel=2)
+                        continue
+                    timestamp_path = path
+                row.update({'Run Name': f'{game}_local_{seed}_O',
+                            'Run ID': f"local:{row['Local Run Name']}", 'Queue Details': '',
+                            'Created At': pd.Timestamp(timestamp_path.stat().st_mtime,
+                                                       unit='s', tz='UTC').isoformat()})
+                rows.append(row)
+    return rows
+
+
 def read_queued_runs(queue_dir):
     """등록 이력 대신 현재 모든 job_queue*.txt의 스냅샷을 읽습니다."""
     queue_dir = Path(queue_dir)
@@ -317,15 +411,17 @@ def read_local_paper_results(queue_dir):
     return rows
 
 
-def merge_local_paper_results(df, queue_dir):
-    """One row per study run; keep W&B provenance and prefer its local final mean."""
+def merge_local_run_rows(df, local_rows):
+    """One row per local run; keep W&B provenance and prefer its local final mean."""
     records = df.to_dict('records')
-    for local in read_local_paper_results(queue_dir):
+    for local in local_rows:
         matches = [row for row in records if (
             row.get('Local Run Name') == local['Local Run Name'] or (
                 row.get('Base Run Name') == local['Base Run Name']
                 and row.get('Training Phase') != 'warmup'))]
         remote = max(matches, key=lambda row: str(row.get('Created At', '')), default={})
+        if local['State'] == 'running' and remote:
+            continue  # W&B has the authoritative status once this run is synced.
         if remote and pd.to_datetime(remote.get('Created At'), utc=True, errors='coerce') > pd.to_datetime(local['Created At']):
             continue  # A later retry must not inherit the previous run's result.
         records = [row for row in records if row not in matches and not (
@@ -337,6 +433,15 @@ def merge_local_paper_results(df, queue_dir):
                 merged[key] = remote[key]
         records.append(merged)
     return pd.DataFrame(records)
+
+
+def merge_local_paper_results(df, queue_dir):
+    return merge_local_run_rows(df, read_local_paper_results(queue_dir))
+
+
+def merge_local_results(df, queue_dir):
+    df = merge_local_paper_results(df, queue_dir)
+    return merge_local_run_rows(df, read_local_td_error_only_runs(queue_dir))
 
 
 def paper_study_table(df, queue_dir, queued_rows):
@@ -390,9 +495,9 @@ def expand_shared_runs(df):
         pairs = pair_value if isinstance(pair_value, list) else ast.literal_eval(
             str(config_value(row, 'Warmup Offset Pairs', '[]')))
         enable = str(row['Retrieval Enable']).strip()
-        if enable.lower() == 'randomneighor':
+        if enable.lower() in {'randomneighor', 'td_error_only'}:
             # 단독 preset은 완료된 점수도 보존하며 실제 설정으로 변환합니다.
-            row.update(overrides['randomneighor'])
+            row.update(overrides[enable.lower()])
             enable = str(row['Retrieval Enable'])
         if enable.startswith('['):
             experiments = ast.literal_eval(enable)
@@ -624,7 +729,7 @@ def main(csv_path=None, output_path=None, queue_dir=None):
     if 'State' not in df:
         df['State'] = ''
     df['State'] = df['State'].fillna('').astype(str).str.strip().str.lower()
-    df = merge_local_paper_results(df, queue_dir)
+    df = merge_local_results(df, queue_dir)
 
     # W&B에 누락된 수동 점수는 스케줄러와 같은 원본을 사용합니다.
     manual_path = Path(__file__).resolve().with_name('manual_results.json')
@@ -976,9 +1081,11 @@ def main(csv_path=None, output_path=None, queue_dir=None):
     pivot_df = pivot_df.reindex(sorted_index)
     pivot_df = add_paired_baseline_mean(pivot_df, excluded_seeds)
 
-    # 세 warmup 설정 중 하나라도 학습이 있는 시드를 앞에 모읍니다.
+    # TD-error only ablation run이 있는 시드를 평균 열 왼쪽에 모읍니다.
     # 완료 점수뿐 아니라 RUNNING/QUEUED도 포함하며 각 시드 그룹의 기존 순서를 유지합니다.
-    priority_rows = pivot_df.loc[pivot_df.index.get_level_values('Config').isin(PRIORITY_CONFIGS)]
+    priority_rows = pivot_df.loc[
+        pivot_df.index.get_level_values('Config').str.contains(r'\btd_error_only\b', regex=True)
+    ]
     priority_seeds = [
         column for column in pivot_df.columns
         if str(column).strip().isdigit()
@@ -1051,6 +1158,16 @@ def main(csv_path=None, output_path=None, queue_dir=None):
                     REPRODUCED_SCORE_SOURCE + '\n'
                     '재현 열의 표시값을 전사했으며, 시드별 실험값이 아닙니다.\n'
                     'HNS 비교에는 게임 셀의 기존 Random/Human 참조값을 사용합니다.',
+                    'STORM',
+                )
+            if 'td_error_only' in config:
+                worksheet.cell(row=excel_row, column=2).comment = Comment(
+                    'TD-error only ablation: value/value_diff 신호를 결합하지 않고 '
+                    'ReLU(z(|TD error|))만으로 anchor를 선택합니다.\n'
+                    'threshold는 JointTrainAgent.Retrieval.td_error_z_score_threshold이며 '
+                    'threshold, anchor 가중치, warmup, offset이 다른 실험은 별도 행입니다.\n'
+                    '이 ablation의 점수 또는 RUNNING/QUEUED가 있는 시드를 '
+                    'Mean (공통 시드) 왼쪽에 배치합니다.',
                     'STORM',
                 )
             if config == 'target: 16 (anchor 미설정)':

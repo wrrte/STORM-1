@@ -1,0 +1,10 @@
+SCREEN_EVENT {"phase": "return_start"}
+A.L.E: Arcade Learning Environment (version 0.8.1+53f58b7)
+[Powered by Stella]
+/home/choemj/STORM-1/sub_models/world_models.py:275: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_amp)
+/home/choemj/STORM-1/agents.py:89: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_amp)
+Current env: [33mALE/Frostbite-v5[0m
+Mean reward: [33m235.0[0m
+SCREEN_EVENT {"phase": "return_done", "score": 235.0}

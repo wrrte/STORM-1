@@ -1,0 +1,511 @@
+{
+  "simulation_only": true,
+  "rng_seed": 2027,
+  "trials": 10000,
+  "target_slots_per_game": 3,
+  "sampling": "paired, with replacement",
+  "proxy_assumption": "Absolute value scores stand in for missing TD-only scores",
+  "observed_games": [
+    "Alien",
+    "Amidar",
+    "Assault",
+    "Asterix",
+    "BankHeist",
+    "BattleZone",
+    "Boxing",
+    "Breakout",
+    "ChopperCommand",
+    "CrazyClimber",
+    "DemonAttack",
+    "Freeway",
+    "Frostbite",
+    "Gopher",
+    "Hero",
+    "Jamesbond",
+    "Kangaroo",
+    "KungFuMaster",
+    "MsPacman",
+    "Pong",
+    "PrivateEye",
+    "Qbert",
+    "RoadRunner"
+  ],
+  "fully_synthetic_games": [
+    "Krull",
+    "Seaquest",
+    "UpNDown"
+  ],
+  "sources": {
+    "/home/choemj/STORM-1/results/converted_results.xlsx": "f9c61f2e0ce076b86246077ada11f6096acc95e73067ff1e2d05456939346f2e",
+    "/home/choemj/iclr2027_conference.tex": "1ac2ac33990abd1e491db6bed4321ef37d2bdea669476399b2ee6e6e0ed8987c"
+  },
+  "input_pairs": {
+    "td_error_only": {
+      "Alien": [
+        {
+          "seed": 1,
+          "full": 1510.0,
+          "variant": 864.5
+        }
+      ],
+      "Amidar": [
+        {
+          "seed": 1,
+          "full": 169.45,
+          "variant": 146.75
+        }
+      ],
+      "Assault": [
+        {
+          "seed": 1,
+          "full": 779.45,
+          "variant": 688.8
+        }
+      ],
+      "Asterix": [
+        {
+          "seed": 10,
+          "full": 600.0,
+          "variant": 937.5
+        }
+      ],
+      "BankHeist": [
+        {
+          "seed": 2010,
+          "full": 633.5,
+          "variant": 531.0
+        }
+      ],
+      "BattleZone": [
+        {
+          "seed": 2010,
+          "full": 14250.0,
+          "variant": 11200.0
+        }
+      ],
+      "Boxing": [
+        {
+          "seed": 2000,
+          "full": 78.5,
+          "variant": 72.4
+        }
+      ],
+      "Breakout": [
+        {
+          "seed": 10,
+          "full": 12.7,
+          "variant": 12.25
+        }
+      ],
+      "ChopperCommand": [
+        {
+          "seed": 10,
+          "full": 2025.0,
+          "variant": 2040.0
+        }
+      ],
+      "CrazyClimber": [
+        {
+          "seed": 10,
+          "full": 56795.0,
+          "variant": 44555.0
+        }
+      ],
+      "DemonAttack": [
+        {
+          "seed": 10,
+          "full": 150.75,
+          "variant": 181.25
+        }
+      ],
+      "Freeway": [
+        {
+          "seed": 1,
+          "full": 21.5,
+          "variant": 33.7
+        }
+      ],
+      "Frostbite": [
+        {
+          "seed": 710,
+          "full": 2443.0,
+          "variant": 274.5
+        }
+      ],
+      "Gopher": [
+        {
+          "seed": 9994,
+          "full": 8044.0,
+          "variant": 3550.0
+        }
+      ],
+      "Hero": [
+        {
+          "seed": 1,
+          "full": 13108.75,
+          "variant": 13363.0
+        }
+      ],
+      "Jamesbond": [
+        {
+          "seed": 1,
+          "full": 522.5,
+          "variant": 345.0
+        }
+      ],
+      "Kangaroo": [
+        {
+          "seed": 6000,
+          "full": 1670.0,
+          "variant": 2535.0
+        }
+      ],
+      "KungFuMaster": [
+        {
+          "seed": 10,
+          "full": 30110.0,
+          "variant": 23325.0
+        }
+      ],
+      "MsPacman": [
+        {
+          "seed": 2000,
+          "full": 2250.0,
+          "variant": 2962.0
+        }
+      ],
+      "Pong": [
+        {
+          "seed": 710,
+          "full": 8.2,
+          "variant": 9.35
+        }
+      ],
+      "PrivateEye": [
+        {
+          "seed": 2000,
+          "full": 191.95,
+          "variant": -930.0
+        }
+      ],
+      "Qbert": [
+        {
+          "seed": 10,
+          "full": 4056.25,
+          "variant": 3456.25
+        }
+      ],
+      "RoadRunner": [
+        {
+          "seed": 6020,
+          "full": 16980.0,
+          "variant": 19570.0
+        }
+      ]
+    },
+    "value": {
+      "Alien": [
+        {
+          "seed": 1,
+          "full": 1510.0,
+          "variant": 1108.5
+        },
+        {
+          "seed": 2000,
+          "full": 665.0,
+          "variant": 1076.5
+        }
+      ],
+      "Amidar": [
+        {
+          "seed": 1,
+          "full": 169.45,
+          "variant": 109.65
+        },
+        {
+          "seed": 6020,
+          "full": 222.5,
+          "variant": 236.55
+        }
+      ],
+      "Assault": [
+        {
+          "seed": 1,
+          "full": 779.45,
+          "variant": 746.0
+        },
+        {
+          "seed": 6010,
+          "full": 723.85,
+          "variant": 714.0
+        }
+      ],
+      "Asterix": [
+        {
+          "seed": 6000,
+          "full": 887.5,
+          "variant": 1032.5
+        },
+        {
+          "seed": 6010,
+          "full": 1005.0,
+          "variant": 862.5
+        }
+      ],
+      "BankHeist": [
+        {
+          "seed": 2010,
+          "full": 633.5,
+          "variant": 666.0
+        },
+        {
+          "seed": 9999,
+          "full": 565.0,
+          "variant": 652.5
+        }
+      ],
+      "BattleZone": [
+        {
+          "seed": 6000,
+          "full": 14350.0,
+          "variant": 18350.0
+        },
+        {
+          "seed": 6020,
+          "full": 10850.0,
+          "variant": 8550.0
+        }
+      ],
+      "Boxing": [
+        {
+          "seed": 6010,
+          "full": 85.05,
+          "variant": 80.4
+        },
+        {
+          "seed": 6040,
+          "full": 82.65,
+          "variant": 82.75
+        }
+      ],
+      "Breakout": [
+        {
+          "seed": 6000,
+          "full": 12.0,
+          "variant": 12.3
+        }
+      ],
+      "ChopperCommand": [
+        {
+          "seed": 10,
+          "full": 2025.0,
+          "variant": 2120.0
+        },
+        {
+          "seed": 710,
+          "full": 970.0,
+          "variant": 1125.0
+        }
+      ],
+      "CrazyClimber": [
+        {
+          "seed": 2000,
+          "full": 63275.0,
+          "variant": 55845.0
+        },
+        {
+          "seed": 6020,
+          "full": 60805.0,
+          "variant": 50560.0
+        }
+      ],
+      "DemonAttack": [
+        {
+          "seed": 710,
+          "full": 149.25,
+          "variant": 148.75
+        },
+        {
+          "seed": 3710,
+          "full": 128.25,
+          "variant": 137.5
+        }
+      ],
+      "Freeway": [
+        {
+          "seed": 1,
+          "full": 21.5,
+          "variant": 21.5
+        },
+        {
+          "seed": 6020,
+          "full": 33.75,
+          "variant": 33.65
+        }
+      ],
+      "Frostbite": [
+        {
+          "seed": 6000,
+          "full": 2746.5,
+          "variant": 3081.0
+        },
+        {
+          "seed": 6010,
+          "full": 251.0,
+          "variant": 238.5
+        }
+      ],
+      "Gopher": [
+        {
+          "seed": 9997,
+          "full": 8373.0,
+          "variant": 4575.0
+        },
+        {
+          "seed": 9998,
+          "full": 7531.0,
+          "variant": 5320.0
+        }
+      ],
+      "Hero": [
+        {
+          "seed": 1,
+          "full": 13108.75,
+          "variant": 13335.0
+        },
+        {
+          "seed": 3710,
+          "full": 13325.5,
+          "variant": 13402.0
+        }
+      ],
+      "Jamesbond": [
+        {
+          "seed": 1,
+          "full": 522.5,
+          "variant": 457.5
+        },
+        {
+          "seed": 6000,
+          "full": 665.0,
+          "variant": 585.0
+        }
+      ],
+      "Kangaroo": [
+        {
+          "seed": 6030,
+          "full": 2900.0,
+          "variant": 3140.0
+        }
+      ],
+      "Krull": [
+        {
+          "seed": 6050,
+          "full": 6783.5,
+          "variant": 7480.5
+        },
+        {
+          "seed": 6070,
+          "full": 6568.0,
+          "variant": 7093.5
+        }
+      ],
+      "KungFuMaster": [
+        {
+          "seed": 10,
+          "full": 30110.0,
+          "variant": 17935.0
+        },
+        {
+          "seed": 6000,
+          "full": 24960.0,
+          "variant": 17935.0
+        }
+      ],
+      "MsPacman": [
+        {
+          "seed": 6000,
+          "full": 1886.5,
+          "variant": 2197.0
+        },
+        {
+          "seed": 6010,
+          "full": 1885.0,
+          "variant": 2647.5
+        }
+      ],
+      "Pong": [
+        {
+          "seed": 3710,
+          "full": 14.45,
+          "variant": 0.5
+        },
+        {
+          "seed": 9999,
+          "full": 16.3,
+          "variant": 14.5
+        }
+      ],
+      "PrivateEye": [
+        {
+          "seed": 6040,
+          "full": -593.85,
+          "variant": 911.25
+        }
+      ],
+      "Qbert": [
+        {
+          "seed": 10,
+          "full": 4056.25,
+          "variant": 4142.5
+        },
+        {
+          "seed": 6010,
+          "full": 4157.5,
+          "variant": 1130.0
+        }
+      ],
+      "RoadRunner": [
+        {
+          "seed": 6030,
+          "full": 16410.0,
+          "variant": 16665.0
+        },
+        {
+          "seed": 6040,
+          "full": 18865.0,
+          "variant": 16540.0
+        }
+      ],
+      "Seaquest": [
+        {
+          "seed": 1,
+          "full": 475.0,
+          "variant": 474.0
+        },
+        {
+          "seed": 9999,
+          "full": 545.0,
+          "variant": 411.0
+        }
+      ],
+      "UpNDown": [
+        {
+          "seed": 6030,
+          "full": 7972.5,
+          "variant": 6006.5
+        }
+      ]
+    }
+  },
+  "configurations": {
+    "td_error_only": [
+      "target: 16 (anchor 미설정)",
+      "target: 16 (anchor r: 1) [td_error_only, threshold: 3.5]"
+    ],
+    "value": [
+      "target: 16 (anchor 미설정)",
+      "target: 16 (anchor 미설정) [value]"
+    ]
+  }
+}

@@ -1,0 +1,28 @@
+{
+  "updates": 100,
+  "total_anchor_insertions": 241,
+  "mean_anchors_per_update": 2.41,
+  "within_run_sd_across_updates": 1.5640855591570548,
+  "mean_se": 0.15609971105347728,
+  "mean_ci95": [
+    2.12,
+    2.73
+  ],
+  "ci_method": "circular moving-block percentile bootstrap",
+  "block_size_updates": 10,
+  "bootstrap_samples": 10000,
+  "bootstrap_seed": 0,
+  "checkpoint": "/home/choemj/STORM-1/ckpt/Qbert-6010_Shared/shared_warmup_50559",
+  "source_config": "/home/choemj/STORM-1/ckpt/Qbert-6010_Shared/shared_warmup_50559/config.yaml",
+  "env": "ALE/Qbert-v5",
+  "seed": 6010,
+  "score_combination": "td_error_only",
+  "threshold": 3.671875,
+  "env_step_start": 50559,
+  "env_step_stop_exclusive": 50659,
+  "probe_env_step_start": 50559,
+  "burn_in_updates": 0,
+  "environment_reset_at_resume": true,
+  "rebuild_retrieval_on_resume": false,
+  "scope": "Within this short resumed run; not uncertainty across games or training seeds."
+}

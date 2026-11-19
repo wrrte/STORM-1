@@ -33,6 +33,9 @@ Keep each marker pair around just its table and float barrier. Malformed or
 ambiguous blocks raise an error before saving. Main performance is untouched.
 Each table ends with a float barrier to keep it within its ablation subsection.
 The target document must load the placeins package.
+TD-error only uses its exact threshold/anchor configuration and is paired with
+Full FLASH independently of the other comparisons. Its subsection is installed
+at the end of the document on the first run. Pending runs are never table scores.
 """
 
 import argparse
@@ -53,6 +56,7 @@ from update_tex import (
 
 
 FLASH_CONFIG = 'target: 16 (anchor 미설정)'
+TD_ERROR_ONLY_CONFIG = 'target: 16 (anchor r: 1) [td_error_only, threshold: 3.5]'
 GOPHER_RANDOM_CONFIG = 'target: 16 (anchor r: 1) [RandomNeighor]'
 GOPHER_RANDOM_SEED_LIMIT = 4
 # 본문에 표시할 게임을 원하는 순서로 지정하세요. CLI --main-games로도 변경 가능합니다.
@@ -74,6 +78,22 @@ MAIN_GAMES = [
 ATARI_GAME_COUNT = 26
 MAIN_BEGIN_MARKER = '% BEGIN AUTO MAIN ABLATION'
 MAIN_END_MARKER = '% END AUTO MAIN ABLATION'
+MAIN_ABLATION_KEYS = ('neighbor', 'random', 'value', 'add')
+
+TD_ERROR_ONLY_SECTION = r'''\clearpage
+\subsection{Ablation 5: TD-Error-Only Anchor Selection}
+\label{subsec:td_error_only_ablation}
+
+This ablation selects anchors using normalized TD-error magnitude without the temporal value-difference factor. With the same per-environment EMA normalization as Eq.~\eqref{eq:salience}, its score is
+\begin{equation}
+S_t^{\mathrm{TD}}=\operatorname{ReLU}\!\left(\frac{\delta_t^{\mathrm{TD}}-\bar{\mu}_e}{\sqrt{\bar{\sigma}_e^2}+\epsilon}\right),\qquad \tau_{\mathrm{TD}}=3.5.
+\label{eq:appendix_td_error_only_salience}
+\end{equation}
+The highest-scoring position in each replay sequence triggers an anchor when its score reaches $\tau_{\mathrm{TD}}$. The TD-error-only configuration retains hash-indexed neighbor retrieval with target $n=16$, a 50,000-step warmup, and anchor offset $-2$. It uses relative anchor weight $r=1$; the Full FLASH reference uses the default fixed anchor weight $1/16$.
+
+Table~\ref{tab:td_error_only_ablation} compares final evaluation returns for Full FLASH and TD-error only.
+
+'''
 
 
 @dataclass(frozen=True)
@@ -83,6 +103,8 @@ class Ablation:
     marker_name: str
     label: str
     caption: str
+    omit_unavailable_games: bool = False
+    appendix_section: str = ''
 
     @property
     def configs(self):
@@ -115,14 +137,11 @@ ABLATIONS = {
         r'Neighbor source ablation on STORM. Full FLASH uses hash-matched '
         r'neighbors; Random neighbors replaces the non-anchor contexts with '
         r'uniformly sampled valid replay contexts. Both use retrieval target '
-        r'$n=16$. Full FLASH candidates use the default anchor setting and the '
-        r'main-performance seed selection; Random-neighbor candidates '
-        r'use the default configuration, except Gopher: '
-        r'the default and $r=1$ anchor settings are pooled, the higher score is '
-        r'kept per seed, and at most the four highest-scoring distinct seeds are used. '
-        r'For each game, both methods average the same number of seeds, set by '
-        r'the smaller candidate set, and independently retain their highest-scoring '
-        r'seeds (ties use ascending seed IDs). ',
+        r'$n=16$ and the default anchor setting, except that the Gopher random '
+        r'candidate pool also includes the $r=1$ anchor setting. '
+        r'For each game, equal numbers of highest-scoring completed runs are '
+        r'averaged, with selection performed independently for the two methods. ',
+        omit_unavailable_games=True,
     ),
     'value': Ablation(
         FLASH_CONFIG + ' [value]', 'Absolute value', 'VALUE SIGNAL',
@@ -139,6 +158,19 @@ ABLATIONS = {
         r'ReLU-transformed normalized TD-error and softplus-transformed '
         r'normalized temporal value difference; Additive sums these terms. '
         r'Both use retrieval target $n=16$ and the default anchor setting. ',
+    ),
+    'td_error_only': Ablation(
+        TD_ERROR_ONLY_CONFIG, 'TD-error only', 'TD ERROR ONLY',
+        'tab:td_error_only_ablation',
+        r'TD-error-only anchor selection on STORM. Full FLASH combines '
+        r'normalized TD-error and temporal value difference multiplicatively; '
+        r'TD-error only uses $\operatorname{ReLU}(z_t^{\mathrm{TD}})$ with '
+        r'threshold $3.5$. Both use hash-indexed retrieval with target $n=16$ '
+        r'and a 50,000-step warmup. Full FLASH uses the default fixed anchor '
+        r'weight $1/16$; TD-error only uses relative anchor weight $r=1$. '
+        r'Aggregate metrics use the games shown in the table. ',
+        omit_unavailable_games=True,
+        appendix_section=TD_ERROR_ONLY_SECTION,
     ),
 }
 
@@ -259,7 +291,7 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
     for _, parts, _ in calculated_rows:
         label = parts[0].strip()
         is_metric = metric_name(label) is not None
-        if ablation == ABLATIONS['random'] and not is_metric and label not in results:
+        if ablation.omit_unavailable_games and not is_metric and label not in results:
             continue
         if is_metric and not metrics_started:
             table.append(r'\midrule')
@@ -273,12 +305,27 @@ def render_ablation_table(lines, results, ablation=NEIGHBOR):
 
 
 def update_ablation_table(document, results, ablation=NEIGHBOR):
-    """Replace exactly one marked table while preserving all surrounding text."""
+    """Replace a marked table, installing the final TD-only subsection if absent."""
     lines = document.splitlines(keepends=True)
     bounds = marked_table_bounds(lines, ablation.begin_marker, ablation.end_marker,
                                  ablation.label)
     if bounds is None:
-        raise ValueError(f'Missing {ablation.marker_name} ablation table markers.')
+        if not ablation.appendix_section:
+            raise ValueError(f'Missing {ablation.marker_name} ablation table markers.')
+        labels = re.findall(r'\\label\{([^}]+)\}', ablation.appendix_section)
+        if any(rf'\label{{{label}}}' in tex_code(line)
+               for label in [ablation.label, *labels] for line in lines):
+            raise ValueError(f'Existing {ablation.marker_name} subsection/table is missing its markers.')
+        endings = [i for i, line in enumerate(lines)
+                   if tex_code(line).strip() == r'\end{document}']
+        if len(endings) != 1:
+            raise ValueError('Expected exactly one \\end{document} before installing an ablation.')
+        table = render_ablation_table(lines, results, ablation)
+        newline = '\r\n' if lines[endings[0]].endswith('\r\n') else '\n'
+        block = ('\n' + ablation.appendix_section + ablation.begin_marker + '\n'
+                 + table + ablation.end_marker + '\n\n')
+        return (''.join(lines[:endings[0]]) + block.replace('\n', newline)
+                + ''.join(lines[endings[0]:]))
     table = render_ablation_table(lines, results, ablation)
     return replace_marked_table(lines, bounds, table)
 
@@ -351,7 +398,7 @@ def render_main_ablation_table(lines, results, paired_seeds, games):
         raise ValueError('--main-games must not contain duplicate games.')
 
     cells = {}
-    for key in ABLATIONS:
+    for key in MAIN_ABLATION_KEYS:
         unknown_results = results[key].keys() - references.keys()
         if unknown_results:
             raise ValueError(f'Games missing from the main table: {sorted(unknown_results)}')

@@ -1,0 +1,23 @@
+{
+  "candidate": {
+    "run_name": "Frostbite-6000_Shared",
+    "checkpoint": "shared_warmup_50304",
+    "source": {
+      "kind": "shared",
+      "training_state": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-6000_Shared/shared_warmup_50304/training_state.pt",
+        "size": 231330712,
+        "mtime_ns": 1789908960882835249
+      }
+    },
+    "config": "/home/choemj/STORM-1/runs/Frostbite-6000_Shared/config.yaml",
+    "config_sha256": "fa3b9ae7a64d12cb4e0f24b427ca9692410d50bb9287c89ae7c37fc0401f56ae",
+    "fingerprint": "2e35ba4dcd0e05689a341a4473d77bc824f69ec168ed8b132e16a6725cb7c3a2",
+    "id": "Frostbite-6000_Shared__shared_warmup_50304__2e35ba4dcd"
+  },
+  "gpu": "1",
+  "episode_avg_return": 261.0,
+  "qualified": false,
+  "alignment": null,
+  "status": "below_threshold"
+}

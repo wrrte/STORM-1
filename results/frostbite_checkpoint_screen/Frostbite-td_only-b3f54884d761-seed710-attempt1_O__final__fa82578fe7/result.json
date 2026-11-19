@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "run_name": "Frostbite-td_only-b3f54884d761-seed710-attempt1_O",
+    "checkpoint": "final",
+    "source": {
+      "kind": "weights",
+      "world_model": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/world_model_final.pth",
+        "size": 66101095,
+        "mtime_ns": 1794816655571317939
+      },
+      "agent": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/agent_final.pth",
+        "size": 13699915,
+        "mtime_ns": 1794816655589317838
+      }
+    },
+    "config": "/home/choemj/STORM-1/runs/Frostbite-td_only-b3f54884d761-seed710-attempt1_O/config.yaml",
+    "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+    "fingerprint": "fa82578fe7e9fdff39b5a9abfa7cbe8313e4a55dccb978d6c71ba71f7068a625",
+    "id": "Frostbite-td_only-b3f54884d761-seed710-attempt1_O__final__fa82578fe7"
+  },
+  "gpu": "1",
+  "episode_avg_return": 277.5,
+  "qualified": false,
+  "alignment": null,
+  "status": "below_threshold"
+}

@@ -1,0 +1,71 @@
+{
+  "mode": "single",
+  "run_name": "Frostbite-life_done-wm_2L512D8H-100k-seed6000_O",
+  "bootstrap_unit": "episode",
+  "repetitions": 10000,
+  "seed": 2027,
+  "interval_method": "cluster percentile 95%",
+  "estimand": "Context-weighted mean correlation and correlation of the context-weighted mean value profile",
+  "undefined_handling": "Constant predictions are undefined; exclude them from per-context means; report counts",
+  "uncertainty_scope": "Context sampling for one fixed checkpoint only",
+  "evaluated_frames": 17421,
+  "evaluated_episodes": 20,
+  "evaluated_blocks": 320,
+  "metrics": {
+    "spearman": {
+      "n": 17420,
+      "clusters": 20,
+      "mean": 0.08685470754992805,
+      "ci95": [
+        0.044602468975857776,
+        0.13319391857710008
+      ],
+      "undefined_contexts": 1,
+      "distribution": {
+        "mean": 0.08685470754992805,
+        "median": 0.09427626599502159,
+        "q1": -0.4206076802852883,
+        "q3": 0.6789340295324399,
+        "iqr": 1.099541709817728
+      }
+    },
+    "kendall": {
+      "n": 17420,
+      "clusters": 20,
+      "mean": 0.05872258246304192,
+      "ci95": [
+        0.024044099949346007,
+        0.09613556658337792
+      ],
+      "undefined_contexts": 1,
+      "distribution": {
+        "mean": 0.05872258246304192,
+        "median": 0.04461338568646844,
+        "q1": -0.32735154055104504,
+        "q3": 0.4801960383990247,
+        "iqr": 0.8075475789500697
+      }
+    }
+  },
+  "global_profile_correlations": {
+    "spearman": 0.8504901960784315,
+    "kendall": 0.7205882352941176
+  },
+  "global_profile_ci95": {
+    "spearman": [
+      0.1985294117647059,
+      0.9803921568627453
+    ],
+    "kendall": [
+      0.10294117647058822,
+      0.926470588235294
+    ]
+  },
+  "global_profile_undefined_bootstrap_repetitions": {
+    "spearman": 0,
+    "kendall": 0
+  },
+  "global_profile_bootstrap_clusters": 20,
+  "global_profile_bootstrap_repetitions": 10000,
+  "global_profile_undefined_handling": "Undefined constant-profile bootstrap draws are excluded from percentile intervals; counts are reported"
+}

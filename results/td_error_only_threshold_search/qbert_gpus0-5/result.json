@@ -1,0 +1,39 @@
+{
+  "target": 5.99,
+  "tolerance": 0.05,
+  "best_tested_threshold": 3.671875,
+  "calibration": {
+    "mean_anchors_per_update": 2.41,
+    "se": 0.15609971105347728,
+    "ci95": [
+      2.12,
+      2.73
+    ],
+    "uncertainty_unit": "consecutive updates within this one resumed run (block bootstrap)",
+    "games": 1,
+    "runs": 1,
+    "threshold": 3.671875,
+    "absolute_error": 3.58
+  },
+  "validation": {
+    "mean_anchors_per_update": 2.196,
+    "se": 0.04779715087495464,
+    "ci95": [
+      2.102,
+      2.2890249999999996
+    ],
+    "uncertainty_unit": "consecutive updates within this one resumed run (block bootstrap)",
+    "games": 1,
+    "runs": 1,
+    "absolute_error": 3.794
+  },
+  "calibration_within_tolerance": false,
+  "validation_within_tolerance": false,
+  "best_at_search_boundary": false,
+  "observed_nonmonotonicity": true,
+  "scope": "Short resumed probes on the specified checkpoints; not a guarantee for full 50k–100k training.",
+  "validation_scope": "Subsequent updates under the selected threshold, not independent training runs.",
+  "training_override": {
+    "JointTrainAgent.Retrieval.td_error_z_score_threshold": 3.671875
+  }
+}

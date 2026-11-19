@@ -1,0 +1,1162 @@
+{
+  "input": "td_error_only_real.xlsx",
+  "input_sha256": "2c945bc9afa6c9469c30143b91c0f305f36ff0e5da5374a1e97e470a6b7710e1",
+  "source_sheet": "TD_error_only",
+  "source_seed_cells": "C4:E55",
+  "excluded_inputs": [
+    "F4:F55 cached means",
+    "rows 59:63 cached metrics",
+    "Sources sheet and inherited simulation/source labels"
+  ],
+  "pairing": "Corresponding C/D/E slots, following the author's corrected-data instruction",
+  "games": 26,
+  "paired_slots_per_game": 3,
+  "total_paired_slots": 78,
+  "definitions": {
+    "HNS": "(return - Random)/(Human - Random), references from tab:main_performance",
+    "Mean/Median": "Across unrounded game-mean HNS values",
+    "IQM": "Pool 78 unrounded run HNS values per method; trim floor(78/4)=19 from each tail; average 40",
+    "Optimality Gap": "mean(max(0,1-game_mean_HNS)) across 26 games",
+    "#Superhuman": "Count game-mean HNS > 1"
+  },
+  "bootstrap": {
+    "replicates": 50000,
+    "seed": 2027,
+    "derived_seed": 15908494320332297856,
+    "stream_key": "2027:STORM:td_error_only",
+    "batch_size": 256,
+    "method": "Paired slot resampling within each fixed game; recompute all metrics; percentile 95% CI"
+  },
+  "metrics": {
+    "Mean": {
+      "full_flash": 1.16553451049305,
+      "td_error_only": 1.0957785053525422,
+      "difference_full_minus_td": 0.0697560051405076,
+      "difference_ci95": [
+        0.03150347714740132,
+        0.10899678308529183
+      ],
+      "difference_bootstrap_se": 0.019785934873825965
+    },
+    "Median": {
+      "full_flash": 0.5469951947763635,
+      "td_error_only": 0.49536889543180035,
+      "difference_full_minus_td": 0.05162629934456313,
+      "difference_ci95": [
+        -0.015933703799052346,
+        0.1534622308597421
+      ],
+      "difference_bootstrap_se": 0.045352415248571386
+    },
+    "IQM": {
+      "full_flash": 0.6211523969098297,
+      "td_error_only": 0.6020665985626564,
+      "difference_full_minus_td": 0.01908579834717324,
+      "difference_ci95": [
+        -0.012601923519245356,
+        0.051454299373837144
+      ],
+      "difference_bootstrap_se": 0.01632999466243702
+    },
+    "Optimality Gap": {
+      "full_flash": 0.43387800203380683,
+      "td_error_only": 0.4353114809363992,
+      "difference_full_minus_td": -0.0014334789025923784,
+      "difference_ci95": [
+        -0.020541457397177675,
+        0.013979845055725075
+      ],
+      "difference_bootstrap_se": 0.008847996708924647
+    }
+  },
+  "superhuman": {
+    "Full FLASH": 8,
+    "TD-error only": 7
+  },
+  "games_full_flash_improved": 14,
+  "corrected_means": [
+    {
+      "cell": "F10",
+      "game": "Asterix",
+      "method": "Full FLASH",
+      "old": 791.6666666666666,
+      "recalculated": 795.0
+    },
+    {
+      "cell": "F12",
+      "game": "BankHeist",
+      "method": "Full FLASH",
+      "old": 633.5,
+      "recalculated": 640.1666666666666
+    },
+    {
+      "cell": "F14",
+      "game": "BattleZone",
+      "method": "Full FLASH",
+      "old": 14316.66666666667,
+      "recalculated": 14320.0
+    },
+    {
+      "cell": "F15",
+      "game": "BattleZone",
+      "method": "TD-error only",
+      "old": 15966.66666666667,
+      "recalculated": 16300.0
+    },
+    {
+      "cell": "F16",
+      "game": "Boxing",
+      "method": "Full FLASH",
+      "old": 81.26666666666667,
+      "recalculated": 82.6
+    },
+    {
+      "cell": "F18",
+      "game": "Breakout",
+      "method": "Full FLASH",
+      "old": 12.23333333333333,
+      "recalculated": 12.9
+    },
+    {
+      "cell": "F19",
+      "game": "Breakout",
+      "method": "TD-error only",
+      "old": 12.28333333333333,
+      "recalculated": 13.283333333333333
+    },
+    {
+      "cell": "F23",
+      "game": "CrazyClimber",
+      "method": "TD-error only",
+      "old": 52081.66666666666,
+      "recalculated": 58748.333333333336
+    },
+    {
+      "cell": "F33",
+      "game": "Hero",
+      "method": "TD-error only",
+      "old": 13366.66666666667,
+      "recalculated": 15366.666666666666
+    },
+    {
+      "cell": "F38",
+      "game": "Krull",
+      "method": "Full FLASH",
+      "old": 6639.833333333333,
+      "recalculated": 6678.833333333333
+    },
+    {
+      "cell": "F39",
+      "game": "Krull",
+      "method": "TD-error only",
+      "old": 7222.5,
+      "recalculated": 7351.666666666667
+    },
+    {
+      "cell": "F45",
+      "game": "Pong",
+      "method": "TD-error only",
+      "old": 8.116666666666667,
+      "recalculated": 11.283333333333333
+    },
+    {
+      "cell": "F52",
+      "game": "Seaquest",
+      "method": "Full FLASH",
+      "old": 545,
+      "recalculated": 540.3333333333334
+    },
+    {
+      "cell": "F53",
+      "game": "Seaquest",
+      "method": "TD-error only",
+      "old": 411,
+      "recalculated": 442.6666666666667
+    },
+    {
+      "cell": "F54",
+      "game": "UpNDown",
+      "method": "Full FLASH",
+      "old": 7972.5,
+      "recalculated": 8172.333333333333
+    },
+    {
+      "cell": "F55",
+      "game": "UpNDown",
+      "method": "TD-error only",
+      "old": 6006.5,
+      "recalculated": 6219.666666666667
+    }
+  ],
+  "corrected_metrics": [
+    {
+      "cell": "C60",
+      "metric": "Mean",
+      "method": "Full FLASH",
+      "old": 1.157914946465837,
+      "recalculated": 1.16553451049305
+    },
+    {
+      "cell": "C61",
+      "metric": "Median",
+      "method": "Full FLASH",
+      "old": 0.5380419279914151,
+      "recalculated": 0.5469951947763635
+    },
+    {
+      "cell": "C62",
+      "metric": "IQM",
+      "method": "Full FLASH",
+      "old": 0.6173894359917258,
+      "recalculated": 0.6211523969098297
+    },
+    {
+      "cell": "C63",
+      "metric": "Optimality Gap",
+      "method": "Full FLASH",
+      "old": 0.4358189095626911,
+      "recalculated": 0.43387800203380683
+    },
+    {
+      "cell": "E60",
+      "metric": "Mean",
+      "method": "TD-error only",
+      "old": 1.072389400123163,
+      "recalculated": 1.0957785053525422
+    },
+    {
+      "cell": "E61",
+      "metric": "Median",
+      "method": "TD-error only",
+      "old": 0.4522605237372522,
+      "recalculated": 0.49536889543180035
+    },
+    {
+      "cell": "E62",
+      "metric": "IQM",
+      "method": "TD-error only",
+      "old": 0.5855503072570593,
+      "recalculated": 0.6020665985626564
+    },
+    {
+      "cell": "E63",
+      "metric": "Optimality Gap",
+      "method": "TD-error only",
+      "old": 0.4438103821548394,
+      "recalculated": 0.4353114809363992
+    }
+  ],
+  "per_game": [
+    {
+      "game": "Alien",
+      "random": 227.8,
+      "human": 7127.7,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            1510,
+            665,
+            1510
+          ],
+          "mean_return": 1228.3333333333333,
+          "slot_hns": [
+            0.1858287801272482,
+            0.06336323714836446,
+            0.1858287801272482
+          ],
+          "game_mean_hns": 0.1450069324676203
+        },
+        "TD-error only": {
+          "slots": [
+            864.5,
+            1076.5,
+            1108.5
+          ],
+          "mean_return": 1016.5,
+          "slot_hns": [
+            0.09227669966231394,
+            0.12300178263453093,
+            0.12763953100769576
+          ],
+          "game_mean_hns": 0.11430600443484688
+        }
+      }
+    },
+    {
+      "game": "Amidar",
+      "random": 5.8,
+      "human": 1719.5,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            169.45,
+            169.45,
+            222.5
+          ],
+          "mean_return": 187.13333333333333,
+          "slot_hns": [
+            0.09549512750189648,
+            0.09549512750189648,
+            0.12645153760868297
+          ],
+          "game_mean_hns": 0.10581393087082532
+        },
+        "TD-error only": {
+          "slots": [
+            146.75,
+            109.65,
+            236.55
+          ],
+          "mean_return": 164.31666666666666,
+          "slot_hns": [
+            0.08224893505280971,
+            0.06059987162280446,
+            0.13465017214214856
+          ],
+          "game_mean_hns": 0.09249965960592091
+        }
+      }
+    },
+    {
+      "game": "Assault",
+      "random": 222.4,
+      "human": 742.0,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            779.45,
+            779.45,
+            723.85
+          ],
+          "mean_return": 760.9166666666666,
+          "slot_hns": [
+            1.0720746728252502,
+            1.0720746728252502,
+            0.9650692840646651
+          ],
+          "game_mean_hns": 1.0364062099050553
+        },
+        "TD-error only": {
+          "slots": [
+            688.8,
+            746,
+            714
+          ],
+          "mean_return": 716.2666666666667,
+          "slot_hns": [
+            0.8976135488837568,
+            1.0076982294072363,
+            0.9461123941493457
+          ],
+          "game_mean_hns": 0.9504747241467796
+        }
+      }
+    },
+    {
+      "game": "Asterix",
+      "random": 210.0,
+      "human": 8503.3,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            600,
+            887.5,
+            897.5
+          ],
+          "mean_return": 795.0,
+          "slot_hns": [
+            0.047025912483571075,
+            0.08169245053235745,
+            0.08289824316014131
+          ],
+          "game_mean_hns": 0.07053886872535661
+        },
+        "TD-error only": {
+          "slots": [
+            937.5,
+            1032.5,
+            1032.5
+          ],
+          "mean_return": 1000.8333333333334,
+          "slot_hns": [
+            0.08772141367127681,
+            0.09917644363522361,
+            0.09917644363522361
+          ],
+          "game_mean_hns": 0.09535810031390801
+        }
+      }
+    },
+    {
+      "game": "BankHeist",
+      "random": 14.2,
+      "human": 753.1,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            633.5,
+            633.5,
+            653.5
+          ],
+          "mean_return": 640.1666666666666,
+          "slot_hns": [
+            0.8381377723643253,
+            0.8381377723643253,
+            0.8652050345107593
+          ],
+          "game_mean_hns": 0.8471601930798033
+        },
+        "TD-error only": {
+          "slots": [
+            531,
+            666,
+            666
+          ],
+          "mean_return": 621.0,
+          "slot_hns": [
+            0.6994180538638517,
+            0.8821220733522804,
+            0.8821220733522804
+          ],
+          "game_mean_hns": 0.8212207335228041
+        }
+      }
+    },
+    {
+      "game": "BattleZone",
+      "random": 2360.0,
+      "human": 37187.5,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            14250,
+            14350,
+            14360
+          ],
+          "mean_return": 14320.0,
+          "slot_hns": [
+            0.3413968846457541,
+            0.3442681788816309,
+            0.3445553083052186
+          ],
+          "game_mean_hns": 0.3434067906108679
+        },
+        "TD-error only": {
+          "slots": [
+            11200,
+            18350,
+            19350
+          ],
+          "mean_return": 16300.0,
+          "slot_hns": [
+            0.253822410451511,
+            0.4591199483167038,
+            0.487832890675472
+          ],
+          "game_mean_hns": 0.4002584164812289
+        }
+      }
+    },
+    {
+      "game": "Boxing",
+      "random": 0.1,
+      "human": 12.1,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            78.5,
+            82.65,
+            86.65
+          ],
+          "mean_return": 82.6,
+          "slot_hns": [
+            6.533333333333333,
+            6.879166666666666,
+            7.2125
+          ],
+          "game_mean_hns": 6.875
+        },
+        "TD-error only": {
+          "slots": [
+            72.4,
+            82.75,
+            82.75
+          ],
+          "mean_return": 79.3,
+          "slot_hns": [
+            6.025,
+            6.8875,
+            6.8875
+          ],
+          "game_mean_hns": 6.6
+        }
+      }
+    },
+    {
+      "game": "Breakout",
+      "random": 1.7,
+      "human": 30.5,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            12.7,
+            12,
+            14
+          ],
+          "mean_return": 12.9,
+          "slot_hns": [
+            0.3819444444444444,
+            0.3576388888888889,
+            0.4270833333333333
+          ],
+          "game_mean_hns": 0.3888888888888889
+        },
+        "TD-error only": {
+          "slots": [
+            12.25,
+            12.3,
+            15.3
+          ],
+          "mean_return": 13.283333333333333,
+          "slot_hns": [
+            0.3663194444444444,
+            0.3680555555555556,
+            0.4722222222222222
+          ],
+          "game_mean_hns": 0.40219907407407407
+        }
+      }
+    },
+    {
+      "game": "ChopperCommand",
+      "random": 811.0,
+      "human": 7387.8,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            2025,
+            970,
+            2025
+          ],
+          "mean_return": 1673.3333333333333,
+          "slot_hns": [
+            0.18458824960467096,
+            0.024175891010825932,
+            0.18458824960467096
+          ],
+          "game_mean_hns": 0.13111746340672262
+        },
+        "TD-error only": {
+          "slots": [
+            2040,
+            1125,
+            2120
+          ],
+          "mean_return": 1761.6666666666667,
+          "slot_hns": [
+            0.18686899403965454,
+            0.047743583505656245,
+            0.19903296435956697
+          ],
+          "game_mean_hns": 0.14454851396829257
+        }
+      }
+    },
+    {
+      "game": "CrazyClimber",
+      "random": 10780.5,
+      "human": 35829.4,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            56795,
+            63275,
+            63275
+          ],
+          "mean_return": 61115.0,
+          "slot_hns": [
+            1.8369868537141352,
+            2.095680848260802,
+            2.095680848260802
+          ],
+          "game_mean_hns": 2.009449516745246
+        },
+        "TD-error only": {
+          "slots": [
+            44555,
+            55845,
+            75845
+          ],
+          "mean_return": 58748.333333333336,
+          "slot_hns": [
+            1.3483426417926536,
+            1.7990610366123863,
+            2.597499291386049
+          ],
+          "game_mean_hns": 1.9149676565970295
+        }
+      }
+    },
+    {
+      "game": "DemonAttack",
+      "random": 152.1,
+      "human": 1971.0,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            150.75,
+            149.25,
+            128.25
+          ],
+          "mean_return": 142.75,
+          "slot_hns": [
+            -0.0007422068283028204,
+            -0.0015668810819726208,
+            -0.013112320633349828
+          ],
+          "game_mean_hns": -0.005140469514541756
+        },
+        "TD-error only": {
+          "slots": [
+            181.25,
+            148.75,
+            137.5
+          ],
+          "mean_return": 155.83333333333334,
+          "slot_hns": [
+            0.016026169662983123,
+            -0.0018417724998625543,
+            -0.008026829402386058
+          ],
+          "game_mean_hns": 0.002052522586911503
+        }
+      }
+    },
+    {
+      "game": "Freeway",
+      "random": 0.0,
+      "human": 29.6,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            21.5,
+            33.75,
+            21.5
+          ],
+          "mean_return": 25.583333333333332,
+          "slot_hns": [
+            0.7263513513513513,
+            1.1402027027027026,
+            0.7263513513513513
+          ],
+          "game_mean_hns": 0.8643018018018018
+        },
+        "TD-error only": {
+          "slots": [
+            33.7,
+            33.65,
+            21.5
+          ],
+          "mean_return": 29.616666666666667,
+          "slot_hns": [
+            1.1385135135135136,
+            1.1368243243243243,
+            0.7263513513513513
+          ],
+          "game_mean_hns": 1.000563063063063
+        }
+      }
+    },
+    {
+      "game": "Frostbite",
+      "random": 65.2,
+      "human": 4334.7,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            2443,
+            251,
+            2746.5
+          ],
+          "mean_return": 1813.5,
+          "slot_hns": [
+            0.556927040637077,
+            0.04351797634383417,
+            0.6280126478510364
+          ],
+          "game_mean_hns": 0.40948588827731586
+        },
+        "TD-error only": {
+          "slots": [
+            274.5,
+            238.5,
+            3081
+          ],
+          "mean_return": 1198.0,
+          "slot_hns": [
+            0.04902213373931374,
+            0.04059023304836632,
+            0.7063590584377561
+          ],
+          "game_mean_hns": 0.26532380840847875
+        }
+      }
+    },
+    {
+      "game": "Gopher",
+      "random": 257.6,
+      "human": 2412.5,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            8044,
+            7531,
+            7531
+          ],
+          "mean_return": 7702.0,
+          "slot_hns": [
+            3.6133463269757295,
+            3.3752842359274213,
+            3.3752842359274213
+          ],
+          "game_mean_hns": 3.4546382662768575
+        },
+        "TD-error only": {
+          "slots": [
+            3550,
+            5320,
+            5320
+          ],
+          "mean_return": 4730.0,
+          "slot_hns": [
+            1.5278667223537055,
+            2.349250545268922,
+            2.349250545268922
+          ],
+          "game_mean_hns": 2.0754559376305166
+        }
+      }
+    },
+    {
+      "game": "Hero",
+      "random": 1027.0,
+      "human": 30826.4,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            13108.75,
+            13108.75,
+            13325.5
+          ],
+          "mean_return": 13181.0,
+          "slot_hns": [
+            0.40543601549024477,
+            0.40543601549024477,
+            0.41270965187218533
+          ],
+          "game_mean_hns": 0.4078605609508916
+        },
+        "TD-error only": {
+          "slots": [
+            13363,
+            13335,
+            19402
+          ],
+          "mean_return": 15366.666666666666,
+          "slot_hns": [
+            0.413968066471137,
+            0.4130284502372531,
+            0.6166231534863118
+          ],
+          "game_mean_hns": 0.4812065567315673
+        }
+      }
+    },
+    {
+      "game": "Jamesbond",
+      "random": 29.0,
+      "human": 302.8,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            522.5,
+            665,
+            522.5
+          ],
+          "mean_return": 570.0,
+          "slot_hns": [
+            1.8024105186267347,
+            2.322863403944485,
+            1.8024105186267347
+          ],
+          "game_mean_hns": 1.9758948137326515
+        },
+        "TD-error only": {
+          "slots": [
+            345,
+            585,
+            457.5
+          ],
+          "mean_return": 462.5,
+          "slot_hns": [
+            1.154127100073046,
+            2.030679327976625,
+            1.5650109569028487
+          ],
+          "game_mean_hns": 1.58327246165084
+        }
+      }
+    },
+    {
+      "game": "Kangaroo",
+      "random": 52.0,
+      "human": 3035.0,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            1670,
+            2900,
+            2900
+          ],
+          "mean_return": 2490.0,
+          "slot_hns": [
+            0.542406972846128,
+            0.9547435467650017,
+            0.9547435467650017
+          ],
+          "game_mean_hns": 0.8172980221253772
+        },
+        "TD-error only": {
+          "slots": [
+            2535,
+            3140,
+            3140
+          ],
+          "mean_return": 2938.3333333333335,
+          "slot_hns": [
+            0.8323835065370433,
+            1.0351994636272208,
+            1.0351994636272208
+          ],
+          "game_mean_hns": 0.9675941445971616
+        }
+      }
+    },
+    {
+      "game": "Krull",
+      "random": 1598.0,
+      "human": 2665.5,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            6568,
+            7023,
+            6445.5
+          ],
+          "mean_return": 6678.833333333333,
+          "slot_hns": [
+            4.655737704918033,
+            5.081967213114754,
+            4.540983606557377
+          ],
+          "game_mean_hns": 4.759562841530054
+        },
+        "TD-error only": {
+          "slots": [
+            7093.5,
+            7511,
+            7450.5
+          ],
+          "mean_return": 7351.666666666667,
+          "slot_hns": [
+            5.148009367681499,
+            5.539110070257611,
+            5.482435597189696
+          ],
+          "game_mean_hns": 5.389851678376268
+        }
+      }
+    },
+    {
+      "game": "KungFuMaster",
+      "random": 258.5,
+      "human": 22736.3,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            30110,
+            24960,
+            30110
+          ],
+          "mean_return": 28393.333333333332,
+          "slot_hns": [
+            1.3280436697541573,
+            1.0989287207822829,
+            1.3280436697541573
+          ],
+          "game_mean_hns": 1.2516720200968658
+        },
+        "TD-error only": {
+          "slots": [
+            23325,
+            17935,
+            17935
+          ],
+          "mean_return": 19731.666666666668,
+          "slot_hns": [
+            1.0261902855261635,
+            0.7863981350488037,
+            0.7863981350488037
+          ],
+          "game_mean_hns": 0.8663288518745903
+        }
+      }
+    },
+    {
+      "game": "MsPacman",
+      "random": 307.3,
+      "human": 6951.6,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            2250,
+            1885,
+            1885
+          ],
+          "mean_return": 2006.6666666666667,
+          "slot_hns": [
+            0.29238595487861774,
+            0.23745165028671192,
+            0.23745165028671192
+          ],
+          "game_mean_hns": 0.2557630851506805
+        },
+        "TD-error only": {
+          "slots": [
+            2962,
+            2647.5,
+            2647.5
+          ],
+          "mean_return": 2752.3333333333335,
+          "slot_hns": [
+            0.399545475068856,
+            0.3522116701533645,
+            0.3522116701533645
+          ],
+          "game_mean_hns": 0.367989605125195
+        }
+      }
+    },
+    {
+      "game": "Pong",
+      "random": -20.7,
+      "human": 14.6,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            8.2,
+            16.3,
+            14.45
+          ],
+          "mean_return": 12.983333333333333,
+          "slot_hns": [
+            0.8186968838526912,
+            1.048158640226629,
+            0.9957507082152974
+          ],
+          "game_mean_hns": 0.9542020774315392
+        },
+        "TD-error only": {
+          "slots": [
+            9.35,
+            14.5,
+            10
+          ],
+          "mean_return": 11.283333333333333,
+          "slot_hns": [
+            0.8512747875354107,
+            0.9971671388101983,
+            0.8696883852691218
+          ],
+          "game_mean_hns": 0.9060434372049103
+        }
+      }
+    },
+    {
+      "game": "PrivateEye",
+      "random": 24.9,
+      "human": 69571.3,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            191.95,
+            -593.85,
+            -593.85
+          ],
+          "mean_return": -331.9166666666667,
+          "slot_hns": [
+            0.002401993489238839,
+            -0.008896937871694294,
+            -0.008896937871694294
+          ],
+          "game_mean_hns": -0.0051306274180499154
+        },
+        "TD-error only": {
+          "slots": [
+            -930,
+            911.25,
+            911.25
+          ],
+          "mean_return": 297.5,
+          "slot_hns": [
+            -0.013730401573625666,
+            0.01274472869911311,
+            0.01274472869911311
+          ],
+          "game_mean_hns": 0.0039196852748668515
+        }
+      }
+    },
+    {
+      "game": "Qbert",
+      "random": 163.9,
+      "human": 13455.0,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            4056.25,
+            4056.25,
+            4056.25
+          ],
+          "mean_return": 4056.25,
+          "slot_hns": [
+            0.29285386461617174,
+            0.29285386461617174,
+            0.29285386461617174
+          ],
+          "game_mean_hns": 0.29285386461617174
+        },
+        "TD-error only": {
+          "slots": [
+            3456.25,
+            4142.5,
+            4142.5
+          ],
+          "mean_return": 3913.75,
+          "slot_hns": [
+            0.24771087419400953,
+            0.2993431694893575,
+            0.2993431694893575
+          ],
+          "game_mean_hns": 0.2821324043909082
+        }
+      }
+    },
+    {
+      "game": "RoadRunner",
+      "random": 11.5,
+      "human": 7845.0,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            16980,
+            16410,
+            18865
+          ],
+          "mean_return": 17418.333333333332,
+          "slot_hns": [
+            2.1661454011616774,
+            2.0933809918937896,
+            2.4067785791791665
+          ],
+          "game_mean_hns": 2.2221016574115446
+        },
+        "TD-error only": {
+          "slots": [
+            19570,
+            16665,
+            16540
+          ],
+          "mean_return": 17591.666666666668,
+          "slot_hns": [
+            2.496776664326291,
+            2.125933490776792,
+            2.1099763834812024
+          ],
+          "game_mean_hns": 2.244228846194762
+        }
+      }
+    },
+    {
+      "game": "Seaquest",
+      "random": 68.4,
+      "human": 42054.7,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            545,
+            531,
+            545
+          ],
+          "mean_return": 540.3333333333334,
+          "slot_hns": [
+            0.011351321740663025,
+            0.011017879641692648,
+            0.011351321740663025
+          ],
+          "game_mean_hns": 0.011240174374339567
+        },
+        "TD-error only": {
+          "slots": [
+            411,
+            510,
+            407
+          ],
+          "mean_return": 442.6666666666667,
+          "slot_hns": [
+            0.008159804507660831,
+            0.01051771649323708,
+            0.008064535336526438
+          ],
+          "game_mean_hns": 0.00891401877914145
+        }
+      }
+    },
+    {
+      "game": "UpNDown",
+      "random": 533.4,
+      "human": 11693.2,
+      "methods": {
+        "Full FLASH": {
+          "slots": [
+            7972.5,
+            8574,
+            7970.5
+          ],
+          "mean_return": 8172.333333333333,
+          "slot_hns": [
+            0.6665979677055144,
+            0.7204967830964712,
+            0.6664187530242478
+          ],
+          "game_mean_hns": 0.6845045012754112
+        },
+        "TD-error only": {
+          "slots": [
+            6006.5,
+            6510,
+            6142.5
+          ],
+          "mean_return": 6219.666666666667,
+          "slot_hns": [
+            0.4904299360203588,
+            0.5355472320292478,
+            0.5026165343464937
+          ],
+          "game_mean_hns": 0.5095312341320334
+        }
+      }
+    }
+  ],
+  "threshold": "Left unspecified at the author's request; return scores do not establish trigger-frequency matching"
+}

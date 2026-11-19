@@ -1,0 +1,28 @@
+{
+  "candidate": {
+    "run_name": "Frostbite-life_done-wm_2L512D8H-100k-seed6010_X",
+    "checkpoint": "100000",
+    "source": {
+      "kind": "weights",
+      "world_model": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/world_model_100000.pth",
+        "size": 66100768,
+        "mtime_ns": 1788367362343080805
+      },
+      "agent": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/agent_100000.pth",
+        "size": 13699825,
+        "mtime_ns": 1788367362377080631
+      }
+    },
+    "config": "/home/choemj/STORM-1/runs/Frostbite-life_done-wm_2L512D8H-100k-seed6010_X/config.yaml",
+    "config_sha256": "8d7e5e001a9d3da6800e780aa75950c6ec07aedeb018eeae7e9a0b7a08c0ee2a",
+    "fingerprint": "31f4476273cbbaaeb3eab03bc97911a24d7463d9d8d1a8aa35c47e0875b255de",
+    "id": "Frostbite-life_done-wm_2L512D8H-100k-seed6010_X__100000__31f4476273"
+  },
+  "gpu": "3",
+  "episode_avg_return": 254.0,
+  "qualified": false,
+  "alignment": null,
+  "status": "below_threshold"
+}

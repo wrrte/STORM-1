@@ -1,0 +1,33 @@
+{
+  "fingerprint": "e2f834d373ad7048c1d957add7d7b5f1c4438de7d24e9d8b99748a4ec5f607b3",
+  "parameters": {
+    "episodes": 20,
+    "seed": 0,
+    "precision": "bf16",
+    "environment": "ALE/Frostbite-v5",
+    "eval_code_sha256": "8c1da8a88662d33791117f221580234a3345435a7c649959eae6177f09600b1d"
+  },
+  "episode_avg_return": 264.5,
+  "episode_returns": [
+    270.0,
+    240.0,
+    270.0,
+    270.0,
+    270.0,
+    270.0,
+    270.0,
+    260.0,
+    250.0,
+    250.0,
+    270.0,
+    270.0,
+    250.0,
+    260.0,
+    270.0,
+    270.0,
+    260.0,
+    270.0,
+    290.0,
+    260.0
+  ]
+}

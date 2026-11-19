@@ -1,0 +1,43 @@
+{
+  "candidate": {
+    "run_name": "Frostbite-6010_add",
+    "checkpoint": "final",
+    "source": {
+      "kind": "weights",
+      "world_model": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_add/world_model_final.pth",
+        "size": 66101095,
+        "mtime_ns": 1790025948410541246
+      },
+      "agent": {
+        "path": "/home/choemj/STORM-1/ckpt/Frostbite-6010_add/agent_final.pth",
+        "size": 13699915,
+        "mtime_ns": 1790025948425541134
+      }
+    },
+    "config": "/home/choemj/STORM-1/runs/Frostbite-6010_add/config.yaml",
+    "config_sha256": "52899af5bec4ab6fca6f7a8d68dbd36dd2a5ffaa03b0fc057e694a852ad476e8",
+    "fingerprint": "d3b94a3fd18a1134a945a868c49303b75c8e7e95a7091bb7ceec8dd002b3fbd8",
+    "id": "Frostbite-6010_add__final__d3b94a3fd1"
+  },
+  "options": {
+    "episodes": 20,
+    "return_seed": 0,
+    "value_seed": 2027,
+    "precision": "bf16",
+    "min_return": 1000.0,
+    "bootstrap": 10000,
+    "data": "/home/choemj/STORM-1/results/old/seed_3710/shared_contexts.npz",
+    "data_stamp": {
+      "path": "/home/choemj/STORM-1/results/old/seed_3710/shared_contexts.npz",
+      "size": 6956121,
+      "mtime_ns": 1789711190283333902
+    },
+    "template_dir": "/home/choemj/STORM-1/frostbite_igloo_templates",
+    "templates_sha256": "461a54e9fc6c4d6a130e25b92c7c1c9c979cb129b511e9e6829c7cd0ecbbb7f0",
+    "eval_code_sha256": "8c1da8a88662d33791117f221580234a3345435a7c649959eae6177f09600b1d",
+    "value_code_sha256": "6c5da35e50c3089463010593a67580d0a0fe9b410f38aae3be3515952b0f0517"
+  },
+  "directory": "/home/choemj/STORM-1/results/frostbite_checkpoint_screen/Frostbite-6010_add__final__d3b94a3fd1",
+  "gpu": "5"
+}
