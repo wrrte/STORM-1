@@ -32,6 +32,7 @@ from training_branches import (
     configure_storm_retrieval_run, parse_storm_training_args,
     save_storm_warmup_metadata, launch_storm_warmup_followup,
     capture_rng_state, launch_training_branches, save_final_models, restore_rng_state,
+    rebuild_retrieval_for_resume,
 )
 import pandas as pd
 from seed_screening import configure_seed_screen, SCREEN_REJECTED_EXIT_CODE
@@ -186,7 +187,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                                   retrieval_state_resume=None, rng_state_resume=None,
                                   branch_commands=None, eval_precision="auto", eval_seed=0,
                                   rebuild_retrieval_on_resume=False, seed_screen=None,
-                                  on_world_model_update=None, save_final_checkpoint=True):
+                                  on_world_model_update=None, save_final_checkpoint=True,
+                                  preserve_rebuild_rng=False):
     if branch_commands is not None and num_envs != 1:
         raise ValueError("Shared warmup episode-boundary branching requires NumEnvs=1; parallel environments cannot be paused independently")
 
@@ -225,7 +227,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         num_envs=num_envs, config=retrieval_config, latent_dim=latent_dim,
         statistics_mode=getattr(getattr(conf, "Performance", None), "RetrievalStatisticsMode", "legacy"))
     if retrieval_state_resume is not None:
-        retrieval_manager.load_state_dict(retrieval_state_resume)
+        retrieval_manager.load_state_dict(retrieval_state_resume,
+                                          restore_hash=not rebuild_retrieval_on_resume)
     is_first_step = np.ones(num_envs, dtype=bool)
 
     # Rebuild retrieval hash buckets if resuming with retrieval enabled
@@ -253,14 +256,8 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         # Raw sweep snapshots leave the collector's PCA/hash and RNG untouched.
         # Prepare every branch from the restored RNG, including the baseline,
         # so all variants of one checkpoint start after the same preparation.
-        if replay_buffer.ready():
-            enabled = retrieval_manager.enabled
-            retrieval_manager.enabled = True
-            world_model.eval()
-            try:
-                retrieval_manager.rebuild_all_hash_buckets(replay_buffer, world_model, chunk_size=1024)
-            finally:
-                retrieval_manager.enabled = enabled
+        if rebuild_retrieval_for_resume(retrieval_manager, replay_buffer, world_model,
+                                        preserve_rng=preserve_rebuild_rng):
             last_rebuild_step = resume_step
         logger.log("Retrieval/shared_warmup_ended_at_step", resume_step * num_envs)
 
@@ -793,7 +790,7 @@ if __name__ == "__main__":
         episode_rewards_resume = []
         retrieval_state_resume = None
         rng_state_resume = None
-        rebuild_retrieval_on_resume = False
+        rebuild_retrieval_on_resume = args.rebuild_retrieval_on_resume
         if args.resume_from:
             print(colorama.Fore.CYAN + f"Resuming from checkpoint: {args.resume_from}" + colorama.Style.RESET_ALL)
             (resume_step, logger_tag_step, resume_last_rebuild_step,
@@ -805,7 +802,7 @@ if __name__ == "__main__":
             warmup_metadata_path = os.path.join(args.resume_from, "warmup_metadata.json")
             if os.path.isfile(warmup_metadata_path):
                 with open(warmup_metadata_path) as metadata_file:
-                    rebuild_retrieval_on_resume = json.load(metadata_file).get("rebuild_on_resume", False)
+                    rebuild_retrieval_on_resume |= json.load(metadata_file).get("rebuild_on_resume", False)
             if shared_warmup_logdir:
                 with open(f"runs/{args.n}/shared_warmup.json", "w") as shared_info:
                     json.dump({"checkpoint_dir": os.path.abspath(args.resume_from),
@@ -850,6 +847,7 @@ if __name__ == "__main__":
             rng_state_resume=rng_state_resume,
             branch_commands=branch_commands,
             rebuild_retrieval_on_resume=rebuild_retrieval_on_resume,
+            preserve_rebuild_rng=args.rebuild_retrieval_on_resume,
             seed_screen=seed_screen,
         )
 

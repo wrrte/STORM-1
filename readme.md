@@ -278,6 +278,75 @@ python -u train.py --resume_warmup ckpt/<run>_Shared JointTrainAgent.Retrieval.e
 The run suffix is `_randomneighor`. See [the training guide](../retrieval_training.md)
 for sampling, weighting and checkpoint details.
 
+### Shared-warmup hash-bit and target sweep
+
+Set `hash_target_pairs` to the explicit `[hash_bits, target]` pairs to train.
+For a 3-by-3 grid, list all nine pairs. `target` includes the anchor.
+Use an empty `warmup_offset_pairs` to collect exactly one warmup target:
+
+```yaml
+JointTrainAgent:
+  Retrieval:
+    enable: Both
+    warmup_steps: 50000
+    warmup_offset_pairs: []
+    hash_target_pairs:
+      - [9, 4]
+      - [9, 8]
+      - [9, 16]
+      - [10, 4]
+      - [10, 8]
+      - [10, 16]
+      - [12, 4]
+      - [12, 8]
+      - [12, 16]
+```
+
+Launch the usual `train.py` command with this config. Warmup is trained once,
+up to the first episode boundary at or after 50k. Each pair then starts from
+the same model, optimizer, replay, EMA statistics and RNG snapshot. `Both` adds
+one baseline continuation per requested warmup, rather than one per hash/target
+pair. `enable: True` runs only the retrieval pairs. All continuations execute
+sequentially. A nonempty `warmup_offset_pairs` combines every hash/target pair
+with every requested warmup/offset pair.
+
+Reuse an existing WarmupSweep without repeating collection:
+
+```shell
+python -u train.py --resume_warmup ckpt/Pong-17_WarmupSweep \
+  -n Pong-17-grid \
+  JointTrainAgent.Retrieval.enable Both \
+  JointTrainAgent.Retrieval.warmup_offset_pairs '[[50000, -2]]' \
+  JointTrainAgent.Retrieval.hash_target_pairs '[[9, 4], [10, 8], [12, 16]]'
+```
+
+For a reusable ordinary `_Shared` checkpoint, supply
+`JointTrainAgent.Retrieval.enable "['retrieval', 'baseline']"`, omit the
+`warmup_offset_pairs` override, and use the same `hash_target_pairs` override.
+Snapshot metadata supplies the original environment and seed; each snapshot
+must contain the EMA signals required by the selected experiments.
+
+Before any hash lookup in a grid branch, the old projection, buckets and
+queued anchors are discarded while EMA statistics are restored. The new
+`hash_bits` controls both the bit vector and the PCA projection (or the initial
+random projection when `use_pca: False`); the complete replay index is rebuilt.
+Rebuild randomness is isolated from the restored training RNG, so changing
+the PCA width does not itself shift the branch's training RNG at activation.
+Subsequent learning trajectories can differ as retrieval changes.
+
+Names include `_h9_t4`, `_h10_t8`, etc.; W&B records each branch's effective
+config and Excel keeps grid runs on separate hash/target rows. The original
+snapshots are retained. Sweep followups use their own manifests/results under
+`followups/`. Reusing a WarmupSweep without a new `-n` assigns a fresh job name;
+use a fresh `-n` for each ordinary shared-checkpoint followup.
+
+`hash_bits` must be an integer from 1 through 62 and `target` a positive integer.
+Duplicate pairs are rejected. Each explicit pair overrides the scalar settings
+for that branch. Keep `max_anchors`, `multiplier`, `max_contexts` and weighting
+settings fixed when comparing pairs; groups remain subject to `max_contexts`.
+The `target1` named preset conflicts with a pair's target; use a pair with target
+1 instead. An empty `hash_target_pairs` preserves the existing sweep behavior.
+
 ### TD-error-only anchor ablation
 
 Set `score_combination: td_error_only` to select anchors using only

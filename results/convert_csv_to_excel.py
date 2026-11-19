@@ -751,6 +751,8 @@ def main(csv_path=None, output_path=None, queue_dir=None):
         if row.get('Local Run Name') in controls:
             continue
         run_name = str(row['Run Name'])
+        hash_sweep = bool(re.search(r'(?:^|_)h\d+_t\d+(?:_|$)', ' '.join(
+            str(row.get(key, '')) for key in ('Run Name', 'Local Run Name', 'Base Run Name'))))
         parts = run_name.split('_')
         game = parts[0]
         
@@ -850,7 +852,8 @@ def main(csv_path=None, output_path=None, queue_dir=None):
                 r_target = row.get('Retrieval Target', 'N/A')
                 try:
                     r_target = float(r_target)
-                    if r_target not in (1, 16):
+                    if (not math.isfinite(r_target) or not r_target.is_integer() or r_target < 1
+                            or (not hash_sweep and r_target not in (1, 16))):
                         continue
                 except (ValueError, TypeError):
                     continue
@@ -879,6 +882,14 @@ def main(csv_path=None, output_path=None, queue_dir=None):
                     else:
                         continue
                 variants = []
+                if hash_sweep:
+                    try:
+                        hash_bits = float(row.get('Hash Bits', 'N/A'))
+                    except (ValueError, TypeError):
+                        continue
+                    if not math.isfinite(hash_bits) or not hash_bits.is_integer() or not 1 <= hash_bits <= 62:
+                        continue
+                    variants.append(f'hash_bits: {int(hash_bits)}')
                 if value_signal == 'value' and score_combination != 'td_error_only':
                     variants.append('value')
                 if score_combination == 'add':

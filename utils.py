@@ -256,6 +256,7 @@ def load_config(config_path):
     conf.JointTrainAgent.Retrieval.max_pca_samples = 10000
     conf.JointTrainAgent.Retrieval.warmup_steps = 5000
     conf.JointTrainAgent.Retrieval.warmup_offset_pairs = []
+    conf.JointTrainAgent.Retrieval.hash_target_pairs = []
     conf.JointTrainAgent.Retrieval.min_warmup_steps = 0
     conf.JointTrainAgent.Retrieval.dynamic_warmup_target_steps = 1000
     conf.JointTrainAgent.Retrieval.dynamic_warmup_multiplier = 2.6

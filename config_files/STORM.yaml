@@ -59,6 +59,7 @@ JointTrainAgent:
     max_pca_samples: 100000
     warmup_steps: 50000 # Both splits at the first episode boundary at/after this target; -1 uses dynamic warmup
     warmup_offset_pairs: [[30000, -2], [50000, -2], [70000, -2]] # Also accepts ["dynamic_warmup", -2] (or [-1, -2]).
+    hash_target_pairs: [] # Explicit [hash_bits, target] pairs, e.g. [[9, 4], [10, 8], [12, 16]]. Set warmup_offset_pairs: [] for one shared warmup.
     min_warmup_steps: 5000
     dynamic_warmup_target_steps: 20000
     dynamic_warmup_multiplier: 2.6 # Reward-rise threshold: mean + multiplier * std.
