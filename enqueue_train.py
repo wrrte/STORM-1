@@ -4,7 +4,7 @@ import json
 from pathlib import Path
 import sys
 
-from queue_train import PAIR_PREFIX, ROOT, TrainingQueue, override_args
+from queue_train import PAIR_PREFIX, ROOT, SEED_DIR, TrainingQueue, override_args, read_seed_files, gpu_id
 
 
 def validate_overrides(config_path, overrides):
@@ -23,9 +23,9 @@ def validate_overrides(config_path, overrides):
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--gpus", nargs="+", required=True,
-                        help="GPU indices for NEW game/seed pairs; existing owners never change")
-    games = parser.add_mutually_exclusive_group(required=True)
+    parser.add_argument("--gpus", nargs="+",
+                        help="Filter GPU seed files; for explicit new pairs, choose their initial GPUs")
+    games = parser.add_mutually_exclusive_group()
     games.add_argument("--games", nargs="+", help="Games to combine with every --seeds value")
     games.add_argument("--game-seeds", type=json.loads, help='Exact pairs, e.g. [["Alien",3000],["Pong",3010]]')
     parser.add_argument("--seeds", nargs="+", type=int)
@@ -36,6 +36,7 @@ def main(argv=None):
                         help="JSON pairs, e.g. [[9,4],[10,8]]")
     parser.add_argument("--set", nargs=2, action="append", default=[], metavar=("KEY", "VALUE"),
                         help="Additional config override (repeatable); VALUE is a YAML scalar/list")
+    parser.add_argument("--dry-run", action="store_true", help="Validate and print the plan without enqueueing")
     args = parser.parse_args(argv)
     if bool(args.games) != bool(args.seeds):
         parser.error("Use --games with --seeds, or --game-seeds without --seeds")
@@ -49,14 +50,47 @@ def main(argv=None):
             if key == "BasicSettings.Seed":
                 raise ValueError("Set the seed with --seeds / --game-seeds")
             overrides[key] = yaml.safe_load(text)
-        pairs = args.game_seeds if args.game_seeds is not None else [
-            [game, seed] for game in args.games for seed in args.seeds]
-        if not isinstance(pairs, list) or not pairs or any(
-                not isinstance(pair, list) or len(pair) != 2 or not isinstance(pair[0], str)
-                for pair in pairs):
-            raise ValueError("--game-seeds must be a nonempty list of [game, seed] pairs")
+        if args.gpus is not None:
+            args.gpus = [gpu_id(gpu) for gpu in args.gpus]
         validate_overrides(args.config, overrides)
-        added, skipped = TrainingQueue().enqueue(pairs, args.gpus, args.config, overrides)
+        if args.games or args.game_seeds is not None:
+            if not args.gpus:
+                raise ValueError("--gpus is required for explicit new game/seed pairs")
+            pairs = args.game_seeds if args.game_seeds is not None else [
+                [game, seed] for game in args.games for seed in args.seeds]
+            if not isinstance(pairs, list) or not pairs or any(
+                    not isinstance(pair, list) or len(pair) != 2 or not isinstance(pair[0], str)
+                    for pair in pairs):
+                raise ValueError("--game-seeds must be a nonempty list of [game, seed] pairs")
+            if args.dry_run:
+                print(f"Fresh training plan: {pairs}; GPUs for new pairs: {args.gpus}; overrides: {overrides}")
+                return 0
+            added, skipped = TrainingQueue().enqueue(pairs, args.gpus, args.config, overrides)
+        else:
+            from warmup_catalog import plan_resume_jobs
+            from utils import load_config
+            entries = [entry for entry in read_seed_files().values() if entry.get("enabled", True)
+                       and (args.gpus is None or entry["gpu"] in args.gpus)]
+            if not entries:
+                raise ValueError(f"No enabled game/seed selections in {SEED_DIR}; run warmup_catalog.py first")
+            mode = load_config(args.config).JointTrainAgent.Retrieval.enable
+            specs, incompatible = plan_resume_jobs(entries, overrides, mode)
+            for reason in incompatible:
+                print(f"Skipped: {reason}", file=sys.stderr)
+            # Fresh collection must be explicit; deleting a saved source must not
+            # accidentally start expensive training from scratch.
+            specs.extend(dict(game=entry["game"], seed=entry["seed"], gpu=entry["gpu"],
+                              config=str(args.config.absolute()), overrides=overrides)
+                         for entry in entries if entry.get("fresh", False))
+            if not specs:
+                raise ValueError("No compatible warmups for this experiment; no jobs were queued")
+            if args.dry_run:
+                for spec in specs:
+                    print(f"GPU {spec['gpu']}: {spec['game']} / {spec['seed']}  "
+                          f"resume={spec.get('resume_warmup', 'fresh')}  overrides={json.dumps(spec['overrides'])}")
+                print(f"Planned {len(specs)} job(s); {len(incompatible)} incompatible selection(s); no jobs queued.")
+                return 0
+            added, skipped = TrainingQueue().enqueue_jobs(specs, sorted({entry["gpu"] for entry in entries}, key=int))
     except (ValueError, KeyError, TypeError, AssertionError, OSError) as error:
         parser.error(str(error))
     for job in added:

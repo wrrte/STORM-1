@@ -1,0 +1,61 @@
+{
+  "gpu": "0",
+  "game_seeds": [
+    {
+      "game": "Amidar",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Amidar-6020_Shared/shared_warmup_50791"
+      ]
+    },
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Boxing-6040_Shared/shared_warmup_50048"
+      ]
+    },
+    {
+      "game": "Hero",
+      "seed": 3710,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Hero-3710_Shared/shared_warmup_50393"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 7010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-7010_Shared/shared_warmup_50213"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 7010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-7010_Shared/shared_warmup_50126"
+      ]
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6040,
+      "enabled": true,
+      "warmups": [
+        "ckpt/PrivateEye-6040_Shared/shared_warmup_51262"
+      ]
+    },
+    {
+      "game": "UpNDown",
+      "seed": 6030,
+      "enabled": true,
+      "warmups": [
+        "ckpt/UpNDown-6030_Shared/shared_warmup_50056"
+      ]
+    }
+  ]
+}

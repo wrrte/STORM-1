@@ -18,6 +18,7 @@ import uuid
 
 ROOT = Path(__file__).resolve().parent
 QUEUE_DIR = ROOT / "training_queue"
+SEED_DIR = ROOT / "config_files/game_seeds"
 PAIR_PREFIX = "JointTrainAgent.Retrieval."
 GAMES = """Alien Amidar Assault Asterix BankHeist BattleZone Boxing Breakout
 ChopperCommand CrazyClimber DemonAttack Freeway Frostbite Gopher Hero Jamesbond
@@ -81,6 +82,31 @@ def override_args(overrides):
             for part in (key, value if isinstance(value, str) else repr(value))]
 
 
+def read_seed_files(directory=SEED_DIR):
+    """Read permanent, user-editable seed selections; reject duplicates globally."""
+    selections = {}
+    for path in sorted(Path(directory).glob("gpu_*.json")):
+        data = json.loads(path.read_text())
+        gpu = gpu_id(data["gpu"])
+        if path.name != f"gpu_{gpu}.json" or not isinstance(data["game_seeds"], list):
+            raise ValueError(f"Invalid GPU seed file: {path}")
+        for entry in data["game_seeds"]:
+            key = pair_key(entry["game"], entry["seed"])
+            if key in selections:
+                raise ValueError(f"Duplicate game/seed {key} in GPU seed files (including disabled entries)")
+            if type(entry.get("enabled", True)) is not bool:
+                raise ValueError(f"{path}: enabled must be true or false")
+            if type(entry.get("fresh", False)) is not bool:
+                raise ValueError(f"{path}: fresh must be true or false")
+            if not isinstance(entry.get("warmups", []), list) or any(
+                    not isinstance(source, str) for source in entry.get("warmups", [])):
+                raise ValueError(f"{path}: warmups must be a list of checkpoint paths")
+            if entry.get("fresh") and entry.get("warmups"):
+                raise ValueError(f"{path}: choose warmups or fresh training, not both")
+            selections[key] = {**entry, "game": canonical_game(entry["game"]), "gpu": gpu}
+    return selections
+
+
 def command_for(job, root=ROOT):
     pair_key(job["game"], job["seed"])
     gpu_id(job["gpu"])
@@ -91,6 +117,12 @@ def command_for(job, root=ROOT):
     for key in ("warmup_offset_pairs", "hash_target_pairs"):
         if not isinstance(job["overrides"].get(PAIR_PREFIX + key), list):
             raise ValueError(f"Job must explicitly contain a {key} list")
+    if job.get("resume_warmup"):
+        # The saved checkpoint owns its config, environment, seed and trajectory.
+        # Supplying a fresh -config_path here would be rejected by the trainer.
+        return [job["python"], "-u", str(root / "train.py"), "-n", job["name"],
+                "-seed", str(job["seed"]), "-env_name", f"ALE/{job['game']}-v5",
+                "--resume_warmup", job["resume_warmup"], *override_args(job["overrides"])]
     return [job["python"], "-u", str(root / "train.py"),
             "-n", job["name"], "-seed", str(job["seed"]),
             "-config_path", job["config"], "-env_name", f"ALE/{job['game']}-v5",
@@ -99,8 +131,9 @@ def command_for(job, root=ROOT):
 
 
 class TrainingQueue:
-    def __init__(self, directory=QUEUE_DIR):
+    def __init__(self, directory=QUEUE_DIR, seed_directory=None):
         self.directory = Path(directory)
+        self.seed_directory = Path(seed_directory) if seed_directory is not None else self.directory.parent / "config_files/game_seeds"
 
     def path(self, gpu):
         return self.directory / f"gpu_{gpu_id(gpu)}.jsonl"
@@ -125,33 +158,55 @@ class TrainingQueue:
         return [json.loads(line) for line in path.read_text().splitlines() if line.strip()] if path.exists() else []
 
     def enqueue(self, game_seeds, gpus, config, overrides, python=sys.executable):
+        specs = [dict(game=game, seed=seed, config=str(Path(config).absolute()), overrides=overrides)
+                 for game, seed in game_seeds]
+        return self.enqueue_jobs(specs, gpus, python=python)
+
+    def enqueue_jobs(self, specs, gpus, python=sys.executable):
         gpus = list(dict.fromkeys(gpu_id(gpu) for gpu in gpus))
         if not gpus:
             raise ValueError("At least one GPU is required")
-        pairs = {}
-        for game, seed in game_seeds:
-            pairs[pair_key(game, seed)] = (canonical_game(game), seed)
         added, skipped = [], 0
         with locked(self.directory / "queue.lock"):
             registry = self.registry()
+            selections = read_seed_files(self.seed_directory)
+            for key, entry in selections.items():
+                previous = registry["owners"].get(key)
+                if previous is not None and previous != entry["gpu"]:
+                    raise ValueError(f"{key} already belongs to GPU {previous}; restore its seed file assignment")
             queues = {}
-            for key, (game, seed) in pairs.items():
+            new_selections = False
+            for spec in specs:
+                game, seed = canonical_game(spec["game"]), spec["seed"]
+                key = pair_key(game, seed)
+                selected_gpu = selections.get(key, {}).get("gpu", spec.get("gpu"))
+                if selected_gpu is not None:
+                    gpu_id(selected_gpu)
+                    if spec.get("gpu", selected_gpu) != selected_gpu:
+                        raise ValueError(f"GPU selection disagrees with seed file for {key}")
+                    if registry["owners"].get(key, selected_gpu) != selected_gpu:
+                        raise ValueError(f"Cannot move {key} from GPU {registry['owners'][key]} to {selected_gpu}")
+                    registry["owners"][key] = selected_gpu
                 if key not in registry["owners"]:
                     # Stable tie-breaking follows --gpus order. Historical owners count too.
                     registry["owners"][key] = min(
                         gpus, key=lambda gpu: list(registry["owners"].values()).count(gpu))
                 gpu = registry["owners"][key]
+                if key not in selections:
+                    selections[key] = dict(game=game, seed=seed, gpu=gpu, enabled=True,
+                                           warmups=[spec["warmup_source"]] if spec.get("warmup_source") else [],
+                                           fresh=not bool(spec.get("resume_warmup")))
+                    new_selections = True
                 if gpu not in queues:
                     queues[gpu] = self.jobs(gpu)
                 job_id = uuid.uuid4().hex
-                job = dict(id=job_id, game=game, seed=seed, gpu=gpu,
+                job = dict(spec, id=job_id, game=game, seed=seed, gpu=gpu,
                            name=f"{game}-seed{seed}-queue-{job_id}",
-                           config=str(Path(config).absolute()), python=str(Path(python).absolute()),
-                           overrides=overrides)
+                           python=str(Path(python).absolute()))
                 command_for(job)
                 json_line(job)  # Reject nonserializable/nonfinite values before any writes.
-                if any(all(previous.get(field) == job[field]
-                           for field in ("game", "seed", "config", "python", "overrides"))
+                if any(all(previous.get(field) == job.get(field)
+                           for field in ("game", "seed", "config", "python", "overrides", "resume_warmup"))
                        for previous in queues[gpu]):
                     skipped += 1
                     continue
@@ -159,6 +214,13 @@ class TrainingQueue:
                 added.append(job)
             # Persist ownership first: an interrupted enqueue cannot cause migration.
             self.save_registry(registry)
+            if new_selections:
+                self.seed_directory.mkdir(parents=True, exist_ok=True)
+                for gpu in sorted({entry["gpu"] for entry in selections.values()}, key=int):
+                    entries = [{key: value for key, value in entry.items() if key != "gpu"}
+                               for entry in selections.values() if entry["gpu"] == gpu]
+                    write_atomic(self.seed_directory / f"gpu_{gpu}.json",
+                                 json.dumps(dict(gpu=gpu, game_seeds=entries), indent=2) + "\n")
             for gpu, jobs in queues.items():
                 write_atomic(self.path(gpu), "".join(map(json_line, jobs)))
         return added, skipped
@@ -188,6 +250,9 @@ class TrainingQueue:
             key = pair_key(job["game"], job["seed"])
             if job["gpu"] != gpu or registry["owners"].get(key) != gpu:
                 raise ValueError(f"Ownership mismatch for {key}; queued job was left in {path}")
+            selection = read_seed_files(self.seed_directory).get(key)
+            if selection is not None and selection["gpu"] != gpu:
+                raise ValueError(f"Seed file moved {key} away from its permanent GPU {gpu}")
             command_for(job)  # Validate the head before removing it.
             write_atomic(path, tail)
             self.record("started", job)

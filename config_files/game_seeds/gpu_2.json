@@ -1,0 +1,53 @@
+{
+  "gpu": "2",
+  "game_seeds": [
+    {
+      "game": "Asterix",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Asterix-6000_Shared/shared_warmup_50011"
+      ]
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/CrazyClimber-6020_Shared/shared_warmup_53133"
+      ]
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Jamesbond-6010_Shared/shared_warmup_50135"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/PrivateEye-myserver-6020_Both/shared_warmup_50000"
+      ]
+    }
+  ]
+}

@@ -1,0 +1,53 @@
+{
+  "gpu": "5",
+  "game_seeds": [
+    {
+      "game": "BattleZone",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/BattleZone-6020_Shared/shared_warmup_50450"
+      ]
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Freeway-6020_Shared/shared_warmup_51200"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6040,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-6040_Shared/shared_warmup_50211"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 6050,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-6050_Shared/shared_warmup_50452"
+      ]
+    },
+    {
+      "game": "MsPacman",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/MsPacman-6010_Shared/shared_warmup_50003"
+      ]
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 6040,
+      "enabled": true,
+      "warmups": [
+        "ckpt/RoadRunner-6040_Shared/shared_warmup_50507"
+      ]
+    }
+  ]
+}

@@ -107,8 +107,84 @@ Following the **Training and Evaluating Instructions** to reproduce the main res
 
 ### GPU job queues
 
-Activate the STORM Python environment. Add experiments with `enqueue_train.py`,
-then run one `N_train.sh` per available GPU in separate tmux sessions:
+**Permanent seed selections are separate from consumable jobs.** Edit
+`config_files/game_seeds/gpu_0.json` through `gpu_7.json` to choose each GPU's
+games, individual seeds, and saved warmups. These files remain after jobs run:
+
+```json
+{
+  "gpu": "0",
+  "game_seeds": [
+    {
+      "game": "Amidar",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": ["ckpt/Amidar-6020_Shared/shared_warmup_50791"]
+    }
+  ]
+}
+```
+
+Set `enabled` to `false` to exclude a seed from future enqueue operations.
+Remove a path from `warmups` to exclude that particular snapshot. An empty
+`warmups` list does not start fresh training; set `fresh: true` explicitly if
+you want a new prefix, with no saved warmup paths. The same game/seed may have
+multiple snapshots in one entry, but cannot appear in multiple GPU files,
+even when disabled. Each snapshot is reused in a separate job on that GPU.
+
+The current local inventory contains **53 warmups for 49 distinct game/seed
+pairs**. All are selected initially, including 31 legacy checkpoints whose
+reusable metadata was recovered from saved branch commands/configs and actual
+training state. Original checkpoints are preserved. Legacy adapters contain
+small config/metadata files and symlinks under `training_queue/imported_warmups/`;
+they do not copy the large model/replay files.
+
+Refresh the inventory when more warmups have been saved:
+
+```bash
+conda activate storm
+python warmup_catalog.py --gpus 0 1 2 3 4 5 6 7
+```
+
+Discovery checks checkpoint/RNG/statistics state and replay array headers on
+CPU. Unusable sources and reasons go in `training_queue/warmup_inventory.json`.
+It preserves existing selection choices, only adds newly discovered sources,
+and never queues or starts training. It does not perform a full GPU training
+verification. Historical physical GPU IDs could not be established from the
+saved metadata, so the initial files distribute unique pairs across GPUs 0–7
+for future runs. You may move a whole entry to another GPU file **before its
+first queue registration**; afterwards the permanent assignment prevents moves.
+
+With no `--games` or `--game-seeds`, `enqueue_train.py` reads these files and
+uses their enabled selections. Games do not need to share the same seed:
+
+```bash
+python enqueue_train.py \
+  --warmup-offset-pairs '[[50000,-2]]' \
+  --hash-target-pairs '[[9,4],[10,8],[12,16]]' \
+  --set JointTrainAgent.Retrieval.enable Both \
+  --dry-run
+```
+
+Remove `--dry-run` to append the reviewed jobs. Add `--gpus 0 2` to use only
+those GPU files. Each job uses `--resume_warmup`; it restores the saved model,
+optimizer, replay, statistics and RNG instead of collecting warmup again.
+Unspecified settings come from the **saved checkpoint config**, while explicit
+overrides select the new experiment. The default experiment mode comes from
+the selected `--config` (normally `STORM.yaml`).
+
+For existing shared snapshots, each matching warmup/offset pair becomes a
+continuation with that scalar offset; its hash/target pairs run from the same
+snapshot. The nominal warmup target must match: a saved 50k snapshot is usable
+for `[50000, -2]`, even if the actual episode boundary is 50,406, but cannot
+reconstruct `[30000, -2]`. Incompatible targets or missing scoring statistics
+are reported and skipped; no replacement warmup is silently trained. In the
+current inventory all 53 sources support retrieval/TD-error experiments, while
+17 lack the `value` statistics required by the `value` preset.
+
+To explicitly add **fresh training** with new game/seed pairs, use `--games`
+and `--seeds` (Cartesian product), or `--game-seeds` (exact pairs). New entries
+are also recorded in the permanent GPU seed files:
 
 ```bash
 cd /home/choemj/STORM-1
@@ -123,7 +199,7 @@ python enqueue_train.py --gpus 0 1 2 3 \
 bash 0_train.sh  # separate tmux sessions: bash 1_train.sh, etc.
 ```
 
-This adds four jobs (games × seeds). Each job runs its entire requested sweep
+This fresh-training example adds four jobs (games × seeds). Each job runs its entire requested sweep
 on one GPU, sharing warmup snapshots through the existing training code. Both
 nonempty pair lists combine every warmup/offset pair with every hash/target
 pair. To specify game/seed pairs individually instead of games × seeds:
@@ -138,10 +214,12 @@ python enqueue_train.py --gpus 0 1 \
 
 `--warmup-offset-pairs` and `--hash-target-pairs` default to `[]`: **both YAML
 pair lists are always replaced**, so an omitted list cannot silently add extra
-experiments. `--set KEY VALUE` may be repeated for other settings. Values use
-YAML syntax (`True`, `Both`, numbers, lists, `null`). All other settings come
-from `config_files/STORM.yaml` at execution time, or the file passed with
-`--config`. Adding jobs validates overrides using the trainer, saves the Python
+experiments in fresh training. With existing snapshots, an omitted warmup pair
+list reuses each snapshot's saved target and offset (or explicit scalar
+overrides). `--set KEY VALUE` may be repeated for other settings. Values use
+YAML syntax (`True`, `Both`, numbers, lists, `null`). For fresh training, all
+other settings come from `config_files/STORM.yaml` at execution time, or the
+file passed with `--config`. Adding jobs validates overrides using the trainer, saves the Python
 executable from the active environment, and never edits the source YAML or
 starts training. Run names are unique so later experiments have separate outputs.
 
@@ -163,7 +241,9 @@ pending jobs are skipped; adding the same experiment after consumption permits
 a fresh run on its original GPU. Use the enqueue tool to append jobs safely
 while workers are running.
 
-Queue updates and assignments share a file lock. A second worker on the same
+Changing seed-file selections affects future enqueue operations; already queued
+jobs keep their saved overrides and source paths. Queue updates and assignments
+share a file lock. A second worker on the same
 GPU is rejected, as is moving a queued record to another GPU's file. On first
 worker startup, the GPU index is bound to its host/physical UUID; later device
 changes are rejected before a job is removed. Training receives that UUID in

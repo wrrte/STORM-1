@@ -1,0 +1,53 @@
+{
+  "gpu": "7",
+  "game_seeds": [
+    {
+      "game": "Boxing",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Boxing-6020_Both/shared_warmup_50406"
+      ]
+    },
+    {
+      "game": "Frostbite",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Frostbite-6010_Shared/shared_warmup_50294"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 7000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-7000_Shared/shared_warmup_50295"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 7000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-7000_Shared/shared_warmup_51060"
+      ]
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/PrivateEye-6000_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "Seaquest",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Seaquest-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000"
+      ]
+    }
+  ]
+}
