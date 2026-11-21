@@ -107,25 +107,100 @@ Following the **Training and Evaluating Instructions** to reproduce the main res
 
 ### GPU job queues
 
-Activate the STORM Python environment, then run `bash 0_train.sh` (or
-`1_train.sh` through `7_train.sh`) to consume ordinary shell commands, one per
-line. All workers default to the shared `job_queue_td_error_only.txt`,
-regardless of GPU model. Relative paths in jobs resolve from the STORM-1 directory. Queue pops
-use the corresponding `.lock` file, so multiple GPUs can share a queue.
-Blank lines and comments are skipped. Failed jobs are reported and the worker
-continues; each job has its own shell environment and working directory.
+Activate the STORM Python environment. Add experiments with `enqueue_train.py`,
+then run one `N_train.sh` per available GPU in separate tmux sessions:
 
-Pass a queue path to select a separate queue, for example:
+```bash
+cd /home/choemj/STORM-1
+conda activate storm
+
+python enqueue_train.py --gpus 0 1 2 3 \
+  --games Alien Pong --seeds 3000 3010 \
+  --warmup-offset-pairs '[[30000,-2],[50000,-2],[70000,0]]' \
+  --hash-target-pairs '[[9,4],[10,8],[12,16]]' \
+  --set JointTrainAgent.Retrieval.enable Both
+
+bash 0_train.sh  # separate tmux sessions: bash 1_train.sh, etc.
+```
+
+This adds four jobs (games × seeds). Each job runs its entire requested sweep
+on one GPU, sharing warmup snapshots through the existing training code. Both
+nonempty pair lists combine every warmup/offset pair with every hash/target
+pair. To specify game/seed pairs individually instead of games × seeds:
+
+```bash
+python enqueue_train.py --gpus 0 1 \
+  --game-seeds '[["Alien",3000],["Pong",3010]]' \
+  --hash-target-pairs '[[9,4],[10,8]]' \
+  --set JointTrainAgent.Retrieval.warmup_steps 50000 \
+  --set JointTrainAgent.Retrieval.anchor_weight_r 2
+```
+
+`--warmup-offset-pairs` and `--hash-target-pairs` default to `[]`: **both YAML
+pair lists are always replaced**, so an omitted list cannot silently add extra
+experiments. `--set KEY VALUE` may be repeated for other settings. Values use
+YAML syntax (`True`, `Both`, numbers, lists, `null`). All other settings come
+from `config_files/STORM.yaml` at execution time, or the file passed with
+`--config`. Adding jobs validates overrides using the trainer, saves the Python
+executable from the active environment, and never edits the source YAML or
+starts training. Run names are unique so later experiments have separate outputs.
+
+The persistent files are under `training_queue/` (excluded from Git):
+
+| File | Purpose |
+| --- | --- |
+| `gpu_N.jsonl` | GPU N's pending jobs, one JSON object per line; the first line is removed when claimed |
+| `assignments.json` | Permanent game/seed → GPU ownership, plus host and physical GPU UUID bindings |
+| `history.jsonl` | Consumed jobs and their exit/interruption records, including all overrides |
+
+New game/seed pairs are balanced across `--gpus` by the number of assigned
+pairs. Existing pairs **always keep their original GPU**, even when a later
+enqueue command lists different GPUs. For example, if `Alien / 3000` belongs
+to GPU 0, new hyperparameters for that pair append to `gpu_0.jsonl`; they wait
+there when GPU 0 is stopped. This also holds after all earlier jobs finish or
+workers restart. Game names are case-insensitive for ownership. Identical
+pending jobs are skipped; adding the same experiment after consumption permits
+a fresh run on its original GPU. Use the enqueue tool to append jobs safely
+while workers are running.
+
+Queue updates and assignments share a file lock. A second worker on the same
+GPU is rejected, as is moving a queued record to another GPU's file. On first
+worker startup, the GPU index is bound to its host/physical UUID; later device
+changes are rejected before a job is removed. Training receives that UUID in
+`CUDA_VISIBLE_DEVICES` so CUDA's device ordering cannot redirect it. Keep `assignments.json` when
+clearing pending jobs: deleting it loses the historical ownership information.
+This ownership applies to the new queue's jobs; it does not infer GPU ownership
+from older runs or control manually launched training.
+
+```bash
+python queue_train.py status
+bash 0_train.sh --once
+bash 1_train.sh --max-jobs 2
+```
+
+`--once` executes at most one job and exits, including when the queue is empty.
+`--max-jobs N` exits after N jobs. Both return the last job's exit status.
+Otherwise a worker waits for more jobs when its queue is empty. Failed jobs
+are recorded and the worker continues. Ctrl-C/SIGTERM stops the active training
+process and leaves subsequent jobs queued. Consumed jobs are not automatically
+retried; add them again to retry on the same GPU. An exit code of zero records
+process success, not an independent verification of evaluation output.
+
+**Legacy shell queues:** pass an explicit queue filename to keep the previous
+one-shell-command-per-line behavior. These queues have no permanent game/seed
+ownership; use the new default queue when device affinity is required.
 
 ```bash
 bash 0_train.sh job_queue_random_neighbor.txt
 bash 0_train.sh job_queue_random_neighbor.txt --once
+bash 0_train.sh job_queue_td_error_only.txt
 ```
 
-`--once` executes at most one queued job and exits, including when the queue is
-empty. `--max-jobs N` exits after N jobs. These options return the last job's
-exit status. To run the baseline-first campaign, use `bash baseline_train.sh 0`
-instead; its `job_queue_baseline_first.txt` contains campaign reservations.
+Legacy queue pops use their corresponding `.lock` files. Blank lines and
+comments are skipped, and each job has its own shell environment and working
+directory. Relative paths resolve from STORM-1. To run the baseline-first
+campaign, use `bash baseline_train.sh 0`; its `job_queue_baseline_first.txt`
+contains campaign reservations.
 
 ### First TD-error-only result for every game
 
@@ -135,11 +210,11 @@ checkpoint. Edit `td_error_z_score_threshold` there before preparing the queue:
 
 ```shell
 ../miniconda3/envs/storm/bin/python td_error_only_queue.py prepare
-bash 0_train.sh
+bash 0_train.sh job_queue_td_error_only.txt
 ```
 
-Additional GPUs use the same default queue, for example `bash 1_train.sh`.
-Passing a queue path explicitly selects that queue instead.
+Additional GPUs must explicitly select the same legacy queue, for example
+`bash 1_train.sh job_queue_td_error_only.txt`.
 Run the preparation command with the STORM Python
 environment; its executable is saved in every queue command.
 

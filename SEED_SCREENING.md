@@ -70,7 +70,7 @@ To stage a new campaign after the active one has finished:
 ```bash
 python frostbite_queue_campaign.py \
   --prepare config_files/STORM.frostbite_screen_20261107.yaml --start-seed 12000
-bash 0_train.sh
+bash 0_train.sh job_queue_3090.txt
 ```
 
 The selected seeds are conditioned on early training performance. These are

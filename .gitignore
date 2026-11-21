@@ -27,3 +27,4 @@ results/td_error_only_queue/
 job_queue_td_error_only.lock
 */test_*
 snap/
+training_queue/

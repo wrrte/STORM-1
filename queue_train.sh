@@ -48,6 +48,17 @@ fi
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 export CUDA_VISIBLE_DEVICES="$queue_gpu"
+# Default: each GPU consumes only its own persistent game/seed assignments.
+# An explicit queue file retains the legacy shell-command queue interface.
+if [[ -z "$queue_path" ]]; then
+    queue_options=()
+    if $queue_once; then
+        queue_options+=(--once)
+    elif (( queue_max_jobs )); then
+        queue_options+=(--max-jobs "$queue_max_jobs")
+    fi
+    exec python -u queue_train.py worker "$queue_gpu" "${queue_options[@]}"
+fi
 for dependency in nvidia-smi flock; do
     if ! command -v "$dependency" >/dev/null 2>&1; then
         echo "Required command not found: $dependency" >&2
@@ -59,8 +70,6 @@ if [[ -z "$queue_gpu_name" ]]; then
     echo "No GPU name returned for GPU $queue_gpu." >&2
     exit 1
 fi
-# Every N_train.sh shares the TD-only queue unless a queue is passed explicitly.
-queue_path="${queue_path:-job_queue_td_error_only.txt}"
 queue_lock="${queue_path%.txt}.lock"
 touch -- "$queue_path"
 echo "Worker started on GPU $queue_gpu ($queue_gpu_name). Waiting for jobs in $queue_path..."
