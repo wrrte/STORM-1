@@ -75,54 +75,22 @@ def start_round(cache, round_id, models, config, overrides):
     return manifest
 
 
-def wandb_evidence(root):
-    """Index only hardware/run identity, never export the whole W&B metadata."""
-    result = {}
-    for path in sorted((root / "wandb").glob("*/files/wandb-metadata.json")):
-        try:
-            meta = json.loads(path.read_text())
-            args = meta["args"]
-            key = tuple(args[args.index(flag) + 1] for flag in ("-n", "-seed", "-env_name"))
-            model = gpu_type(meta["gpu"])
-            result.setdefault(key, {}).setdefault(model, str(path.relative_to(root)))
-        except (ValueError, KeyError, IndexError, TypeError, OSError):
-            continue
-    return result
-
-
-def origin(record, source, evidence, root):
-    path = source / "queue_origin.json"
-    if path.is_file():
-        data = json.loads(path.read_text())
-        return gpu_type(data["gpu_type"]), dict(kind="queue_origin", source=str(path.relative_to(root)))
-    meta = record["metadata"]
-    key = (meta["run_name"], str(record["seed"]), meta["env_name"])
-    models = evidence.get(key, {})
-    if len(models) != 1:
-        reason = "conflicting W&B GPU models" if models else "no saved GPU provenance"
-        raise ValueError(f"{reason}; GPU type cannot be inferred from the current card or a folder name")
-    model, path = next(iter(models.items()))
-    return model, dict(kind="wandb_run", source=path)
-
-
 def scan(cache, round_id, model, machine=None, *, root=ROOT):
-    """Read local payloads afresh; do not enqueue, import, prune, or change selections."""
+    """Inspect local payloads and assign them to this machine's supplied GPU model."""
     from warmup_catalog import warmup_sources, inspect_warmup, source_stamp, compatibility
     model, machine = gpu_type(model), identifier(machine or socket.gethostname())
     manifest = load_manifest(cache, round_id)
     if model not in manifest["gpu_types"]:
         raise ValueError(f"{model} is not a participant in round {round_id}")
-    evidence = wandb_evidence(root)
     games, excluded = {}, []
     for source in warmup_sources(root, include_unpublished=True):
         name = str(source.relative_to(root))
         try:
             before = source_stamp(source)
             record = inspect_warmup(source, root=root, queue_dir=root / "training_queue")
-            actual, proof = origin(record, source, evidence, root)
-            record["gpu_type"] = actual
-            if actual != model:
-                raise ValueError(f"Saved GPU type is {actual}, not this scan's {model}; scan it under {actual}")
+            # Checkpoints stay on the machine that generated them. Its supplied
+            # GPU model is authoritative; historical hardware logs are optional.
+            record["gpu_type"] = model
             checks = []
             for i, overrides in enumerate(manifest["profile"]["requests"]):
                 job = dict(game=record["game"], seed=record["seed"], gpu_type=model,
@@ -134,7 +102,7 @@ def scan(cache, round_id, model, machine=None, *, root=ROOT):
             item = dict(source=name, step=record["step"], warmup_steps=record["warmup_steps"],
                         statistics_signals=record["statistics_signals"],
                         saved_config_sha256=hashlib.sha256(record["config"].encode()).hexdigest(),
-                        provenance=proof, checks=checks)
+                        provenance=dict(kind="machine_location", machine=machine, gpu_type=model), checks=checks)
             seeds = games.setdefault(record["game"], {}).setdefault(model, {})
             seeds.setdefault(str(record["seed"]), []).append(item)
         except (ValueError, KeyError, TypeError, OSError, RuntimeError, EOFError, AssertionError,
@@ -142,7 +110,7 @@ def scan(cache, round_id, model, machine=None, *, root=ROOT):
             excluded.append(dict(source=name, reason=f"{type(error).__name__}: {error}"))
     commit = git(root, "rev-parse", "HEAD", check=False)
     report = dict(version=1, round=round_id, profile_sha256=manifest["profile_sha256"],
-                  gpu_type=model, machine=machine, scanned_at=timestamp(),
+                  gpu_type=model, machine=machine, gpu_assignment="machine_location", scanned_at=timestamp(),
                   code_commit=commit.stdout.strip() if commit.returncode == 0 else None,
                   games=games, excluded=excluded)
     path = round_dir(cache, round_id) / "machines" / model / f"{machine}.json"
@@ -345,7 +313,8 @@ def main(argv=None):
                     commands.add_parser("pull"), commands.add_parser("report")):
         command.add_argument("--round", required=True)
         if command.prog.split()[-1] in {"scan", "sync"}:
-            command.add_argument("--gpu-type", required=True)
+            command.add_argument("--gpu-type", required=True,
+                                 help="GPU model of this machine; assigns all local checkpoints to that model")
             command.add_argument("--machine", help="Stable machine ID; defaults to hostname")
         if command.prog.split()[-1] in {"sync", "pull"}:
             command.add_argument("--remote", default="origin")

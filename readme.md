@@ -298,10 +298,14 @@ used. The inventory is accurate **as of each scan**, not a live remote disk
 check. Rescanning replaces that machine's report, removing deleted snapshots
 from the current inventory. New rounds keep prior round history separate.
 
-Inspection reuses the queue's CPU checkpoint/configuration checks and validates
-the saved `queue_origin.json`. Legacy snapshots require consistent W&B run
-identity/GPU evidence; an unverified GPU type is excluded instead of inferred
-from the current card or a directory name. A structurally valid snapshot can
+Inspection reuses the queue's CPU checkpoint/configuration checks. Checkpoints
+remain on the machine that generated them, so `--gpu-type` assigns every local
+snapshot to that machine's GPU model. Historical `queue_origin.json` and W&B
+GPU logs are not required and do not override this assignment. Reports record
+the machine/model as `provenance.kind: machine_location`. After updating an
+older scanner, rerun `sync` on any machine whose reports excluded snapshots
+for missing GPU history; existing published reports are replaced on that scan.
+A structurally valid snapshot can
 still be incompatible with the frozen profile. With multiple requested warmup
 targets, “usable” means compatible with **at least one** request; the JSON
 includes the compatibility result and reason for every request/snapshot.
