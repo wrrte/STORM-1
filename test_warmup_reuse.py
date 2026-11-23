@@ -37,8 +37,8 @@ class WarmupTests(unittest.TestCase):
         conf.JointTrainAgent.Retrieval.warmup_offset_pairs = []
         conf.JointTrainAgent.Retrieval.hash_target_pairs = []
         conf.JointTrainAgent.Retrieval.save_warmup = True
-        meta = dict(version=1, run_name=run, seed=6000, env_name='ALE/Alien-v5', step=50001,
-                    trajectory_path=str(self.root/'D_TRAJ/Alien.pkl'), cwd=str(self.root),
+        meta = dict(version=1, run_name=run, seed=self.job['seed'], env_name=f"ALE/{self.job['game']}-v5", step=50001,
+                    trajectory_path=str(self.root/'D_TRAJ'/f"{self.job['game']}.pkl"), cwd=str(self.root),
                     statistics_signals=list(signals), requested_warmup_steps=[50000])
         (source/'config.yaml').write_text(conf.dump())
         (source/'warmup_metadata.json').write_text(json.dumps(meta))
@@ -46,7 +46,8 @@ class WarmupTests(unittest.TestCase):
         (source/'replay_buffer.npz').write_text('test replay payload')
         return dict(source=str(source.relative_to(self.root)), resume_warmup=str(source),
                     config=conf.dump(), metadata=meta, legacy=False, gpu_type='A6000',
-                    game='Alien', seed=6000, step=50001, warmup_steps=[50000], statistics_signals=list(signals))
+                    game=self.job['game'], seed=self.job['seed'], step=50001,
+                    warmup_steps=[50000], statistics_signals=list(signals))
 
     def test_retrieval_sweeps_reuse_but_prefix_changes_do_not(self):
         self.assertIsNone(compatibility(self.record, self.job))
@@ -68,6 +69,35 @@ class WarmupTests(unittest.TestCase):
         record, reasons=choose_warmup(self.job,dict(available=[self.record]))
         self.assertIsNone(record)
         self.assertIn('missing statistics',reasons[0]['reason'])
+
+    def test_freeway_defaults_to_demonstrations_and_reuses_matching_snapshot(self):
+        spec = build_specs([['Freeway', 6010]], 'A6000', ROOT / 'config_files/STORM.yaml', {
+            PAIR_PREFIX+'warmup_offset_pairs': [], PAIR_PREFIX+'hash_target_pairs': [],
+            PAIR_PREFIX+'enable': 'Both'}, 0)[0]
+        self.assertTrue(spec['overrides']['JointTrainAgent.UseDemonstration'])
+        self.assertTrue(request_config(spec).JointTrainAgent.UseDemonstration)
+        self.assertFalse(request_config(self.job).JointTrainAgent.UseDemonstration)
+        # The registry evaluates a common frozen profile against each actual game.
+        profile_job = copy.deepcopy(spec)
+        profile_job['overrides'].pop('JointTrainAgent.UseDemonstration')
+        self.assertTrue(request_config(profile_job).JointTrainAgent.UseDemonstration)
+        self.job = self.queue.enqueue_jobs([spec])[0][0]
+        with_demo = self.make_record('freeway-demo')
+        with_demo.update(game='Freeway', seed=6010)
+        without_demo = copy.deepcopy(with_demo)
+        conf = request_config(spec)
+        conf.JointTrainAgent.UseDemonstration = False
+        without_demo.update(source='without-demo', config=conf.dump())
+        chosen, reasons = choose_warmup(self.job, dict(available=[without_demo, with_demo]))
+        self.assertEqual(chosen['source'], with_demo['source'])
+        self.assertIn('UseDemonstration', reasons[0]['reason'])
+        # Both retrieval and baseline continuations retain Freeway's demonstration setting.
+        for command in branch_commands(self.job, with_demo, root=self.root).values():
+            index = command.index('JointTrainAgent.UseDemonstration')
+            self.assertEqual(command[index + 1], 'True')
+        explicit = copy.deepcopy(spec)
+        explicit['overrides']['JointTrainAgent.UseDemonstration'] = False
+        self.assertFalse(request_config(explicit).JointTrainAgent.UseDemonstration)
 
     def test_existing_warmup_plan_contains_all_hash_arms_and_one_baseline(self):
         commands=branch_commands(self.job,self.record,root=self.root)

@@ -22,7 +22,7 @@ def validate_overrides(config_path, overrides):
 
 def build_specs(pairs, model, config, overrides, priority):
     from utils import load_config
-    from warmup_catalog import request_config
+    from warmup_catalog import request_config, game_overrides
     from storm_warmup_sweep import parse_warmup_offset_pairs
     text = load_config(config).dump()
     template = dict(gpu_type=model, config=str(config.absolute()), config_text=text, overrides=overrides)
@@ -34,7 +34,7 @@ def build_specs(pairs, model, config, overrides, priority):
     for game, seed in pairs:
         pair_key(game, seed)
         for target, offset in targets:
-            effective = {**overrides, PAIR_PREFIX + "warmup_offset_pairs": [],
+            effective = {**game_overrides(game, overrides), PAIR_PREFIX + "warmup_offset_pairs": [],
                          PAIR_PREFIX + "warmup_steps": target, PAIR_PREFIX + "anchor_offset": offset,
                          PAIR_PREFIX + "save_warmup": True}
             specs.append(dict(template, game=canonical_game(game), seed=seed,

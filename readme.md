@@ -140,6 +140,13 @@ YAML pair lists. With no warmup pairs, the selected config's scalar
 `warmup_steps`/`anchor_offset` applies. Each warmup/offset pair is a separate
 job; its selected experiment/hash variants retain individual completion state.
 
+For STORM, Freeway defaults to `JointTrainAgent.UseDemonstration: true`, while
+other games retain the configured value (false in `STORM.yaml`). The same
+game-specific setting applies to warmup compatibility, new collection, and
+retrieval/baseline continuations. An explicit
+`--set JointTrainAgent.UseDemonstration False` requests the no-demonstration
+ablation instead.
+
 ```bash
 # In separate tmux sessions, start only the cards you want to use.
 bash 0_train.sh
@@ -312,8 +319,9 @@ Local files are in `training_queue/shared_warmups/rounds/ROUND/manifest.json`
 and `machines/GPU_TYPE/MACHINE.json` beneath that round directory. They are
 excluded from the source branch and published on the dedicated inventory
 branch. The initial A6000 inspection found 53 snapshots / 49 valid pairs;
-47 pairs match the default profile. Freeway/6010 and Freeway/6020 differ in
-`JointTrainAgent.UseDemonstration`. RTX 3090 and TITAN RTX remain pending until
+all 49 pairs match the default profile, including Freeway's demonstration
+snapshots. The extra four snapshots are duplicate game/seed pairs, not
+unidentified pairs. RTX 3090 and TITAN RTX remain pending until
 their machines publish an inspection.
 
 ### Migrating older queues

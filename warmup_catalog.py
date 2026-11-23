@@ -238,11 +238,19 @@ def resolve_prepared(source, *, root=ROOT, queue_dir=QUEUE_DIR):
     return checkpoint, metadata
 
 
+def game_overrides(game, overrides):
+    """STORM uses demonstrations for Freeway unless explicitly overridden."""
+    effective = dict(overrides)
+    if game and canonical_game(game) == "Freeway":
+        effective.setdefault("JointTrainAgent.UseDemonstration", True)
+    return effective
+
+
 def request_config(job):
     from yacs.config import CfgNode
     from training_branches import parse_retrieval_mode
     conf = CfgNode.load_cfg(job["config_text"])
-    overrides = dict(job["overrides"])
+    overrides = game_overrides(job.get("game"), job["overrides"])
     mode = overrides.pop(PAIR_PREFIX + "enable", conf.JointTrainAgent.Retrieval.enable)
     if PAIR_PREFIX + "anchor_weight_r" in overrides:
         conf.JointTrainAgent.Retrieval.anchor_weight_r = None
