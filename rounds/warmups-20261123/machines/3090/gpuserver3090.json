@@ -4,7 +4,7 @@
   "profile_sha256": "2bc7ac1b6d0dd0abb9816784c9bcf94bd201785227370486e9684ec797311853",
   "gpu_type": "3090",
   "machine": "gpuserver3090",
-  "scanned_at": "2026-11-23T07:28:27.053906+00:00",
+  "scanned_at": "2026-11-23T07:35:51.839896+00:00",
   "code_commit": "d620d37a3476cc17a24d9fd98e87f158f917a9be",
   "games": {
     "Alien": {
