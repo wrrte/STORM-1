@@ -4,8 +4,9 @@
   "profile_sha256": "2bc7ac1b6d0dd0abb9816784c9bcf94bd201785227370486e9684ec797311853",
   "gpu_type": "3090",
   "machine": "gpuserver3090",
-  "scanned_at": "2026-11-23T07:35:51.839896+00:00",
-  "code_commit": "d620d37a3476cc17a24d9fd98e87f158f917a9be",
+  "gpu_assignment": "machine_location",
+  "scanned_at": "2026-11-23T07:37:08.063518+00:00",
+  "code_commit": "e3dc2cff358ef39ebf50a19315348e99caf28818",
   "games": {
     "Alien": {
       "3090": {
@@ -22,8 +23,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261014_045142-g8q1cbmg/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -45,8 +47,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261014_045142-g8q1cbmg/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -70,8 +73,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_163812-wlp0kjb2/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -95,8 +99,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_152106-5slgvjs4/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -120,8 +125,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_063636-v2g6e1pf/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -146,8 +152,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_151428-yh0des80/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -170,8 +177,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_151428-yh0des80/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -194,8 +202,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_151428-yh0des80/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -220,8 +229,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_082928-e9gfm415/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -244,8 +254,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_082928-e9gfm415/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -268,8 +279,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_082928-e9gfm415/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -293,8 +305,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_011600-3i1rr01b/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -318,8 +331,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_011609-yviy86bs/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -343,8 +357,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_011611-row1posy/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -372,8 +387,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261014_091408-0q4xwmr8/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -397,8 +413,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_163816-6jcetts8/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -422,8 +439,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_154336-9auxogsv/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -447,8 +465,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_094845-9qu6c88u/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -473,8 +492,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_152459-yp037y84/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -497,8 +517,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_152459-yp037y84/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -521,8 +542,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_152459-yp037y84/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -547,8 +569,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_084243-h92873k8/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -571,8 +594,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_084243-h92873k8/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -595,8 +619,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_084243-h92873k8/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -620,8 +645,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_011620-quvwm4dp/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -645,8 +671,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_011633-7p8t7td2/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -670,8 +697,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_011637-4hx1sk5e/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -699,8 +727,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261012_150635-vxwpvsh9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -724,8 +753,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_062337-oa9o69hf/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -749,8 +779,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_163820-fj9e7ecy/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -775,8 +806,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_152802-hkl88w2n/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -799,8 +831,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_152802-hkl88w2n/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -823,8 +856,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_152802-hkl88w2n/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -849,8 +883,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_121800-gcpaavgb/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -873,8 +908,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_121800-gcpaavgb/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -897,8 +933,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_121800-gcpaavgb/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -922,8 +959,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_165136-csjzqtjl/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -947,8 +985,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_035710-8aefd250/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -972,8 +1011,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_062210-zdgr4rga/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -997,8 +1037,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_062955-annegmji/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1026,8 +1067,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261014_111805-yt9rnqvg/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1051,8 +1093,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_193122-etxix9xr/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1076,8 +1119,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_094850-xv23ds19/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1102,8 +1146,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_024348-tpz42ub4/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1126,8 +1171,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_024348-tpz42ub4/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1150,8 +1196,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_024348-tpz42ub4/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1176,8 +1223,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_125218-mjoaxim3/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1200,8 +1248,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_125218-mjoaxim3/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1224,8 +1273,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_125218-mjoaxim3/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1249,8 +1299,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_163825-6pq4sopa/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1274,8 +1325,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_090613-ncr4oldh/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1299,8 +1351,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_111346-lm1x13ln/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1324,8 +1377,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_111351-aoanynqe/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1353,8 +1407,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261014_165214-qa8vuv4o/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1376,8 +1431,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261014_165214-qa8vuv4o/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1401,8 +1457,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_163843-7pv963ib/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1426,8 +1483,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_193225-i1b69x1j/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1451,8 +1509,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_094856-9xcth1v1/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1477,8 +1536,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_024609-3lpmy3cr/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1501,8 +1561,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_024609-3lpmy3cr/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1525,8 +1586,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_024609-3lpmy3cr/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1551,8 +1613,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_200005-bs5s2ztt/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1575,8 +1638,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_200005-bs5s2ztt/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1599,8 +1663,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_200005-bs5s2ztt/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1624,8 +1689,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_111359-ugkfsa9u/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1649,8 +1715,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_113327-5ddcvza4/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1674,8 +1741,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_114117-v26b74kw/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1703,8 +1771,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261014_015212-wtp21y3g/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1728,8 +1797,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_165919-48z6dc9p/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1753,8 +1823,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_080928-apg0mnwk/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1778,8 +1849,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_012220-kjg80rby/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1804,8 +1876,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_030711-cww4eyxe/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1828,8 +1901,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_030711-cww4eyxe/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1852,8 +1926,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_030711-cww4eyxe/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1878,8 +1953,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_201802-iuf6hrf5/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1902,8 +1978,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_201802-iuf6hrf5/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1926,8 +2003,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_201802-iuf6hrf5/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1951,8 +2029,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_140712-5aq9tsy2/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -1976,8 +2055,9 @@
             ],
             "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261107_145238-1h7lhmox/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2005,8 +2085,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261012_150645-zo431hef/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2030,8 +2111,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_220943-gk043fwh/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2055,8 +2137,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_095418-ikwihs80/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2080,8 +2163,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_202032-e38ldnex/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2106,8 +2190,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_031522-aj6ytutz/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2130,8 +2215,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_031522-aj6ytutz/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2154,8 +2240,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_031522-aj6ytutz/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2180,8 +2267,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_002436-hsercr2r/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2204,8 +2292,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_002436-hsercr2r/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2228,8 +2317,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_002436-hsercr2r/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2257,8 +2347,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261014_185457-06fs6uhz/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2282,8 +2373,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_193240-h4mpvg5p/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2307,8 +2399,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_094905-218rlem0/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2333,8 +2426,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_141836-qjsj7p1n/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2357,8 +2451,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_141836-qjsj7p1n/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2381,8 +2476,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_141836-qjsj7p1n/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2407,8 +2503,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_003641-ga69lmes/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2431,8 +2528,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_003641-ga69lmes/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2455,8 +2553,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_003641-ga69lmes/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2480,8 +2579,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_220633-l5epeyrl/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2509,8 +2609,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261015_012617-indujqxr/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2534,8 +2635,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_193301-c0nfsol7/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2559,8 +2661,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261022_114526-lqrinbh8/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2585,8 +2688,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_142635-7v45mbff/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2609,8 +2713,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_142635-7v45mbff/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2633,8 +2738,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_142635-7v45mbff/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2659,8 +2765,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_081613-adxaho6g/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2683,8 +2790,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_081613-adxaho6g/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2707,8 +2815,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_081613-adxaho6g/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2732,8 +2841,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_013559-6sfg0wgx/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2761,8 +2871,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261015_033148-bcv0tx5g/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2784,8 +2895,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261015_033148-bcv0tx5g/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2809,8 +2921,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_225545-e75yv3qj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2834,8 +2947,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261023_142844-4e8cz5x4/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2860,8 +2974,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_143306-ne2qa571/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2884,8 +2999,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_143306-ne2qa571/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2908,8 +3024,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_143306-ne2qa571/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2934,8 +3051,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_082656-s5he719w/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2958,8 +3076,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_082656-s5he719w/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -2982,8 +3101,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_082656-s5he719w/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3007,8 +3127,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_031710-gq7b8igq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3036,8 +3157,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261015_092456-ue0x9nli/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3061,8 +3183,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_232005-v53p8rne/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3086,8 +3209,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261023_194607-dz5p1ri9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3112,8 +3236,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_151027-jr9v0zuc/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3136,8 +3261,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_151027-jr9v0zuc/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3160,8 +3286,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261030_151027-jr9v0zuc/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3186,8 +3313,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_124814-ms5elntc/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3210,8 +3338,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_124814-ms5elntc/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3234,8 +3363,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_124814-ms5elntc/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3259,8 +3389,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_064604-h6zpocfq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3288,8 +3419,9 @@
             ],
             "saved_config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261023_032609-d0ulfxbq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3313,8 +3445,9 @@
             ],
             "saved_config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261023_085822-aymnmgfu/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3338,8 +3471,9 @@
             ],
             "saved_config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_095621-ogpktrzj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3363,8 +3497,9 @@
             ],
             "saved_config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_082304-71hj2re8/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3389,8 +3524,9 @@
             ],
             "saved_config_sha256": "09247a202b703d0f8b64036a401920fa531c7ebe7f2217f3d968b49b52da3d94",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_150707-lcstj46y/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3413,8 +3549,9 @@
             ],
             "saved_config_sha256": "d187b72007338cdfbf1780914707f39985eec06af7b19c10590482e109640ee4",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_150707-lcstj46y/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3437,8 +3574,9 @@
             ],
             "saved_config_sha256": "4fbcc02b7bb1f1f0fdcd81e79f186f6713cabdfc91a2a2244318484b4bf27953",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_150707-lcstj46y/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3463,8 +3601,9 @@
             ],
             "saved_config_sha256": "09247a202b703d0f8b64036a401920fa531c7ebe7f2217f3d968b49b52da3d94",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_130507-psgzpxcm/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3487,8 +3626,9 @@
             ],
             "saved_config_sha256": "d187b72007338cdfbf1780914707f39985eec06af7b19c10590482e109640ee4",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_130507-psgzpxcm/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3511,8 +3651,9 @@
             ],
             "saved_config_sha256": "4fbcc02b7bb1f1f0fdcd81e79f186f6713cabdfc91a2a2244318484b4bf27953",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261105_130507-psgzpxcm/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3540,8 +3681,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261013_152931-tmzq8iju/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3565,8 +3707,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_095628-lm23oo6e/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3590,8 +3733,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_001729-1mgaebwu/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3616,8 +3760,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134302-88vnugoq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3640,8 +3785,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134302-88vnugoq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3664,8 +3810,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134302-88vnugoq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3689,8 +3836,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_120352-o15t8yjf/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3715,8 +3863,9 @@
             ],
             "saved_config_sha256": "5f836b6483854a1c3a07fdf437f1ad82aa89621dd8dbc54cd5657a81da750574",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261108_000957-yedg73ru/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3741,8 +3890,9 @@
             ],
             "saved_config_sha256": "5f836b6483854a1c3a07fdf437f1ad82aa89621dd8dbc54cd5657a81da750574",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261108_085207-3yag1lg3/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3767,8 +3917,9 @@
             ],
             "saved_config_sha256": "5f836b6483854a1c3a07fdf437f1ad82aa89621dd8dbc54cd5657a81da750574",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/latest-run/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3796,8 +3947,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261012_233112-h65m7n5p/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3821,8 +3973,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_095633-4mo90l4w/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3846,8 +3999,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_134746-hp4l9u7o/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3871,8 +4025,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_163702-4l9a23ae/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3897,8 +4052,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134304-rsovk1bw/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3921,8 +4077,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134304-rsovk1bw/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3945,8 +4102,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134304-rsovk1bw/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3974,8 +4132,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261015_104215-m866kvqa/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -3999,8 +4158,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_063244-xiokqe80/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4024,8 +4184,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_010811-k0c61a88/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4050,8 +4211,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134305-npeh6j85/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4074,8 +4236,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134305-npeh6j85/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4098,8 +4261,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134305-npeh6j85/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4123,8 +4287,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_170938-8xyrx34g/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4152,8 +4317,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_095641-39z69o8u/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4175,8 +4341,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_095641-39z69o8u/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4200,8 +4367,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261012_232351-p5jjyikk/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4225,8 +4393,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_185807-q4engxgy/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4250,8 +4419,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_094501-9ur8o1o7/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4276,8 +4446,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134306-4fvucrkm/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4300,8 +4471,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134306-4fvucrkm/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4324,8 +4496,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261102_134306-4fvucrkm/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4353,8 +4526,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261015_173828-uwtvp3xv/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4379,14 +4553,165 @@
             ],
             "saved_config_sha256": "0b0c81d046d5c49acdd123216be108f3c74fba777b0ac07208db05c5955970be",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261026_051926-4qziezq1/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
                 "request": 0,
                 "compatible": true,
                 "reason": null
+              }
+            ]
+          }
+        ],
+        "2050": [
+          {
+            "source": "ckpt/Kangaroo-2050_Shared/shared_warmup_50197",
+            "step": 50197,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2060": [
+          {
+            "source": "ckpt/Kangaroo-2060_Shared/shared_warmup_50321",
+            "step": 50321,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2070": [
+          {
+            "source": "ckpt/Kangaroo-2070_Shared/shared_warmup_50189",
+            "step": 50189,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2080": [
+          {
+            "source": "ckpt/Kangaroo-2080_Shared/shared_warmup_50304",
+            "step": 50304,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2090": [
+          {
+            "source": "ckpt/Kangaroo-2090_Shared/shared_warmup_50265",
+            "step": 50265,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2100": [
+          {
+            "source": "ckpt/Kangaroo-2100_Shared/shared_warmup_50455",
+            "step": 50455,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
               }
             ]
           }
@@ -4404,8 +4729,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261026_084706-xghc1moe/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4430,8 +4756,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_053305-d1jx7g04/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4454,8 +4781,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_053305-d1jx7g04/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4478,8 +4806,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261029_053305-d1jx7g04/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4503,8 +4832,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_070251-neuyd2s9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4532,8 +4862,9 @@
             ],
             "saved_config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261028_162635-s7xbcamy/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4557,14 +4888,317 @@
             ],
             "saved_config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261028_162639-xxvvc4ow/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
                 "request": 0,
                 "compatible": true,
                 "reason": null
+              }
+            ]
+          }
+        ],
+        "2100": [
+          {
+            "source": "ckpt/Krull-2100_Shared/shared_warmup_50621",
+            "step": 50621,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2110": [
+          {
+            "source": "ckpt/Krull-2110_Shared/shared_warmup_57054",
+            "step": 57054,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "7af343d9daae68ffddcadb126001257758e147da3a8e0459cbd9da28804e37ed",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "2120": [
+          {
+            "source": "ckpt/Krull-2120_Shared/shared_warmup_50597",
+            "step": 50597,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2130": [
+          {
+            "source": "ckpt/Krull-2130_Shared/shared_warmup_50645",
+            "step": 50645,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2140": [
+          {
+            "source": "ckpt/Krull-2140_Shared/shared_warmup_50282",
+            "step": 50282,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2150": [
+          {
+            "source": "ckpt/Krull-2150_Shared/shared_warmup_50308",
+            "step": 50308,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2160": [
+          {
+            "source": "ckpt/Krull-2160_Shared/shared_warmup_50948",
+            "step": 50948,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2170": [
+          {
+            "source": "ckpt/Krull-2170_Shared/shared_warmup_50486",
+            "step": 50486,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2180": [
+          {
+            "source": "ckpt/Krull-2180_Shared/shared_warmup_50227",
+            "step": 50227,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2190": [
+          {
+            "source": "ckpt/Krull-2190_Shared/shared_warmup_51493",
+            "step": 51493,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2200": [
+          {
+            "source": "ckpt/Krull-2200_Shared/shared_warmup_51349",
+            "step": 51349,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "2210": [
+          {
+            "source": "ckpt/Krull-2210_Shared/shared_warmup_50010",
+            "step": 50010,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
               }
             ]
           }
@@ -4583,8 +5217,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_012233-i0wd4arv/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4607,8 +5242,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_012233-i0wd4arv/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4631,8 +5267,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_012233-i0wd4arv/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4656,8 +5293,9 @@
             ],
             "saved_config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261028_162646-oct0z07a/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4681,8 +5319,9 @@
             ],
             "saved_config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261028_162650-zk1sgsqr/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4710,8 +5349,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261015_190019-u98nkx69/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4735,8 +5375,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_210719-7zsc58lw/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4760,8 +5401,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_110234-rn4cm2hq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4785,8 +5427,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_141313-3oivzrbf/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4811,8 +5454,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_013047-xsllp3ua/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4835,8 +5479,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_013047-xsllp3ua/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4859,8 +5504,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_013047-xsllp3ua/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4888,8 +5534,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_021750-y1l1244o/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4911,8 +5558,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_021750-y1l1244o/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4934,8 +5582,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_021750-y1l1244o/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4959,8 +5608,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_210725-cw1ntvmk/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -4984,8 +5634,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_110239-ifze3an2/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5009,8 +5660,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_144825-94yksq60/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5035,8 +5687,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_013424-14t6taxa/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5059,8 +5712,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_013424-14t6taxa/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5083,8 +5737,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_013424-14t6taxa/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5112,8 +5767,36 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261013_064924-b54ow02s/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "2010": [
+          {
+            "source": "ckpt/Pong-2010_Shared/shared_warmup_50148",
+            "step": 50148,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5137,8 +5820,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_210730-oc2tfxjv/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5162,8 +5846,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_163705-bw2nr1j2/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5188,8 +5873,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_124619-46shnga9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5212,8 +5898,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_124619-46shnga9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5236,8 +5923,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_124619-46shnga9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5261,8 +5949,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_113857-9qq3jp8v/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5290,8 +5979,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_025253-goyt45yh/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5313,8 +6003,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_025253-goyt45yh/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5338,8 +6029,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_210735-83t18cqx/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5363,8 +6055,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_110245-x1oqpjh4/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5388,8 +6081,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_215516-41yns9d1/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5414,8 +6108,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_125410-vkmv0ieq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5438,8 +6133,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_125410-vkmv0ieq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5462,8 +6158,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_125410-vkmv0ieq/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5491,8 +6188,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261013_215602-ft43zoc8/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5516,8 +6214,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_210741-kpbgrq1q/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5541,8 +6240,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_074812-moy9d7do/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5566,8 +6266,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261021_201015-zpvoz4k4/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5592,8 +6293,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_130727-rnzbkuvj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5616,8 +6318,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_130727-rnzbkuvj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5640,8 +6343,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_130727-rnzbkuvj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5669,8 +6373,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261013_074321-rukkjbk9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5694,8 +6399,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261024_150518-b545fdcy/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5719,8 +6425,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261025_221850-67e083zt/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5744,8 +6451,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_235812-ajblizfa/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5770,8 +6478,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_130823-hehfhof5/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5794,8 +6503,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_130823-hehfhof5/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5818,8 +6528,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261103_130823-hehfhof5/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5847,8 +6558,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261016_085431-hi5yyffn/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5872,8 +6584,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261026_000741-xm0wng8s/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5897,8 +6610,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_110250-lq6djfts/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5922,8 +6636,9 @@
             ],
             "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261018_222432-zmhjx5rz/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5948,8 +6663,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_004418-qfms1edl/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5972,8 +6688,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_004418-qfms1edl/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -5996,8 +6713,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_004418-qfms1edl/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -6025,8 +6743,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261013_155230-7ire52x2/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -6050,8 +6769,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261026_033133-d0hm554n/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -6075,8 +6795,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261017_002618-7diuavqb/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -6100,8 +6821,9 @@
             ],
             "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261021_144825-wt2ljt7h/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -6126,8 +6848,9 @@
             ],
             "saved_config_sha256": "2a06067df9586cf71ac81fd266dc1148e43047410737c9db4e3707b64e129fdc",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_004655-mhyfb1x9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -6150,8 +6873,9 @@
             ],
             "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_004655-mhyfb1x9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -6174,8 +6898,9 @@
             ],
             "saved_config_sha256": "a7c6f81837206802f39b2eb0947a38f951cc009203565e983b72c52639564438",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261104_004655-mhyfb1x9/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "gpuserver3090",
+              "gpu_type": "3090"
             },
             "checks": [
               {
@@ -6189,82 +6914,5 @@
       }
     }
   },
-  "excluded": [
-    {
-      "source": "ckpt/Kangaroo-2050_Shared/shared_warmup_50197",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Kangaroo-2060_Shared/shared_warmup_50321",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Kangaroo-2070_Shared/shared_warmup_50189",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Kangaroo-2080_Shared/shared_warmup_50304",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Kangaroo-2090_Shared/shared_warmup_50265",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Kangaroo-2100_Shared/shared_warmup_50455",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2100_Shared/shared_warmup_50621",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2110_Shared/shared_warmup_57054",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2120_Shared/shared_warmup_50597",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2130_Shared/shared_warmup_50645",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2140_Shared/shared_warmup_50282",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2150_Shared/shared_warmup_50308",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2160_Shared/shared_warmup_50948",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2170_Shared/shared_warmup_50486",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2180_Shared/shared_warmup_50227",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2190_Shared/shared_warmup_51493",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2200_Shared/shared_warmup_51349",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Krull-2210_Shared/shared_warmup_50010",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    },
-    {
-      "source": "ckpt/Pong-2010_Shared/shared_warmup_50148",
-      "reason": "ValueError: no saved GPU provenance; GPU type cannot be inferred from the current card or a folder name"
-    }
-  ]
+  "excluded": []
 }
