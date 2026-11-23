@@ -1,0 +1,870 @@
+{
+  "version": 1,
+  "round": "warmups-20261123",
+  "profile_sha256": "2bc7ac1b6d0dd0abb9816784c9bcf94bd201785227370486e9684ec797311853",
+  "gpu_type": "TITAN_RTX",
+  "machine": "choemj",
+  "scanned_at": "2026-11-23T07:28:48.296055+00:00",
+  "code_commit": "d620d37a3476cc17a24d9fd98e87f158f917a9be",
+  "games": {
+    "BankHeist": {
+      "TITAN_RTX": {
+        "9997": [
+          {
+            "source": "ckpt/BankHeist-9997_Shared/shared_warmup_50443",
+            "step": 50443,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260924_171624-k6utq6rd/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9998": [
+          {
+            "source": "ckpt/BankHeist-9998_Both/shared_warmup_50394",
+            "step": 50394,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260920_004511-d4z34fmk/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9999": [
+          {
+            "source": "ckpt/BankHeist-9999_Shared/shared_warmup_50032",
+            "step": 50032,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260919_034023-ucwvzrdc/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          },
+          {
+            "source": "ckpt/BankHeist-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260917_204122-pp9fthie/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Breakout": {
+      "TITAN_RTX": {
+        "9999": [
+          {
+            "source": "ckpt/Breakout-9999_Shared/shared_warmup_50236",
+            "step": 50236,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260924_225515-ut1w13xu/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Frostbite": {
+      "TITAN_RTX": {
+        "9999": [
+          {
+            "source": "ckpt/Frostbite-9999_Shared/shared_warmup_50867",
+            "step": 50867,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "6256915671305b2ec3544d395ec69209038755c0fa417e6f09cbae4b24edbbe2",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260924_041419-aa069uv0/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Gopher": {
+      "TITAN_RTX": {
+        "9993": [
+          {
+            "source": "ckpt/Gopher-9993_Shared/shared_warmup_50716",
+            "step": 50716,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260925_042831-h65n1yum/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9994": [
+          {
+            "source": "ckpt/Gopher-9994_Shared/shared_warmup_50297",
+            "step": 50297,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260923_050744-oiydfe2c/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9997": [
+          {
+            "source": "ckpt/Gopher-9997_Shared/shared_warmup_50444",
+            "step": 50444,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260921_064303-ytq0e196/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9998": [
+          {
+            "source": "ckpt/Gopher-9998_Both/shared_warmup_50694",
+            "step": 50694,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260919_170229-knkjniaj/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-9998_Shared/shared_warmup_50694",
+            "step": 50694,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b66453ba63197a8c909b7be3464cfed35bd9a7de51271bbd8c69ef5f643ebce5",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260919_170229-knkjniaj/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9999": [
+          {
+            "source": "ckpt/Gopher-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260917_125214-9uwipoit/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "12000": [
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12000-try2_WarmupSweep/shared_warmup_30618",
+            "step": 30618,
+            "warmup_steps": [
+              30000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_020252-83ddqumi/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [30000]"
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12000-try2_WarmupSweep/shared_warmup_50737",
+            "step": 50737,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_020252-83ddqumi/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12000-try2_WarmupSweep/shared_warmup_70359",
+            "step": 70359,
+            "warmup_steps": [
+              70000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_020252-83ddqumi/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [70000]"
+              }
+            ]
+          }
+        ],
+        "12001": [
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12001-try1_WarmupSweep/shared_warmup_31541",
+            "step": 31541,
+            "warmup_steps": [
+              30000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_103209-6l4er08d/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [30000]"
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12001-try1_WarmupSweep/shared_warmup_50226",
+            "step": 50226,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_103209-6l4er08d/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12001-try1_WarmupSweep/shared_warmup_71093",
+            "step": 71093,
+            "warmup_steps": [
+              70000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_103209-6l4er08d/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [70000]"
+              }
+            ]
+          }
+        ],
+        "12002": [
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12002-try1_WarmupSweep/shared_warmup_31719",
+            "step": 31719,
+            "warmup_steps": [
+              30000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_190553-d481im8a/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [30000]"
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12002-try1_WarmupSweep/shared_warmup_50452",
+            "step": 50452,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_190553-d481im8a/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12002-try1_WarmupSweep/shared_warmup_71364",
+            "step": 71364,
+            "warmup_steps": [
+              70000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261110_190553-d481im8a/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [70000]"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Jamesbond": {
+      "TITAN_RTX": {
+        "9999": [
+          {
+            "source": "ckpt/Jamesbond-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_200436-hkcc76kc/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Kangaroo": {
+      "TITAN_RTX": {
+        "9989": [
+          {
+            "source": "ckpt/Kangaroo-9989_Shared/shared_warmup_50502",
+            "step": 50502,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261011_093833-x4vi2ew1/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Krull": {
+      "TITAN_RTX": {
+        "9987": [
+          {
+            "source": "ckpt/Krull-9987_Shared/shared_warmup_50277",
+            "step": 50277,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261008_091751-74cpaem0/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "9988": [
+          {
+            "source": "ckpt/Krull-9988_Shared/shared_warmup_50129",
+            "step": 50129,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261008_054233-5ow93yfz/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "9989": [
+          {
+            "source": "ckpt/Krull-9989_Shared/shared_warmup_50916",
+            "step": 50916,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261006_095412-1ct5vt3t/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "9990": [
+          {
+            "source": "ckpt/Krull-9990_Shared/shared_warmup_50409",
+            "step": 50409,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20261006_062724-8an3luwj/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          }
+        ],
+        "9999": [
+          {
+            "source": "ckpt/Krull-9999_Shared/shared_warmup_50784",
+            "step": 50784,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error"
+            ],
+            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260919_080818-w0gbhskj/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "missing statistics for retrieval"
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Krull-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260917_045837-b7n7y0cf/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Pong": {
+      "TITAN_RTX": {
+        "9999": [
+          {
+            "source": "ckpt/Pong-9999_Shared/shared_warmup_50935",
+            "step": 50935,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260922_032229-gvllzow1/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "PrivateEye": {
+      "TITAN_RTX": {
+        "9999": [
+          {
+            "source": "ckpt/PrivateEye-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_124747-r0cnma1m/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Seaquest": {
+      "TITAN_RTX": {
+        "9999": [
+          {
+            "source": "ckpt/Seaquest-9999_Shared/shared_warmup_51050",
+            "step": 51050,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260919_123523-80uefa74/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Seaquest-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_045028-lpxhxjns/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "excluded": []
+}
