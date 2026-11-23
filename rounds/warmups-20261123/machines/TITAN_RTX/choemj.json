@@ -5,8 +5,8 @@
   "gpu_type": "TITAN_RTX",
   "machine": "choemj",
   "gpu_assignment": "machine_location",
-  "scanned_at": "2026-11-23T07:38:35.296225+00:00",
-  "code_commit": "e3dc2cff358ef39ebf50a19315348e99caf28818",
+  "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+  "code_commit": "5ab17809f373779d7a2defdd0fc4fc2ec228ef66",
   "games": {
     "BankHeist": {
       "TITAN_RTX": {
@@ -601,161 +601,9 @@
         ]
       }
     },
-    "Kangaroo": {
-      "TITAN_RTX": {
-        "9989": [
-          {
-            "source": "ckpt/Kangaroo-9989_Shared/shared_warmup_50502",
-            "step": 50502,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error"
-            ],
-            "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "choemj",
-              "gpu_type": "TITAN_RTX"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": false,
-                "reason": "missing statistics for retrieval"
-              }
-            ]
-          }
-        ]
-      }
-    },
     "Krull": {
       "TITAN_RTX": {
-        "9987": [
-          {
-            "source": "ckpt/Krull-9987_Shared/shared_warmup_50277",
-            "step": 50277,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error"
-            ],
-            "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "choemj",
-              "gpu_type": "TITAN_RTX"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": false,
-                "reason": "missing statistics for retrieval"
-              }
-            ]
-          }
-        ],
-        "9988": [
-          {
-            "source": "ckpt/Krull-9988_Shared/shared_warmup_50129",
-            "step": 50129,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error"
-            ],
-            "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "choemj",
-              "gpu_type": "TITAN_RTX"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": false,
-                "reason": "missing statistics for retrieval"
-              }
-            ]
-          }
-        ],
-        "9989": [
-          {
-            "source": "ckpt/Krull-9989_Shared/shared_warmup_50916",
-            "step": 50916,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error"
-            ],
-            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "choemj",
-              "gpu_type": "TITAN_RTX"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": false,
-                "reason": "missing statistics for retrieval"
-              }
-            ]
-          }
-        ],
-        "9990": [
-          {
-            "source": "ckpt/Krull-9990_Shared/shared_warmup_50409",
-            "step": 50409,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error"
-            ],
-            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "choemj",
-              "gpu_type": "TITAN_RTX"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": false,
-                "reason": "missing statistics for retrieval"
-              }
-            ]
-          }
-        ],
         "9999": [
-          {
-            "source": "ckpt/Krull-9999_Shared/shared_warmup_50784",
-            "step": 50784,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error"
-            ],
-            "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "choemj",
-              "gpu_type": "TITAN_RTX"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": false,
-                "reason": "missing statistics for retrieval"
-              }
-            ]
-          },
           {
             "source": "ckpt/Krull-myserver-9999_Both/shared_warmup_50000",
             "step": 50000,
