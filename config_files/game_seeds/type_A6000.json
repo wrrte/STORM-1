@@ -1,0 +1,401 @@
+{
+  "gpu_type": "A6000",
+  "game_seeds": [
+    {
+      "game": "Amidar",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Amidar-6020_Shared/shared_warmup_50791"
+      ]
+    },
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Boxing-6040_Shared/shared_warmup_50048"
+      ]
+    },
+    {
+      "game": "Hero",
+      "seed": 3710,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Hero-3710_Shared/shared_warmup_50393"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 7010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-7010_Shared/shared_warmup_50213"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 7010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-7010_Shared/shared_warmup_50126"
+      ]
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6040,
+      "enabled": true,
+      "warmups": [
+        "ckpt/PrivateEye-6040_Shared/shared_warmup_51262"
+      ]
+    },
+    {
+      "game": "UpNDown",
+      "seed": 6030,
+      "enabled": true,
+      "warmups": [
+        "ckpt/UpNDown-6030_Shared/shared_warmup_50056"
+      ]
+    },
+    {
+      "game": "Assault",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Assault-6010_Shared/shared_warmup_50537"
+      ]
+    },
+    {
+      "game": "Breakout",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Breakout-6000_Shared/shared_warmup_50235"
+      ]
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Jamesbond-6000_Both/shared_warmup_50000",
+        "ckpt/Jamesbond-6000_Shared/shared_warmup_50054"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 7020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-7020_Shared/shared_warmup_50238"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 7020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-7020_Shared/shared_warmup_50529"
+      ]
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/PrivateEye-myserver-6010_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "Asterix",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Asterix-6000_Shared/shared_warmup_50011"
+      ]
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/CrazyClimber-6020_Shared/shared_warmup_53133"
+      ]
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Jamesbond-6010_Shared/shared_warmup_50135"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/PrivateEye-myserver-6020_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "Asterix",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Asterix-6010_Shared/shared_warmup_50038"
+      ]
+    },
+    {
+      "game": "Freeway",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Freeway-6000_Both/shared_warmup_50000",
+        "ckpt/Freeway-6000_Shared/shared_warmup_51200"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-6020_Shared/shared_warmup_50230"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-life_done-wm_2L512D8H-100k-seed6010_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "KungFuMaster",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/KungFuMaster-6000_Shared/shared_warmup_50667"
+      ]
+    },
+    {
+      "game": "Qbert",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Qbert-6010_Shared/shared_warmup_50559"
+      ]
+    },
+    {
+      "game": "BattleZone",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/BattleZone-6000_Shared/shared_warmup_50711"
+      ]
+    },
+    {
+      "game": "Freeway",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Freeway-6010_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-6030_Shared/shared_warmup_50067"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-6020_Both/shared_warmup_51133"
+      ]
+    },
+    {
+      "game": "MsPacman",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/MsPacman-6000_Both/shared_warmup_50000",
+        "ckpt/MsPacman-6000_Shared/shared_warmup_50105"
+      ]
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 6030,
+      "enabled": true,
+      "warmups": [
+        "ckpt/RoadRunner-6030_Shared/shared_warmup_51024"
+      ]
+    },
+    {
+      "game": "BattleZone",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/BattleZone-6020_Shared/shared_warmup_50450"
+      ]
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Freeway-6020_Shared/shared_warmup_51200"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6040,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-6040_Shared/shared_warmup_50211"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 6050,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-6050_Shared/shared_warmup_50452"
+      ]
+    },
+    {
+      "game": "MsPacman",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/MsPacman-6010_Shared/shared_warmup_50003"
+      ]
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 6040,
+      "enabled": true,
+      "warmups": [
+        "ckpt/RoadRunner-6040_Shared/shared_warmup_50507"
+      ]
+    },
+    {
+      "game": "Boxing",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Boxing-6010_Shared/shared_warmup_51575",
+        "ckpt/Boxing-myserver-6010_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "Frostbite",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Frostbite-6000_Shared/shared_warmup_50304"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6050,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-6050_Shared/shared_warmup_50343"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 6070,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-6070_Shared/shared_warmup_51367"
+      ]
+    },
+    {
+      "game": "MsPacman",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/MsPacman-6020_Shared/shared_warmup_50512"
+      ]
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 6060,
+      "enabled": true,
+      "warmups": [
+        "ckpt/RoadRunner-6060_Shared/shared_warmup_50218"
+      ]
+    },
+    {
+      "game": "Boxing",
+      "seed": 6020,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Boxing-6020_Both/shared_warmup_50406"
+      ]
+    },
+    {
+      "game": "Frostbite",
+      "seed": 6010,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Frostbite-6010_Shared/shared_warmup_50294"
+      ]
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 7000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Kangaroo-7000_Shared/shared_warmup_50295"
+      ]
+    },
+    {
+      "game": "Krull",
+      "seed": 7000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Krull-7000_Shared/shared_warmup_51060"
+      ]
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/PrivateEye-6000_Both/shared_warmup_50000"
+      ]
+    },
+    {
+      "game": "Seaquest",
+      "seed": 6000,
+      "enabled": true,
+      "warmups": [
+        "ckpt/Seaquest-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000"
+      ]
+    }
+  ]
+}

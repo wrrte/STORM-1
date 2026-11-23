@@ -1,13 +1,15 @@
-"""Discover reusable warmups and maintain editable game/seed files for each GPU."""
+"""Discover reusable warmups and maintain game/seed selections for each GPU model."""
 import argparse
 import hashlib
 import json
+import os
+import shutil
 from pathlib import Path
 import sys
 import zipfile
 
 from queue_train import (ROOT, QUEUE_DIR, SEED_DIR, PAIR_PREFIX, TrainingQueue,
-                         canonical_game, gpu_id, json_line, locked, pair_key,
+                         canonical_game, gpu_type, json_line, locked, pair_key, save_seed_files,
                          read_seed_files, write_atomic, override_args)
 
 sys.path.insert(0, str(ROOT.parent))
@@ -162,51 +164,59 @@ def materialize(record):
     write_atomic(destination / "warmup_metadata.json", json_line(record["metadata"]))
 
 
-def discover(gpus, *, root=ROOT, queue_dir=QUEUE_DIR, seed_dir=SEED_DIR):
-    gpus = list(dict.fromkeys(gpu_id(gpu) for gpu in gpus))
-    if not gpus:
-        raise ValueError("At least one GPU is required")
-    candidates = {path for path in (root / "ckpt").glob("*/shared_warmup_*") if path.is_dir()}
-    candidates.update(path.parent for path in (root / "ckpt").rglob("warmup_metadata.json"))
-    records, excluded = [], []
-    for source in sorted(candidates):
-        try:
-            records.append(inspect_warmup(source, root=root, queue_dir=queue_dir))
-        except Exception as error:
-            excluded.append(dict(source=relative(source, root), reason=f"{type(error).__name__}: {error}"))
+def source_stamp(source):
+    return [(name, (source / name).stat().st_size, (source / name).stat().st_mtime_ns)
+            for name in ("training_state.pt", "replay_buffer.npz", "warmup_metadata.json", "config.yaml", "branches.json", "queue_origin.json")
+            if (source / name).exists()]
+
+
+def discover(model, *, root=ROOT, queue_dir=QUEUE_DIR, seed_dir=SEED_DIR, refresh=False, persist=True):
+    """Incremental discovery on enqueue and execution; metadata is the publication marker."""
+    model = gpu_type(model)
     queue = TrainingQueue(queue_dir, seed_dir)
-    with locked(queue.directory / "queue.lock"):
-        registry = queue.registry()
-        selections = read_seed_files(seed_dir)
+    with locked(queue.directory / "catalog.lock"):
         report_path = queue.directory / "warmup_inventory.json"
         previous = json.loads(report_path.read_text()) if report_path.exists() else {}
-        known = {item["source"] for item in previous.get("available", [])}
+        cached = {item["source"]: item for item in previous.get("available", [])}
+        candidates = {path for path in (root / "ckpt").glob("*/shared_warmup_*")
+                      if path.is_dir() and not path.name.endswith(".retired") and ((path / "warmup_metadata.json").is_file() or (path / "branches.json").is_file())}
+        candidates.update(path.parent for path in (root / "ckpt").rglob("warmup_metadata.json")
+                          if not path.parent.name.endswith(".retired"))
+        selections = read_seed_files(seed_dir)
+        records, excluded = [], []
+        for source in sorted(candidates):
+            name, stamp = relative(source, root), source_stamp(source)
+            try:
+                record = cached.get(name)
+                if refresh or not record or record.get("stamp") != json.loads(json.dumps(stamp)) or "config" not in record:
+                    record = inspect_warmup(source, root=root, queue_dir=queue_dir)
+                    record["stamp"] = stamp
+                origin = source / "queue_origin.json"
+                kind = json.loads(origin.read_text())["gpu_type"] if origin.exists() else selections.get(
+                    pair_key(record["game"], record["seed"]), {}).get("gpu_type", model)
+                record["gpu_type"] = gpu_type(kind)
+                if persist:
+                    materialize(record)
+                records.append(record)
+            except (ValueError, KeyError, TypeError, OSError, RuntimeError, EOFError, zipfile.BadZipFile) as error:
+                excluded.append(dict(source=name, reason=f"{type(error).__name__}: {error}"))
+        # The same lock protects catalog -> selection updates; never override user disabled choices.
         for record in records:
-            materialize(record)
             key = pair_key(record["game"], record["seed"])
-            if key not in selections:
-                # A deliberately removed seed/source stays removed on rediscovery.
-                if record["source"] in known:
-                    continue
-                counts = {gpu: sum(entry["gpu"] == gpu for entry in selections.values()) for gpu in gpus}
-                gpu = registry["owners"].get(key, min(gpus, key=counts.get))
-                selections[key] = dict(game=record["game"], seed=record["seed"], gpu=gpu, enabled=True, warmups=[])
-            entry = selections[key]
-            if registry["owners"].get(key, entry["gpu"]) != entry["gpu"]:
-                raise ValueError(f"{key}: seed file disagrees with permanent GPU ownership")
-            if entry.get("fresh", False):
-                continue
-            if record["source"] not in known and record["source"] not in entry.get("warmups", []):
-                entry.setdefault("warmups", []).append(record["source"])
-        seed_dir.mkdir(parents=True, exist_ok=True)
-        for gpu in sorted(set(gpus) | {entry["gpu"] for entry in selections.values()}, key=int):
-            entries = [{key: value for key, value in entry.items() if key != "gpu"}
-                       for entry in selections.values() if entry["gpu"] == gpu]
-            write_atomic(seed_dir / f"gpu_{gpu}.json", json.dumps(dict(gpu=gpu, game_seeds=entries), indent=2) + "\n")
-        report = dict(available=[{key: value for key, value in item.items() if key not in ("config", "metadata")}
-                                 for item in records], excluded=excluded,
-                      note="Assignments are for future queue jobs; historical physical GPU IDs are unknown.")
-        write_atomic(report_path, json.dumps(report, indent=2) + "\n")
+            entry = selections.setdefault(key, dict(game=record["game"], seed=record["seed"],
+                                                     gpu_type=record["gpu_type"], enabled=True, warmups=[]))
+            if entry["gpu_type"] != record["gpu_type"]:
+                raise ValueError(f"Warmup GPU type conflicts with seed ownership: {record['source']}")
+            if record["source"] not in entry.setdefault("warmups", []):
+                entry["warmups"].append(record["source"])
+            entry.pop("fresh", None)
+        if persist:
+            queue.register_selections(selections)
+            save_seed_files(selections, seed_dir)
+        report = dict(available=records, excluded=excluded,
+                      note="Legacy sources use the migrated seed type; original hardware is not inferred.")
+        if persist:
+            write_atomic(report_path, json.dumps(report, indent=2) + "\n")
     return report
 
 
@@ -216,78 +226,160 @@ def resolve_prepared(source, *, root=ROOT, queue_dir=QUEUE_DIR):
     resume = source if (source / "warmup_metadata.json").exists() else imported_path(source, queue_dir)
     checkpoint, metadata = load_storm_warmup_metadata(resume)
     if resume != source and metadata.get("imported_from") != str(source):
-        raise ValueError("Imported checkpoint source does not match; rerun warmup_catalog.py")
+        raise ValueError("Imported checkpoint source does not match; refresh the catalog")
     return checkpoint, metadata
 
 
-def plan_resume_jobs(selections, overrides, mode, *, root=ROOT, queue_dir=QUEUE_DIR):
-    from utils import load_config
-    from training_branches import (parse_retrieval_mode, parse_storm_training_args,
-                                   prepare_storm_warmup_followup)
-    from storm_warmup_sweep import experiment_names, parse_warmup_offset_pairs
-    from storm_dynamic_warmup import DynamicWarmup
+def request_config(job):
+    from yacs.config import CfgNode
+    from training_branches import parse_retrieval_mode
+    conf = CfgNode.load_cfg(job["config_text"])
+    overrides = dict(job["overrides"])
+    mode = overrides.pop(PAIR_PREFIX + "enable", conf.JointTrainAgent.Retrieval.enable)
+    if PAIR_PREFIX + "anchor_weight_r" in overrides:
+        conf.JointTrainAgent.Retrieval.anchor_weight_r = None
+    conf.merge_from_list(override_args(overrides))
+    conf.JointTrainAgent.Retrieval.enable = parse_retrieval_mode(mode, allow_experiments=True)
+    return conf
 
-    names = experiment_names(parse_retrieval_mode(overrides.get(PAIR_PREFIX + "enable", mode), allow_experiments=True))
-    specs, skipped = [], []
-    for entry in selections:
-        for source in dict.fromkeys(entry.get("warmups", [])):
-            checkpoint, metadata = resolve_prepared(source, root=root, queue_dir=queue_dir)
-            if pair_key(entry["game"], entry["seed"]) != pair_key(canonical_game(metadata["env_name"]), metadata["seed"]):
-                raise ValueError(f"Seed file identity does not match {source}")
-            conf = load_config(checkpoint / "config.yaml")
-            saved = conf.JointTrainAgent.Retrieval
-            targets = metadata.get("requested_warmup_steps", [saved.warmup_steps])
-            requested = overrides[PAIR_PREFIX + "warmup_offset_pairs"] or [[
-                overrides.get(PAIR_PREFIX + "warmup_steps", targets[0]),
-                overrides.get(PAIR_PREFIX + "anchor_offset", saved.anchor_offset)]]
-            pairs = parse_warmup_offset_pairs(requested, conf.JointTrainAgent.SampleMaxSteps)
-            for target, offset in pairs:
-                if target not in targets:
-                    skipped.append(f"{source}: requested warmup {target}; saved targets {targets}")
-                    continue
-                effective = {**overrides, PAIR_PREFIX + "enable": names,
-                             PAIR_PREFIX + "warmup_offset_pairs": [],
-                             PAIR_PREFIX + "warmup_steps": target, PAIR_PREFIX + "anchor_offset": offset}
-                # Architecture/replay dimensions must still match the saved weights.
-                for key, value in effective.items():
-                    if key.startswith("Models.") or key in ("BasicSettings.ImageSize", "JointTrainAgent.NumEnvs",
-                                                            "JointTrainAgent.BufferMaxLength"):
-                        original = conf
-                        for part in key.split("."):
-                            original = original[part]
-                        if original != value:
-                            raise ValueError(f"Cannot change {key} when reusing {source}")
-                if target == -1:
-                    changed = conf.clone()
-                    changed.defrost()
-                    for key, value in effective.items():
-                        if key.startswith(PAIR_PREFIX + "dynamic_") or key in (PAIR_PREFIX + "min_warmup_steps", PAIR_PREFIX + "max_warmup_steps"):
-                            changed.JointTrainAgent.Retrieval[key.removeprefix(PAIR_PREFIX)] = value
-                    if DynamicWarmup(changed.JointTrainAgent.Retrieval).settings != DynamicWarmup(saved).settings:
-                        raise ValueError("Changing dynamic warmup settings requires a new collector")
-                args, extra = parse_storm_training_args([
-                    "--resume_warmup", str(checkpoint), "-n", "queue-validation",
-                    "-seed", str(entry["seed"]), "-env_name", metadata["env_name"], *override_args(effective)])
-                try:
-                    prepare_storm_warmup_followup(args, extra, root / "train.py", load_config)
-                except ValueError as error:
-                    if "lacks the statistics" not in str(error):
-                        raise
-                    skipped.append(f"{source}: {error}")
-                    continue
-                specs.append(dict(game=entry["game"], seed=entry["seed"], gpu=entry["gpu"],
-                                  config=str(checkpoint / "config.yaml"), resume_warmup=str(checkpoint),
-                                  warmup_source=source, overrides=effective))
-    return specs, skipped
+
+def compatibility(record, job):
+    """Only post-warmup retrieval/evaluation choices may differ from the saved prefix."""
+    from yacs.config import CfgNode
+    from training_branches import parse_retrieval_mode, RETRIEVAL_EXPERIMENTS, retrieval_statistics_signals
+    from storm_warmup_sweep import experiment_names
+    saved = CfgNode.load_cfg(record["config"])
+    requested = request_config(job)
+    if record["gpu_type"] != job["gpu_type"]:
+        return "GPU type mismatch"
+    target = requested.JointTrainAgent.Retrieval.warmup_steps
+    if target not in record["warmup_steps"]:
+        return f"warmup target {target} not in {record['warmup_steps']}"
+    if requested.JointTrainAgent.SampleMaxSteps <= record["step"]:
+        return "warmup is past the requested training end"
+    # Model/optimizer/data-collection settings determine the reusable prefix.
+    for key in ("Models",):
+        if dict(saved[key]) != dict(requested[key]):
+            return f"changed {key}"
+    for section, keys in {
+        "BasicSettings": ["ImageSize", "ReplayBufferOnGPU"],
+        "JointTrainAgent": ["NumEnvs", "BufferMaxLength", "BufferWarmUp", "BatchSize", "BatchLength",
+                           "DemonstrationBatchSize", "ImagineBatchSize", "ImagineDemonstrationBatchSize",
+                           "ImagineContextLength", "ImagineBatchLength", "TrainDynamicsEverySteps",
+                           "TrainAgentEverySteps", "UseDemonstration"],
+    }.items():
+        for key in keys:
+            if saved[section].get(key) != requested[section].get(key):
+                return f"changed {section}.{key}"
+    before, after = saved.JointTrainAgent.Retrieval, requested.JointTrainAgent.Retrieval
+    if before.ema_alpha != after.ema_alpha:
+        return "changed statistics ema_alpha"
+    if target == -1:
+        from storm_dynamic_warmup import DynamicWarmup
+        if DynamicWarmup(before).settings != DynamicWarmup(after).settings:
+            return "changed dynamic warmup settings"
+    for name in experiment_names(parse_retrieval_mode(after.enable, allow_experiments=True)):
+        effective = {**dict(after), **RETRIEVAL_EXPERIMENTS[name]}
+        if effective["enable"] and effective.get("trigger_mode", "absolute") == "z_score":
+            if not set(retrieval_statistics_signals(effective)) <= set(record["statistics_signals"]):
+                return f"missing statistics for {name}"
+    return None
+
+
+def choose_warmup(job, report):
+    candidates, incompatible = [], []
+    for record in report["available"]:
+        if pair_key(record["game"], record["seed"]) != pair_key(job["game"], job["seed"]):
+            continue
+        reason = compatibility(record, job)
+        if reason:
+            incompatible.append(dict(source=record["source"], reason=reason))
+        else:
+            candidates.append(record)
+    # Stable choice across retries; favor snapshots usable by more experiment presets.
+    candidates.sort(key=lambda record: (-len(record["statistics_signals"]), record["step"], record["source"]))
+    return (candidates[0] if candidates else None), incompatible
+
+
+def branch_commands(job, record, *, root=ROOT):
+    from training_branches import parse_storm_training_args, prepare_storm_warmup_followup
+    from storm_warmup_sweep import experiment_names
+    conf = request_config(job)
+    # Apply the whole requested configuration, not unrelated defaults from a saved experiment.
+    def flatten(value, prefix=""):
+        result = {}
+        for key, item in value.items():
+            path = prefix + key
+            if isinstance(item, dict):
+                result.update(flatten(item, path + "."))
+            else:
+                result[path] = item
+        return result
+    effective = flatten(conf)
+    effective[PAIR_PREFIX + "enable"] = experiment_names(conf.JointTrainAgent.Retrieval.enable)
+    effective[PAIR_PREFIX + "save_warmup"] = False
+    effective[PAIR_PREFIX + "warmup_offset_pairs"] = []
+    args, extra = parse_storm_training_args([
+        "--resume_warmup", record["resume_warmup"], "-n", job["name"],
+        "-seed", str(job["seed"]), "-env_name", f"ALE/{job['game']}-v5", *override_args(effective)])
+    _, _, commands = prepare_storm_warmup_followup(args, extra, root / "train.py", __import__("utils").load_config)
+    for command in commands.values():
+        command[0] = job["python"]
+    return commands
+
+
+def prune_replaced(job, replacement, incompatible, queue, *, root=ROOT):
+    """Delete incompatible sources only after a verified replacement, with live uses pinned."""
+    deleted = []
+    with locked(queue.directory / "catalog.lock"):
+        report_path = queue.directory / "warmup_inventory.json"
+        report = json.loads(report_path.read_text())
+        records = {item["source"]: item for item in report["available"]}
+        # Active jobs retain their exact source. Pending experiments retain any compatible source.
+        others = [item for item in queue.jobs(statuses=("pending", "running", "failed")) if item["id"] != job["id"]]
+        for item in incompatible:
+            record = records.get(item["source"])
+            if not record or record["source"] == replacement["source"]:
+                continue
+            # Different warmup lengths are useful independent assets, not obsolete snapshots.
+            if not set(record["warmup_steps"]) <= set(replacement["warmup_steps"]):
+                continue
+            if any(other.get("warmup_source") == record["source"] or (
+                pair_key(other["game"], other["seed"]) == pair_key(record["game"], record["seed"])
+                and compatibility(record, other) is None) for other in others):
+                continue
+            source = source_path(record["source"], root)
+            if not source.is_relative_to((root / "ckpt").resolve()) or not source.name.startswith("shared_warmup_"):
+                continue
+            # Atomic rename makes the source unavailable before deleting its large files.
+            tombstone = source.with_name(source.name + ".retired")
+            if tombstone.exists():
+                continue
+            os.replace(source, tombstone)
+            shutil.rmtree(tombstone)
+            adapter = imported_path(source, queue.directory)
+            if adapter.exists():
+                shutil.rmtree(adapter.parent)
+            deleted.append(record["source"])
+        if deleted:
+            selections = read_seed_files(queue.seed_directory)
+            for entry in selections.values():
+                entry["warmups"] = [source for source in entry.get("warmups", []) if source not in deleted]
+            save_seed_files(selections, queue.seed_directory)
+            report["available"] = [record for record in report["available"] if record["source"] not in deleted]
+            write_atomic(report_path, json.dumps(report, indent=2) + "\n")
+            with queue.connect() as db:
+                queue.event(db, job["id"], "pruned", sources=deleted, replacement=replacement["source"])
+    return deleted
 
 
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
-    parser.add_argument("--gpus", nargs="+", default=[str(gpu) for gpu in range(8)])
+    parser.add_argument("--gpu-type", default="A6000", help="Type assigned to previously unregistered legacy sources")
+    parser.add_argument("--refresh", action="store_true")
     args = parser.parse_args(argv)
-    report = discover(args.gpus)
+    report = discover(args.gpu_type, refresh=args.refresh)
     print(f"Available: {len(report['available'])} warmup(s); excluded: {len(report['excluded'])}")
-    print(f"Edit {SEED_DIR}/gpu_N.json to select seeds/warmups. No training jobs were queued.")
     for item in report["excluded"]:
         print(f"Excluded {item['source']}: {item['reason']}")
     return 0

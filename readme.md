@@ -105,170 +105,139 @@ Following the **Training and Evaluating Instructions** to reproduce the main res
 
 ## Additional Useful Information
 
-### GPU job queues
+### GPU model queues and reusable warmups
 
-**Permanent seed selections are separate from consumable jobs.** Edit
-`config_files/game_seeds/gpu_0.json` through `gpu_7.json` to choose each GPU's
-games, individual seeds, and saved warmups. These files remain after jobs run:
+A **seed belongs to one GPU model**, independently of the game. All A6000
+workers on this machine share one priority queue; a seed is never tied to a
+physical card number. Workers identify the actual model and UUID using
+`nvidia-smi`. Different models cannot consume each other's jobs.
 
-```json
-{
-  "gpu": "0",
-  "game_seeds": [
-    {
-      "game": "Amidar",
-      "seed": 6020,
-      "enabled": true,
-      "warmups": ["ckpt/Amidar-6020_Shared/shared_warmup_50791"]
-    }
-  ]
-}
-```
-
-Set `enabled` to `false` to exclude a seed from future enqueue operations.
-Remove a path from `warmups` to exclude that particular snapshot. An empty
-`warmups` list does not start fresh training; set `fresh: true` explicitly if
-you want a new prefix, with no saved warmup paths. The same game/seed may have
-multiple snapshots in one entry, but cannot appear in multiple GPU files,
-even when disabled. Each snapshot is reused in a separate job on that GPU.
-
-The current local inventory contains **53 warmups for 49 distinct game/seed
-pairs**. All are selected initially, including 31 legacy checkpoints whose
-reusable metadata was recovered from saved branch commands/configs and actual
-training state. Original checkpoints are preserved. Legacy adapters contain
-small config/metadata files and symlinks under `training_queue/imported_warmups/`;
-they do not copy the large model/replay files.
-
-Refresh the inventory when more warmups have been saved:
-
-```bash
-conda activate storm
-python warmup_catalog.py --gpus 0 1 2 3 4 5 6 7
-```
-
-Discovery checks checkpoint/RNG/statistics state and replay array headers on
-CPU. Unusable sources and reasons go in `training_queue/warmup_inventory.json`.
-It preserves existing selection choices, only adds newly discovered sources,
-and never queues or starts training. It does not perform a full GPU training
-verification. Historical physical GPU IDs could not be established from the
-saved metadata, so the initial files distribute unique pairs across GPUs 0–7
-for future runs. You may move a whole entry to another GPU file **before its
-first queue registration**; afterwards the permanent assignment prevents moves.
-
-With no `--games` or `--game-seeds`, `enqueue_train.py` reads these files and
-uses their enabled selections. Games do not need to share the same seed:
-
-```bash
-python enqueue_train.py \
-  --warmup-offset-pairs '[[50000,-2]]' \
-  --hash-target-pairs '[[9,4],[10,8],[12,16]]' \
-  --set JointTrainAgent.Retrieval.enable Both \
-  --dry-run
-```
-
-Remove `--dry-run` to append the reviewed jobs. Add `--gpus 0 2` to use only
-those GPU files. Each job uses `--resume_warmup`; it restores the saved model,
-optimizer, replay, statistics and RNG instead of collecting warmup again.
-Unspecified settings come from the **saved checkpoint config**, while explicit
-overrides select the new experiment. The default experiment mode comes from
-the selected `--config` (normally `STORM.yaml`).
-
-For existing shared snapshots, each matching warmup/offset pair becomes a
-continuation with that scalar offset; its hash/target pairs run from the same
-snapshot. The nominal warmup target must match: a saved 50k snapshot is usable
-for `[50000, -2]`, even if the actual episode boundary is 50,406, but cannot
-reconstruct `[30000, -2]`. Incompatible targets or missing scoring statistics
-are reported and skipped; no replacement warmup is silently trained. In the
-current inventory all 53 sources support retrieval/TD-error experiments, while
-17 lack the `value` statistics required by the `value` preset.
-
-To explicitly add **fresh training** with new game/seed pairs, use `--games`
-and `--seeds` (Cartesian product), or `--game-seeds` (exact pairs). New entries
-are also recorded in the permanent GPU seed files:
+`config_files/game_seeds/type_A6000.json` lists the selected games, seeds,
+and saved warmups. Set `enabled: false` to exclude a pair from future default
+enqueues. Explicit `--games`/`--game-seeds` can request it again. Discovery runs
+on enqueue and immediately before execution, so newly published shared
+warmups become available automatically. Both explicit pairs and saved
+selections prefer compatible existing snapshots.
 
 ```bash
 cd /home/choemj/STORM-1
 conda activate storm
 
-python enqueue_train.py --gpus 0 1 2 3 \
-  --games Alien Pong --seeds 3000 3010 \
-  --warmup-offset-pairs '[[30000,-2],[50000,-2],[70000,0]]' \
+# Preview using the existing A6000 selections. No jobs or training are started.
+python enqueue_train.py --gpu-type A6000 \
+  --warmup-offset-pairs '[[50000,-2]]' \
   --hash-target-pairs '[[9,4],[10,8],[12,16]]' \
-  --set JointTrainAgent.Retrieval.enable Both
-
-bash 0_train.sh  # separate tmux sessions: bash 1_train.sh, etc.
+  --set JointTrainAgent.Retrieval.enable Both \
+  --priority 10 --dry-run
 ```
 
-This fresh-training example adds four jobs (games × seeds). Each job runs its entire requested sweep
-on one GPU, sharing warmup snapshots through the existing training code. Both
-nonempty pair lists combine every warmup/offset pair with every hash/target
-pair. To specify game/seed pairs individually instead of games × seeds:
+Remove `--dry-run` to enqueue. Higher priority numbers run first; ties use
+insertion order. New high-priority jobs do not preempt running training.
+Identical pending/running experiments are deduplicated. Configuration is
+snapshotted when enqueued, so later edits to `STORM.yaml` do not alter an
+already queued experiment. The pair options default to `[]`, replacing the
+YAML pair lists. With no warmup pairs, the selected config's scalar
+`warmup_steps`/`anchor_offset` applies. Each warmup/offset pair is a separate
+job; its selected experiment/hash variants retain individual completion state.
 
 ```bash
-python enqueue_train.py --gpus 0 1 \
-  --game-seeds '[["Alien",3000],["Pong",3010]]' \
-  --hash-target-pairs '[[9,4],[10,8]]' \
-  --set JointTrainAgent.Retrieval.warmup_steps 50000 \
-  --set JointTrainAgent.Retrieval.anchor_weight_r 2
+# In separate tmux sessions, start only the cards you want to use.
+bash 0_train.sh
+bash 4_train.sh
+bash 7_train.sh
+
+# Any physical index is supported; there is no 0–7 restriction.
+bash queue_train.sh 12 --once
+
+python queue_train.py status --gpu-type A6000
+python queue_train.py status --all
+python queue_train.py priority JOB_ID 100
+python queue_train.py retry FAILED_JOB_ID  # preserves completed branches
 ```
 
-`--warmup-offset-pairs` and `--hash-target-pairs` default to `[]`: **both YAML
-pair lists are always replaced**, so an omitted list cannot silently add extra
-experiments in fresh training. With existing snapshots, an omitted warmup pair
-list reuses each snapshot's saved target and offset (or explicit scalar
-overrides). `--set KEY VALUE` may be repeated for other settings. Values use
-YAML syntax (`True`, `Both`, numbers, lists, `null`). For fresh training, all
-other settings come from `config_files/STORM.yaml` at execution time, or the
-file passed with `--config`. Adding jobs validates overrides using the trainer, saves the Python
-executable from the active environment, and never edits the source YAML or
-starts training. Run names are unique so later experiments have separate outputs.
+Stopping workers 0–3 leaves their unstarted jobs available to workers 4–7.
+Ctrl-C/SIGTERM terminates the active job's process tree and returns its job to
+the same model pool. The next free worker takes the highest-priority runnable
+job. Completed branches are skipped. Collection for the same game/seed is
+serialized until a warmup is published; continuations can then run on multiple
+cards of that model concurrently.
 
-The persistent files are under `training_queue/` (excluded from Git):
+Queue training requests a full model/optimizer/replay/RNG checkpoint at the
+next episode boundary when stopped. If it finishes saving within the shutdown
+grace period (120 seconds by default; set `STORM_QUEUE_STOP_GRACE` to change it), another worker resumes from that checkpoint.
+Otherwise it uses the last complete checkpoint or the shared warmup, restarting
+only the unfinished branch. This is not an exact mid-episode ALE-state restore.
+Checkpoint publication is atomic; partially written checkpoints are ignored.
+Final evaluation must also finish before a branch is marked complete. Temporary
+resume checkpoints are removed after branch success.
+
+A dead worker's running job is recovered when its lease lock is released.
+A surviving trainer retains that lock, preventing duplicate execution after a
+worker-only SIGKILL. Errors are recorded as failed jobs rather than retried in
+an endless loop. `--once` handles at most one job; `--max-jobs N` limits a worker.
+
+New seeds can be allocated without choosing numbers manually:
+
+```bash
+python enqueue_train.py --gpu-type A6000 --games Alien Pong --new-seeds 2 --dry-run
+# Or use existing/exact pairs, still preferring reusable warmups:
+python enqueue_train.py --gpu-type A6000 --game-seeds '[["Alien",6000],["Pong",6010]]' --dry-run
+python queue_train.py seeds
+```
+
+New A6000 seeds use `1000000–1999999`; RTX 3090 uses `2000000–2999999`,
+TITAN RTX `3000000–3999999`, PRO 6000 Blackwell `4000000–4999999`, RTX 4090
+`5000000–5999999`, RTX 5090 `6000000–6999999`, and RTX 6000 Ada
+`7000000–7999999`. Other models receive persisted nonoverlapping ranges.
+Legacy seeds retain their original values and explicit model mappings, so
+existing checkpoints remain reusable. A seed already registered to another
+model, or belonging to another model's reserved range, is rejected for every
+game. `--new-seeds --dry-run` previews numbers without reserving them.
+
+Compatibility checks include model dimensions, replay/training-prefix settings,
+statistics EMA settings, warmup targets, dynamic warmup settings and the
+statistics needed by the requested retrieval preset. Post-warmup hash/target,
+offset and retrieval experiment settings may vary. If no compatible source
+exists, the job collects a new shared warmup with all three statistics signals
+and then runs its continuations. The original config file is never edited.
+
+After a compatible replacement is verified, incompatible old snapshots for the
+same pair/covered warmup targets are removed to reclaim disk space. A source
+pinned by a running/retryable failed job or useful to another pending experiment is retained;
+different warmup targets are retained as well. Deletion is restricted to shared
+warmup directories under this repository's `ckpt/`. A dry run never deletes
+checkpoints. Catalog inspection can also be requested explicitly:
+
+```bash
+python warmup_catalog.py --gpu-type A6000 --refresh
+```
+
+Runtime data is stored under `training_queue/` (excluded from Git):
 
 | File | Purpose |
 | --- | --- |
-| `gpu_N.jsonl` | GPU N's pending jobs, one JSON object per line; the first line is removed when claimed |
-| `assignments.json` | Permanent game/seed → GPU ownership, plus host and physical GPU UUID bindings |
-| `history.jsonl` | Consumed jobs and their exit/interruption records, including all overrides |
+| `queue.sqlite3` | Authoritative pending/running/completed/failed jobs, priorities, seed ownership and execution events |
+| `warmup_inventory.json` | Inspected warmups, compatibility metadata and excluded-source reasons |
+| `leases/` | Process-held locks preventing duplicate claims/recovery |
+| `requests/` | Frozen collector configs |
+| `imported_warmups/` | Metadata/config adapters and symlinks for reusable legacy snapshots |
+| `legacy_backup/` | Original per-card selections, queues and history from migration |
 
-New game/seed pairs are balanced across `--gpus` by the number of assigned
-pairs. Existing pairs **always keep their original GPU**, even when a later
-enqueue command lists different GPUs. For example, if `Alien / 3000` belongs
-to GPU 0, new hyperparameters for that pair append to `gpu_0.jsonl`; they wait
-there when GPU 0 is stopped. This also holds after all earlier jobs finish or
-workers restart. Game names are case-insensitive for ownership. Identical
-pending jobs are skipped; adding the same experiment after consumption permits
-a fresh run on its original GPU. Use the enqueue tool to append jobs safely
-while workers are running.
-
-Changing seed-file selections affects future enqueue operations; already queued
-jobs keep their saved overrides and source paths. Queue updates and assignments
-share a file lock. A second worker on the same
-GPU is rejected, as is moving a queued record to another GPU's file. On first
-worker startup, the GPU index is bound to its host/physical UUID; later device
-changes are rejected before a job is removed. Training receives that UUID in
-`CUDA_VISIBLE_DEVICES` so CUDA's device ordering cannot redirect it. Keep `assignments.json` when
-clearing pending jobs: deleting it loses the historical ownership information.
-This ownership applies to the new queue's jobs; it does not infer GPU ownership
-from older runs or control manually launched training.
+For an older checkout, stop its old queue workers and migrate once:
 
 ```bash
-python queue_train.py status
-bash 0_train.sh --once
-bash 1_train.sh --max-jobs 2
+python queue_train.py migrate --gpu-type A6000
 ```
 
-`--once` executes at most one job and exits, including when the queue is empty.
-`--max-jobs N` exits after N jobs. Both return the last job's exit status.
-Otherwise a worker waits for more jobs when its queue is empty. Failed jobs
-are recorded and the worker continues. Ctrl-C/SIGTERM stops the active training
-process and leaves subsequent jobs queued. Consumed jobs are not automatically
-retried; add them again to retry on the same GPU. An exit code of zero records
-process success, not an independent verification of evaluation output.
+Migration preserves seed values and original files in a backup, imports pending
+and interrupted jobs, and writes `type_A6000.json`. It refuses migration while
+an old worker holds its lock. This workspace's 53 existing snapshots have A6000
+model evidence in their saved W&B metadata; the 49 selected game/seed pairs are
+now in the A6000 pool. Existing checkpoints were not deleted during migration.
 
 **Legacy shell queues:** pass an explicit queue filename to keep the previous
 one-shell-command-per-line behavior. These queues have no permanent game/seed
-ownership; use the new default queue when device affinity is required.
+ownership or interruption recovery; use the default model queue for those features.
 
 ```bash
 bash 0_train.sh job_queue_random_neighbor.txt

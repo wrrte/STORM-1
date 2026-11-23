@@ -48,7 +48,7 @@ fi
 
 cd -- "$(dirname -- "${BASH_SOURCE[0]}")"
 export CUDA_VISIBLE_DEVICES="$queue_gpu"
-# Default: each GPU consumes only its own persistent game/seed assignments.
+# Default: workers consume the common priority queue for their detected GPU model.
 # An explicit queue file retains the legacy shell-command queue interface.
 if [[ -z "$queue_path" ]]; then
     queue_options=()

@@ -35,6 +35,7 @@ from training_branches import (
     rebuild_retrieval_for_resume,
 )
 import pandas as pd
+import queue_checkpoint
 from seed_screening import configure_seed_screen, SCREEN_REJECTED_EXIT_CODE
 
 def check_dynamic_warmup(episode_rewards, window_size=20, multiplier=2.6):
@@ -319,6 +320,7 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                         retrieval_manager=retrieval_manager, shared_warmup=True,
                         rng_state_override=snapshot_rng,
                     )
+                    queue_checkpoint.warmup_saved(ckpt_dir)
                     sweep.register_snapshot(ckpt_dir, total_steps * num_envs, targets,
                                             conf, args, retrieval_manager.statistics_signals,
                                             dynamic_state=dynamic.state_dict() if dynamic is not None else None)
@@ -329,6 +331,9 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 logger.writer.close()
                 import wandb
                 wandb.finish()
+                if os.environ.get("STORM_QUEUE_COLLECT_ONLY") == "1":
+                    queue_checkpoint.stage_complete(args.n)
+                    sys.exit(0)
                 sweep.launch()
 
         if sweep is None and branch_commands is not None and not is_retrieval_warmup and at_episode_boundary:
@@ -348,14 +353,18 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
                 last_rebuild_step, True, list(episode_rewards), dynamic_warmup_met_step,
                 retrieval_manager=retrieval_manager, shared_warmup=True,
             )
-            if getattr(retrieval_config, "save_warmup", False):
-                save_storm_warmup_metadata(
-                    ckpt_dir, conf, args, total_steps, retrieval_manager.statistics_signals,
-                    dynamic_warmup=dynamic.state_dict() if dynamic is not None else None)
+            # Every shared snapshot is reusable, including manually launched Both runs.
+            queue_checkpoint.warmup_saved(ckpt_dir)
+            save_storm_warmup_metadata(
+                ckpt_dir, conf, args, total_steps, retrieval_manager.statistics_signals,
+                dynamic_warmup=dynamic.state_dict() if dynamic is not None else None)
             vec_env.close()
             logger.writer.close()
             import wandb
             wandb.finish()
+            if os.environ.get("STORM_QUEUE_COLLECT_ONLY") == "1":
+                queue_checkpoint.stage_complete(args.n)
+                sys.exit(0)
             if isinstance(branch_commands, dict):
                 launch_training_branches(ckpt_dir, experiments={
                     name: command + ["--resume_from", ckpt_dir]
@@ -587,6 +596,17 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
         # flush all buffered wandb metrics for this step
         logger.flush_wandb()
 
+        if queue_checkpoint.STOP_REQUESTED and done_flag.any():
+            queue_checkpoint.save_resume(args.n, lambda path: save_full_checkpoint(
+                path, world_model, agent, replay_buffer, total_steps + 1, logger,
+                last_rebuild_step, warmup_finished, list(episode_rewards),
+                dynamic_warmup_met_step, retrieval_manager=retrieval_manager))
+            vec_env.close()
+            logger.writer.close()
+            import wandb
+            wandb.finish()
+            sys.exit(143)
+
         if save_requested and done_flag.any():
             # Resume starts at the next collection/update iteration.
             next_step = total_steps + 1
@@ -595,6 +615,12 @@ def joint_train_world_model_agent(env_name, max_steps, num_envs, image_size,
             save_requested = False
 
     vec_env.close()
+    if branch_commands is None and os.environ.get("STORM_QUEUE_JOB"):
+        # Keep full training state until final evaluation also succeeds.
+        queue_checkpoint.save_resume(args.n, lambda path: save_full_checkpoint(
+            path, world_model, agent, replay_buffer, max_steps // num_envs, logger,
+            last_rebuild_step, warmup_finished, list(episode_rewards),
+            dynamic_warmup_met_step, retrieval_manager=retrieval_manager))
     if branch_commands is None and save_final_checkpoint:
         save_final_models(f"ckpt/{args.n}", world_model, agent, max_steps // num_envs)
     return True
@@ -723,6 +749,8 @@ if __name__ == "__main__":
     warnings.filterwarnings('ignore')
     torch.backends.cuda.matmul.allow_tf32 = True
     torch.backends.cudnn.allow_tf32 = True
+
+    queue_checkpoint.install_handlers()
 
     # parse arguments
     args, extra_args = parse_storm_training_args()
@@ -921,3 +949,5 @@ if __name__ == "__main__":
     logger.writer.close()
     import wandb
     wandb.finish()
+
+    queue_checkpoint.stage_complete(args.n)
