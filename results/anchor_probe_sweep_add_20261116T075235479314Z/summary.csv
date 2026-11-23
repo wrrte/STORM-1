@@ -1,0 +1,6 @@
+threshold,status,env_step_start,env_step_stop_exclusive,updates,total_anchor_insertions,mean_anchors_per_update,within_run_sd_across_updates,mean_ci95_low,mean_ci95_high,output,log,error
+3.5,interrupted,,,,,,,,,/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075235479314Z/01_threshold_3.5,/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075235479314Z/logs/01_threshold_3.5.log,Sweep interrupted
+3.75,pending,,,,,,,,,,,
+4.0,pending,,,,,,,,,,,
+4.25,pending,,,,,,,,,,,
+4.5,pending,,,,,,,,,,,

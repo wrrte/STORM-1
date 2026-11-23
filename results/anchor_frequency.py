@@ -558,6 +558,10 @@ def main(argv=None):
     write_csv(args.output / "per_game.csv", games)
     write_json(args.output / "summary.json", summary)
     report(args, comparisons, games, summary, audit, failures)
+    from anchor_frequency_variability import analyze
+    analyze(args.output, bootstrap_samples=args.bootstrap_samples, make_plots=not args.no_plots)
+    with (args.output / "report.md").open("a") as stream:
+        stream.write("\n[Update dispersion, SDs, and confidence intervals](variability_report.md).\n")
     if not args.no_plots:
         plot_results(args.output, comparisons, games, curves)
     print(json.dumps(summary, ensure_ascii=False, indent=2), flush=True)

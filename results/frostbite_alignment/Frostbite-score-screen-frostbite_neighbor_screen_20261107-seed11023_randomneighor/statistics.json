@@ -1,0 +1,53 @@
+{
+  "mode": "single",
+  "bootstrap_unit": "episode",
+  "repetitions": 10000,
+  "seed": 2027,
+  "interval_method": "cluster percentile 95%",
+  "estimand": "Frame-weighted mean over contexts where the correlation is defined",
+  "undefined_handling": "Constant predictions are undefined; exclude and report counts",
+  "uncertainty_scope": "Context sampling for one fixed checkpoint only",
+  "evaluated_frames": 17421,
+  "evaluated_episodes": 20,
+  "evaluated_blocks": 320,
+  "metrics": {
+    "spearman": {
+      "n": 17421,
+      "clusters": 20,
+      "mean": 0.17159016857374007,
+      "ci95": [
+        0.14531231712851078,
+        0.20020647151649448
+      ],
+      "undefined": 0,
+      "distribution": {
+        "mean": 0.17159016857374007,
+        "median": 0.26960784313725494,
+        "q1": -0.31327004376014617,
+        "q3": 0.6564259638815948,
+        "iqr": 0.9696960076417409
+      }
+    },
+    "kendall": {
+      "n": 17421,
+      "clusters": 20,
+      "mean": 0.14019869983881064,
+      "ci95": [
+        0.11930272942950255,
+        0.1624631498092294
+      ],
+      "undefined": 0,
+      "distribution": {
+        "mean": 0.14019869983881064,
+        "median": 0.19022548235232356,
+        "q1": -0.22606631677876166,
+        "q3": 0.49999999999999994,
+        "iqr": 0.7260663167787615
+      }
+    }
+  },
+  "global_profile_correlations": {
+    "spearman": 0.6200980392156864,
+    "kendall": 0.3823529411764705
+  }
+}

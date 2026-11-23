@@ -1,0 +1,47 @@
+{
+  "checkpoint": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+  "source_config": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193/config.yaml",
+  "env": "ALE/Qbert-v5",
+  "seed": 3333,
+  "score_combination": "add",
+  "steps_per_threshold": 100,
+  "thresholds": [
+    3.5,
+    3.75,
+    4.0,
+    4.25,
+    4.5
+  ],
+  "completed": 0,
+  "failed": 1,
+  "runs": [
+    {
+      "threshold": 3.5,
+      "status": "interrupted",
+      "error": "Sweep interrupted",
+      "output": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075235479314Z/01_threshold_3.5",
+      "log": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075235479314Z/logs/01_threshold_3.5.log"
+    },
+    {
+      "threshold": 3.75,
+      "status": "pending",
+      "error": ""
+    },
+    {
+      "threshold": 4.0,
+      "status": "pending",
+      "error": ""
+    },
+    {
+      "threshold": 4.25,
+      "status": "pending",
+      "error": ""
+    },
+    {
+      "threshold": 4.5,
+      "status": "pending",
+      "error": ""
+    }
+  ],
+  "scope": "Each CI describes one threshold's short resumed run; not uncertainty across games/seeds."
+}

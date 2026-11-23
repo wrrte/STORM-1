@@ -1,0 +1,31 @@
+{
+  "run_name": "Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11010_randomneighor",
+  "seed": 11010,
+  "env_name": "ALE/Frostbite-v5",
+  "checkpoint_step": 100000,
+  "sample_max_steps": 102000,
+  "precision": "bf16",
+  "episode_avg_return": 2177.0,
+  "episode_returns": [
+    1860.0,
+    3860.0,
+    2670.0,
+    1760.0,
+    3040.0,
+    1090.0,
+    2050.0,
+    2680.0,
+    1610.0,
+    1530.0,
+    1510.0,
+    1460.0,
+    2840.0,
+    1150.0,
+    2890.0,
+    1350.0,
+    1380.0,
+    3460.0,
+    1290.0,
+    4060.0
+  ]
+}

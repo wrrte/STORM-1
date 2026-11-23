@@ -1,0 +1,56 @@
+Traceback (most recent call last):
+  File "/mnt/hdd_4A/choemj/measure_additive_anchors.py", line 446, in <module>
+    sys.exit(main())
+  File "/mnt/hdd_4A/choemj/measure_additive_anchors.py", line 439, in main
+    run_probe(args)
+  File "/mnt/hdd_4A/choemj/measure_additive_anchors.py", line 192, in run_probe
+    train = importlib.import_module("train")
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/importlib/__init__.py", line 126, in import_module
+    return _bootstrap._gcd_import(name[level:], package, level)
+  File "<frozen importlib._bootstrap>", line 1050, in _gcd_import
+  File "<frozen importlib._bootstrap>", line 1027, in _find_and_load
+  File "<frozen importlib._bootstrap>", line 1006, in _find_and_load_unlocked
+  File "<frozen importlib._bootstrap>", line 688, in _load_unlocked
+  File "<frozen importlib._bootstrap_external>", line 883, in exec_module
+  File "<frozen importlib._bootstrap>", line 241, in _call_with_frames_removed
+  File "/mnt/hdd_4A/choemj/STORM-1/train.py", line 20, in <module>
+    from utils import seed_np_torch, Logger, load_config, configure_performance
+  File "/mnt/hdd_4A/choemj/STORM-1/utils.py", line 11, in <module>
+    import wandb
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/wandb/__init__.py", line 22, in <module>
+    from wandb.sdk.lib import wb_logging as _wb_logging
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/wandb/sdk/__init__.py", line 25, in <module>
+    from .artifacts.artifact import Artifact
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/wandb/sdk/artifacts/artifact.py", line 41, in <module>
+    from wandb.apis.normalize import normalize_exceptions
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/wandb/apis/__init__.py", line 43, in <module>
+    from .public import Api  # noqa
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/wandb/apis/public/__init__.py", line 50, in <module>
+    from wandb.apis.public.artifacts import (
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/wandb/apis/public/artifacts.py", line 918, in <module>
+    class _ArtifactConnectionGeneric(ConnectionWithTotal[TNode]):
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/pydantic/main.py", line 965, in __class_getitem__
+    submodel = _generics.create_generic_submodel(model_name, origin, args, params)
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/pydantic/_internal/_generics.py", line 127, in create_generic_submodel
+    created_model = meta(
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/pydantic/_internal/_model_construction.py", line 243, in __new__
+    set_model_fields(cls, config_wrapper=config_wrapper, ns_resolver=ns_resolver)
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/pydantic/_internal/_model_construction.py", line 579, in set_model_fields
+    fields, pydantic_extra_info, class_vars = collect_model_fields(
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/pydantic/_internal/_fields.py", line 423, in collect_model_fields
+    _update_fields_from_docstrings(cls, fields)
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/pydantic/_internal/_fields.py", line 122, in _update_fields_from_docstrings
+    fields_docs = extract_docstrings_from_cls(cls, use_inspect=use_inspect)
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/pydantic/_internal/_docs_extraction.py", line 104, in extract_docstrings_from_cls
+    source = _extract_source_from_frame(cls)
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/pydantic/_internal/_docs_extraction.py", line 56, in _extract_source_from_frame
+    if inspect.getmodule(frame) is inspect.getmodule(cls):
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/inspect.py", line 861, in getmodule
+    file = getabsfile(object, _filename)
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/inspect.py", line 844, in getabsfile
+    _filename = getsourcefile(object) or getfile(object)
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/inspect.py", line 829, in getsourcefile
+    module = getmodule(object, filename)
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/inspect.py", line 869, in getmodule
+    if ismodule(module) and hasattr(module, '__file__'):
+KeyboardInterrupt

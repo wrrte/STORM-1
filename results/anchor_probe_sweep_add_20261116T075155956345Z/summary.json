@@ -1,0 +1,180 @@
+{
+  "checkpoint": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+  "source_config": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193/config.yaml",
+  "env": "ALE/Qbert-v5",
+  "seed": 3333,
+  "score_combination": "add",
+  "steps_per_threshold": 100,
+  "thresholds": [
+    3.5,
+    3.75,
+    4.0,
+    4.25,
+    4.5
+  ],
+  "completed": 5,
+  "failed": 0,
+  "runs": [
+    {
+      "threshold": 3.5,
+      "status": "completed",
+      "error": "",
+      "output": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/01_threshold_3.5",
+      "log": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/logs/01_threshold_3.5.log",
+      "result": {
+        "updates": 100,
+        "total_anchor_insertions": 632,
+        "mean_anchors_per_update": 6.32,
+        "within_run_sd_across_updates": 2.117173644844523,
+        "mean_ci95": [
+          5.93,
+          6.73
+        ],
+        "ci_method": "circular moving-block percentile bootstrap",
+        "block_size_updates": 10,
+        "bootstrap_samples": 10000,
+        "bootstrap_seed": 0,
+        "checkpoint": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+        "source_config": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193/config.yaml",
+        "env": "ALE/Qbert-v5",
+        "seed": 3333,
+        "score_combination": "add",
+        "threshold": 3.5,
+        "env_step_start": 50193,
+        "env_step_stop_exclusive": 50293,
+        "environment_reset_at_resume": true,
+        "rebuild_retrieval_on_resume": true,
+        "scope": "Within this short resumed run; not uncertainty across games or training seeds."
+      }
+    },
+    {
+      "threshold": 3.75,
+      "status": "completed",
+      "error": "",
+      "output": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/02_threshold_3.75",
+      "log": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/logs/02_threshold_3.75.log",
+      "result": {
+        "updates": 100,
+        "total_anchor_insertions": 629,
+        "mean_anchors_per_update": 6.29,
+        "within_run_sd_across_updates": 1.9451831208750947,
+        "mean_ci95": [
+          5.98,
+          6.590249999999997
+        ],
+        "ci_method": "circular moving-block percentile bootstrap",
+        "block_size_updates": 10,
+        "bootstrap_samples": 10000,
+        "bootstrap_seed": 0,
+        "checkpoint": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+        "source_config": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193/config.yaml",
+        "env": "ALE/Qbert-v5",
+        "seed": 3333,
+        "score_combination": "add",
+        "threshold": 3.75,
+        "env_step_start": 50193,
+        "env_step_stop_exclusive": 50293,
+        "environment_reset_at_resume": true,
+        "rebuild_retrieval_on_resume": true,
+        "scope": "Within this short resumed run; not uncertainty across games or training seeds."
+      }
+    },
+    {
+      "threshold": 4.0,
+      "status": "completed",
+      "error": "",
+      "output": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/03_threshold_4",
+      "log": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/logs/03_threshold_4.log",
+      "result": {
+        "updates": 100,
+        "total_anchor_insertions": 603,
+        "mean_anchors_per_update": 6.03,
+        "within_run_sd_across_updates": 2.0073350341669274,
+        "mean_ci95": [
+          5.69,
+          6.38
+        ],
+        "ci_method": "circular moving-block percentile bootstrap",
+        "block_size_updates": 10,
+        "bootstrap_samples": 10000,
+        "bootstrap_seed": 0,
+        "checkpoint": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+        "source_config": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193/config.yaml",
+        "env": "ALE/Qbert-v5",
+        "seed": 3333,
+        "score_combination": "add",
+        "threshold": 4.0,
+        "env_step_start": 50193,
+        "env_step_stop_exclusive": 50293,
+        "environment_reset_at_resume": true,
+        "rebuild_retrieval_on_resume": true,
+        "scope": "Within this short resumed run; not uncertainty across games or training seeds."
+      }
+    },
+    {
+      "threshold": 4.25,
+      "status": "completed",
+      "error": "",
+      "output": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/04_threshold_4.25",
+      "log": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/logs/04_threshold_4.25.log",
+      "result": {
+        "updates": 100,
+        "total_anchor_insertions": 565,
+        "mean_anchors_per_update": 5.65,
+        "within_run_sd_across_updates": 1.8768929838238708,
+        "mean_ci95": [
+          5.3,
+          6.02
+        ],
+        "ci_method": "circular moving-block percentile bootstrap",
+        "block_size_updates": 10,
+        "bootstrap_samples": 10000,
+        "bootstrap_seed": 0,
+        "checkpoint": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+        "source_config": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193/config.yaml",
+        "env": "ALE/Qbert-v5",
+        "seed": 3333,
+        "score_combination": "add",
+        "threshold": 4.25,
+        "env_step_start": 50193,
+        "env_step_stop_exclusive": 50293,
+        "environment_reset_at_resume": true,
+        "rebuild_retrieval_on_resume": true,
+        "scope": "Within this short resumed run; not uncertainty across games or training seeds."
+      }
+    },
+    {
+      "threshold": 4.5,
+      "status": "completed",
+      "error": "",
+      "output": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/05_threshold_4.5",
+      "log": "/mnt/hdd_4A/choemj/STORM-1/results/anchor_probe_sweep_add_20261116T075155956345Z/logs/05_threshold_4.5.log",
+      "result": {
+        "updates": 100,
+        "total_anchor_insertions": 534,
+        "mean_anchors_per_update": 5.34,
+        "within_run_sd_across_updates": 1.8047076486150595,
+        "mean_ci95": [
+          5.05,
+          5.62
+        ],
+        "ci_method": "circular moving-block percentile bootstrap",
+        "block_size_updates": 10,
+        "bootstrap_samples": 10000,
+        "bootstrap_seed": 0,
+        "checkpoint": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+        "source_config": "/mnt/hdd_4A/choemj/STORM-1/ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193/config.yaml",
+        "env": "ALE/Qbert-v5",
+        "seed": 3333,
+        "score_combination": "add",
+        "threshold": 4.5,
+        "env_step_start": 50193,
+        "env_step_stop_exclusive": 50293,
+        "environment_reset_at_resume": true,
+        "rebuild_retrieval_on_resume": true,
+        "scope": "Within this short resumed run; not uncertainty across games or training seeds."
+      }
+    }
+  ],
+  "scope": "Each CI describes one threshold's short resumed run; not uncertainty across games/seeds."
+}

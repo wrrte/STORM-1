@@ -1,0 +1,223 @@
+% Generated from saved predictions. Requires booktabs; no manuscript file was edited.
+\subsection{Controlled Igloo-Stage Evaluation of Random Neighbors}
+\label{app:random11010_alignment}
+\paragraph{Checkpoint and shared contexts.}
+We evaluate the fixed world model and critic of the Random-neighbors variant trained with seed 11010, using checkpoints saved at 100,000 environment steps. This variant retains the multiplicative value-difference/TD-error anchor rule and replaces non-anchor neighbor contexts with random replay contexts. Its separate final BF16 policy evaluation averages 2177.0 return over 20 episodes; these policy-evaluation episodes are distinct from the critic-diagnostic episodes below. The checkpoint was selected under a final-return-above-1000 criterion, rather than sampled uniformly from training runs.
+
+We reuse the 20,000 agent-step observations collected by the Baseline policy trained with seed 3710, at action repeat 4 and image resolution $64\times64$. The rollout comprises 19 complete episodes and part of a twentieth episode. The Random policy does not collect new contexts for this analysis. Consecutive observations with unchanged RAM-derived igloo stage are split into blocks of at most 64 observations, without crossing episode boundaries. Blocks shorter than nine observations are excluded. For each of the 320 valid blocks, we replace the igloo region throughout the block with each of the 17 stage templates ($0$--$16$), keeping other pixels and all actions fixed across stage variants. No background noise is injected. The first eight observations initialize temporal context; the remaining time points yield 17,421 evaluated contexts and 296,157 context-stage predictions. The recorded sampling protocol resets the random seed per block and stage variant. Each prediction uses one latent draw, without averaging repeated draws.
+
+\paragraph{Per-context alignment and uncertainty.}
+For each context $i$, we calculate $\rho_i=\operatorname{Spearman}((0,\ldots,16),(v_i(0),\ldots,v_i(16)))$ and analogously Kendall's $\tau_b$. We average these coefficients with equal weight per context. Standard tie handling is used. Constant predictions would yield undefined correlations and be excluded rather than assigned zero; none occur here. We use 10,000 whole-episode bootstrap replicates with seed 2027. Each replicate samples 20 episode identifiers with replacement, includes all their evaluated contexts with the sampled multiplicity, and recomputes the context-count denominator. The 2.5th and 97.5th percentiles define 95\% confidence intervals. These intervals describe evaluation-context uncertainty for a fixed checkpoint and exclude variation across training seeds and repeated latent draws.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean per-context stage--value correlations for Random neighbors, training seed 11010. Brackets denote episode-bootstrap percentile 95\% CIs.}
+\label{tab:random11010_metrics}
+\begin{tabular}{lrrr}
+\toprule
+Metric & Mean [95\% CI] & Defined contexts & Undefined \\
+\midrule
+Spearman's $\rho$ & 0.1076 [0.0838, 0.1315] & 17421 & 0 \\
+Kendall's $\tau_b$ & 0.0521 [0.0320, 0.0722] & 17421 & 0 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Distributions across contexts.}
+The positive means coexist with broad context-level distributions. Quartiles measure dispersion across contexts, whereas confidence intervals quantify uncertainty in a mean. The standard deviations below use $N-1$ as their denominator.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Distribution of per-context correlations across all 17,421 evaluated contexts.}
+\label{tab:random11010_distribution}
+\begin{tabular}{lrrrrr}
+\toprule
+Metric & SD & Median & Q1 & Q3 & IQR \\
+\midrule
+$\rho$ & 0.5598 & 0.1838 & -0.3151 & 0.6298 & 0.9450 \\
+$\tau_b$ & 0.4474 & 0.1058 & -0.2583 & 0.4265 & 0.6848 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Signs and conditional magnitudes of per-context correlations. These are absolute correlations, not changes relative to another model.}
+\label{tab:random11010_direction}
+\begin{tabular}{lrr}
+\toprule
+Statistic & Spearman's $\rho$ & Kendall's $\tau_b$ \\
+\midrule
+Positive & 10,313 (59.20\%) & 9,914 (56.91\%) \\
+Zero & 9 (0.05\%) & 107 (0.61\%) \\
+Negative & 7,099 (40.75\%) & 7,400 (42.48\%) \\
+Mean where positive & 0.5107 & 0.3820 \\
+Mean where negative & -0.4777 & -0.3891 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Variation across evaluation episodes.}
+We also average correlations separately within each diagnostic episode. The final episode is partial. These are descriptive summaries for one checkpoint, not independent training-seed replications. The pooled estimates weight contexts equally and need not equal the unweighted average of episode means. Episode-mean Spearman correlation is positive in 20 of 20 episodes and episode-mean Kendall correlation is positive in 17 of 20 episodes.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Mean Random-neighbors correlations by diagnostic episode. The final episode is partial.}
+\label{tab:random11010_episodes}
+\begin{tabular}{lrrr}
+\toprule
+Episode & Evaluated contexts & Mean $\rho$ & Mean $\tau_b$ \\
+\midrule
+1 & 783 & 0.0910 & 0.0413 \\
+2 & 1,048 & 0.1366 & 0.0799 \\
+3 & 957 & 0.0938 & 0.0410 \\
+4 & 1,010 & 0.1634 & 0.0982 \\
+5 & 861 & 0.0665 & 0.0209 \\
+6 & 1,008 & 0.1680 & 0.1012 \\
+7 & 907 & 0.0592 & 0.0184 \\
+8 & 793 & 0.0699 & 0.0184 \\
+9 & 896 & 0.0200 & -0.0199 \\
+10 & 890 & 0.0180 & -0.0304 \\
+11 & 896 & 0.2016 & 0.1319 \\
+12 & 952 & 0.0783 & 0.0310 \\
+13 & 956 & 0.1166 & 0.0636 \\
+14 & 444 & 0.1950 & 0.1039 \\
+15 & 848 & 0.1371 & 0.0745 \\
+16 & 929 & 0.1267 & 0.0677 \\
+17 & 712 & 0.1421 & 0.0788 \\
+18 & 857 & 0.0237 & -0.0201 \\
+19 & 1,010 & 0.0900 & 0.0367 \\
+20 & 664 & 0.2058 & 0.1351 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Global average value profile.}
+We additionally form $\bar v(k)=N^{-1}\sum_i v_i(k)$ and correlate this 17-point profile with stage index. This reverses the order of averaging and correlation relative to the per-context metric. The resulting Spearman and Kendall coefficients are 0.2525 and 0.1765, respectively. The profile reaches its maximum at stage 15. These profile correlations are point estimates. The intervals in the following table refer to mean predicted values, not to profile correlations.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Global mean predicted value by igloo stage for Random neighbors. Brackets give whole-episode bootstrap percentile 95\% CIs for mean values.}
+\label{tab:random11010_profile}
+\begin{tabular}{lrrr}
+\toprule
+Stage & Mean value [95\% CI] & SD & Median \\
+\midrule
+0 & 76.1779 [71.0471, 80.5966] & 78.0126 & 51.0979 \\
+1 & 73.2849 [68.0474, 78.1041] & 82.7158 & 47.1827 \\
+2 & 70.3748 [64.4470, 75.9350] & 84.6167 & 42.8708 \\
+3 & 65.3279 [58.9496, 71.5737] & 82.0353 & 38.9449 \\
+4 & 62.6912 [56.1461, 69.0963] & 80.9843 & 36.5247 \\
+5 & 58.4531 [51.8663, 65.0673] & 79.0647 & 31.6020 \\
+6 & 56.3041 [49.7330, 62.9126] & 77.8341 & 28.2243 \\
+7 & 56.7419 [50.1638, 63.3161] & 78.3432 & 26.8860 \\
+8 & 58.9956 [52.2512, 65.7181] & 80.5944 & 27.7712 \\
+9 & 65.0385 [57.8622, 72.0813] & 85.6870 & 31.0966 \\
+10 & 70.3423 [63.0760, 77.3312] & 87.9017 & 35.9430 \\
+11 & 72.6247 [65.4320, 79.5093] & 88.2706 & 37.7159 \\
+12 & 72.9407 [65.7321, 80.0828] & 87.5350 & 37.7159 \\
+13 & 68.5533 [62.0050, 75.3507] & 82.5470 & 34.2512 \\
+14 & 70.2469 [64.1353, 76.4981] & 81.6918 & 38.3256 \\
+15 & 83.3514 [77.2647, 89.2148] & 84.8511 & 71.3308 \\
+16 & 80.0640 [74.4780, 85.6818] & 82.4167 & 71.3308 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\paragraph{Supplementary comparisons with saved Baseline and FLASH predictions.}
+For reference, we compare with the previously saved Baseline and FLASH checkpoints trained with seed 3710. Frame identifiers, episode identifiers, within-episode steps, block identifiers, and stage templates match exactly. Comparisons are paired over evaluation contexts, while the training seed differs between Random and the reference models. All differences below are Random minus reference. We reuse the same episode-bootstrap selections for both sides, apply no multiplicity correction, and do not report separate p-values.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Saved checkpoint comparison on identical contexts. Training seeds differ between Random and the reference models. Brackets give 95\% CIs.}
+\label{tab:random11010_comparison_means}
+\begin{tabular}{lrr}
+\toprule
+Model & Spearman's $\rho$ & Kendall's $\tau_b$ \\
+\midrule
+Baseline (seed 3710) & 0.0756 [0.0447, 0.1097] & 0.0397 [0.0143, 0.0676] \\
+Random neighbors (seed 11010) & 0.1076 [0.0838, 0.1315] & 0.0521 [0.0320, 0.0722] \\
+FLASH (seed 3710) & 0.1622 [0.1269, 0.1988] & 0.1343 [0.1063, 0.1634] \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Paired context-weighted mean differences, Random minus reference. Intervals quantify fixed-checkpoint context uncertainty.}
+\label{tab:random11010_differences}
+\begin{tabular}{lrrrrr}
+\toprule
+Difference & Metric & Mean [95\% CI] & Median & Q1 & Q3 \\
+\midrule
+Random - Baseline & $\rho$ & 0.0321 [0.0012, 0.0616] & -0.0372 & -0.2734 & 0.3846 \\
+Random - Baseline & $\tau_b$ & 0.0124 [-0.0136, 0.0370] & -0.0343 & -0.2904 & 0.3390 \\
+Random - Flash & $\rho$ & -0.0545 [-0.0965, -0.0139] & -0.1230 & -0.4113 & 0.2636 \\
+Random - Flash & $\tau_b$ & -0.0822 [-0.1162, -0.0495] & -0.1494 & -0.3915 & 0.2001 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Frequency and conditional magnitude of matched-context changes. All changes are Random minus reference.}
+\label{tab:random11010_changes}
+\begin{tabular}{lrrrrrr}
+\toprule
+Reference & Metric & Higher & Lower & Equal & Positive mean & Negative mean \\
+\midrule
+Baseline & $\rho$ & 8,132 & 9,287 & 2 & +0.5002 & -0.3778 \\
+Baseline & $\tau_b$ & 8,249 & 9,143 & 29 & +0.4071 & -0.3437 \\
+Flash & $\rho$ & 6,367 & 11,052 & 2 & +0.5821 & -0.4213 \\
+Flash & $\tau_b$ & 6,229 & 11,169 & 23 & +0.4547 & -0.3818 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+Relative to Baseline, the mean Spearman difference is +0.0321, while its median is -0.0372 and only 46.68\% of contexts have a positive difference. The conditional positive mean (+0.5002) has a larger absolute magnitude than the conditional negative mean (-0.3778). Thus a positive mean difference coexists with improvement in fewer than half of matched contexts. The episode-bootstrap difference interval lies above zero for Spearman relative to Baseline, whereas the Kendall interval includes zero. Relative to FLASH, both mean differences and their intervals lie below zero. These statements concern the evaluated fixed checkpoints, not across-seed variant effects.
+
+\begin{table}[!htbp]
+\centering
+\small
+\caption{Episode-specific paired mean differences: Random minus each reference. The final diagnostic episode is partially observed.}
+\label{tab:random11010_episode_differences}
+\begin{tabular}{lrrrrr}
+\toprule
+Episode & Contexts & $\Delta\rho_{R-B}$ & $\Delta\tau_{R-B}$ & $\Delta\rho_{R-F}$ & $\Delta\tau_{R-F}$ \\
+\midrule
+1 & 783 & -0.0109 & -0.0159 & -0.0103 & -0.0479 \\
+2 & 1,048 & +0.0842 & +0.0661 & +0.1134 & +0.0490 \\
+3 & 957 & +0.0220 & +0.0046 & -0.0123 & -0.0431 \\
+4 & 1,010 & +0.0174 & +0.0083 & +0.0142 & -0.0365 \\
+5 & 861 & +0.0552 & +0.0375 & -0.1186 & -0.1408 \\
+6 & 1,008 & +0.1545 & +0.1065 & +0.0308 & -0.0073 \\
+7 & 907 & +0.0913 & +0.0656 & -0.1474 & -0.1545 \\
+8 & 793 & -0.0947 & -0.0915 & -0.2118 & -0.2089 \\
+9 & 896 & -0.0555 & -0.0629 & -0.2142 & -0.2146 \\
+10 & 890 & +0.0143 & -0.0075 & -0.1318 & -0.1491 \\
+11 & 896 & +0.0330 & +0.0194 & -0.0470 & -0.0809 \\
+12 & 952 & -0.0148 & -0.0267 & +0.0421 & -0.0043 \\
+13 & 956 & +0.0341 & +0.0227 & -0.0181 & -0.0398 \\
+14 & 444 & -0.1160 & -0.1445 & -0.2328 & -0.2407 \\
+15 & 848 & +0.1355 & +0.0926 & -0.0098 & -0.0411 \\
+16 & 929 & +0.1303 & +0.0921 & -0.0302 & -0.0631 \\
+17 & 712 & -0.0085 & -0.0374 & -0.1032 & -0.1198 \\
+18 & 857 & -0.0106 & -0.0282 & -0.1692 & -0.1651 \\
+19 & 1,010 & +0.0874 & +0.0532 & +0.0430 & -0.0049 \\
+20 & 664 & -0.0591 & -0.0508 & -0.0714 & -0.0927 \\
+\bottomrule
+\end{tabular}
+\end{table}
+
+The Random-minus-Baseline episode-mean difference is positive in 12 of 20 episodes for Spearman and 11 of 20 for Kendall. The corresponding counts against FLASH are 5 of 20 and 1 of 20. These counts are descriptive, without separate episode-level significance tests.
+
+\paragraph{Interpretation and scope.}
+For these fixed checkpoints, mean per-context alignment follows Baseline $<$ Random $<$ FLASH. Absolute correlations remain weak on average and vary substantially across contexts. This diagnostic measures critic responses to controlled visual stage changes; it does not establish that true policy-dependent expected return is monotonic in stage in every context, that edited observation--action histories are realizable trajectories, or that latent representations are disentangled. The results are separate from the background-noise classification probe. Differences between these checkpoints do not estimate an across-training-seed variant effect.

@@ -1,0 +1,28 @@
+A.L.E: Arcade Learning Environment (version 0.8.1+53f58b7)
+[Powered by Stella]
+/mnt/hdd_4A/choemj/STORM-1/sub_models/world_models.py:275: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_amp)
+/mnt/hdd_4A/choemj/STORM-1/agents.py:89: FutureWarning: `torch.cuda.amp.GradScaler(args...)` is deprecated. Please use `torch.amp.GradScaler('cuda', args...)` instead.
+  self.scaler = torch.cuda.amp.GradScaler(enabled=self.use_amp)
+Current env: [33mALE/Qbert-v5[0m
+[Retrieval] Global Rebuild completed. Re-hashed 50193 frames (PCA: True).
+  0%|          | 0/100 [00:00<?, ?it/s]init_imagine_buffer: 1024x16@torch.bfloat16
+  1%|          | 1/100 [00:00<01:06,  1.49it/s]  2%|▏         | 2/100 [00:00<00:44,  2.19it/s]  3%|▎         | 3/100 [00:01<00:36,  2.65it/s]  4%|▍         | 4/100 [00:01<00:31,  3.03it/s]  5%|▌         | 5/100 [00:01<00:29,  3.22it/s]  6%|▌         | 6/100 [00:02<00:27,  3.38it/s]  7%|▋         | 7/100 [00:02<00:26,  3.57it/s]  8%|▊         | 8/100 [00:02<00:24,  3.75it/s]  8%|▊         | 8/100 [00:02<00:32,  2.86it/s]
+Traceback (most recent call last):
+  File "/mnt/hdd_4A/choemj/measure_additive_anchors.py", line 461, in <module>
+    sys.exit(main())
+  File "/mnt/hdd_4A/choemj/measure_additive_anchors.py", line 454, in main
+    run_probe(args)
+  File "/mnt/hdd_4A/choemj/measure_additive_anchors.py", line 247, in run_probe
+    completed = train.joint_train_world_model_agent(
+  File "/mnt/hdd_4A/choemj/STORM-1/train.py", line 555, in joint_train_world_model_agent
+    agent.update(
+  File "/mnt/hdd_4A/choemj/STORM-1/agents.py", line 175, in update
+    self.scaler.scale(loss).backward()
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/torch/_tensor.py", line 631, in backward
+    torch.autograd.backward(
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/torch/autograd/__init__.py", line 381, in backward
+    _engine_run_backward(
+  File "/home/choemj/miniconda3/envs/storm/lib/python3.10/site-packages/torch/autograd/graph.py", line 869, in _engine_run_backward
+    return Variable._execution_engine.run_backward(  # Calls into the C++ engine to run the backward pass
+KeyboardInterrupt

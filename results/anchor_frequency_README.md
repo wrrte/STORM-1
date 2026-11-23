@@ -127,3 +127,39 @@ ratio의 95% bootstrap CI는 게임별 두 설정의 평균을 함께 재표집�
 저장하지 않았으므로 기존 로그만으로 다른 additive threshold의 빈도를 재계산할 수는 없다.
 
 W&B 전체 history의 API 동작은 [공식 SDK 소스](https://github.com/wandb/wandb/blob/main/wandb/apis/public/runs.py)에 설명되어 있다.
+
+## Update별 변동성과 CI
+
+기본 실행과 `--offline` 실행은 변동성 분석도 함께 생성한다. 기존 결과에서 변동성만
+다시 계산하려면 아래 명령을 사용한다. W&B에 다시 연결하지 않는다.
+
+```bash
+conda run -n storm python results/anchor_frequency_variability.py
+```
+
+- `variability_report.md`, `variability_summary.json`: 평균, run 내 SD, 전체 update 분포 SD,
+  평균·평균 차이·비율의 95% CI.
+- `per_run_variability.csv`: run별 평균, 표본 SD, 분위수, 최솟값·최댓값, 0 비율,
+  lag-1 자기상관, 평균의 조건부 block-bootstrap CI.
+- `per_game_variability.csv`: 게임별 통계와 시드별 run 평균의 SD. 시드가 1개이면
+  시드 간 SD는 추정할 수 없어 빈 칸으로 남긴다.
+- `mean_ci_block_sensitivity.csv`: 연속 update 250/1,000/5,000개 단위 circular block
+  bootstrap으로 얻은 평균 CI와 표준오차. 기본 재표집 횟수는 2,000이다.
+- `per_phase_variability.csv`, `frequency_variability_over_time.png`: 환경 step
+  5,000개 구간별 평균과 update 분포의 P05~P95. 음영은 평균의 CI가 아니다.
+- `update_count_distribution.csv`, `frequency_variability.png`, `.pdf`: 게임·시드를
+  동일 가중한 삽입 수 분포와 게임별 평균 ± run 내 SD.
+
+Run 내 SD는 각 run에서 update 사이에 얼마나 변동하는지 나타낸다. 요약값은 run별
+표본 분산을 시드·게임 순서로 동일 가중해 평균한 뒤 제곱근(RMS)을 취한다. 전체 update
+SD는 게임·시드 차이까지 포함한 경험 분포의 SD로, 두 수치를 구분해야 한다.
+
+전체 평균의 95% CI는 기존 분석과 동일하게 paired game mean을 재표집한다. 이 CI는
+관측 시드를 고정한 상태에서 게임 구성에 따른 민감도를 나타낸다. 독립 학습 시드 수를
+늘렸을 때의 불확실성과는 다르다. 전체 update 수를 독립 표본 수로 간주하지 않는다.
+
+Run별 block-bootstrap CI는 국소적 시간 상관을 유지하지만, 대략적인 정상성과 적절한
+block 길이를 가정한다. 학습 drift가 있으면 조건이 깨질 수 있으므로 구간별 그림과
+block 길이에 따른 민감도를 함께 확인해야 한다. 이미 관측한 로그 구간의 평균 자체는
+정확히 알고 있는 값이고, 이 CI는 같은 통계적 과정이 반복된다는 가정 아래의 조건부
+진단이다. 시드가 1~2개인 게임에서 시드 간 CI를 무리하게 만들지는 않는다.
