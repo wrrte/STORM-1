@@ -1,0 +1,1352 @@
+{
+  "version": 1,
+  "round": "warmups-20261123",
+  "profile_sha256": "2bc7ac1b6d0dd0abb9816784c9bcf94bd201785227370486e9684ec797311853",
+  "gpu_type": "A6000",
+  "machine": "A6000",
+  "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+  "code_commit": "d620d37a3476cc17a24d9fd98e87f158f917a9be",
+  "games": {
+    "Amidar": {
+      "A6000": {
+        "6020": [
+          {
+            "source": "ckpt/Amidar-6020_Shared/shared_warmup_50791",
+            "step": 50791,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260920_113005-ky8u1wad/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Assault": {
+      "A6000": {
+        "6010": [
+          {
+            "source": "ckpt/Assault-6010_Shared/shared_warmup_50537",
+            "step": 50537,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "9f2a23b349bb683d78649071de91782261fa9adc830a652c4637bbcd2596f7fb",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260920_002941-pv8b0vnz/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Asterix": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/Asterix-6000_Shared/shared_warmup_50011",
+            "step": 50011,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260923_181757-7rkps5ua/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6010": [
+          {
+            "source": "ckpt/Asterix-6010_Shared/shared_warmup_50038",
+            "step": 50038,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260920_134809-nqv0hrq8/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "BattleZone": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/BattleZone-6000_Shared/shared_warmup_50711",
+            "step": 50711,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260920_144849-yxx685wn/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6020": [
+          {
+            "source": "ckpt/BattleZone-6020_Shared/shared_warmup_50450",
+            "step": 50450,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260922_075414-ro78pc6n/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Boxing": {
+      "A6000": {
+        "6010": [
+          {
+            "source": "ckpt/Boxing-6010_Shared/shared_warmup_51575",
+            "step": 51575,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "a192a1c03009bc91145de80e7c13d73e8dc27983134967d5587daa7275932c58",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260922_115242-wevauhk2/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6020": [
+          {
+            "source": "ckpt/Boxing-6020_Both/shared_warmup_50406",
+            "step": 50406,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260920_005027-9tjfa59d/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6040": [
+          {
+            "source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+            "step": 50048,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260924_041121-1etnqhal/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Breakout": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/Breakout-6000_Shared/shared_warmup_50235",
+            "step": 50235,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260923_155912-11is2qqu/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "CrazyClimber": {
+      "A6000": {
+        "6020": [
+          {
+            "source": "ckpt/CrazyClimber-6020_Shared/shared_warmup_53133",
+            "step": 53133,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260925_013629-lphyg8qj/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Freeway": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/Freeway-6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "7eabbe47d7750eb362385ce809664f4a7b89ae19498b87cd5d6dfaa1aa780215",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_214113-vj6fah1y/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6010": [
+          {
+            "source": "ckpt/Freeway-6010_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "7eabbe47d7750eb362385ce809664f4a7b89ae19498b87cd5d6dfaa1aa780215",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_214128-bjfe05b9/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6020": [
+          {
+            "source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+            "step": 51200,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "8e623bc0594a5bd902c54b3745658f449ab729c320028bd01305e2938be9f714",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260921_083652-v3y7v9gk/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Frostbite": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/Frostbite-6000_Shared/shared_warmup_50304",
+            "step": 50304,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260920_193457-o9ktp3rz/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6010": [
+          {
+            "source": "ckpt/Frostbite-6010_Shared/shared_warmup_50294",
+            "step": 50294,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260921_151929-0ztw8w90/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Hero": {
+      "A6000": {
+        "3710": [
+          {
+            "source": "ckpt/Hero-3710_Shared/shared_warmup_50393",
+            "step": 50393,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c7c53717fd69725d3716c2ef2ddb37024adaa8014d4f0a8ca0d512fa0fce002c",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260926_000358-0f0ggtpk/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Jamesbond": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/Jamesbond-6000_Shared/shared_warmup_50054",
+            "step": 50054,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_145606-yxyqz7am/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6010": [
+          {
+            "source": "ckpt/Jamesbond-6010_Shared/shared_warmup_50135",
+            "step": 50135,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "d73fb4959e8f17da420490ed00833507e2c983d814bdb6d4aebc557aa60e6226",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260925_101302-5rrawt3e/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Kangaroo": {
+      "A6000": {
+        "6020": [
+          {
+            "source": "ckpt/Kangaroo-6020_Shared/shared_warmup_50230",
+            "step": 50230,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260923_074517-ipx0kpf5/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6030": [
+          {
+            "source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+            "step": 50067,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260921_155028-ecn9o3gx/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6040": [
+          {
+            "source": "ckpt/Kangaroo-6040_Shared/shared_warmup_50211",
+            "step": 50211,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260923_155929-0s1hbwqs/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6050": [
+          {
+            "source": "ckpt/Kangaroo-6050_Shared/shared_warmup_50343",
+            "step": 50343,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260923_181750-9mg49ffa/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "7000": [
+          {
+            "source": "ckpt/Kangaroo-7000_Shared/shared_warmup_50295",
+            "step": 50295,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260926_100606-dcovkdro/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "7010": [
+          {
+            "source": "ckpt/Kangaroo-7010_Shared/shared_warmup_50213",
+            "step": 50213,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260926_100658-mskszfxr/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "7020": [
+          {
+            "source": "ckpt/Kangaroo-7020_Shared/shared_warmup_50238",
+            "step": 50238,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260926_100728-4ztzzfwr/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6000": [
+          {
+            "source": "ckpt/Kangaroo-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_003810-053q6ude/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6010": [
+          {
+            "source": "ckpt/Kangaroo-life_done-wm_2L512D8H-100k-seed6010_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_035650-7u64q6sg/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Krull": {
+      "A6000": {
+        "6020": [
+          {
+            "source": "ckpt/Krull-6020_Both/shared_warmup_51133",
+            "step": 51133,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260920_015722-l3a6tipm/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6050": [
+          {
+            "source": "ckpt/Krull-6050_Shared/shared_warmup_50452",
+            "step": 50452,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260923_122145-5x8w5nc9/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6070": [
+          {
+            "source": "ckpt/Krull-6070_Shared/shared_warmup_51367",
+            "step": 51367,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260924_154143-44vzf00d/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "7000": [
+          {
+            "source": "ckpt/Krull-7000_Shared/shared_warmup_51060",
+            "step": 51060,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260926_100603-71qc5hhm/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "7010": [
+          {
+            "source": "ckpt/Krull-7010_Shared/shared_warmup_50126",
+            "step": 50126,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260926_100605-oqcgmx6v/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "7020": [
+          {
+            "source": "ckpt/Krull-7020_Shared/shared_warmup_50529",
+            "step": 50529,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260926_100606-r0dr2ss0/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6000": [
+          {
+            "source": "ckpt/Krull-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_054819-27h20s5o/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "KungFuMaster": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/KungFuMaster-6000_Shared/shared_warmup_50667",
+            "step": 50667,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260924_044948-0zhqiaae/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "MsPacman": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/MsPacman-6000_Shared/shared_warmup_50105",
+            "step": 50105,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b66453ba63197a8c909b7be3464cfed35bd9a7de51271bbd8c69ef5f643ebce5",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_134015-hst9xi8r/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6010": [
+          {
+            "source": "ckpt/MsPacman-6010_Shared/shared_warmup_50003",
+            "step": 50003,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "991112ddc37491c5e87b7ee06a9ac5608c952128b224ea7d1e2e4075baedc167",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260922_070807-b4hzstwm/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6020": [
+          {
+            "source": "ckpt/MsPacman-6020_Shared/shared_warmup_50512",
+            "step": 50512,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "2464e0358383c356f2041e625546df221a030b0abe91c279635c2a7e5f29640c",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260923_172635-p181tbuu/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "PrivateEye": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/PrivateEye-6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_132247-zhc1t71r/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6040": [
+          {
+            "source": "ckpt/PrivateEye-6040_Shared/shared_warmup_51262",
+            "step": 51262,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "0f9079b8d6d9d796fa60ca15a47b2fe583444445ca403380d533fae45a287cb7",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260925_065121-r0oqo8bl/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6010": [
+          {
+            "source": "ckpt/PrivateEye-myserver-6010_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260919_165836-h2njymy7/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6020": [
+          {
+            "source": "ckpt/PrivateEye-myserver-6020_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260919_161838-8wbxfbt6/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Qbert": {
+      "A6000": {
+        "6010": [
+          {
+            "source": "ckpt/Qbert-6010_Shared/shared_warmup_50559",
+            "step": 50559,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260924_153253-w3rgf0hl/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "RoadRunner": {
+      "A6000": {
+        "6030": [
+          {
+            "source": "ckpt/RoadRunner-6030_Shared/shared_warmup_51024",
+            "step": 51024,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260921_194903-4nra6tc0/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6040": [
+          {
+            "source": "ckpt/RoadRunner-6040_Shared/shared_warmup_50507",
+            "step": 50507,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260922_232956-kaiau85e/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6060": [
+          {
+            "source": "ckpt/RoadRunner-6060_Shared/shared_warmup_50218",
+            "step": 50218,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260924_013500-ay9xewz2/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Seaquest": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/Seaquest-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260918_130818-jfcgfsay/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "UpNDown": {
+      "A6000": {
+        "6030": [
+          {
+            "source": "ckpt/UpNDown-6030_Shared/shared_warmup_50056",
+            "step": 50056,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "wandb_run",
+              "source": "wandb/run-20260921_231345-v9pgryi6/files/wandb-metadata.json"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "excluded": []
+}
