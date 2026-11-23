@@ -191,6 +191,12 @@ def discover(model, *, root=ROOT, queue_dir=QUEUE_DIR, seed_dir=SEED_DIR, refres
         cached = {item["source"]: item for item in previous.get("available", [])}
         candidates = warmup_sources(root)
         selections = read_seed_files(seed_dir)
+        # Seed ownership is shared across games, including pairs not selected yet.
+        owners = {entry["seed"]: entry["gpu_type"] for entry in selections.values()}
+        with queue.connect() as db:
+            for row in db.execute("SELECT seed,gpu_type FROM seeds"):
+                if owners.setdefault(row["seed"], row["gpu_type"]) != row["gpu_type"]:
+                    raise ValueError(f"Seed {row['seed']} ownership differs between selections and queue")
         records, excluded = [], []
         for source in sorted(candidates):
             name, stamp = relative(source, root), source_stamp(source)
@@ -200,11 +206,15 @@ def discover(model, *, root=ROOT, queue_dir=QUEUE_DIR, seed_dir=SEED_DIR, refres
                     record = inspect_warmup(source, root=root, queue_dir=queue_dir)
                     record["stamp"] = stamp
                 origin = source / "queue_origin.json"
-                kind = json.loads(origin.read_text())["gpu_type"] if origin.exists() else selections.get(
-                    pair_key(record["game"], record["seed"]), {}).get("gpu_type", model)
+                kind = json.loads(origin.read_text())["gpu_type"] if origin.exists() else owners.get(
+                    record["seed"], model)
                 record["gpu_type"] = gpu_type(kind)
+                if owners.get(record["seed"], record["gpu_type"]) != record["gpu_type"]:
+                    raise ValueError(f"Seed {record['seed']} belongs to {owners[record['seed']]}, "
+                                     f"not {record['gpu_type']}")
                 if persist:
                     materialize(record)
+                owners[record["seed"]] = record["gpu_type"]
                 records.append(record)
             except (ValueError, KeyError, TypeError, OSError, RuntimeError, EOFError, zipfile.BadZipFile) as error:
                 excluded.append(dict(source=name, reason=f"{type(error).__name__}: {error}"))

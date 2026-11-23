@@ -133,6 +133,50 @@ class WarmupTests(unittest.TestCase):
         self.assertFalse((self.queue.directory/'warmup_inventory.json').exists())
         self.assertFalse(self.queue.seed_directory.exists())
 
+    def test_discovery_preserves_seed_owner_when_another_game_is_found(self):
+        save_seed_files({'pong:6000':dict(game='Pong',seed=6000,gpu_type='A6000',
+                                        enabled=False,warmups=[])},self.queue.seed_directory)
+        self.job['seed'] = 2010
+        fresh = self.make_record('fresh')
+        records = {record['source']: record for record in (self.record, fresh)}
+        def inspect(source, **kwargs):
+            return copy.deepcopy(records[str(source.relative_to(self.root))])
+        with patch('warmup_catalog.inspect_warmup',side_effect=inspect):
+            preview = discover('3090',root=self.root,queue_dir=self.queue.directory,
+                               seed_dir=self.queue.seed_directory,persist=False)
+            report = discover('3090',root=self.root,queue_dir=self.queue.directory,
+                              seed_dir=self.queue.seed_directory)
+        expected = {6000:'A6000',2010:'3090'}
+        self.assertEqual({r['seed']:r['gpu_type'] for r in preview['available']},expected)
+        self.assertEqual({r['seed']:r['gpu_type'] for r in report['available']},expected)
+        self.assertEqual(report['excluded'],[])
+        selections = read_seed_files(self.queue.seed_directory)
+        self.assertEqual(selections['alien:6000']['gpu_type'],'A6000')
+        self.assertFalse(selections['pong:6000']['enabled'])
+        self.assertEqual(selections['alien:2010']['gpu_type'],'3090')
+        with self.queue.connect() as db:
+            self.assertEqual(dict(db.execute('SELECT seed,gpu_type FROM seeds')),expected)
+
+    def test_discovery_uses_queue_owner_without_a_selection_file(self):
+        with patch('warmup_catalog.inspect_warmup',return_value=copy.deepcopy(self.record)):
+            report = discover('3090',root=self.root,queue_dir=self.queue.directory,
+                              seed_dir=self.queue.seed_directory)
+        self.assertEqual(report['available'][0]['gpu_type'],'A6000')
+        self.assertEqual(read_seed_files(self.queue.seed_directory)['alien:6000']['gpu_type'],'A6000')
+
+    def test_discovery_excludes_explicit_origin_that_conflicts_with_seed_owner(self):
+        source = self.root/self.record['source']
+        (source/'queue_origin.json').write_text(json.dumps(dict(gpu_type='3090')))
+        with patch('warmup_catalog.inspect_warmup',return_value=copy.deepcopy(self.record)):
+            preview = discover('3090',root=self.root,queue_dir=self.queue.directory,
+                               seed_dir=self.queue.seed_directory,persist=False)
+            report = discover('3090',root=self.root,queue_dir=self.queue.directory,
+                              seed_dir=self.queue.seed_directory)
+        self.assertEqual(report['available'],[])
+        self.assertEqual(preview['excluded'],report['excluded'])
+        self.assertIn('Seed 6000 belongs to A6000',report['excluded'][0]['reason'])
+        self.assertEqual(read_seed_files(self.queue.seed_directory),{})
+
     def test_prune_waits_for_replacement_and_preserves_pinned_or_useful_sources(self):
         replacement=self.make_record('replacement')
         self.record['statistics_signals']=['td_error','value_diff']
