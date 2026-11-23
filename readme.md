@@ -325,8 +325,59 @@ excluded from the source branch and published on the dedicated inventory
 branch. The initial A6000 inspection found 53 snapshots / 49 valid pairs;
 all 49 pairs match the default profile, including Freeway's demonstration
 snapshots. The extra four snapshots are duplicate game/seed pairs, not
-unidentified pairs. RTX 3090 and TITAN RTX remain pending until
-their machines publish an inspection.
+unidentified pairs. Each round's report shows which other machines have
+published an inspection.
+
+### Cleaning warmups with missing statistics or broken payloads
+
+`cleanup_warmups.py` re-inspects local files using a cached round's frozen
+profile. It selects snapshots missing statistics required by that profile,
+and published snapshots with recognized checkpoint/replay corruption. Other
+warmup targets (such as 30k/70k when requesting 50k), other configuration
+variants, and seed ownership conflicts alone are retained. Unknown inspection
+errors and directories without publication metadata are retained as well.
+
+Snapshot counts and game/seed counts differ: the RTX 3090 inventory had 264
+snapshots for 181 pairs. Its 83 extra snapshots are not all invalid. For this
+round, 171 snapshots matched the requested 50k profile, 76 covered 30k/70k
+targets, and 17 lacked required statistics. TITAN had 6 statistics-deficient
+snapshots across 6 pairs, including one pair with another compatible snapshot.
+The cleanup selects the 17 / 6 deficient snapshots, subject to a fresh local
+inspection and protection for queued/retryable work.
+
+After updating the source code on each machine, use its own GPU type. The
+default command previews targets, reasons and disk size:
+
+```bash
+# On the RTX 3090 machine:
+python cleanup_warmups.py --round warmups-20261123 --gpu-type RTX3090
+
+# On the TITAN machine:
+python cleanup_warmups.py --round warmups-20261123 --gpu-type titan
+```
+
+Add `--apply` to delete, then publish that machine's updated inventory:
+
+```bash
+# On the RTX 3090 machine:
+python cleanup_warmups.py --round warmups-20261123 --gpu-type RTX3090 --apply
+python warmup_registry.py sync --round warmups-20261123 --gpu-type RTX3090
+
+# On the TITAN machine:
+python cleanup_warmups.py --round warmups-20261123 --gpu-type titan --apply
+python warmup_registry.py sync --round warmups-20261123 --gpu-type titan
+```
+
+Use the same `--machine ID` as inventory collection if you overrode the hostname.
+Only real `ckpt/RUN/shared_warmup_STEP` directories are eligible. Pending,
+running, and retryable failed jobs protect their pinned sources and sources
+compatible with their requests. Files changed since inspection are skipped.
+The audit under `training_queue/cleanup/` records candidates, reasons, deletion
+results and protected sources. Applying cleanup updates seed-file references,
+the local discovery cache and the local machine inventory. It starts no
+training; later queued requests collect replacements as needed. After both
+machines publish, run `python warmup_registry.py pull --round warmups-20261123`
+on A6000 to view the combined result.
 
 ### Migrating older queues
 
