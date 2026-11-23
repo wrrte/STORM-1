@@ -170,6 +170,17 @@ def source_stamp(source):
             if (source / name).exists()]
 
 
+def warmup_sources(root=ROOT, *, include_unpublished=False):
+    """Shared source enumeration for the local queue and cross-machine inventory."""
+    candidates = {path for path in (root / "ckpt").glob("*/shared_warmup_*")
+                  if path.is_dir() and not path.name.endswith(".retired") and
+                  (include_unpublished or (path / "warmup_metadata.json").is_file() or
+                   (path / "branches.json").is_file())}
+    candidates.update(path.parent for path in (root / "ckpt").rglob("warmup_metadata.json")
+                      if not path.parent.name.endswith(".retired"))
+    return sorted(candidates)
+
+
 def discover(model, *, root=ROOT, queue_dir=QUEUE_DIR, seed_dir=SEED_DIR, refresh=False, persist=True):
     """Incremental discovery on enqueue and execution; metadata is the publication marker."""
     model = gpu_type(model)
@@ -178,10 +189,7 @@ def discover(model, *, root=ROOT, queue_dir=QUEUE_DIR, seed_dir=SEED_DIR, refres
         report_path = queue.directory / "warmup_inventory.json"
         previous = json.loads(report_path.read_text()) if report_path.exists() else {}
         cached = {item["source"]: item for item in previous.get("available", [])}
-        candidates = {path for path in (root / "ckpt").glob("*/shared_warmup_*")
-                      if path.is_dir() and not path.name.endswith(".retired") and ((path / "warmup_metadata.json").is_file() or (path / "branches.json").is_file())}
-        candidates.update(path.parent for path in (root / "ckpt").rglob("warmup_metadata.json")
-                          if not path.parent.name.endswith(".retired"))
+        candidates = warmup_sources(root)
         selections = read_seed_files(seed_dir)
         records, excluded = [], []
         for source in sorted(candidates):

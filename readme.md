@@ -223,6 +223,101 @@ Runtime data is stored under `training_queue/` (excluded from Git):
 | `imported_warmups/` | Metadata/config adapters and symlinks for reusable legacy snapshots |
 | `legacy_backup/` | Original per-card selections, queues and history from migration |
 
+### Shared warmup inventory across A6000, RTX 3090 and TITAN RTX
+
+`warmup_registry.py` collects **game → GPU model → seed → snapshots** and
+exchanges the inspection results through the `warmup-inventory` Git branch on
+`origin`. This branch contains only JSON metadata. Checkpoint/replay payloads
+stay on their original machine. Synchronization uses a temporary repository,
+so the source checkout's branch, staged changes and uncommitted edits are kept.
+The script must first be available in each machine's source checkout.
+
+A collection **round** freezes the configuration and requested warmup targets,
+so every machine uses the same compatibility criteria even if its local YAML
+differs. Create the round **once, on the first machine**:
+
+```bash
+conda activate storm
+python warmup_registry.py start --round warmups-20261123 \
+  --gpu-types A6000 RTX3090 titan
+```
+
+The default profile is `config_files/STORM.yaml` with the scalar warmup target
+and no pair sweep, matching the default enqueue command. `start` also accepts
+`--config`, `--warmup-offset-pairs`, `--hash-target-pairs`, and repeated
+`--set KEY VALUE`, just like `enqueue_train.py`. Use a new round name to change
+the profile or to collect fresh results from all three models again. `start`
+alone records no scan, and old rounds never satisfy a new round's coverage.
+
+Run the following command **on each corresponding machine**, starting with the
+machine that created the round. Git authentication and a Git author identity
+must already be configured for the repository's `origin` remote.
+
+```bash
+# A6000 machine: publish the round and its local inspection.
+python warmup_registry.py sync --round warmups-20261123 --gpu-type A6000
+
+# RTX 3090 machine: fetch the same round, inspect local files, and publish.
+python warmup_registry.py sync --round warmups-20261123 --gpu-type RTX3090
+
+# TITAN RTX machine: the same operation completes the three-model collection.
+python warmup_registry.py sync --round warmups-20261123 --gpu-type titan
+
+# Back on any machine: fetch the final overview without rescanning/publishing.
+python warmup_registry.py pull --round warmups-20261123
+python warmup_registry.py report --round warmups-20261123 --json
+```
+
+`sync` fetches existing reports before scanning, commits only this machine's
+report and the round manifest, and pushes without force. Concurrent writers
+are retried against the updated branch. Failed publication preserves the
+local scan; retry `sync` after fixing connectivity/authentication. `--remote`
+and `--branch` select a different Git remote or dedicated inventory branch.
+No source-code commits are included in this push. Ordinary `git pull` of
+`main` does not refresh the inventory; use the script's `pull` command.
+
+The display lists pending GPU models, each machine's scan time/publication
+status, usable seeds by game/model, incompatible settings, excluded files,
+and seed ownership conflicts across **all games**. A seed observed under two
+models, or inside another model's reserved range, is flagged and excluded from
+the usable count. Conflicting historical seeds are never silently renamed.
+Collection completion means at least one scan for each of the three models;
+Git completion additionally requires every locally displayed scan to have
+been published. These indicators do not hide incompatibilities or conflicts.
+
+`--machine ID` overrides the hostname; use a distinct, stable ID for each
+machine, including multiple machines of the same model. GPU indices are not
+used. The inventory is accurate **as of each scan**, not a live remote disk
+check. Rescanning replaces that machine's report, removing deleted snapshots
+from the current inventory. New rounds keep prior round history separate.
+
+Inspection reuses the queue's CPU checkpoint/configuration checks and validates
+the saved `queue_origin.json`. Legacy snapshots require consistent W&B run
+identity/GPU evidence; an unverified GPU type is excluded instead of inferred
+from the current card or a directory name. A structurally valid snapshot can
+still be incompatible with the frozen profile. With multiple requested warmup
+targets, “usable” means compatible with **at least one** request; the JSON
+includes the compatibility result and reason for every request/snapshot.
+
+The scanner does not enqueue training, change game/seed selections, or remove
+checkpoints. Local-only inspection and reporting also work offline once the
+round manifest is cached:
+
+```bash
+python warmup_registry.py scan --round warmups-20261123 --gpu-type A6000
+python warmup_registry.py report --round warmups-20261123
+```
+
+Local files are in `training_queue/shared_warmups/rounds/ROUND/manifest.json`
+and `machines/GPU_TYPE/MACHINE.json` beneath that round directory. They are
+excluded from the source branch and published on the dedicated inventory
+branch. The initial A6000 inspection found 53 snapshots / 49 valid pairs;
+47 pairs match the default profile. Freeway/6010 and Freeway/6020 differ in
+`JointTrainAgent.UseDemonstration`. RTX 3090 and TITAN RTX remain pending until
+their machines publish an inspection.
+
+### Migrating older queues
+
 For an older checkout, stop its old queue workers and migrate once:
 
 ```bash
