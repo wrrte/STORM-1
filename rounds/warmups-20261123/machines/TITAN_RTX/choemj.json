@@ -4,8 +4,9 @@
   "profile_sha256": "2bc7ac1b6d0dd0abb9816784c9bcf94bd201785227370486e9684ec797311853",
   "gpu_type": "TITAN_RTX",
   "machine": "choemj",
-  "scanned_at": "2026-11-23T07:28:48.296055+00:00",
-  "code_commit": "d620d37a3476cc17a24d9fd98e87f158f917a9be",
+  "gpu_assignment": "machine_location",
+  "scanned_at": "2026-11-23T07:38:35.296225+00:00",
+  "code_commit": "e3dc2cff358ef39ebf50a19315348e99caf28818",
   "games": {
     "BankHeist": {
       "TITAN_RTX": {
@@ -23,8 +24,9 @@
             ],
             "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260924_171624-k6utq6rd/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -48,8 +50,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260920_004511-d4z34fmk/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -74,8 +77,9 @@
             ],
             "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260919_034023-ucwvzrdc/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -97,8 +101,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260917_204122-pp9fthie/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -127,8 +132,9 @@
             ],
             "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260924_225515-ut1w13xu/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -157,8 +163,9 @@
             ],
             "saved_config_sha256": "6256915671305b2ec3544d395ec69209038755c0fa417e6f09cbae4b24edbbe2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260924_041419-aa069uv0/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -187,8 +194,9 @@
             ],
             "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260925_042831-h65n1yum/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -213,8 +221,9 @@
             ],
             "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260923_050744-oiydfe2c/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -239,8 +248,9 @@
             ],
             "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260921_064303-ytq0e196/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -264,8 +274,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260919_170229-knkjniaj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -288,8 +299,9 @@
             ],
             "saved_config_sha256": "b66453ba63197a8c909b7be3464cfed35bd9a7de51271bbd8c69ef5f643ebce5",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260919_170229-knkjniaj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -313,8 +325,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260917_125214-9uwipoit/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -339,8 +352,9 @@
             ],
             "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_020252-83ddqumi/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -363,8 +377,9 @@
             ],
             "saved_config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_020252-83ddqumi/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -387,8 +402,9 @@
             ],
             "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_020252-83ddqumi/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -413,8 +429,9 @@
             ],
             "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_103209-6l4er08d/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -437,8 +454,9 @@
             ],
             "saved_config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_103209-6l4er08d/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -461,8 +479,9 @@
             ],
             "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_103209-6l4er08d/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -487,8 +506,9 @@
             ],
             "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_190553-d481im8a/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -511,8 +531,9 @@
             ],
             "saved_config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_190553-d481im8a/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -535,8 +556,9 @@
             ],
             "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261110_190553-d481im8a/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -564,8 +586,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260918_200436-hkcc76kc/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -592,8 +615,9 @@
             ],
             "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261011_093833-x4vi2ew1/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -620,8 +644,9 @@
             ],
             "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261008_091751-74cpaem0/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -644,8 +669,9 @@
             ],
             "saved_config_sha256": "f6ffd9af42d1682e915e6194c38360f412c48b5985827459615f638721c206c7",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261008_054233-5ow93yfz/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -668,8 +694,9 @@
             ],
             "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261006_095412-1ct5vt3t/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -692,8 +719,9 @@
             ],
             "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20261006_062724-8an3luwj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -716,8 +744,9 @@
             ],
             "saved_config_sha256": "6ef469fc01a394f357590d670a9fcdc2e9e6ef9fb975dc019da4858f4463eb32",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260919_080818-w0gbhskj/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -739,8 +768,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260917_045837-b7n7y0cf/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -769,8 +799,9 @@
             ],
             "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260922_032229-gvllzow1/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -798,8 +829,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260918_124747-r0cnma1m/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -828,8 +860,9 @@
             ],
             "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260919_123523-80uefa74/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
@@ -851,8 +884,9 @@
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
             "provenance": {
-              "kind": "wandb_run",
-              "source": "wandb/run-20260918_045028-lpxhxjns/files/wandb-metadata.json"
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
             },
             "checks": [
               {
