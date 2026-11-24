@@ -1,0 +1,165 @@
+3090 Alien/2000 priority=0: collect new shared warmup
+3090 Alien/2020 priority=0: collect new shared warmup
+3090 Alien/3000 priority=0: collect new shared warmup
+3090 Alien/3020 priority=0: collect new shared warmup
+3090 Alien/3333 priority=0: ckpt/Alien-3333_WarmupSweep/shared_warmup_50062
+3090 Alien/3334 priority=0: ckpt/Alien-3334_WarmupSweep/shared_warmup_50721
+3090 Alien/1 priority=0: collect new shared warmup
+3090 Amidar/2000 priority=0: collect new shared warmup
+3090 Amidar/2010 priority=0: collect new shared warmup
+3090 Amidar/3000 priority=0: collect new shared warmup
+3090 Amidar/3020 priority=0: collect new shared warmup
+3090 Amidar/3333 priority=0: ckpt/Amidar-3333_WarmupSweep/shared_warmup_50728
+3090 Amidar/3334 priority=0: ckpt/Amidar-3334_WarmupSweep/shared_warmup_50264
+3090 Amidar/1 priority=0: collect new shared warmup
+3090 Assault/2000 priority=0: collect new shared warmup
+3090 Assault/2020 priority=0: collect new shared warmup
+3090 Assault/2030 priority=0: collect new shared warmup
+3090 Assault/3333 priority=0: ckpt/Assault-3333_WarmupSweep/shared_warmup_51098
+3090 Assault/3334 priority=0: ckpt/Assault-3334_WarmupSweep/shared_warmup_50219
+3090 Assault/1 priority=0: collect new shared warmup
+3090 Asterix/2000 priority=0: collect new shared warmup
+3090 Asterix/3000 priority=0: collect new shared warmup
+3090 Asterix/3020 priority=0: collect new shared warmup
+3090 Asterix/3333 priority=0: ckpt/Asterix-3333_WarmupSweep/shared_warmup_50106
+3090 Asterix/3334 priority=0: ckpt/Asterix-3334_WarmupSweep/shared_warmup_50312
+3090 Asterix/10 priority=0: collect new shared warmup
+3090 BankHeist/2010 priority=0: ckpt/BankHeist-2010_Shared/shared_warmup_50918
+3090 BankHeist/2020 priority=0: collect new shared warmup
+3090 BankHeist/3010 priority=0: collect new shared warmup
+3090 BankHeist/3030 priority=0: collect new shared warmup
+3090 BankHeist/3333 priority=0: collect new shared warmup
+  incompatible: ckpt/BankHeist-3333_WarmupSweep/shared_warmup_30069: warmup target 50000 not in [30000]
+  incompatible: ckpt/BankHeist-3333_WarmupSweep/shared_warmup_70521: warmup target 50000 not in [70000]
+3090 BankHeist/3334 priority=0: collect new shared warmup
+  incompatible: ckpt/BankHeist-3334_WarmupSweep/shared_warmup_30498: warmup target 50000 not in [30000]
+  incompatible: ckpt/BankHeist-3334_WarmupSweep/shared_warmup_70121: warmup target 50000 not in [70000]
+3090 BankHeist/9997 priority=0: collect new shared warmup
+3090 BankHeist/9998 priority=0: collect new shared warmup
+3090 BankHeist/9999 priority=0: collect new shared warmup
+3090 BattleZone/2010 priority=0: collect new shared warmup
+3090 BattleZone/2020 priority=0: collect new shared warmup
+3090 BattleZone/3010 priority=0: collect new shared warmup
+3090 BattleZone/3030 priority=0: collect new shared warmup
+3090 BattleZone/3333 priority=0: ckpt/BattleZone-3333_WarmupSweep/shared_warmup_50048
+3090 BattleZone/3334 priority=0: ckpt/BattleZone-3334_WarmupSweep/shared_warmup_50079
+3090 BattleZone/5090 priority=0: collect new shared warmup
+3090 Boxing/2000 priority=0: collect new shared warmup
+3090 Boxing/2010 priority=0: collect new shared warmup
+3090 Boxing/2020 priority=0: collect new shared warmup
+3090 Boxing/2030 priority=0: collect new shared warmup
+3090 Boxing/3333 priority=0: ckpt/Boxing-3333_WarmupSweep/shared_warmup_50981
+3090 Boxing/3334 priority=0: collect new shared warmup
+  incompatible: ckpt/Boxing-3334_WarmupSweep/shared_warmup_31041: warmup target 50000 not in [30000]
+  incompatible: ckpt/Boxing-3334_WarmupSweep/shared_warmup_71015: warmup target 50000 not in [70000]
+3090 Breakout/2000 priority=0: collect new shared warmup
+3090 Breakout/3000 priority=0: collect new shared warmup
+3090 Breakout/3020 priority=0: collect new shared warmup
+3090 Breakout/3333 priority=0: ckpt/Breakout-3333_WarmupSweep/shared_warmup_50333
+3090 Breakout/3334 priority=0: ckpt/Breakout-3334_WarmupSweep/shared_warmup_50466
+3090 ChopperCommand/2000 priority=0: collect new shared warmup
+3090 ChopperCommand/3000 priority=0: ckpt/ChopperCommand-3000_Shared/shared_warmup_50390
+3090 ChopperCommand/3020 priority=0: collect new shared warmup
+3090 ChopperCommand/3333 priority=0: collect new shared warmup
+  incompatible: ckpt/ChopperCommand-3333_WarmupSweep/shared_warmup_30627: warmup target 50000 not in [30000]
+  incompatible: ckpt/ChopperCommand-3333_WarmupSweep/shared_warmup_70812: warmup target 50000 not in [70000]
+3090 ChopperCommand/3334 priority=0: ckpt/ChopperCommand-3334_WarmupSweep/shared_warmup_50968
+3090 CrazyClimber/2000 priority=0: ckpt/CrazyClimber-2000_Shared/shared_warmup_52441
+3090 CrazyClimber/3000 priority=0: collect new shared warmup
+3090 CrazyClimber/3020 priority=0: collect new shared warmup
+3090 CrazyClimber/3333 priority=0: ckpt/CrazyClimber-3333_WarmupSweep/shared_warmup_50890
+3090 CrazyClimber/3334 priority=0: ckpt/CrazyClimber-3334_WarmupSweep/shared_warmup_50552
+3090 DemonAttack/2000 priority=0: collect new shared warmup
+3090 DemonAttack/3000 priority=0: collect new shared warmup
+3090 DemonAttack/3020 priority=0: collect new shared warmup
+3090 DemonAttack/3333 priority=0: ckpt/DemonAttack-3333_WarmupSweep/shared_warmup_50223
+3090 DemonAttack/3334 priority=0: ckpt/DemonAttack-3334_WarmupSweep/shared_warmup_51189
+3090 Freeway/2010 priority=0: collect new shared warmup
+3090 Freeway/2020 priority=0: collect new shared warmup
+3090 Freeway/2030 priority=0: collect new shared warmup
+3090 Freeway/2040 priority=0: collect new shared warmup
+3090 Freeway/3333 priority=0: ckpt/Freeway-3333_WarmupSweep/shared_warmup_51200
+3090 Freeway/3334 priority=0: collect new shared warmup
+  incompatible: ckpt/Freeway-3334_WarmupSweep/shared_warmup_30720: warmup target 50000 not in [30000]
+  incompatible: ckpt/Freeway-3334_WarmupSweep/shared_warmup_71680: warmup target 50000 not in [70000]
+3090 Frostbite/2000 priority=0: collect new shared warmup
+3090 Frostbite/2710 priority=0: collect new shared warmup
+3090 Frostbite/3000 priority=0: collect new shared warmup
+3090 Frostbite/3333 priority=0: ckpt/Frostbite-3333_WarmupSweep/shared_warmup_50135
+3090 Frostbite/11010 priority=0: ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11010_Shared/shared_warmup_50855
+3090 Frostbite/11021 priority=0: ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11021_Shared/shared_warmup_50350
+3090 Frostbite/11023 priority=0: ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11023_Shared/shared_warmup_50358
+3090 Gopher/2000 priority=0: collect new shared warmup
+3090 Gopher/2010 priority=0: collect new shared warmup
+3090 Gopher/2020 priority=0: collect new shared warmup
+3090 Gopher/3000 priority=0: collect new shared warmup
+3090 Gopher/3333 priority=0: collect new shared warmup
+  incompatible: ckpt/Gopher-3333_WarmupSweep/shared_warmup_31171: warmup target 50000 not in [30000]
+  incompatible: ckpt/Gopher-3333_WarmupSweep/shared_warmup_70292: warmup target 50000 not in [70000]
+3090 Hero/2000 priority=0: collect new shared warmup
+3090 Hero/3000 priority=0: ckpt/Hero-3000_Shared/shared_warmup_50475
+3090 Hero/3020 priority=0: collect new shared warmup
+3090 Hero/3333 priority=0: ckpt/Hero-3333_WarmupSweep/shared_warmup_50030
+3090 Jamesbond/2000 priority=0: ckpt/Jamesbond-2000_Both/shared_warmup_50000
+3090 Jamesbond/2010 priority=0: collect new shared warmup
+3090 Jamesbond/2020 priority=0: collect new shared warmup
+3090 Jamesbond/3010 priority=0: collect new shared warmup
+3090 Jamesbond/3333 priority=0: ckpt/Jamesbond-3333_WarmupSweep/shared_warmup_51705
+3090 Kangaroo/2010 priority=0: collect new shared warmup
+3090 Kangaroo/2020 priority=0: ckpt/Kangaroo-2020_Shared/shared_warmup_50192
+3090 Kangaroo/2110 priority=0: collect new shared warmup
+3090 Kangaroo/2235 priority=0: ckpt/Kangaroo-2235_WarmupSweep/shared_warmup_50403
+3090 Kangaroo/3010 priority=0: collect new shared warmup
+3090 Krull/10 priority=0: collect new shared warmup
+3090 Krull/2020 priority=0: collect new shared warmup
+3090 Krull/2110 priority=0: collect new shared warmup
+3090 Krull/3333 priority=0: collect new shared warmup
+  incompatible: ckpt/Krull-3333_WarmupSweep/shared_warmup_30619: warmup target 50000 not in [30000]
+  incompatible: ckpt/Krull-3333_WarmupSweep/shared_warmup_70168: warmup target 50000 not in [70000]
+3090 KungFuMaster/2000 priority=0: collect new shared warmup
+3090 KungFuMaster/2020 priority=0: collect new shared warmup
+3090 KungFuMaster/3000 priority=0: ckpt/KungFuMaster-3000_Shared/shared_warmup_50459
+3090 KungFuMaster/3010 priority=0: ckpt/KungFuMaster-3010_Shared/shared_warmup_50213
+3090 KungFuMaster/3333 priority=0: ckpt/KungFuMaster-3333_WarmupSweep/shared_warmup_50477
+3090 MsPacman/2000 priority=0: ckpt/MsPacman-2000_Both/shared_warmup_50000
+3090 MsPacman/2010 priority=0: collect new shared warmup
+3090 MsPacman/3000 priority=0: ckpt/MsPacman-3000_Shared/shared_warmup_50008
+3090 MsPacman/3010 priority=0: collect new shared warmup
+3090 MsPacman/3333 priority=0: collect new shared warmup
+  incompatible: ckpt/MsPacman-3333_WarmupSweep/shared_warmup_30011: warmup target 50000 not in [30000]
+  incompatible: ckpt/MsPacman-3333_WarmupSweep/shared_warmup_70398: warmup target 50000 not in [70000]
+3090 Pong/2000 priority=0: collect new shared warmup
+3090 Pong/2010 priority=0: ckpt/Pong-2010_Shared/shared_warmup_50148
+3090 Pong/2020 priority=0: collect new shared warmup
+3090 Pong/3000 priority=0: ckpt/Pong-3000_Shared/shared_warmup_50006
+3090 Pong/3333 priority=0: ckpt/Pong-3333_WarmupSweep/shared_warmup_51828
+3090 PrivateEye/2000 priority=0: ckpt/PrivateEye-2000_Both/shared_warmup_50000
+3090 PrivateEye/2010 priority=0: collect new shared warmup
+3090 PrivateEye/3000 priority=0: collect new shared warmup
+3090 PrivateEye/3010 priority=0: collect new shared warmup
+3090 PrivateEye/3333 priority=0: ckpt/PrivateEye-3333_WarmupSweep/shared_warmup_51262
+3090 Qbert/2000 priority=0: collect new shared warmup
+3090 Qbert/2010 priority=0: collect new shared warmup
+3090 Qbert/3000 priority=0: ckpt/Qbert-3000_Shared/shared_warmup_50142
+3090 Qbert/3020 priority=0: collect new shared warmup
+3090 Qbert/3333 priority=0: ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193
+3090 RoadRunner/2010 priority=0: collect new shared warmup
+3090 RoadRunner/2020 priority=0: collect new shared warmup
+3090 RoadRunner/2030 priority=0: collect new shared warmup
+3090 RoadRunner/3010 priority=0: ckpt/RoadRunner-3010_Shared/shared_warmup_50571
+3090 RoadRunner/3333 priority=0: collect new shared warmup
+  incompatible: ckpt/RoadRunner-3333_WarmupSweep/shared_warmup_31218: warmup target 50000 not in [30000]
+  incompatible: ckpt/RoadRunner-3333_WarmupSweep/shared_warmup_70601: warmup target 50000 not in [70000]
+3090 Seaquest/2000 priority=0: collect new shared warmup
+3090 Seaquest/2010 priority=0: collect new shared warmup
+3090 Seaquest/3000 priority=0: ckpt/Seaquest-3000_Shared/shared_warmup_50815
+3090 Seaquest/3010 priority=0: ckpt/Seaquest-3010_Shared/shared_warmup_50042
+3090 Seaquest/3333 priority=0: collect new shared warmup
+  incompatible: ckpt/Seaquest-3333_WarmupSweep/shared_warmup_30555: warmup target 50000 not in [30000]
+  incompatible: ckpt/Seaquest-3333_WarmupSweep/shared_warmup_70315: warmup target 50000 not in [70000]
+3090 UpNDown/2000 priority=0: ckpt/UpNDown-2000_Shared/shared_warmup_50746
+3090 UpNDown/2010 priority=0: collect new shared warmup
+3090 UpNDown/3000 priority=0: ckpt/UpNDown-3000_Shared/shared_warmup_50438
+3090 UpNDown/3020 priority=0: collect new shared warmup
+3090 UpNDown/3333 priority=0: ckpt/UpNDown-3333_WarmupSweep/shared_warmup_50053
+Planned 144 job(s); no jobs enqueued or checkpoints removed.
