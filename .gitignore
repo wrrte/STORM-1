@@ -28,3 +28,4 @@ job_queue_td_error_only.lock
 */test_*
 snap/
 training_queue/
+.wandb_api_key
