@@ -5,9 +5,7 @@
       "game": "Amidar",
       "seed": 6020,
       "enabled": true,
-      "warmups": [
-        "ckpt/Amidar-paper-random-w50000-m2-seed6020-20261107_Shared/shared_warmup_50043"
-      ]
+      "warmups": []
     },
     {
       "game": "Boxing",
@@ -21,9 +19,7 @@
       "game": "Hero",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/Hero-3710_Shared/shared_warmup_50130"
-      ]
+      "warmups": []
     },
     {
       "game": "Kangaroo",
@@ -55,9 +51,7 @@
       "game": "Assault",
       "seed": 6010,
       "enabled": true,
-      "warmups": [
-        "ckpt/Assault-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50914"
-      ]
+      "warmups": []
     },
     {
       "game": "Breakout",
@@ -97,9 +91,7 @@
       "game": "Asterix",
       "seed": 6000,
       "enabled": true,
-      "warmups": [
-        "ckpt/Asterix-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50304"
-      ]
+      "warmups": []
     },
     {
       "game": "CrazyClimber",
@@ -139,9 +131,7 @@
       "game": "Asterix",
       "seed": 6010,
       "enabled": true,
-      "warmups": [
-        "ckpt/Asterix-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50240"
-      ]
+      "warmups": []
     },
     {
       "game": "Freeway",
@@ -183,8 +173,7 @@
       "seed": 6000,
       "enabled": true,
       "warmups": [
-        "ckpt/BattleZone-6000_Shared/shared_warmup_50711",
-        "ckpt/BattleZone-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50058"
+        "ckpt/BattleZone-6000_Shared/shared_warmup_50711"
       ]
     },
     {
@@ -207,9 +196,7 @@
       "game": "Krull",
       "seed": 6020,
       "enabled": true,
-      "warmups": [
-        "ckpt/Krull-6020_Shared/shared_warmup_50348"
-      ]
+      "warmups": []
     },
     {
       "game": "MsPacman",
@@ -256,8 +243,7 @@
       "seed": 6050,
       "enabled": true,
       "warmups": [
-        "ckpt/Krull-6050_Shared/shared_warmup_50452",
-        "ckpt/Krull-6050_Shared/shared_warmup_50404"
+        "ckpt/Krull-6050_Shared/shared_warmup_50452"
       ]
     },
     {
@@ -361,97 +347,73 @@
       "game": "Alien",
       "seed": 6000,
       "enabled": true,
-      "warmups": [
-        "ckpt/Alien-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50605"
-      ]
+      "warmups": []
     },
     {
       "game": "Alien",
       "seed": 6010,
       "enabled": true,
-      "warmups": [
-        "ckpt/Alien-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50412"
-      ]
+      "warmups": []
     },
     {
       "game": "Amidar",
       "seed": 6000,
       "enabled": true,
-      "warmups": [
-        "ckpt/Amidar-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50065"
-      ]
+      "warmups": []
     },
     {
       "game": "Assault",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/Assault-3710_Shared/shared_warmup_50504"
-      ]
+      "warmups": []
     },
     {
       "game": "Assault",
       "seed": 6000,
       "enabled": true,
-      "warmups": [
-        "ckpt/Assault-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50162"
-      ]
+      "warmups": []
     },
     {
       "game": "Asterix",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/Asterix-3710_Shared/shared_warmup_50039"
-      ]
+      "warmups": []
     },
     {
       "game": "Breakout",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/Breakout-3710_Shared/shared_warmup_50099"
-      ]
+      "warmups": []
     },
     {
       "game": "ChopperCommand",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/ChopperCommand-3710_Shared/shared_warmup_50115"
-      ]
+      "warmups": []
     },
     {
       "game": "CrazyClimber",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/CrazyClimber-3710_Shared/shared_warmup_50617"
-      ]
+      "warmups": []
     },
     {
       "game": "DemonAttack",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/DemonAttack-3710_Shared/shared_warmup_50224"
-      ]
+      "warmups": []
     },
     {
       "game": "Frostbite",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/Frostbite-3710_Shared/shared_warmup_50537"
-      ]
+      "warmups": []
     },
     {
       "game": "Pong",
       "seed": 3710,
       "enabled": true,
-      "warmups": [
-        "ckpt/Pong-3710_Shared/shared_warmup_52668"
-      ]
+      "warmups": []
     }
   ]
 }
