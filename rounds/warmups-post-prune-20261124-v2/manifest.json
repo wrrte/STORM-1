@@ -1,0 +1,23 @@
+{
+  "version": 1,
+  "round": "warmups-post-prune-20261124-v2",
+  "created_at": "2026-11-24T06:24:13.072618+00:00",
+  "gpu_types": [
+    "3090",
+    "A6000",
+    "TITAN_RTX"
+  ],
+  "profile": {
+    "config_text": "BasicSettings:\n  ImageSize: 64\n  ReplayBufferOnGPU: true\n  Seed: 0\nJointTrainAgent:\n  BatchLength: 64\n  BatchSize: 16\n  BufferMaxLength: 100000\n  BufferWarmUp: 1024\n  DemonstrationBatchSize: 4\n  EvalEpisodes: 20\n  EvalEverySteps: 50000\n  EvalMode: final_only\n  EvalPrecision: both\n  EvalSeed: 0\n  EvalStartStep: 0\n  FinalEvalStep: 100000\n  ImagineBatchLength: 16\n  ImagineBatchSize: 1024\n  ImagineContextLength: 8\n  ImagineDemonstrationBatchSize: 256\n  NumEnvs: 1\n  Retrieval:\n    additive_z_score_threshold: 4.0\n    anchor_offset: -2\n    anchor_weight: 0.0625\n    anchor_weight_r: 1\n    batch_size_reduction: retrieved\n    dynamic_warmup_delay_steps: 0\n    dynamic_warmup_multiplier: 2.6\n    dynamic_warmup_target_steps: 20000\n    ema_alpha: 0.01\n    enable: true\n    global_rebuild_cooldown: 2000\n    global_rebuild_enable: true\n    global_rebuild_threshold: 0.06\n    hash_bits: 10\n    hash_sample_mode: probs\n    hash_target_pairs: []\n    max_anchors: 16\n    max_bucket_size: 1000000000\n    max_contexts: 256\n    max_pca_samples: 100000\n    max_warmup_steps: 90000\n    min_warmup_steps: 5000\n    multiplier: 16\n    neighbor_source: retrieval\n    save_warmup: false\n    score_combination: multiply\n    target: 16\n    td_error_z_score_threshold: 3.5\n    threshold: 1.0\n    trigger_mode: z_score\n    use_pca: true\n    value_signal: value_diff\n    warmup_offset_pairs:\n    - - 30000\n      - -2\n    - - 50000\n      - -2\n    - - 70000\n      - -2\n    warmup_steps: 50000\n    z_score_threshold: 3.5\n  SampleMaxSteps: 102000\n  SaveEverySteps: 50000\n  SeedScreenMinReturn: 500.0\n  SeedScreenSteps: 0\n  TrainAgentEverySteps: 1\n  TrainDynamicsEverySteps: 1\n  UseDemonstration: false\nModels:\n  Agent:\n    EntropyCoef: 0.0003\n    Gamma: 0.985\n    HiddenDim: 512\n    Lambda: 0.95\n    NumLayers: 2\n  WorldModel:\n    InChannels: 3\n    TransformerHiddenDim: 512\n    TransformerMaxLength: 64\n    TransformerNumHeads: 8\n    TransformerNumLayers: 2\nPerformance:\n  BatchScalarLogging: true\n  DisableDistributionValidation: true\n  ProjectedKVCache: true\n  RetrievalStatisticsMode: vectorized\n  VectorizedReplaySampling: true\nTask: JointTrainAgent\n",
+    "requests": [
+      {
+        "JointTrainAgent.Retrieval.warmup_offset_pairs": [],
+        "JointTrainAgent.Retrieval.hash_target_pairs": [],
+        "JointTrainAgent.Retrieval.warmup_steps": 50000,
+        "JointTrainAgent.Retrieval.anchor_offset": -2,
+        "JointTrainAgent.Retrieval.save_warmup": true
+      }
+    ]
+  },
+  "profile_sha256": "2bc7ac1b6d0dd0abb9816784c9bcf94bd201785227370486e9684ec797311853"
+}
