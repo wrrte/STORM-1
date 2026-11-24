@@ -1,0 +1,425 @@
+{
+  "version": 1,
+  "round": "warmups-post-prune-20261124-v2",
+  "profile_sha256": "2bc7ac1b6d0dd0abb9816784c9bcf94bd201785227370486e9684ec797311853",
+  "gpu_type": "TITAN_RTX",
+  "machine": "choemj",
+  "gpu_assignment": "machine_location",
+  "scanned_at": "2026-11-24T06:25:40.543607+00:00",
+  "code_commit": "980bbdce07a892f9a4077c3bb5a5d08ffe2ba425",
+  "games": {
+    "BankHeist": {
+      "TITAN_RTX": {
+        "9997": [
+          {
+            "source": "ckpt/BankHeist-9997_Shared/shared_warmup_50443",
+            "step": 50443,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9998": [
+          {
+            "source": "ckpt/BankHeist-9998_Both/shared_warmup_50394",
+            "step": 50394,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9999": [
+          {
+            "source": "ckpt/BankHeist-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Gopher": {
+      "TITAN_RTX": {
+        "9993": [
+          {
+            "source": "ckpt/Gopher-9993_Shared/shared_warmup_50716",
+            "step": 50716,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9994": [
+          {
+            "source": "ckpt/Gopher-9994_Shared/shared_warmup_50297",
+            "step": 50297,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9997": [
+          {
+            "source": "ckpt/Gopher-9997_Shared/shared_warmup_50444",
+            "step": 50444,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "9998": [
+          {
+            "source": "ckpt/Gopher-9998_Shared/shared_warmup_50694",
+            "step": 50694,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b66453ba63197a8c909b7be3464cfed35bd9a7de51271bbd8c69ef5f643ebce5",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "12000": [
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12000-try2_WarmupSweep/shared_warmup_30618",
+            "step": 30618,
+            "warmup_steps": [
+              30000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [30000]"
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12000-try2_WarmupSweep/shared_warmup_70359",
+            "step": 70359,
+            "warmup_steps": [
+              70000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [70000]"
+              }
+            ]
+          }
+        ],
+        "12001": [
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12001-try1_WarmupSweep/shared_warmup_31541",
+            "step": 31541,
+            "warmup_steps": [
+              30000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [30000]"
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12001-try1_WarmupSweep/shared_warmup_71093",
+            "step": 71093,
+            "warmup_steps": [
+              70000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [70000]"
+              }
+            ]
+          }
+        ],
+        "12002": [
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12002-try1_WarmupSweep/shared_warmup_31719",
+            "step": 31719,
+            "warmup_steps": [
+              30000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "b1d9ea64c356b034e146b91b0ec6f33e6807a420c5debc15dadcb053951c3871",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [30000]"
+              }
+            ]
+          },
+          {
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12002-try1_WarmupSweep/shared_warmup_71364",
+            "step": 71364,
+            "warmup_steps": [
+              70000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "e9c7772802464ca08aaf2a180e46cb6f0b64bd76fba33ed8ae697335a1817fb7",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": false,
+                "reason": "warmup target 50000 not in [70000]"
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Jamesbond": {
+      "TITAN_RTX": {
+        "9999": [
+          {
+            "source": "ckpt/Jamesbond-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Pong": {
+      "TITAN_RTX": {
+        "9999": [
+          {
+            "source": "ckpt/Pong-9999_Shared/shared_warmup_50935",
+            "step": 50935,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "choemj",
+              "gpu_type": "TITAN_RTX"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "excluded": []
+}
