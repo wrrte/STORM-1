@@ -5,139 +5,11 @@
   "gpu_type": "3090",
   "machine": "gpuserver3090",
   "gpu_assignment": "machine_location",
-  "scanned_at": "2026-11-24T06:25:24.050236+00:00",
-  "code_commit": "980bbdce07a892f9a4077c3bb5a5d08ffe2ba425",
+  "scanned_at": "2026-11-24T06:42:21.256110+00:00",
+  "code_commit": "3deda0094b96e609b7fdc4f56567bf4cc478e16d",
   "games": {
     "Alien": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Alien-2000_Shared/shared_warmup_50590",
-            "step": 50590,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
-            "source": "ckpt/Alien-2000_Shared/shared_warmup_50676",
-            "step": 50676,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/Alien-2020_Shared/shared_warmup_50620",
-            "step": 50620,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/Alien-3000_Shared/shared_warmup_50452",
-            "step": 50452,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/Alien-3020_Shared/shared_warmup_50459",
-            "step": 50459,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Alien-3333_WarmupSweep/shared_warmup_30332",
@@ -291,193 +163,11 @@
               }
             ]
           }
-        ],
-        "1": [
-          {
-            "source": "ckpt/Alien-paper-random-w50000-m2-seed1-20261107_Shared/shared_warmup_50577",
-            "step": 50577,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6000": [
-          {
-            "source": "ckpt/Alien-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50605",
-            "step": 50605,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6010": [
-          {
-            "source": "ckpt/Alien-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50412",
-            "step": 50412,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "Amidar": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Amidar-2000_Shared/shared_warmup_50287",
-            "step": 50287,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2010": [
-          {
-            "source": "ckpt/Amidar-2010_Shared/shared_warmup_50071",
-            "step": 50071,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/Amidar-3000_Shared/shared_warmup_50304",
-            "step": 50304,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/Amidar-3020_Shared/shared_warmup_50544",
-            "step": 50544,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Amidar-3333_WarmupSweep/shared_warmup_30897",
@@ -631,167 +321,11 @@
               }
             ]
           }
-        ],
-        "1": [
-          {
-            "source": "ckpt/Amidar-paper-random-w50000-m2-seed1-20261107_Shared/shared_warmup_50322",
-            "step": 50322,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6000": [
-          {
-            "source": "ckpt/Amidar-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50065",
-            "step": 50065,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6020": [
-          {
-            "source": "ckpt/Amidar-paper-random-w50000-m2-seed6020-20261107_Shared/shared_warmup_50043",
-            "step": 50043,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "Assault": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Assault-2000_Shared/shared_warmup_50465",
-            "step": 50465,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/Assault-2020_Shared/shared_warmup_50741",
-            "step": 50741,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2030": [
-          {
-            "source": "ckpt/Assault-2030_Shared/shared_warmup_50138",
-            "step": 50138,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Assault-3333_WarmupSweep/shared_warmup_30109",
@@ -945,193 +479,11 @@
               }
             ]
           }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/Assault-3710_Shared/shared_warmup_50504",
-            "step": 50504,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "1": [
-          {
-            "source": "ckpt/Assault-paper-random-w50000-m2-seed1-20261107_Shared/shared_warmup_50289",
-            "step": 50289,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6000": [
-          {
-            "source": "ckpt/Assault-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50162",
-            "step": 50162,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6010": [
-          {
-            "source": "ckpt/Assault-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50914",
-            "step": 50914,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "Asterix": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Asterix-2000_Shared/shared_warmup_50185",
-            "step": 50185,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/Asterix-3000_Shared/shared_warmup_50372",
-            "step": 50372,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/Asterix-3020_Shared/shared_warmup_50127",
-            "step": 50127,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Asterix-3333_WarmupSweep/shared_warmup_30208",
@@ -1285,110 +637,6 @@
               }
             ]
           }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/Asterix-3710_Shared/shared_warmup_50039",
-            "step": 50039,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "10": [
-          {
-            "source": "ckpt/Asterix-paper-random-w50000-m2-seed10-20261107_Shared/shared_warmup_50182",
-            "step": 50182,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6000": [
-          {
-            "source": "ckpt/Asterix-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50304",
-            "step": 50304,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6010": [
-          {
-            "source": "ckpt/Asterix-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50240",
-            "step": 50240,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
@@ -1396,110 +644,8 @@
       "3090": {
         "2010": [
           {
-            "source": "ckpt/BankHeist-2010_Shared/shared_warmup_50139",
-            "step": 50139,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
             "source": "ckpt/BankHeist-2010_Shared/shared_warmup_50918",
             "step": 50918,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/BankHeist-2020_Shared/shared_warmup_50065",
-            "step": 50065,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3010": [
-          {
-            "source": "ckpt/BankHeist-3010_Shared/shared_warmup_50485",
-            "step": 50485,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3030": [
-          {
-            "source": "ckpt/BankHeist-3030_Shared/shared_warmup_50296",
-            "step": 50296,
             "warmup_steps": [
               50000
             ],
@@ -1545,31 +691,6 @@
                 "request": 0,
                 "compatible": false,
                 "reason": "warmup target 50000 not in [30000]"
-              }
-            ]
-          },
-          {
-            "source": "ckpt/BankHeist-3333_WarmupSweep/shared_warmup_50321",
-            "step": 50321,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
               }
             ]
           },
@@ -1626,31 +747,6 @@
             ]
           },
           {
-            "source": "ckpt/BankHeist-3334_WarmupSweep/shared_warmup_50552",
-            "step": 50552,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
             "source": "ckpt/BankHeist-3334_WarmupSweep/shared_warmup_70121",
             "step": 70121,
             "warmup_steps": [
@@ -1675,193 +771,11 @@
               }
             ]
           }
-        ],
-        "9997": [
-          {
-            "source": "ckpt/BankHeist-paper-random-w50000-m2-seed9997-20261107_Shared/shared_warmup_50017",
-            "step": 50017,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "9998": [
-          {
-            "source": "ckpt/BankHeist-paper-random-w50000-m2-seed9998-20261107_Shared/shared_warmup_50719",
-            "step": 50719,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "9999": [
-          {
-            "source": "ckpt/BankHeist-paper-random-w50000-m2-seed9999-20261107_Shared/shared_warmup_51280",
-            "step": 51280,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "BattleZone": {
       "3090": {
-        "2010": [
-          {
-            "source": "ckpt/BattleZone-2010_Shared/shared_warmup_50014",
-            "step": 50014,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/BattleZone-2020_Shared/shared_warmup_51059",
-            "step": 51059,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3010": [
-          {
-            "source": "ckpt/BattleZone-3010_Shared/shared_warmup_50807",
-            "step": 50807,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3030": [
-          {
-            "source": "ckpt/BattleZone-3030_Shared/shared_warmup_50475",
-            "step": 50475,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/BattleZone-3333_WarmupSweep/shared_warmup_30102",
@@ -2015,167 +929,11 @@
               }
             ]
           }
-        ],
-        "5090": [
-          {
-            "source": "ckpt/BattleZone-paper-random-w50000-m2-seed5090-20261107_Shared/shared_warmup_51580",
-            "step": 51580,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6000": [
-          {
-            "source": "ckpt/BattleZone-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50058",
-            "step": 50058,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "Boxing": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Boxing-2000_Shared/shared_warmup_50058",
-            "step": 50058,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2010": [
-          {
-            "source": "ckpt/Boxing-2010_Shared/shared_warmup_50628",
-            "step": 50628,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/Boxing-2020_Shared/shared_warmup_50668",
-            "step": 50668,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2030": [
-          {
-            "source": "ckpt/Boxing-2030_Shared/shared_warmup_50360",
-            "step": 50360,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Boxing-3333_WarmupSweep/shared_warmup_30362",
@@ -2280,31 +1038,6 @@
             ]
           },
           {
-            "source": "ckpt/Boxing-3334_WarmupSweep/shared_warmup_50971",
-            "step": 50971,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
             "source": "ckpt/Boxing-3334_WarmupSweep/shared_warmup_71015",
             "step": 71015,
             "warmup_steps": [
@@ -2334,84 +1067,6 @@
     },
     "Breakout": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Breakout-2000_Shared/shared_warmup_50063",
-            "step": 50063,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/Breakout-3000_Shared/shared_warmup_50349",
-            "step": 50349,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/Breakout-3020_Shared/shared_warmup_50185",
-            "step": 50185,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Breakout-3333_WarmupSweep/shared_warmup_30061",
@@ -2565,93 +1220,15 @@
               }
             ]
           }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/Breakout-3710_Shared/shared_warmup_50099",
-            "step": 50099,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "ChopperCommand": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/ChopperCommand-2000_Shared/shared_warmup_50211",
-            "step": 50211,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3000": [
           {
             "source": "ckpt/ChopperCommand-3000_Shared/shared_warmup_50390",
             "step": 50390,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/ChopperCommand-3020_Shared/shared_warmup_50529",
-            "step": 50529,
             "warmup_steps": [
               50000
             ],
@@ -2697,31 +1274,6 @@
                 "request": 0,
                 "compatible": false,
                 "reason": "warmup target 50000 not in [30000]"
-              }
-            ]
-          },
-          {
-            "source": "ckpt/ChopperCommand-3333_WarmupSweep/shared_warmup_50299",
-            "step": 50299,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
               }
             ]
           },
@@ -2827,32 +1379,6 @@
               }
             ]
           }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/ChopperCommand-3710_Shared/shared_warmup_50115",
-            "step": 50115,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
@@ -2860,84 +1386,8 @@
       "3090": {
         "2000": [
           {
-            "source": "ckpt/CrazyClimber-2000_Shared/shared_warmup_50250",
-            "step": 50250,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
             "source": "ckpt/CrazyClimber-2000_Shared/shared_warmup_52441",
             "step": 52441,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/CrazyClimber-3000_Shared/shared_warmup_51536",
-            "step": 51536,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/CrazyClimber-3020_Shared/shared_warmup_50470",
-            "step": 50470,
             "warmup_steps": [
               50000
             ],
@@ -3113,115 +1563,11 @@
               }
             ]
           }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/CrazyClimber-3710_Shared/shared_warmup_50617",
-            "step": 50617,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "DemonAttack": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/DemonAttack-2000_Shared/shared_warmup_51033",
-            "step": 51033,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/DemonAttack-3000_Shared/shared_warmup_50277",
-            "step": 50277,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/DemonAttack-3020_Shared/shared_warmup_50347",
-            "step": 50347,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/DemonAttack-3333_WarmupSweep/shared_warmup_31008",
@@ -3375,141 +1721,11 @@
               }
             ]
           }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/DemonAttack-3710_Shared/shared_warmup_50224",
-            "step": 50224,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "Freeway": {
       "3090": {
-        "2010": [
-          {
-            "source": "ckpt/Freeway-2010_Shared/shared_warmup_51200",
-            "step": 51200,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/Freeway-2020_Shared/shared_warmup_51200",
-            "step": 51200,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2030": [
-          {
-            "source": "ckpt/Freeway-2030_Shared/shared_warmup_51200",
-            "step": 51200,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2040": [
-          {
-            "source": "ckpt/Freeway-2040_Shared/shared_warmup_51200",
-            "step": 51200,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Freeway-3333_WarmupSweep/shared_warmup_30720",
@@ -3614,31 +1830,6 @@
             ]
           },
           {
-            "source": "ckpt/Freeway-3334_WarmupSweep/shared_warmup_51200",
-            "step": 51200,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d187b72007338cdfbf1780914707f39985eec06af7b19c10590482e109640ee4",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
             "source": "ckpt/Freeway-3334_WarmupSweep/shared_warmup_71680",
             "step": 71680,
             "warmup_steps": [
@@ -3668,84 +1859,6 @@
     },
     "Frostbite": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Frostbite-2000_Shared/shared_warmup_50276",
-            "step": 50276,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2710": [
-          {
-            "source": "ckpt/Frostbite-2710_Shared/shared_warmup_50147",
-            "step": 50147,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/Frostbite-3000_Shared/shared_warmup_50180",
-            "step": 50180,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Frostbite-3333_WarmupSweep/shared_warmup_30230",
@@ -3819,32 +1932,6 @@
                 "request": 0,
                 "compatible": false,
                 "reason": "warmup target 50000 not in [70000]"
-              }
-            ]
-          }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/Frostbite-3710_Shared/shared_warmup_50537",
-            "step": 50537,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
               }
             ]
           }
@@ -3934,110 +2021,6 @@
     },
     "Gopher": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Gopher-2000_Shared/shared_warmup_50130",
-            "step": 50130,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2010": [
-          {
-            "source": "ckpt/Gopher-2010_Shared/shared_warmup_50686",
-            "step": 50686,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/Gopher-2020_Shared/shared_warmup_51164",
-            "step": 51164,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/Gopher-3000_Shared/shared_warmup_50271",
-            "step": 50271,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Gopher-3333_WarmupSweep/shared_warmup_31171",
@@ -4061,31 +2044,6 @@
                 "request": 0,
                 "compatible": false,
                 "reason": "warmup target 50000 not in [30000]"
-              }
-            ]
-          },
-          {
-            "source": "ckpt/Gopher-3333_WarmupSweep/shared_warmup_50377",
-            "step": 50377,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
               }
             ]
           },
@@ -4119,62 +2077,10 @@
     },
     "Hero": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Hero-2000_Shared/shared_warmup_50207",
-            "step": 50207,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3000": [
           {
             "source": "ckpt/Hero-3000_Shared/shared_warmup_50475",
             "step": 50475,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/Hero-3020_Shared/shared_warmup_50465",
-            "step": 50465,
             "warmup_steps": [
               50000
             ],
@@ -4273,32 +2179,6 @@
               }
             ]
           }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/Hero-3710_Shared/shared_warmup_50130",
-            "step": 50130,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
@@ -4316,108 +2196,6 @@
               "value_diff"
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
-            "source": "ckpt/Jamesbond-2000_Shared/shared_warmup_50974",
-            "step": 50974,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2010": [
-          {
-            "source": "ckpt/Jamesbond-2010_Shared/shared_warmup_50383",
-            "step": 50383,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/Jamesbond-2020_Shared/shared_warmup_51234",
-            "step": 51234,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3010": [
-          {
-            "source": "ckpt/Jamesbond-3010_Shared/shared_warmup_51050",
-            "step": 51050,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
               "kind": "machine_location",
               "machine": "gpuserver3090",
@@ -4513,32 +2291,6 @@
     },
     "Kangaroo": {
       "3090": {
-        "2010": [
-          {
-            "source": "ckpt/Kangaroo-2010_Shared/shared_warmup_50270",
-            "step": 50270,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "2020": [
           {
             "source": "ckpt/Kangaroo-2020_Shared/shared_warmup_50192",
@@ -4552,32 +2304,6 @@
               "value_diff"
             ],
             "saved_config_sha256": "0b0c81d046d5c49acdd123216be108f3c74fba777b0ac07208db05c5955970be",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2110": [
-          {
-            "source": "ckpt/Kangaroo-2110_Shared/shared_warmup_51122",
-            "step": 51122,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
               "kind": "machine_location",
               "machine": "gpuserver3090",
@@ -4668,116 +2394,11 @@
               }
             ]
           }
-        ],
-        "3010": [
-          {
-            "source": "ckpt/Kangaroo-3010_Shared/shared_warmup_50119",
-            "step": 50119,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "Krull": {
       "3090": {
-        "10": [
-          {
-            "source": "ckpt/Krull-10_Shared/shared_warmup_50454",
-            "step": 50454,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/Krull-2020_Shared/shared_warmup_50648",
-            "step": 50648,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2110": [
-          {
-            "source": "ckpt/Krull-2110_Shared/shared_warmup_57054",
-            "step": 57054,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "7af343d9daae68ffddcadb126001257758e147da3a8e0459cbd9da28804e37ed",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3333": [
           {
             "source": "ckpt/Krull-3333_WarmupSweep/shared_warmup_30619",
@@ -4801,31 +2422,6 @@
                 "request": 0,
                 "compatible": false,
                 "reason": "warmup target 50000 not in [30000]"
-              }
-            ]
-          },
-          {
-            "source": "ckpt/Krull-3333_WarmupSweep/shared_warmup_51014",
-            "step": 51014,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
               }
             ]
           },
@@ -4854,115 +2450,11 @@
               }
             ]
           }
-        ],
-        "6020": [
-          {
-            "source": "ckpt/Krull-6020_Shared/shared_warmup_50348",
-            "step": 50348,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "6050": [
-          {
-            "source": "ckpt/Krull-6050_Shared/shared_warmup_50404",
-            "step": 50404,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
     "KungFuMaster": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/KungFuMaster-2000_Shared/shared_warmup_50492",
-            "step": 50492,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/KungFuMaster-2020_Shared/shared_warmup_50932",
-            "step": 50932,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3000": [
           {
             "source": "ckpt/KungFuMaster-3000_Shared/shared_warmup_50459",
@@ -5120,112 +2612,12 @@
                 "reason": null
               }
             ]
-          },
-          {
-            "source": "ckpt/MsPacman-2000_Shared/shared_warmup_50288",
-            "step": 50288,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
-            "source": "ckpt/MsPacman-2000_Shared/shared_warmup_50683",
-            "step": 50683,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2010": [
-          {
-            "source": "ckpt/MsPacman-2010_Shared/shared_warmup_50678",
-            "step": 50678,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
           }
         ],
         "3000": [
           {
             "source": "ckpt/MsPacman-3000_Shared/shared_warmup_50008",
             "step": 50008,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3010": [
-          {
-            "source": "ckpt/MsPacman-3010_Shared/shared_warmup_50843",
-            "step": 50843,
             "warmup_steps": [
               50000
             ],
@@ -5275,31 +2667,6 @@
             ]
           },
           {
-            "source": "ckpt/MsPacman-3333_WarmupSweep/shared_warmup_50852",
-            "step": 50852,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
             "source": "ckpt/MsPacman-3333_WarmupSweep/shared_warmup_70398",
             "step": 70398,
             "warmup_steps": [
@@ -5329,32 +2696,6 @@
     },
     "Pong": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Pong-2000_Shared/shared_warmup_52171",
-            "step": 52171,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "2010": [
           {
             "source": "ckpt/Pong-2010_Shared/shared_warmup_50148",
@@ -5368,32 +2709,6 @@
               "value_diff"
             ],
             "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/Pong-2020_Shared/shared_warmup_51184",
-            "step": 51184,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
             "provenance": {
               "kind": "machine_location",
               "machine": "gpuserver3090",
@@ -5510,32 +2825,6 @@
               }
             ]
           }
-        ],
-        "3710": [
-          {
-            "source": "ckpt/Pong-3710_Shared/shared_warmup_52668",
-            "step": 52668,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
         ]
       }
     },
@@ -5553,108 +2842,6 @@
               "value_diff"
             ],
             "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
-            "source": "ckpt/PrivateEye-2000_Shared/shared_warmup_51262",
-            "step": 51262,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2010": [
-          {
-            "source": "ckpt/PrivateEye-2010_Shared/shared_warmup_51262",
-            "step": 51262,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3000": [
-          {
-            "source": "ckpt/PrivateEye-3000_Shared/shared_warmup_51262",
-            "step": 51262,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3010": [
-          {
-            "source": "ckpt/PrivateEye-3010_Shared/shared_warmup_51262",
-            "step": 51262,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
             "provenance": {
               "kind": "machine_location",
               "machine": "gpuserver3090",
@@ -5750,88 +2937,10 @@
     },
     "Qbert": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Qbert-2000_Shared/shared_warmup_50309",
-            "step": 50309,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2010": [
-          {
-            "source": "ckpt/Qbert-2010_Shared/shared_warmup_50061",
-            "step": 50061,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3000": [
           {
             "source": "ckpt/Qbert-3000_Shared/shared_warmup_50142",
             "step": 50142,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/Qbert-3020_Shared/shared_warmup_50442",
-            "step": 50442,
             "warmup_steps": [
               50000
             ],
@@ -5935,84 +3044,6 @@
     },
     "RoadRunner": {
       "3090": {
-        "2010": [
-          {
-            "source": "ckpt/RoadRunner-2010_Shared/shared_warmup_50620",
-            "step": 50620,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2020": [
-          {
-            "source": "ckpt/RoadRunner-2020_Shared/shared_warmup_50442",
-            "step": 50442,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2030": [
-          {
-            "source": "ckpt/RoadRunner-2030_Shared/shared_warmup_50365",
-            "step": 50365,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3010": [
           {
             "source": "ckpt/RoadRunner-3010_Shared/shared_warmup_50571",
@@ -6066,31 +3097,6 @@
             ]
           },
           {
-            "source": "ckpt/RoadRunner-3333_WarmupSweep/shared_warmup_50780",
-            "step": 50780,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
             "source": "ckpt/RoadRunner-3333_WarmupSweep/shared_warmup_70601",
             "step": 70601,
             "warmup_steps": [
@@ -6120,58 +3126,6 @@
     },
     "Seaquest": {
       "3090": {
-        "2000": [
-          {
-            "source": "ckpt/Seaquest-2000_Shared/shared_warmup_50141",
-            "step": 50141,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "2010": [
-          {
-            "source": "ckpt/Seaquest-2010_Shared/shared_warmup_50859",
-            "step": 50859,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3000": [
           {
             "source": "ckpt/Seaquest-3000_Shared/shared_warmup_50815",
@@ -6251,31 +3205,6 @@
             ]
           },
           {
-            "source": "ckpt/Seaquest-3333_WarmupSweep/shared_warmup_50262",
-            "step": 50262,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value",
-              "value_diff"
-            ],
-            "saved_config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          },
-          {
             "source": "ckpt/Seaquest-3333_WarmupSweep/shared_warmup_70315",
             "step": 70315,
             "warmup_steps": [
@@ -6331,62 +3260,10 @@
             ]
           }
         ],
-        "2010": [
-          {
-            "source": "ckpt/UpNDown-2010_Shared/shared_warmup_50880",
-            "step": 50880,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
         "3000": [
           {
             "source": "ckpt/UpNDown-3000_Shared/shared_warmup_50438",
             "step": 50438,
-            "warmup_steps": [
-              50000
-            ],
-            "statistics_signals": [
-              "td_error",
-              "value_diff"
-            ],
-            "saved_config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
-            "provenance": {
-              "kind": "machine_location",
-              "machine": "gpuserver3090",
-              "gpu_type": "3090"
-            },
-            "checks": [
-              {
-                "request": 0,
-                "compatible": true,
-                "reason": null
-              }
-            ]
-          }
-        ],
-        "3020": [
-          {
-            "source": "ckpt/UpNDown-3020_Shared/shared_warmup_52612",
-            "step": 52612,
             "warmup_steps": [
               50000
             ],
