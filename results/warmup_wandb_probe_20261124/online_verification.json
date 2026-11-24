@@ -1,0 +1,78 @@
+{
+  "project": "choemj-kaist/STORM",
+  "started_at": "2026-11-24T04:20:58.694333+00:00",
+  "login_verified": true,
+  "selected_samples": [
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "gpu_type": "A6000",
+      "source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+      "matched_run_count": 5,
+      "saved_execution_order": [
+        "retrieval"
+      ],
+      "evidence": "raw_local_wandb_files",
+      "online_verified": false
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "gpu_type": "A6000",
+      "source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+      "matched_run_count": 5,
+      "saved_execution_order": [
+        "retrieval"
+      ],
+      "evidence": "raw_local_wandb_files",
+      "online_verified": false
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "gpu_type": "A6000",
+      "source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+      "matched_run_count": 5,
+      "saved_execution_order": [
+        "target1",
+        "value",
+        "add"
+      ],
+      "evidence": "raw_local_wandb_files",
+      "online_verified": false
+    },
+    {
+      "game": "Boxing",
+      "seed": 2000,
+      "gpu_type": "3090",
+      "source": "ckpt/Boxing-2000_Shared/shared_warmup_50058",
+      "matched_run_count": 1,
+      "evidence": "existing_csv_only",
+      "online_verified": false
+    },
+    {
+      "game": "Breakout",
+      "seed": 9999,
+      "gpu_type": "TITAN_RTX",
+      "source": "ckpt/Breakout-9999_Shared/shared_warmup_50236",
+      "matched_run_count": 1,
+      "evidence": "existing_csv_only",
+      "online_verified": false
+    }
+  ],
+  "discovery_filters": null,
+  "project_run_count": 1621,
+  "enumerated_runs": 1621,
+  "scanned_runs": 400,
+  "scope": "All project run metadata; match five selected snapshot paths and verify game/seed.",
+  "completeness_notes": [
+    "A project-wide metadata scan has no retrieval, hyperparameter, state, or run-name filters.",
+    "Coverage concerns runs present and readable at query time; deleted or never-uploaded runs cannot be recovered.",
+    "The five snapshots are matched by normalized checkpoint path plus explicit game/seed, not a content hash.",
+    "Continuation via an unrelated intermediate checkpoint or an unrecognized imported alias needs separate lineage resolution."
+  ],
+  "runs": [],
+  "unavailable_metadata": [],
+  "updated_at": "2026-11-24T04:21:53.222320+00:00",
+  "scan_finished": false
+}

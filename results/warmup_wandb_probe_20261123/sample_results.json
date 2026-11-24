@@ -1,0 +1,1768 @@
+{
+  "api_access": "authentication_failed",
+  "public_access": "no_run_returned",
+  "source": "local_wandb_cache",
+  "online_verified": false,
+  "samples": [
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "gpu_type": "A6000",
+      "source": "ckpt/Boxing-6040_Shared/shared_warmup_50048"
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "gpu_type": "A6000",
+      "source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067"
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "gpu_type": "A6000",
+      "source": "ckpt/Freeway-6020_Shared/shared_warmup_51200"
+    }
+  ],
+  "runs": [
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+      "run_id": "46ih9bz6",
+      "run_name": "Boxing_46ih9bz6_6040",
+      "branch": "add",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/46ih9bz6",
+      "metric": "eval/episode_avg_return",
+      "value": 72.15,
+      "episode_count": 20,
+      "recomputed_mean": 72.15,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "add",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 88
+        },
+        {
+          "index": 1,
+          "value": 78
+        },
+        {
+          "index": 2,
+          "value": 76
+        },
+        {
+          "index": 3,
+          "value": 66
+        },
+        {
+          "index": 4,
+          "value": 62
+        },
+        {
+          "index": 5,
+          "value": 78
+        },
+        {
+          "index": 6,
+          "value": 83
+        },
+        {
+          "index": 7,
+          "value": 83
+        },
+        {
+          "index": 8,
+          "value": 75
+        },
+        {
+          "index": 9,
+          "value": 49
+        },
+        {
+          "index": 10,
+          "value": 75
+        },
+        {
+          "index": 11,
+          "value": 86
+        },
+        {
+          "index": 12,
+          "value": 65
+        },
+        {
+          "index": 13,
+          "value": 67
+        },
+        {
+          "index": 14,
+          "value": 63
+        },
+        {
+          "index": 15,
+          "value": 76
+        },
+        {
+          "index": 16,
+          "value": 70
+        },
+        {
+          "index": 17,
+          "value": 81
+        },
+        {
+          "index": 18,
+          "value": 55
+        },
+        {
+          "index": 19,
+          "value": 67
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Boxing-6040_Shared/shared_warmup_50048",
+        "metadata": "wandb/run-20260925_072553-46ih9bz6/files/wandb-metadata.json",
+        "summary": "wandb/run-20260925_072553-46ih9bz6/files/wandb-summary.json",
+        "config": "wandb/run-20260925_072553-46ih9bz6/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+      "run_id": "fwsndpqb",
+      "run_name": "Boxing_fwsndpqb_6040",
+      "branch": "baseline",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/fwsndpqb",
+      "metric": "eval/episode_avg_return",
+      "value": 81.65,
+      "episode_count": 20,
+      "recomputed_mean": 81.65,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": false,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 85
+        },
+        {
+          "index": 1,
+          "value": 80
+        },
+        {
+          "index": 2,
+          "value": 83
+        },
+        {
+          "index": 3,
+          "value": 82
+        },
+        {
+          "index": 4,
+          "value": 74
+        },
+        {
+          "index": 5,
+          "value": 96
+        },
+        {
+          "index": 6,
+          "value": 83
+        },
+        {
+          "index": 7,
+          "value": 88
+        },
+        {
+          "index": 8,
+          "value": 70
+        },
+        {
+          "index": 9,
+          "value": 79
+        },
+        {
+          "index": 10,
+          "value": 80
+        },
+        {
+          "index": 11,
+          "value": 89
+        },
+        {
+          "index": 12,
+          "value": 79
+        },
+        {
+          "index": 13,
+          "value": 75
+        },
+        {
+          "index": 14,
+          "value": 79
+        },
+        {
+          "index": 15,
+          "value": 85
+        },
+        {
+          "index": 16,
+          "value": 96
+        },
+        {
+          "index": 17,
+          "value": 83
+        },
+        {
+          "index": 18,
+          "value": 73
+        },
+        {
+          "index": 19,
+          "value": 74
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Boxing-6040_Shared/shared_warmup_50048",
+        "metadata": "wandb/run-20260924_213915-fwsndpqb/files/wandb-metadata.json",
+        "summary": "wandb/run-20260924_213915-fwsndpqb/files/wandb-summary.json",
+        "config": "wandb/run-20260924_213915-fwsndpqb/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+      "run_id": "sq9rmczm",
+      "run_name": "Boxing_sq9rmczm_6040",
+      "branch": "retrieval",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/sq9rmczm",
+      "metric": "eval/episode_avg_return",
+      "value": 82.65,
+      "episode_count": 20,
+      "recomputed_mean": 82.65,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 89
+        },
+        {
+          "index": 1,
+          "value": 84
+        },
+        {
+          "index": 2,
+          "value": 86
+        },
+        {
+          "index": 3,
+          "value": 77
+        },
+        {
+          "index": 4,
+          "value": 75
+        },
+        {
+          "index": 5,
+          "value": 90
+        },
+        {
+          "index": 6,
+          "value": 91
+        },
+        {
+          "index": 7,
+          "value": 88
+        },
+        {
+          "index": 8,
+          "value": 87
+        },
+        {
+          "index": 9,
+          "value": 72
+        },
+        {
+          "index": 10,
+          "value": 84
+        },
+        {
+          "index": 11,
+          "value": 83
+        },
+        {
+          "index": 12,
+          "value": 81
+        },
+        {
+          "index": 13,
+          "value": 72
+        },
+        {
+          "index": 14,
+          "value": 98
+        },
+        {
+          "index": 15,
+          "value": 67
+        },
+        {
+          "index": 16,
+          "value": 79
+        },
+        {
+          "index": 17,
+          "value": 84
+        },
+        {
+          "index": 18,
+          "value": 87
+        },
+        {
+          "index": 19,
+          "value": 79
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Boxing-6040_Shared/shared_warmup_50048",
+        "metadata": "wandb/run-20260924_063219-sq9rmczm/files/wandb-metadata.json",
+        "summary": "wandb/run-20260924_063219-sq9rmczm/files/wandb-summary.json",
+        "config": "wandb/run-20260924_063219-sq9rmczm/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+      "run_id": "bn9chy5l",
+      "run_name": "Boxing_bn9chy5l_6040",
+      "branch": "target1",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/bn9chy5l",
+      "metric": "eval/episode_avg_return",
+      "value": 78.3,
+      "episode_count": 20,
+      "recomputed_mean": 78.3,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 1,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 93
+        },
+        {
+          "index": 1,
+          "value": 82
+        },
+        {
+          "index": 2,
+          "value": 80
+        },
+        {
+          "index": 3,
+          "value": 75
+        },
+        {
+          "index": 4,
+          "value": 76
+        },
+        {
+          "index": 5,
+          "value": 65
+        },
+        {
+          "index": 6,
+          "value": 97
+        },
+        {
+          "index": 7,
+          "value": 80
+        },
+        {
+          "index": 8,
+          "value": 73
+        },
+        {
+          "index": 9,
+          "value": 76
+        },
+        {
+          "index": 10,
+          "value": 80
+        },
+        {
+          "index": 11,
+          "value": 76
+        },
+        {
+          "index": 12,
+          "value": 81
+        },
+        {
+          "index": 13,
+          "value": 59
+        },
+        {
+          "index": 14,
+          "value": 82
+        },
+        {
+          "index": 15,
+          "value": 77
+        },
+        {
+          "index": 16,
+          "value": 69
+        },
+        {
+          "index": 17,
+          "value": 86
+        },
+        {
+          "index": 18,
+          "value": 75
+        },
+        {
+          "index": 19,
+          "value": 84
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Boxing-6040_Shared/shared_warmup_50048",
+        "metadata": "wandb/run-20260925_000753-bn9chy5l/files/wandb-metadata.json",
+        "summary": "wandb/run-20260925_000753-bn9chy5l/files/wandb-summary.json",
+        "config": "wandb/run-20260925_000753-bn9chy5l/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Boxing",
+      "seed": 6040,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+      "run_id": "25c3xkcq",
+      "run_name": "Boxing_25c3xkcq_6040",
+      "branch": "value",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/25c3xkcq",
+      "metric": "eval/episode_avg_return",
+      "value": 82.75,
+      "episode_count": 20,
+      "recomputed_mean": 82.75,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value",
+      "score_combination": "multiply",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 93
+        },
+        {
+          "index": 1,
+          "value": 83
+        },
+        {
+          "index": 2,
+          "value": 85
+        },
+        {
+          "index": 3,
+          "value": 83
+        },
+        {
+          "index": 4,
+          "value": 70
+        },
+        {
+          "index": 5,
+          "value": 94
+        },
+        {
+          "index": 6,
+          "value": 93
+        },
+        {
+          "index": 7,
+          "value": 81
+        },
+        {
+          "index": 8,
+          "value": 81
+        },
+        {
+          "index": 9,
+          "value": 97
+        },
+        {
+          "index": 10,
+          "value": 81
+        },
+        {
+          "index": 11,
+          "value": 49
+        },
+        {
+          "index": 12,
+          "value": 90
+        },
+        {
+          "index": 13,
+          "value": 72
+        },
+        {
+          "index": 14,
+          "value": 82
+        },
+        {
+          "index": 15,
+          "value": 89
+        },
+        {
+          "index": 16,
+          "value": 73
+        },
+        {
+          "index": 17,
+          "value": 83
+        },
+        {
+          "index": 18,
+          "value": 94
+        },
+        {
+          "index": 19,
+          "value": 82
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Boxing-6040_Shared/shared_warmup_50048",
+        "metadata": "wandb/run-20260925_024646-25c3xkcq/files/wandb-metadata.json",
+        "summary": "wandb/run-20260925_024646-25c3xkcq/files/wandb-summary.json",
+        "config": "wandb/run-20260925_024646-25c3xkcq/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+      "run_id": "hjq70086",
+      "run_name": "Freeway_hjq70086_6020",
+      "branch": "add",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/hjq70086",
+      "metric": "eval/episode_avg_return",
+      "value": 33.85,
+      "episode_count": 20,
+      "recomputed_mean": 33.85,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "add",
+      "demonstration": true,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 34
+        },
+        {
+          "index": 1,
+          "value": 34
+        },
+        {
+          "index": 2,
+          "value": 34
+        },
+        {
+          "index": 3,
+          "value": 34
+        },
+        {
+          "index": 4,
+          "value": 34
+        },
+        {
+          "index": 5,
+          "value": 34
+        },
+        {
+          "index": 6,
+          "value": 33
+        },
+        {
+          "index": 7,
+          "value": 34
+        },
+        {
+          "index": 8,
+          "value": 33
+        },
+        {
+          "index": 9,
+          "value": 34
+        },
+        {
+          "index": 10,
+          "value": 34
+        },
+        {
+          "index": 11,
+          "value": 34
+        },
+        {
+          "index": 12,
+          "value": 34
+        },
+        {
+          "index": 13,
+          "value": 34
+        },
+        {
+          "index": 14,
+          "value": 34
+        },
+        {
+          "index": 15,
+          "value": 34
+        },
+        {
+          "index": 16,
+          "value": 34
+        },
+        {
+          "index": 17,
+          "value": 34
+        },
+        {
+          "index": 18,
+          "value": 34
+        },
+        {
+          "index": 19,
+          "value": 33
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Freeway-6020_Shared/shared_warmup_51200",
+        "metadata": "wandb/run-20260925_003954-hjq70086/files/wandb-metadata.json",
+        "summary": "wandb/run-20260925_003954-hjq70086/files/wandb-summary.json",
+        "config": "wandb/run-20260925_003954-hjq70086/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+      "run_id": "sdhrtmpl",
+      "run_name": "Freeway_sdhrtmpl_6020",
+      "branch": "baseline",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/sdhrtmpl",
+      "metric": "eval/episode_avg_return",
+      "value": 33.75,
+      "episode_count": 20,
+      "recomputed_mean": 33.75,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": false,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": true,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 34
+        },
+        {
+          "index": 1,
+          "value": 34
+        },
+        {
+          "index": 2,
+          "value": 34
+        },
+        {
+          "index": 3,
+          "value": 33
+        },
+        {
+          "index": 4,
+          "value": 34
+        },
+        {
+          "index": 5,
+          "value": 34
+        },
+        {
+          "index": 6,
+          "value": 34
+        },
+        {
+          "index": 7,
+          "value": 34
+        },
+        {
+          "index": 8,
+          "value": 34
+        },
+        {
+          "index": 9,
+          "value": 34
+        },
+        {
+          "index": 10,
+          "value": 34
+        },
+        {
+          "index": 11,
+          "value": 34
+        },
+        {
+          "index": 12,
+          "value": 34
+        },
+        {
+          "index": 13,
+          "value": 33
+        },
+        {
+          "index": 14,
+          "value": 32
+        },
+        {
+          "index": 15,
+          "value": 34
+        },
+        {
+          "index": 16,
+          "value": 34
+        },
+        {
+          "index": 17,
+          "value": 34
+        },
+        {
+          "index": 18,
+          "value": 34
+        },
+        {
+          "index": 19,
+          "value": 33
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Freeway-6020_Shared/shared_warmup_51200",
+        "metadata": "wandb/run-20260921_172149-sdhrtmpl/files/wandb-metadata.json",
+        "summary": "wandb/run-20260921_172149-sdhrtmpl/files/wandb-summary.json",
+        "config": "wandb/run-20260921_172149-sdhrtmpl/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+      "run_id": "wq5mxpwt",
+      "run_name": "Freeway_wq5mxpwt_6020",
+      "branch": "retrieval",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/wq5mxpwt",
+      "metric": "eval/episode_avg_return",
+      "value": 33.75,
+      "episode_count": 20,
+      "recomputed_mean": 33.75,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": true,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 34
+        },
+        {
+          "index": 1,
+          "value": 33
+        },
+        {
+          "index": 2,
+          "value": 34
+        },
+        {
+          "index": 3,
+          "value": 34
+        },
+        {
+          "index": 4,
+          "value": 33
+        },
+        {
+          "index": 5,
+          "value": 33
+        },
+        {
+          "index": 6,
+          "value": 34
+        },
+        {
+          "index": 7,
+          "value": 34
+        },
+        {
+          "index": 8,
+          "value": 34
+        },
+        {
+          "index": 9,
+          "value": 34
+        },
+        {
+          "index": 10,
+          "value": 34
+        },
+        {
+          "index": 11,
+          "value": 34
+        },
+        {
+          "index": 12,
+          "value": 34
+        },
+        {
+          "index": 13,
+          "value": 33
+        },
+        {
+          "index": 14,
+          "value": 34
+        },
+        {
+          "index": 15,
+          "value": 34
+        },
+        {
+          "index": 16,
+          "value": 34
+        },
+        {
+          "index": 17,
+          "value": 34
+        },
+        {
+          "index": 18,
+          "value": 33
+        },
+        {
+          "index": 19,
+          "value": 34
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Freeway-6020_Shared/shared_warmup_51200",
+        "metadata": "wandb/run-20260921_111758-wq5mxpwt/files/wandb-metadata.json",
+        "summary": "wandb/run-20260921_111758-wq5mxpwt/files/wandb-summary.json",
+        "config": "wandb/run-20260921_111758-wq5mxpwt/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+      "run_id": "6uixzhvq",
+      "run_name": "Freeway_6uixzhvq_6020",
+      "branch": "target1",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/6uixzhvq",
+      "metric": "eval/episode_avg_return",
+      "value": 32.8,
+      "episode_count": 20,
+      "recomputed_mean": 32.8,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 1,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": true,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 33
+        },
+        {
+          "index": 1,
+          "value": 30
+        },
+        {
+          "index": 2,
+          "value": 33
+        },
+        {
+          "index": 3,
+          "value": 33
+        },
+        {
+          "index": 4,
+          "value": 34
+        },
+        {
+          "index": 5,
+          "value": 33
+        },
+        {
+          "index": 6,
+          "value": 33
+        },
+        {
+          "index": 7,
+          "value": 33
+        },
+        {
+          "index": 8,
+          "value": 33
+        },
+        {
+          "index": 9,
+          "value": 33
+        },
+        {
+          "index": 10,
+          "value": 34
+        },
+        {
+          "index": 11,
+          "value": 33
+        },
+        {
+          "index": 12,
+          "value": 33
+        },
+        {
+          "index": 13,
+          "value": 32
+        },
+        {
+          "index": 14,
+          "value": 32
+        },
+        {
+          "index": 15,
+          "value": 31
+        },
+        {
+          "index": 16,
+          "value": 34
+        },
+        {
+          "index": 17,
+          "value": 33
+        },
+        {
+          "index": 18,
+          "value": 33
+        },
+        {
+          "index": 19,
+          "value": 33
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Freeway-6020_Shared/shared_warmup_51200",
+        "metadata": "wandb/run-20260924_154927-6uixzhvq/files/wandb-metadata.json",
+        "summary": "wandb/run-20260924_154927-6uixzhvq/files/wandb-summary.json",
+        "config": "wandb/run-20260924_154927-6uixzhvq/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Freeway",
+      "seed": 6020,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+      "run_id": "nlf5qudp",
+      "run_name": "Freeway_nlf5qudp_6020",
+      "branch": "value",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/nlf5qudp",
+      "metric": "eval/episode_avg_return",
+      "value": 33.65,
+      "episode_count": 20,
+      "recomputed_mean": 33.65,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value",
+      "score_combination": "multiply",
+      "demonstration": true,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 34
+        },
+        {
+          "index": 1,
+          "value": 33
+        },
+        {
+          "index": 2,
+          "value": 33
+        },
+        {
+          "index": 3,
+          "value": 33
+        },
+        {
+          "index": 4,
+          "value": 34
+        },
+        {
+          "index": 5,
+          "value": 34
+        },
+        {
+          "index": 6,
+          "value": 33
+        },
+        {
+          "index": 7,
+          "value": 34
+        },
+        {
+          "index": 8,
+          "value": 34
+        },
+        {
+          "index": 9,
+          "value": 34
+        },
+        {
+          "index": 10,
+          "value": 34
+        },
+        {
+          "index": 11,
+          "value": 34
+        },
+        {
+          "index": 12,
+          "value": 33
+        },
+        {
+          "index": 13,
+          "value": 34
+        },
+        {
+          "index": 14,
+          "value": 34
+        },
+        {
+          "index": 15,
+          "value": 34
+        },
+        {
+          "index": 16,
+          "value": 34
+        },
+        {
+          "index": 17,
+          "value": 33
+        },
+        {
+          "index": 18,
+          "value": 33
+        },
+        {
+          "index": 19,
+          "value": 34
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Freeway-6020_Shared/shared_warmup_51200",
+        "metadata": "wandb/run-20260924_182338-nlf5qudp/files/wandb-metadata.json",
+        "summary": "wandb/run-20260924_182338-nlf5qudp/files/wandb-summary.json",
+        "config": "wandb/run-20260924_182338-nlf5qudp/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+      "run_id": "p5ikzf5i",
+      "run_name": "Kangaroo_p5ikzf5i_6030",
+      "branch": "add",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/p5ikzf5i",
+      "metric": "eval/episode_avg_return",
+      "value": 2885,
+      "episode_count": 20,
+      "recomputed_mean": 2885,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "add",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 1000
+        },
+        {
+          "index": 1,
+          "value": 1600
+        },
+        {
+          "index": 2,
+          "value": 2800
+        },
+        {
+          "index": 3,
+          "value": 3200
+        },
+        {
+          "index": 4,
+          "value": 3400
+        },
+        {
+          "index": 5,
+          "value": 1800
+        },
+        {
+          "index": 6,
+          "value": 3600
+        },
+        {
+          "index": 7,
+          "value": 4400
+        },
+        {
+          "index": 8,
+          "value": 2600
+        },
+        {
+          "index": 9,
+          "value": 3100
+        },
+        {
+          "index": 10,
+          "value": 800
+        },
+        {
+          "index": 11,
+          "value": 4000
+        },
+        {
+          "index": 12,
+          "value": 3400
+        },
+        {
+          "index": 13,
+          "value": 2200
+        },
+        {
+          "index": 14,
+          "value": 4000
+        },
+        {
+          "index": 15,
+          "value": 4400
+        },
+        {
+          "index": 16,
+          "value": 2800
+        },
+        {
+          "index": 17,
+          "value": 2400
+        },
+        {
+          "index": 18,
+          "value": 3400
+        },
+        {
+          "index": 19,
+          "value": 2800
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+        "metadata": "wandb/run-20260925_101838-p5ikzf5i/files/wandb-metadata.json",
+        "summary": "wandb/run-20260925_101838-p5ikzf5i/files/wandb-summary.json",
+        "config": "wandb/run-20260925_101838-p5ikzf5i/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+      "run_id": "pkcsggmh",
+      "run_name": "Kangaroo_pkcsggmh_6030",
+      "branch": "baseline",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/pkcsggmh",
+      "metric": "eval/episode_avg_return",
+      "value": 3235,
+      "episode_count": 20,
+      "recomputed_mean": 3235,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": false,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 2200
+        },
+        {
+          "index": 1,
+          "value": 2600
+        },
+        {
+          "index": 2,
+          "value": 3200
+        },
+        {
+          "index": 3,
+          "value": 3100
+        },
+        {
+          "index": 4,
+          "value": 3600
+        },
+        {
+          "index": 5,
+          "value": 3400
+        },
+        {
+          "index": 6,
+          "value": 3000
+        },
+        {
+          "index": 7,
+          "value": 3000
+        },
+        {
+          "index": 8,
+          "value": 2800
+        },
+        {
+          "index": 9,
+          "value": 3800
+        },
+        {
+          "index": 10,
+          "value": 2800
+        },
+        {
+          "index": 11,
+          "value": 3600
+        },
+        {
+          "index": 12,
+          "value": 3600
+        },
+        {
+          "index": 13,
+          "value": 4000
+        },
+        {
+          "index": 14,
+          "value": 3000
+        },
+        {
+          "index": 15,
+          "value": 2800
+        },
+        {
+          "index": 16,
+          "value": 2800
+        },
+        {
+          "index": 17,
+          "value": 3400
+        },
+        {
+          "index": 18,
+          "value": 4600
+        },
+        {
+          "index": 19,
+          "value": 3400
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+        "metadata": "wandb/run-20260925_020213-pkcsggmh/files/wandb-metadata.json",
+        "summary": "wandb/run-20260925_020213-pkcsggmh/files/wandb-summary.json",
+        "config": "wandb/run-20260925_020213-pkcsggmh/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+      "run_id": "o9joyx5v",
+      "run_name": "Kangaroo_o9joyx5v_6030",
+      "branch": "retrieval",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/o9joyx5v",
+      "metric": "eval/episode_avg_return",
+      "value": 2900,
+      "episode_count": 20,
+      "recomputed_mean": 2900,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 600
+        },
+        {
+          "index": 1,
+          "value": 2200
+        },
+        {
+          "index": 2,
+          "value": 2400
+        },
+        {
+          "index": 3,
+          "value": 4000
+        },
+        {
+          "index": 4,
+          "value": 4000
+        },
+        {
+          "index": 5,
+          "value": 3000
+        },
+        {
+          "index": 6,
+          "value": 2600
+        },
+        {
+          "index": 7,
+          "value": 2800
+        },
+        {
+          "index": 8,
+          "value": 3000
+        },
+        {
+          "index": 9,
+          "value": 4600
+        },
+        {
+          "index": 10,
+          "value": 3400
+        },
+        {
+          "index": 11,
+          "value": 800
+        },
+        {
+          "index": 12,
+          "value": 2800
+        },
+        {
+          "index": 13,
+          "value": 2200
+        },
+        {
+          "index": 14,
+          "value": 3000
+        },
+        {
+          "index": 15,
+          "value": 2200
+        },
+        {
+          "index": 16,
+          "value": 5200
+        },
+        {
+          "index": 17,
+          "value": 3200
+        },
+        {
+          "index": 18,
+          "value": 2600
+        },
+        {
+          "index": 19,
+          "value": 3400
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+        "metadata": "wandb/run-20260921_181145-o9joyx5v/files/wandb-metadata.json",
+        "summary": "wandb/run-20260921_181145-o9joyx5v/files/wandb-summary.json",
+        "config": "wandb/run-20260921_181145-o9joyx5v/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+      "run_id": "72jx8am0",
+      "run_name": "Kangaroo_72jx8am0_6030",
+      "branch": "target1",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/72jx8am0",
+      "metric": "eval/episode_avg_return",
+      "value": 3460,
+      "episode_count": 20,
+      "recomputed_mean": 3460,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 1,
+      "anchor_offset": -3,
+      "value_signal": "value_diff",
+      "score_combination": "multiply",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 2200
+        },
+        {
+          "index": 1,
+          "value": 2800
+        },
+        {
+          "index": 2,
+          "value": 3600
+        },
+        {
+          "index": 3,
+          "value": 3400
+        },
+        {
+          "index": 4,
+          "value": 3600
+        },
+        {
+          "index": 5,
+          "value": 1800
+        },
+        {
+          "index": 6,
+          "value": 3600
+        },
+        {
+          "index": 7,
+          "value": 3600
+        },
+        {
+          "index": 8,
+          "value": 3200
+        },
+        {
+          "index": 9,
+          "value": 3400
+        },
+        {
+          "index": 10,
+          "value": 4000
+        },
+        {
+          "index": 11,
+          "value": 3400
+        },
+        {
+          "index": 12,
+          "value": 5000
+        },
+        {
+          "index": 13,
+          "value": 4400
+        },
+        {
+          "index": 14,
+          "value": 3000
+        },
+        {
+          "index": 15,
+          "value": 2800
+        },
+        {
+          "index": 16,
+          "value": 3000
+        },
+        {
+          "index": 17,
+          "value": 3600
+        },
+        {
+          "index": 18,
+          "value": 3800
+        },
+        {
+          "index": 19,
+          "value": 5000
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+        "metadata": "wandb/run-20260925_162444-72jx8am0/files/wandb-metadata.json",
+        "summary": "wandb/run-20260925_162444-72jx8am0/files/wandb-summary.json",
+        "config": "wandb/run-20260925_162444-72jx8am0/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 6030,
+      "gpu_type": "A6000",
+      "warmup_source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+      "run_id": "ngfsx3gz",
+      "run_name": "Kangaroo_ngfsx3gz_6030",
+      "branch": "value",
+      "url": "https://wandb.ai/choemj-kaist/STORM/runs/ngfsx3gz",
+      "metric": "eval/episode_avg_return",
+      "value": 3140,
+      "episode_count": 20,
+      "recomputed_mean": 3140,
+      "mean_verified": true,
+      "classification_verified": true,
+      "cached_state": "finished",
+      "training_end": 102000,
+      "retrieval_enable": true,
+      "hash_bits": 10,
+      "target": 16,
+      "anchor_offset": -3,
+      "value_signal": "value",
+      "score_combination": "multiply",
+      "demonstration": false,
+      "evaluation_episodes": [
+        {
+          "index": 0,
+          "value": 1800
+        },
+        {
+          "index": 1,
+          "value": 2800
+        },
+        {
+          "index": 2,
+          "value": 3000
+        },
+        {
+          "index": 3,
+          "value": 3600
+        },
+        {
+          "index": 4,
+          "value": 4600
+        },
+        {
+          "index": 5,
+          "value": 1400
+        },
+        {
+          "index": 6,
+          "value": 3400
+        },
+        {
+          "index": 7,
+          "value": 2600
+        },
+        {
+          "index": 8,
+          "value": 3400
+        },
+        {
+          "index": 9,
+          "value": 3400
+        },
+        {
+          "index": 10,
+          "value": 3200
+        },
+        {
+          "index": 11,
+          "value": 3200
+        },
+        {
+          "index": 12,
+          "value": 5000
+        },
+        {
+          "index": 13,
+          "value": 4200
+        },
+        {
+          "index": 14,
+          "value": 2800
+        },
+        {
+          "index": 15,
+          "value": 2200
+        },
+        {
+          "index": 16,
+          "value": 2400
+        },
+        {
+          "index": 17,
+          "value": 3200
+        },
+        {
+          "index": 18,
+          "value": 3600
+        },
+        {
+          "index": 19,
+          "value": 3000
+        }
+      ],
+      "evidence": {
+        "match": "exact_checkpoint_path_and_game_and_seed",
+        "resume_argument": "/home/choemj/STORM-1/ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+        "metadata": "wandb/run-20260925_042912-ngfsx3gz/files/wandb-metadata.json",
+        "summary": "wandb/run-20260925_042912-ngfsx3gz/files/wandb-summary.json",
+        "config": "wandb/run-20260925_042912-ngfsx3gz/files/config.yaml"
+      },
+      "data_source": "local_wandb_cache",
+      "online_verified": false
+    }
+  ]
+}
