@@ -1,0 +1,4035 @@
+{
+  "kind": "storm-warmup-prune",
+  "version": 1,
+  "created_at": "2026-11-24T05:56:02.964754+00:00",
+  "round": "warmups-20261123",
+  "target_step": 50000,
+  "controls": {
+    "stability_tolerance": 0.05,
+    "paper_tolerance": 0.05
+  },
+  "warning_gpu_loss": 0.05,
+  "other_gpu_loss": 0.05,
+  "strict_100k": false,
+  "machines": {
+    "3090": {
+      "gpuserver3090": {
+        "keep": [
+          {
+            "game": "Alien",
+            "seed": 3333,
+            "source": "ckpt/Alien-3333_WarmupSweep/shared_warmup_50062",
+            "step": 50062,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Alien",
+            "seed": 3334,
+            "source": "ckpt/Alien-3334_WarmupSweep/shared_warmup_50721",
+            "step": 50721,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 3333,
+            "source": "ckpt/Amidar-3333_WarmupSweep/shared_warmup_50728",
+            "step": 50728,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 3334,
+            "source": "ckpt/Amidar-3334_WarmupSweep/shared_warmup_50264",
+            "step": 50264,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 3333,
+            "source": "ckpt/Assault-3333_WarmupSweep/shared_warmup_51098",
+            "step": 51098,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 3334,
+            "source": "ckpt/Assault-3334_WarmupSweep/shared_warmup_50219",
+            "step": 50219,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 3333,
+            "source": "ckpt/Asterix-3333_WarmupSweep/shared_warmup_50106",
+            "step": 50106,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 3334,
+            "source": "ckpt/Asterix-3334_WarmupSweep/shared_warmup_50312",
+            "step": 50312,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 2010,
+            "source": "ckpt/BankHeist-2010_Shared/shared_warmup_50918",
+            "step": 50918,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 3333,
+            "source": "ckpt/BattleZone-3333_WarmupSweep/shared_warmup_50048",
+            "step": 50048,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 3334,
+            "source": "ckpt/BattleZone-3334_WarmupSweep/shared_warmup_50079",
+            "step": 50079,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 3333,
+            "source": "ckpt/Boxing-3333_WarmupSweep/shared_warmup_50981",
+            "step": 50981,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Breakout",
+            "seed": 3333,
+            "source": "ckpt/Breakout-3333_WarmupSweep/shared_warmup_50333",
+            "step": 50333,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Breakout",
+            "seed": 3334,
+            "source": "ckpt/Breakout-3334_WarmupSweep/shared_warmup_50466",
+            "step": 50466,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "ChopperCommand",
+            "seed": 3000,
+            "source": "ckpt/ChopperCommand-3000_Shared/shared_warmup_50390",
+            "step": 50390,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "ChopperCommand",
+            "seed": 3334,
+            "source": "ckpt/ChopperCommand-3334_WarmupSweep/shared_warmup_50968",
+            "step": 50968,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "CrazyClimber",
+            "seed": 2000,
+            "source": "ckpt/CrazyClimber-2000_Shared/shared_warmup_52441",
+            "step": 52441,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "CrazyClimber",
+            "seed": 3333,
+            "source": "ckpt/CrazyClimber-3333_WarmupSweep/shared_warmup_50890",
+            "step": 50890,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "CrazyClimber",
+            "seed": 3334,
+            "source": "ckpt/CrazyClimber-3334_WarmupSweep/shared_warmup_50552",
+            "step": 50552,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "DemonAttack",
+            "seed": 3333,
+            "source": "ckpt/DemonAttack-3333_WarmupSweep/shared_warmup_50223",
+            "step": 50223,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "DemonAttack",
+            "seed": 3334,
+            "source": "ckpt/DemonAttack-3334_WarmupSweep/shared_warmup_51189",
+            "step": 51189,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 3333,
+            "source": "ckpt/Freeway-3333_WarmupSweep/shared_warmup_51200",
+            "step": 51200,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d187b72007338cdfbf1780914707f39985eec06af7b19c10590482e109640ee4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 3333,
+            "source": "ckpt/Frostbite-3333_WarmupSweep/shared_warmup_50135",
+            "step": 50135,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 11010,
+            "source": "ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11010_Shared/shared_warmup_50855",
+            "step": 50855,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "5f836b6483854a1c3a07fdf437f1ad82aa89621dd8dbc54cd5657a81da750574",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 11021,
+            "source": "ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11021_Shared/shared_warmup_50350",
+            "step": 50350,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "5f836b6483854a1c3a07fdf437f1ad82aa89621dd8dbc54cd5657a81da750574",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 11023,
+            "source": "ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11023_Shared/shared_warmup_50358",
+            "step": 50358,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "5f836b6483854a1c3a07fdf437f1ad82aa89621dd8dbc54cd5657a81da750574",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Hero",
+            "seed": 3000,
+            "source": "ckpt/Hero-3000_Shared/shared_warmup_50475",
+            "step": 50475,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Hero",
+            "seed": 3333,
+            "source": "ckpt/Hero-3333_WarmupSweep/shared_warmup_50030",
+            "step": 50030,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 2000,
+            "source": "ckpt/Jamesbond-2000_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 3333,
+            "source": "ckpt/Jamesbond-3333_WarmupSweep/shared_warmup_51705",
+            "step": 51705,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 2020,
+            "source": "ckpt/Kangaroo-2020_Shared/shared_warmup_50192",
+            "step": 50192,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "0b0c81d046d5c49acdd123216be108f3c74fba777b0ac07208db05c5955970be",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 2235,
+            "source": "ckpt/Kangaroo-2235_WarmupSweep/shared_warmup_50403",
+            "step": 50403,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "KungFuMaster",
+            "seed": 3000,
+            "source": "ckpt/KungFuMaster-3000_Shared/shared_warmup_50459",
+            "step": 50459,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "KungFuMaster",
+            "seed": 3010,
+            "source": "ckpt/KungFuMaster-3010_Shared/shared_warmup_50213",
+            "step": 50213,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "KungFuMaster",
+            "seed": 3333,
+            "source": "ckpt/KungFuMaster-3333_WarmupSweep/shared_warmup_50477",
+            "step": 50477,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 2000,
+            "source": "ckpt/MsPacman-2000_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 3000,
+            "source": "ckpt/MsPacman-3000_Shared/shared_warmup_50008",
+            "step": 50008,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Pong",
+            "seed": 2010,
+            "source": "ckpt/Pong-2010_Shared/shared_warmup_50148",
+            "step": 50148,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Pong",
+            "seed": 3000,
+            "source": "ckpt/Pong-3000_Shared/shared_warmup_50006",
+            "step": 50006,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Pong",
+            "seed": 3333,
+            "source": "ckpt/Pong-3333_WarmupSweep/shared_warmup_51828",
+            "step": 51828,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 2000,
+            "source": "ckpt/PrivateEye-2000_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 3333,
+            "source": "ckpt/PrivateEye-3333_WarmupSweep/shared_warmup_51262",
+            "step": 51262,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Qbert",
+            "seed": 3000,
+            "source": "ckpt/Qbert-3000_Shared/shared_warmup_50142",
+            "step": 50142,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Qbert",
+            "seed": 3333,
+            "source": "ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+            "step": 50193,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "RoadRunner",
+            "seed": 3010,
+            "source": "ckpt/RoadRunner-3010_Shared/shared_warmup_50571",
+            "step": 50571,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Seaquest",
+            "seed": 3000,
+            "source": "ckpt/Seaquest-3000_Shared/shared_warmup_50815",
+            "step": 50815,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Seaquest",
+            "seed": 3010,
+            "source": "ckpt/Seaquest-3010_Shared/shared_warmup_50042",
+            "step": 50042,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "UpNDown",
+            "seed": 2000,
+            "source": "ckpt/UpNDown-2000_Shared/shared_warmup_50746",
+            "step": 50746,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "UpNDown",
+            "seed": 3000,
+            "source": "ckpt/UpNDown-3000_Shared/shared_warmup_50438",
+            "step": 50438,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "UpNDown",
+            "seed": 3333,
+            "source": "ckpt/UpNDown-3333_WarmupSweep/shared_warmup_50053",
+            "step": 50053,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "game": "Alien",
+            "seed": 1,
+            "source": "ckpt/Alien-paper-random-w50000-m2-seed1-20261107_Shared/shared_warmup_50577",
+            "step": 50577,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Alien",
+            "seed": 2000,
+            "source": "ckpt/Alien-2000_Shared/shared_warmup_50590",
+            "step": 50590,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Alien",
+            "seed": 2000,
+            "source": "ckpt/Alien-2000_Shared/shared_warmup_50676",
+            "step": 50676,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Alien",
+            "seed": 2020,
+            "source": "ckpt/Alien-2020_Shared/shared_warmup_50620",
+            "step": 50620,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Alien",
+            "seed": 3000,
+            "source": "ckpt/Alien-3000_Shared/shared_warmup_50452",
+            "step": 50452,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Alien",
+            "seed": 3020,
+            "source": "ckpt/Alien-3020_Shared/shared_warmup_50459",
+            "step": 50459,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Alien",
+            "seed": 6000,
+            "source": "ckpt/Alien-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50605",
+            "step": 50605,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Alien",
+            "seed": 6010,
+            "source": "ckpt/Alien-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50412",
+            "step": 50412,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 1,
+            "source": "ckpt/Amidar-paper-random-w50000-m2-seed1-20261107_Shared/shared_warmup_50322",
+            "step": 50322,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 2000,
+            "source": "ckpt/Amidar-2000_Shared/shared_warmup_50287",
+            "step": 50287,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 2010,
+            "source": "ckpt/Amidar-2010_Shared/shared_warmup_50071",
+            "step": 50071,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 3000,
+            "source": "ckpt/Amidar-3000_Shared/shared_warmup_50304",
+            "step": 50304,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 3020,
+            "source": "ckpt/Amidar-3020_Shared/shared_warmup_50544",
+            "step": 50544,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 6000,
+            "source": "ckpt/Amidar-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50065",
+            "step": 50065,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Amidar",
+            "seed": 6020,
+            "source": "ckpt/Amidar-paper-random-w50000-m2-seed6020-20261107_Shared/shared_warmup_50043",
+            "step": 50043,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 1,
+            "source": "ckpt/Assault-paper-random-w50000-m2-seed1-20261107_Shared/shared_warmup_50289",
+            "step": 50289,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 2000,
+            "source": "ckpt/Assault-2000_Shared/shared_warmup_50465",
+            "step": 50465,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 2020,
+            "source": "ckpt/Assault-2020_Shared/shared_warmup_50741",
+            "step": 50741,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 2030,
+            "source": "ckpt/Assault-2030_Shared/shared_warmup_50138",
+            "step": 50138,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 3710,
+            "source": "ckpt/Assault-3710_Shared/shared_warmup_50504",
+            "step": 50504,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 6000,
+            "source": "ckpt/Assault-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50162",
+            "step": 50162,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 6010,
+            "source": "ckpt/Assault-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50914",
+            "step": 50914,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 10,
+            "source": "ckpt/Asterix-paper-random-w50000-m2-seed10-20261107_Shared/shared_warmup_50182",
+            "step": 50182,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 2000,
+            "source": "ckpt/Asterix-2000_Shared/shared_warmup_50185",
+            "step": 50185,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 3000,
+            "source": "ckpt/Asterix-3000_Shared/shared_warmup_50372",
+            "step": 50372,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 3020,
+            "source": "ckpt/Asterix-3020_Shared/shared_warmup_50127",
+            "step": 50127,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 3710,
+            "source": "ckpt/Asterix-3710_Shared/shared_warmup_50039",
+            "step": 50039,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 6000,
+            "source": "ckpt/Asterix-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50304",
+            "step": 50304,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 6010,
+            "source": "ckpt/Asterix-paper-random-w50000-m2-seed6010-20261107_Shared/shared_warmup_50240",
+            "step": 50240,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 2010,
+            "source": "ckpt/BankHeist-2010_Shared/shared_warmup_50139",
+            "step": 50139,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 2020,
+            "source": "ckpt/BankHeist-2020_Shared/shared_warmup_50065",
+            "step": 50065,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 3010,
+            "source": "ckpt/BankHeist-3010_Shared/shared_warmup_50485",
+            "step": 50485,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 3030,
+            "source": "ckpt/BankHeist-3030_Shared/shared_warmup_50296",
+            "step": 50296,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 3333,
+            "source": "ckpt/BankHeist-3333_WarmupSweep/shared_warmup_50321",
+            "step": 50321,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 3334,
+            "source": "ckpt/BankHeist-3334_WarmupSweep/shared_warmup_50552",
+            "step": 50552,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 9997,
+            "source": "ckpt/BankHeist-paper-random-w50000-m2-seed9997-20261107_Shared/shared_warmup_50017",
+            "step": 50017,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 9998,
+            "source": "ckpt/BankHeist-paper-random-w50000-m2-seed9998-20261107_Shared/shared_warmup_50719",
+            "step": 50719,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 9999,
+            "source": "ckpt/BankHeist-paper-random-w50000-m2-seed9999-20261107_Shared/shared_warmup_51280",
+            "step": 51280,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 2010,
+            "source": "ckpt/BattleZone-2010_Shared/shared_warmup_50014",
+            "step": 50014,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 2020,
+            "source": "ckpt/BattleZone-2020_Shared/shared_warmup_51059",
+            "step": 51059,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 3010,
+            "source": "ckpt/BattleZone-3010_Shared/shared_warmup_50807",
+            "step": 50807,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 3030,
+            "source": "ckpt/BattleZone-3030_Shared/shared_warmup_50475",
+            "step": 50475,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 5090,
+            "source": "ckpt/BattleZone-paper-random-w50000-m2-seed5090-20261107_Shared/shared_warmup_51580",
+            "step": 51580,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 6000,
+            "source": "ckpt/BattleZone-paper-random-w50000-m2-seed6000-20261107_Shared/shared_warmup_50058",
+            "step": 50058,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "658a42f9bd194bd956838f37070ae7427d8b61f9820e094e4aa1caaca95bd8e2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 2000,
+            "source": "ckpt/Boxing-2000_Shared/shared_warmup_50058",
+            "step": 50058,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 2010,
+            "source": "ckpt/Boxing-2010_Shared/shared_warmup_50628",
+            "step": 50628,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 2020,
+            "source": "ckpt/Boxing-2020_Shared/shared_warmup_50668",
+            "step": 50668,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 2030,
+            "source": "ckpt/Boxing-2030_Shared/shared_warmup_50360",
+            "step": 50360,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 3334,
+            "source": "ckpt/Boxing-3334_WarmupSweep/shared_warmup_50971",
+            "step": 50971,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Breakout",
+            "seed": 2000,
+            "source": "ckpt/Breakout-2000_Shared/shared_warmup_50063",
+            "step": 50063,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Breakout",
+            "seed": 3000,
+            "source": "ckpt/Breakout-3000_Shared/shared_warmup_50349",
+            "step": 50349,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Breakout",
+            "seed": 3020,
+            "source": "ckpt/Breakout-3020_Shared/shared_warmup_50185",
+            "step": 50185,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Breakout",
+            "seed": 3710,
+            "source": "ckpt/Breakout-3710_Shared/shared_warmup_50099",
+            "step": 50099,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "ChopperCommand",
+            "seed": 2000,
+            "source": "ckpt/ChopperCommand-2000_Shared/shared_warmup_50211",
+            "step": 50211,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "ChopperCommand",
+            "seed": 3020,
+            "source": "ckpt/ChopperCommand-3020_Shared/shared_warmup_50529",
+            "step": 50529,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "ChopperCommand",
+            "seed": 3333,
+            "source": "ckpt/ChopperCommand-3333_WarmupSweep/shared_warmup_50299",
+            "step": 50299,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "ChopperCommand",
+            "seed": 3710,
+            "source": "ckpt/ChopperCommand-3710_Shared/shared_warmup_50115",
+            "step": 50115,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "CrazyClimber",
+            "seed": 2000,
+            "source": "ckpt/CrazyClimber-2000_Shared/shared_warmup_50250",
+            "step": 50250,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "CrazyClimber",
+            "seed": 3000,
+            "source": "ckpt/CrazyClimber-3000_Shared/shared_warmup_51536",
+            "step": 51536,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "CrazyClimber",
+            "seed": 3020,
+            "source": "ckpt/CrazyClimber-3020_Shared/shared_warmup_50470",
+            "step": 50470,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "CrazyClimber",
+            "seed": 3710,
+            "source": "ckpt/CrazyClimber-3710_Shared/shared_warmup_50617",
+            "step": 50617,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "DemonAttack",
+            "seed": 2000,
+            "source": "ckpt/DemonAttack-2000_Shared/shared_warmup_51033",
+            "step": 51033,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "DemonAttack",
+            "seed": 3000,
+            "source": "ckpt/DemonAttack-3000_Shared/shared_warmup_50277",
+            "step": 50277,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "DemonAttack",
+            "seed": 3020,
+            "source": "ckpt/DemonAttack-3020_Shared/shared_warmup_50347",
+            "step": 50347,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "DemonAttack",
+            "seed": 3710,
+            "source": "ckpt/DemonAttack-3710_Shared/shared_warmup_50224",
+            "step": 50224,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 2010,
+            "source": "ckpt/Freeway-2010_Shared/shared_warmup_51200",
+            "step": 51200,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 2020,
+            "source": "ckpt/Freeway-2020_Shared/shared_warmup_51200",
+            "step": 51200,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 2030,
+            "source": "ckpt/Freeway-2030_Shared/shared_warmup_51200",
+            "step": 51200,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 2040,
+            "source": "ckpt/Freeway-2040_Shared/shared_warmup_51200",
+            "step": 51200,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "35aaf509e272fa9828dbcd09a594a8c944ce51707b1f2fd933be1835bad2c2e6",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 3334,
+            "source": "ckpt/Freeway-3334_WarmupSweep/shared_warmup_51200",
+            "step": 51200,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d187b72007338cdfbf1780914707f39985eec06af7b19c10590482e109640ee4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 2000,
+            "source": "ckpt/Frostbite-2000_Shared/shared_warmup_50276",
+            "step": 50276,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 2710,
+            "source": "ckpt/Frostbite-2710_Shared/shared_warmup_50147",
+            "step": 50147,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 3000,
+            "source": "ckpt/Frostbite-3000_Shared/shared_warmup_50180",
+            "step": 50180,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 3710,
+            "source": "ckpt/Frostbite-3710_Shared/shared_warmup_50537",
+            "step": 50537,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 2000,
+            "source": "ckpt/Gopher-2000_Shared/shared_warmup_50130",
+            "step": 50130,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 2010,
+            "source": "ckpt/Gopher-2010_Shared/shared_warmup_50686",
+            "step": 50686,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 2020,
+            "source": "ckpt/Gopher-2020_Shared/shared_warmup_51164",
+            "step": 51164,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 3000,
+            "source": "ckpt/Gopher-3000_Shared/shared_warmup_50271",
+            "step": 50271,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 3333,
+            "source": "ckpt/Gopher-3333_WarmupSweep/shared_warmup_50377",
+            "step": 50377,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Hero",
+            "seed": 2000,
+            "source": "ckpt/Hero-2000_Shared/shared_warmup_50207",
+            "step": 50207,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Hero",
+            "seed": 3020,
+            "source": "ckpt/Hero-3020_Shared/shared_warmup_50465",
+            "step": 50465,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Hero",
+            "seed": 3710,
+            "source": "ckpt/Hero-3710_Shared/shared_warmup_50130",
+            "step": 50130,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 2000,
+            "source": "ckpt/Jamesbond-2000_Shared/shared_warmup_50974",
+            "step": 50974,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 2010,
+            "source": "ckpt/Jamesbond-2010_Shared/shared_warmup_50383",
+            "step": 50383,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 2020,
+            "source": "ckpt/Jamesbond-2020_Shared/shared_warmup_51234",
+            "step": 51234,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 3010,
+            "source": "ckpt/Jamesbond-3010_Shared/shared_warmup_51050",
+            "step": 51050,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 2010,
+            "source": "ckpt/Kangaroo-2010_Shared/shared_warmup_50270",
+            "step": 50270,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 2110,
+            "source": "ckpt/Kangaroo-2110_Shared/shared_warmup_51122",
+            "step": 51122,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 3010,
+            "source": "ckpt/Kangaroo-3010_Shared/shared_warmup_50119",
+            "step": 50119,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 10,
+            "source": "ckpt/Krull-10_Shared/shared_warmup_50454",
+            "step": 50454,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 2020,
+            "source": "ckpt/Krull-2020_Shared/shared_warmup_50648",
+            "step": 50648,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 2110,
+            "source": "ckpt/Krull-2110_Shared/shared_warmup_57054",
+            "step": 57054,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "7af343d9daae68ffddcadb126001257758e147da3a8e0459cbd9da28804e37ed",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 3333,
+            "source": "ckpt/Krull-3333_WarmupSweep/shared_warmup_51014",
+            "step": 51014,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 6020,
+            "source": "ckpt/Krull-6020_Shared/shared_warmup_50348",
+            "step": 50348,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 6050,
+            "source": "ckpt/Krull-6050_Shared/shared_warmup_50404",
+            "step": 50404,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "8e10296f6ed0f714b3d8668dfd3f2c5f3a98f8283b30aabf4336b4b28dd797cb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "KungFuMaster",
+            "seed": 2000,
+            "source": "ckpt/KungFuMaster-2000_Shared/shared_warmup_50492",
+            "step": 50492,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "KungFuMaster",
+            "seed": 2020,
+            "source": "ckpt/KungFuMaster-2020_Shared/shared_warmup_50932",
+            "step": 50932,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 2000,
+            "source": "ckpt/MsPacman-2000_Shared/shared_warmup_50288",
+            "step": 50288,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 2000,
+            "source": "ckpt/MsPacman-2000_Shared/shared_warmup_50683",
+            "step": 50683,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 2010,
+            "source": "ckpt/MsPacman-2010_Shared/shared_warmup_50678",
+            "step": 50678,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 3010,
+            "source": "ckpt/MsPacman-3010_Shared/shared_warmup_50843",
+            "step": 50843,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 3333,
+            "source": "ckpt/MsPacman-3333_WarmupSweep/shared_warmup_50852",
+            "step": 50852,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Pong",
+            "seed": 2000,
+            "source": "ckpt/Pong-2000_Shared/shared_warmup_52171",
+            "step": 52171,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Pong",
+            "seed": 2020,
+            "source": "ckpt/Pong-2020_Shared/shared_warmup_51184",
+            "step": 51184,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Pong",
+            "seed": 3710,
+            "source": "ckpt/Pong-3710_Shared/shared_warmup_52668",
+            "step": 52668,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 2000,
+            "source": "ckpt/PrivateEye-2000_Shared/shared_warmup_51262",
+            "step": 51262,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 2010,
+            "source": "ckpt/PrivateEye-2010_Shared/shared_warmup_51262",
+            "step": 51262,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 3000,
+            "source": "ckpt/PrivateEye-3000_Shared/shared_warmup_51262",
+            "step": 51262,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 3010,
+            "source": "ckpt/PrivateEye-3010_Shared/shared_warmup_51262",
+            "step": 51262,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "735d45f37008140b13a35dafca8af29ae236c794d76d30065a47fcfcd7b631eb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Qbert",
+            "seed": 2000,
+            "source": "ckpt/Qbert-2000_Shared/shared_warmup_50309",
+            "step": 50309,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Qbert",
+            "seed": 2010,
+            "source": "ckpt/Qbert-2010_Shared/shared_warmup_50061",
+            "step": 50061,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Qbert",
+            "seed": 3020,
+            "source": "ckpt/Qbert-3020_Shared/shared_warmup_50442",
+            "step": 50442,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "RoadRunner",
+            "seed": 2010,
+            "source": "ckpt/RoadRunner-2010_Shared/shared_warmup_50620",
+            "step": 50620,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "RoadRunner",
+            "seed": 2020,
+            "source": "ckpt/RoadRunner-2020_Shared/shared_warmup_50442",
+            "step": 50442,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "RoadRunner",
+            "seed": 2030,
+            "source": "ckpt/RoadRunner-2030_Shared/shared_warmup_50365",
+            "step": 50365,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "RoadRunner",
+            "seed": 3333,
+            "source": "ckpt/RoadRunner-3333_WarmupSweep/shared_warmup_50780",
+            "step": 50780,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Seaquest",
+            "seed": 2000,
+            "source": "ckpt/Seaquest-2000_Shared/shared_warmup_50141",
+            "step": 50141,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Seaquest",
+            "seed": 2010,
+            "source": "ckpt/Seaquest-2010_Shared/shared_warmup_50859",
+            "step": 50859,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Seaquest",
+            "seed": 3333,
+            "source": "ckpt/Seaquest-3333_WarmupSweep/shared_warmup_50262",
+            "step": 50262,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "d939b61db145c46f1dd5271429231e159e60a0b6cebfa8ddfda03eedcf56923f",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "UpNDown",
+            "seed": 2010,
+            "source": "ckpt/UpNDown-2010_Shared/shared_warmup_50880",
+            "step": 50880,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "UpNDown",
+            "seed": 3020,
+            "source": "ckpt/UpNDown-3020_Shared/shared_warmup_52612",
+            "step": 52612,
+            "scanned_at": "2026-11-23T07:49:30.225771+00:00",
+            "config_sha256": "a4a67c684848161e898e4b59568aa4de9fcd8450add3cb52633a4a1f19d1257d",
+            "targets": [
+              50000
+            ]
+          }
+        ]
+      }
+    },
+    "A6000": {
+      "A6000": {
+        "keep": [
+          {
+            "game": "BattleZone",
+            "seed": 6000,
+            "source": "ckpt/BattleZone-6000_Shared/shared_warmup_50711",
+            "step": 50711,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BattleZone",
+            "seed": 6020,
+            "source": "ckpt/BattleZone-6020_Shared/shared_warmup_50450",
+            "step": 50450,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 6010,
+            "source": "ckpt/Boxing-6010_Shared/shared_warmup_51575",
+            "step": 51575,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "a192a1c03009bc91145de80e7c13d73e8dc27983134967d5587daa7275932c58",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 6020,
+            "source": "ckpt/Boxing-6020_Both/shared_warmup_50406",
+            "step": 50406,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Boxing",
+            "seed": 6040,
+            "source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+            "step": 50048,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "CrazyClimber",
+            "seed": 6020,
+            "source": "ckpt/CrazyClimber-6020_Shared/shared_warmup_53133",
+            "step": 53133,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 6000,
+            "source": "ckpt/Freeway-6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "7eabbe47d7750eb362385ce809664f4a7b89ae19498b87cd5d6dfaa1aa780215",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 6010,
+            "source": "ckpt/Freeway-6010_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "7eabbe47d7750eb362385ce809664f4a7b89ae19498b87cd5d6dfaa1aa780215",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Freeway",
+            "seed": 6020,
+            "source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+            "step": 51200,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "8e623bc0594a5bd902c54b3745658f449ab729c320028bd01305e2938be9f714",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 6010,
+            "source": "ckpt/Jamesbond-6010_Shared/shared_warmup_50135",
+            "step": 50135,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "d73fb4959e8f17da420490ed00833507e2c983d814bdb6d4aebc557aa60e6226",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 6030,
+            "source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+            "step": 50067,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 6040,
+            "source": "ckpt/Kangaroo-6040_Shared/shared_warmup_50211",
+            "step": 50211,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 6050,
+            "source": "ckpt/Krull-6050_Shared/shared_warmup_50452",
+            "step": 50452,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 6070,
+            "source": "ckpt/Krull-6070_Shared/shared_warmup_51367",
+            "step": 51367,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 7000,
+            "source": "ckpt/Krull-7000_Shared/shared_warmup_51060",
+            "step": 51060,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 7020,
+            "source": "ckpt/Krull-7020_Shared/shared_warmup_50529",
+            "step": 50529,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "KungFuMaster",
+            "seed": 6000,
+            "source": "ckpt/KungFuMaster-6000_Shared/shared_warmup_50667",
+            "step": 50667,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "RoadRunner",
+            "seed": 6030,
+            "source": "ckpt/RoadRunner-6030_Shared/shared_warmup_51024",
+            "step": 51024,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "RoadRunner",
+            "seed": 6040,
+            "source": "ckpt/RoadRunner-6040_Shared/shared_warmup_50507",
+            "step": 50507,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "RoadRunner",
+            "seed": 6060,
+            "source": "ckpt/RoadRunner-6060_Shared/shared_warmup_50218",
+            "step": 50218,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "UpNDown",
+            "seed": 6030,
+            "source": "ckpt/UpNDown-6030_Shared/shared_warmup_50056",
+            "step": 50056,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "game": "Amidar",
+            "seed": 6020,
+            "source": "ckpt/Amidar-6020_Shared/shared_warmup_50791",
+            "step": 50791,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Assault",
+            "seed": 6010,
+            "source": "ckpt/Assault-6010_Shared/shared_warmup_50537",
+            "step": 50537,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "9f2a23b349bb683d78649071de91782261fa9adc830a652c4637bbcd2596f7fb",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 6000,
+            "source": "ckpt/Asterix-6000_Shared/shared_warmup_50011",
+            "step": 50011,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Asterix",
+            "seed": 6010,
+            "source": "ckpt/Asterix-6010_Shared/shared_warmup_50038",
+            "step": 50038,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Breakout",
+            "seed": 6000,
+            "source": "ckpt/Breakout-6000_Shared/shared_warmup_50235",
+            "step": 50235,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 6000,
+            "source": "ckpt/Frostbite-6000_Shared/shared_warmup_50304",
+            "step": 50304,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 6010,
+            "source": "ckpt/Frostbite-6010_Shared/shared_warmup_50294",
+            "step": 50294,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Hero",
+            "seed": 3710,
+            "source": "ckpt/Hero-3710_Shared/shared_warmup_50393",
+            "step": 50393,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c7c53717fd69725d3716c2ef2ddb37024adaa8014d4f0a8ca0d512fa0fce002c",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 6000,
+            "source": "ckpt/Jamesbond-6000_Shared/shared_warmup_50054",
+            "step": 50054,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 6000,
+            "source": "ckpt/Kangaroo-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 6010,
+            "source": "ckpt/Kangaroo-life_done-wm_2L512D8H-100k-seed6010_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 6020,
+            "source": "ckpt/Kangaroo-6020_Shared/shared_warmup_50230",
+            "step": 50230,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 6050,
+            "source": "ckpt/Kangaroo-6050_Shared/shared_warmup_50343",
+            "step": 50343,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 7000,
+            "source": "ckpt/Kangaroo-7000_Shared/shared_warmup_50295",
+            "step": 50295,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 7010,
+            "source": "ckpt/Kangaroo-7010_Shared/shared_warmup_50213",
+            "step": 50213,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Kangaroo",
+            "seed": 7020,
+            "source": "ckpt/Kangaroo-7020_Shared/shared_warmup_50238",
+            "step": 50238,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 6000,
+            "source": "ckpt/Krull-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 6020,
+            "source": "ckpt/Krull-6020_Both/shared_warmup_51133",
+            "step": 51133,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 7010,
+            "source": "ckpt/Krull-7010_Shared/shared_warmup_50126",
+            "step": 50126,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 6000,
+            "source": "ckpt/MsPacman-6000_Shared/shared_warmup_50105",
+            "step": 50105,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "b66453ba63197a8c909b7be3464cfed35bd9a7de51271bbd8c69ef5f643ebce5",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 6010,
+            "source": "ckpt/MsPacman-6010_Shared/shared_warmup_50003",
+            "step": 50003,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "991112ddc37491c5e87b7ee06a9ac5608c952128b224ea7d1e2e4075baedc167",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "MsPacman",
+            "seed": 6020,
+            "source": "ckpt/MsPacman-6020_Shared/shared_warmup_50512",
+            "step": 50512,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "2464e0358383c356f2041e625546df221a030b0abe91c279635c2a7e5f29640c",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 6000,
+            "source": "ckpt/PrivateEye-6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 6010,
+            "source": "ckpt/PrivateEye-myserver-6010_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 6020,
+            "source": "ckpt/PrivateEye-myserver-6020_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 6040,
+            "source": "ckpt/PrivateEye-6040_Shared/shared_warmup_51262",
+            "step": 51262,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "0f9079b8d6d9d796fa60ca15a47b2fe583444445ca403380d533fae45a287cb7",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Qbert",
+            "seed": 6010,
+            "source": "ckpt/Qbert-6010_Shared/shared_warmup_50559",
+            "step": 50559,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Seaquest",
+            "seed": 6000,
+            "source": "ckpt/Seaquest-life_done-wm_2L512D8H-100k-seed6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:27:35.823860+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          }
+        ]
+      }
+    },
+    "TITAN_RTX": {
+      "choemj": {
+        "keep": [
+          {
+            "game": "BankHeist",
+            "seed": 9997,
+            "source": "ckpt/BankHeist-9997_Shared/shared_warmup_50443",
+            "step": 50443,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 9998,
+            "source": "ckpt/BankHeist-9998_Both/shared_warmup_50394",
+            "step": 50394,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "BankHeist",
+            "seed": 9999,
+            "source": "ckpt/BankHeist-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 9993,
+            "source": "ckpt/Gopher-9993_Shared/shared_warmup_50716",
+            "step": 50716,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 9994,
+            "source": "ckpt/Gopher-9994_Shared/shared_warmup_50297",
+            "step": 50297,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 9997,
+            "source": "ckpt/Gopher-9997_Shared/shared_warmup_50444",
+            "step": 50444,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 9998,
+            "source": "ckpt/Gopher-9998_Shared/shared_warmup_50694",
+            "step": 50694,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "b66453ba63197a8c909b7be3464cfed35bd9a7de51271bbd8c69ef5f643ebce5",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Jamesbond",
+            "seed": 9999,
+            "source": "ckpt/Jamesbond-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Pong",
+            "seed": 9999,
+            "source": "ckpt/Pong-9999_Shared/shared_warmup_50935",
+            "step": 50935,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "targets": [
+              50000
+            ]
+          }
+        ],
+        "delete": [
+          {
+            "game": "BankHeist",
+            "seed": 9999,
+            "source": "ckpt/BankHeist-9999_Shared/shared_warmup_50032",
+            "step": 50032,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Breakout",
+            "seed": 9999,
+            "source": "ckpt/Breakout-9999_Shared/shared_warmup_50236",
+            "step": 50236,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Frostbite",
+            "seed": 9999,
+            "source": "ckpt/Frostbite-9999_Shared/shared_warmup_50867",
+            "step": 50867,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "6256915671305b2ec3544d395ec69209038755c0fa417e6f09cbae4b24edbbe2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 9998,
+            "source": "ckpt/Gopher-9998_Both/shared_warmup_50694",
+            "step": 50694,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 9999,
+            "source": "ckpt/Gopher-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 12000,
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12000-try2_WarmupSweep/shared_warmup_50737",
+            "step": 50737,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 12001,
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12001-try1_WarmupSweep/shared_warmup_50226",
+            "step": 50226,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Gopher",
+            "seed": 12002,
+            "source": "ckpt/Gopher-score-search-20261110T011417Z-9ec157-seed12002-try1_WarmupSweep/shared_warmup_50452",
+            "step": 50452,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "5de7e94c302ea103c22b0780ef11e5d50edf31cb6376daa61e3b1f69f09535f2",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Krull",
+            "seed": 9999,
+            "source": "ckpt/Krull-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "PrivateEye",
+            "seed": 9999,
+            "source": "ckpt/PrivateEye-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Seaquest",
+            "seed": 9999,
+            "source": "ckpt/Seaquest-9999_Shared/shared_warmup_51050",
+            "step": 51050,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "targets": [
+              50000
+            ]
+          },
+          {
+            "game": "Seaquest",
+            "seed": 9999,
+            "source": "ckpt/Seaquest-myserver-9999_Both/shared_warmup_50000",
+            "step": 50000,
+            "scanned_at": "2026-11-23T07:48:28.576412+00:00",
+            "config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "targets": [
+              50000
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "games": {
+    "Alien": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.1058638530993203,
+      "workbook_gpu_types": [
+        "3090"
+      ],
+      "before_consolidation_hns": 0.10586385309932028,
+      "kept_hns": 0.10586385309932028,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Alien-3333_WarmupSweep/shared_warmup_50062",
+          "hns": 0.08249394918766939,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "7vsf4n7g"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/Alien-3334_WarmupSweep/shared_warmup_50721",
+          "hns": 0.12923375701097117,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "a3mztuge"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Amidar": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.07774114489117115,
+      "workbook_gpu_types": [
+        "3090"
+      ],
+      "before_consolidation_hns": 0.07774114489117115,
+      "kept_hns": 0.07774114489117115,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Amidar-3333_WarmupSweep/shared_warmup_50728",
+          "hns": 0.07008227811168816,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "kkr7f4s4"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/Amidar-3334_WarmupSweep/shared_warmup_50264",
+          "hns": 0.08540001167065414,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "6kz9argm"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Assault": {
+      "keep_count": 2,
+      "paper_warning": true,
+      "workbook_hns": 0.9252790608160124,
+      "workbook_gpu_types": [
+        "3090"
+      ],
+      "before_consolidation_hns": 0.9252790608160124,
+      "kept_hns": 0.9252790608160124,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Assault-3333_WarmupSweep/shared_warmup_51098",
+          "hns": 0.9135873749037722,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "9ommexj3"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/Assault-3334_WarmupSweep/shared_warmup_50219",
+          "hns": 0.9369707467282525,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "zxxzghef"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Asterix": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.06812728346978887,
+      "workbook_gpu_types": [
+        "3090"
+      ],
+      "before_consolidation_hns": 0.06812728346978887,
+      "kept_hns": 0.06812728346978887,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Asterix-3333_WarmupSweep/shared_warmup_50106",
+          "hns": 0.07053886872535661,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "kk7glrb7"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/Asterix-3334_WarmupSweep/shared_warmup_50312",
+          "hns": 0.06571569821422113,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "gp04bsql"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "BankHeist": {
+      "keep_count": 4,
+      "paper_warning": true,
+      "workbook_hns": 0.6055284882934091,
+      "workbook_gpu_types": [
+        "3090",
+        "TITAN_RTX"
+      ],
+      "before_consolidation_hns": 0.797198538367844,
+      "kept_hns": 0.797198538367844,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2010,
+          "source": "ckpt/BankHeist-2010_Shared/shared_warmup_50918",
+          "hns": 0.9775341724184599,
+          "score_method": "Retrieval on (t=1, target1)",
+          "run_ids": [
+            "n2o8ai7o"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9997,
+          "source": "ckpt/BankHeist-9997_Shared/shared_warmup_50443",
+          "hns": 0.40506157802138315,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "0gyzvcbv"
+          ],
+          "owner_note": "기존 큐 소유 GPU 3090"
+        },
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9998,
+          "source": "ckpt/BankHeist-9998_Both/shared_warmup_50394",
+          "hns": 0.9206929219109486,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "qtnmt54d"
+          ],
+          "owner_note": "기존 큐 소유 GPU 3090"
+        },
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9999,
+          "source": "ckpt/BankHeist-myserver-9999_Both/shared_warmup_50000",
+          "hns": 0.8855054811205846,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "fjepojgh"
+          ],
+          "owner_note": "기존 큐 소유 GPU 3090"
+        }
+      ]
+    },
+    "BattleZone": {
+      "keep_count": 4,
+      "paper_warning": false,
+      "workbook_hns": 0.2419783217285191,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 0.24197832172851913,
+      "kept_hns": 0.24197832172851913,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/BattleZone-3333_WarmupSweep/shared_warmup_50048",
+          "hns": 0.10164381595003948,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "x3fl3r1m"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/BattleZone-3334_WarmupSweep/shared_warmup_50079",
+          "hns": 0.23946593927212692,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "4a63cor3"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6000,
+          "source": "ckpt/BattleZone-6000_Shared/shared_warmup_50711",
+          "hns": 0.5021893618548561,
+          "score_method": "Retrieval on (t=16, add)",
+          "run_ids": [
+            "388nq0zg"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6020,
+          "source": "ckpt/BattleZone-6020_Shared/shared_warmup_50450",
+          "hns": 0.12461416983705405,
+          "score_method": "Retrieval on (t=16, add)",
+          "run_ids": [
+            "d2abfmkr"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        }
+      ]
+    },
+    "Boxing": {
+      "keep_count": 4,
+      "paper_warning": true,
+      "workbook_hns": 6.159375000000001,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 6.752083333333334,
+      "kept_hns": 6.752083333333334,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Boxing-3333_WarmupSweep/shared_warmup_50981",
+          "hns": 5.983333333333334,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "fgmizkxh"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6010,
+          "source": "ckpt/Boxing-6010_Shared/shared_warmup_51575",
+          "hns": 6.829166666666667,
+          "score_method": "Retrieval on (t=1, target1)",
+          "run_ids": [
+            "aw155gil"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6020,
+          "source": "ckpt/Boxing-6020_Both/shared_warmup_50406",
+          "hns": 7.316666666666667,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "ykhthbew"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6040,
+          "source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+          "hns": 6.879166666666667,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "sq9rmczm"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Breakout": {
+      "keep_count": 2,
+      "paper_warning": true,
+      "workbook_hns": 0.3628472222222222,
+      "workbook_gpu_types": [
+        "3090"
+      ],
+      "before_consolidation_hns": 0.3637152777777778,
+      "kept_hns": 0.3628472222222222,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Breakout-3333_WarmupSweep/shared_warmup_50333",
+          "hns": 0.3697916666666667,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "quqftql8"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/Breakout-3334_WarmupSweep/shared_warmup_50466",
+          "hns": 0.3559027777777778,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "lwvexef2"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "ChopperCommand": {
+      "keep_count": 2,
+      "paper_warning": true,
+      "workbook_hns": 0.08955723148035519,
+      "workbook_gpu_types": [
+        "3090"
+      ],
+      "before_consolidation_hns": 0.09563921664031139,
+      "kept_hns": 0.09563921664031139,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3000,
+          "source": "ckpt/ChopperCommand-3000_Shared/shared_warmup_50390",
+          "hns": 0.06294854640554677,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "saqf18kh"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/ChopperCommand-3334_WarmupSweep/shared_warmup_50968",
+          "hns": 0.12832988687507602,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "kr1jsh8b"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "CrazyClimber": {
+      "keep_count": 4,
+      "paper_warning": true,
+      "workbook_hns": 1.755496249336298,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 1.7766548630878,
+      "kept_hns": 1.7766548630878,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2000,
+          "source": "ckpt/CrazyClimber-2000_Shared/shared_warmup_52441",
+          "hns": 1.8836954916183943,
+          "score_method": "Retrieval on (t=16, add)",
+          "run_ids": [
+            "bedi2fsj"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/CrazyClimber-3333_WarmupSweep/shared_warmup_50890",
+          "hns": 1.5216037430785383,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "r1len3mf"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/CrazyClimber-3334_WarmupSweep/shared_warmup_50552",
+          "hns": 1.7042464938580135,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "m8py1tm9"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6020,
+          "source": "ckpt/CrazyClimber-6020_Shared/shared_warmup_53133",
+          "hns": 1.9970737237962544,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "psz02qu1"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        }
+      ]
+    },
+    "DemonAttack": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.02248611798339656,
+      "workbook_gpu_types": [
+        "3090"
+      ],
+      "before_consolidation_hns": 0.02248611798339656,
+      "kept_hns": 0.02248611798339656,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/DemonAttack-3333_WarmupSweep/shared_warmup_50223",
+          "hns": 0.024272912199681126,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "8ghm59vj"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3334,
+          "source": "ckpt/DemonAttack-3334_WarmupSweep/shared_warmup_51189",
+          "hns": 0.020699323767111994,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "wbg3b5ml"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Freeway": {
+      "keep_count": 4,
+      "paper_warning": false,
+      "workbook_hns": 1.126266891891892,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 1.1262668918918917,
+      "kept_hns": 1.1262668918918917,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Freeway-3333_WarmupSweep/shared_warmup_51200",
+          "hns": 1.1249999999999998,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "76f2ht2y"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6000,
+          "source": "ckpt/Freeway-6000_Both/shared_warmup_50000",
+          "hns": 1.1334459459459458,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "cofe2vbz"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6010,
+          "source": "ckpt/Freeway-6010_Both/shared_warmup_50000",
+          "hns": 1.1064189189189189,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "bctqzwwt"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6020,
+          "source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+          "hns": 1.1402027027027026,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "wq5mxpwt"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        }
+      ]
+    },
+    "Frostbite": {
+      "keep_count": 4,
+      "paper_warning": false,
+      "workbook_hns": 0.4092809462466331,
+      "workbook_gpu_types": [
+        "3090"
+      ],
+      "before_consolidation_hns": 0.4092809462466331,
+      "kept_hns": 0.4092809462466331,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Frostbite-3333_WarmupSweep/shared_warmup_50135",
+          "hns": 0.04398641527110903,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "fd32blfo"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 11010,
+          "source": "ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11010_Shared/shared_warmup_50855",
+          "hns": 0.5545848460007027,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "2162vfan"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 11021,
+          "source": "ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11021_Shared/shared_warmup_50350",
+          "hns": 0.623679587773744,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "v6ynrc8k"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 11023,
+          "source": "ckpt/Frostbite-score-screen-frostbite_neighbor_screen_20261107-seed11023_Shared/shared_warmup_50358",
+          "hns": 0.4148729359409767,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "gpgp6cbi"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Gopher": {
+      "keep_count": 4,
+      "paper_warning": false,
+      "workbook_hns": 2.638243073924544,
+      "workbook_gpu_types": [
+        "3090",
+        "TITAN_RTX"
+      ],
+      "before_consolidation_hns": 2.638243073924544,
+      "kept_hns": 3.0154067474128725,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9993,
+          "source": "ckpt/Gopher-9993_Shared/shared_warmup_50716",
+          "hns": 2.2685043389484427,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "hv0vm0l6"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9994,
+          "source": "ckpt/Gopher-9994_Shared/shared_warmup_50297",
+          "hns": 4.170680774049839,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "fm363ogk"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9997,
+          "source": "ckpt/Gopher-9997_Shared/shared_warmup_50444",
+          "hns": 3.666713072532368,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "i327smvq"
+          ],
+          "owner_note": "기존 큐 소유 GPU 3090"
+        },
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9998,
+          "source": "ckpt/Gopher-9998_Shared/shared_warmup_50694",
+          "hns": 1.9557288041208407,
+          "score_method": "Retrieval on (t=1, target1)",
+          "run_ids": [
+            "mt02ehq0"
+          ],
+          "owner_note": "기존 큐 소유 GPU 3090"
+        }
+      ]
+    },
+    "Hero": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.3943367987274912,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 0.39433679872749117,
+      "kept_hns": 0.4108597824117264,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3000,
+          "source": "ckpt/Hero-3000_Shared/shared_warmup_50475",
+          "hns": 0.41643455908508226,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "wsuev5is"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Hero-3333_WarmupSweep/shared_warmup_50030",
+          "hns": 0.40528500573837056,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "y7i3smh7"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Jamesbond": {
+      "keep_count": 4,
+      "paper_warning": false,
+      "workbook_hns": 1.650611760409058,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000",
+        "TITAN_RTX"
+      ],
+      "before_consolidation_hns": 1.6506117604090575,
+      "kept_hns": 1.6506117604090575,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2000,
+          "source": "ckpt/Jamesbond-2000_Both/shared_warmup_50000",
+          "hns": 2.1356829802775747,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "jaw7ayeo",
+            "ythg879x"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Jamesbond-3333_WarmupSweep/shared_warmup_51705",
+          "hns": 1.9211102994886777,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "va9z85du"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6010,
+          "source": "ckpt/Jamesbond-6010_Shared/shared_warmup_50135",
+          "hns": 1.2819576333089846,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "ehqtwe50"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        },
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9999,
+          "source": "ckpt/Jamesbond-9999_Both/shared_warmup_50000",
+          "hns": 1.2636961285609933,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "uf5wn792"
+          ],
+          "owner_note": "기존 큐 소유 GPU 3090"
+        }
+      ]
+    },
+    "Kangaroo": {
+      "keep_count": 4,
+      "paper_warning": true,
+      "workbook_hns": 0.7638702648340596,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 1.4691166610794502,
+      "kept_hns": 1.4691166610794502,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2020,
+          "source": "ckpt/Kangaroo-2020_Shared/shared_warmup_50192",
+          "hns": 1.0276567214213879,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "27t3bde3",
+            "6b3e7ffa"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2235,
+          "source": "ckpt/Kangaroo-2235_WarmupSweep/shared_warmup_50403",
+          "hns": 2.999664767013074,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "syk4l7z9"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6030,
+          "source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+          "hns": 1.0670465973851826,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "pkcsggmh"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6040,
+          "source": "ckpt/Kangaroo-6040_Shared/shared_warmup_50211",
+          "hns": 0.7820985584981562,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "vzgi4ob3"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Krull": {
+      "keep_count": 4,
+      "paper_warning": false,
+      "workbook_hns": 4.680210772833724,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000",
+        "TITAN_RTX"
+      ],
+      "before_consolidation_hns": 4.680210772833724,
+      "kept_hns": 5.136651053864169,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6050,
+          "source": "ckpt/Krull-6050_Shared/shared_warmup_50452",
+          "hns": 6.194379391100703,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "nlo7aywj"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6070,
+          "source": "ckpt/Krull-6070_Shared/shared_warmup_51367",
+          "hns": 4.655737704918033,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "0p5xvjs6"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 7000,
+          "source": "ckpt/Krull-7000_Shared/shared_warmup_51060",
+          "hns": 4.565807962529274,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "1f15ac6n"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 7020,
+          "source": "ckpt/Krull-7020_Shared/shared_warmup_50529",
+          "hns": 5.130679156908665,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "kw1uxov7"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "KungFuMaster": {
+      "keep_count": 4,
+      "paper_warning": true,
+      "workbook_hns": 0.8626177828791075,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 0.8626177828791075,
+      "kept_hns": 0.8626177828791075,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3000,
+          "source": "ckpt/KungFuMaster-3000_Shared/shared_warmup_50459",
+          "hns": 0.9740499515077099,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "8rkdy1r6"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3010,
+          "source": "ckpt/KungFuMaster-3010_Shared/shared_warmup_50213",
+          "hns": 0.8524633193639948,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "cqtuuibn"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/KungFuMaster-3333_WarmupSweep/shared_warmup_50477",
+          "hns": 0.525029139862442,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "bpap0iop"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6000,
+          "source": "ckpt/KungFuMaster-6000_Shared/shared_warmup_50667",
+          "hns": 1.098928720782283,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "d4b34vu3"
+          ],
+          "owner_note": "여러 GPU에 존재 · 3090, A6000"
+        }
+      ]
+    },
+    "MsPacman": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.2943048929157323,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 0.29430489291573225,
+      "kept_hns": 0.275642279848893,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2000,
+          "source": "ckpt/MsPacman-2000_Both/shared_warmup_50000",
+          "hns": 0.31315563716268074,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "c0he2io2"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3000,
+          "source": "ckpt/MsPacman-3000_Shared/shared_warmup_50008",
+          "hns": 0.2381289225351053,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "1gbfqc1r"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Pong": {
+      "keep_count": 4,
+      "paper_warning": true,
+      "workbook_hns": 0.4702549575070822,
+      "workbook_gpu_types": [
+        "3090",
+        "TITAN_RTX"
+      ],
+      "before_consolidation_hns": 0.4702549575070822,
+      "kept_hns": 0.4702549575070822,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2010,
+          "source": "ckpt/Pong-2010_Shared/shared_warmup_50148",
+          "hns": 0.02266288951841362,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "x78f4ijl"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3000,
+          "source": "ckpt/Pong-3000_Shared/shared_warmup_50006",
+          "hns": 0.4546742209631728,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "5ohgw6j3"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Pong-3333_WarmupSweep/shared_warmup_51828",
+          "hns": 0.3555240793201133,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "tb9tpdtv"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "TITAN_RTX",
+          "machine": "choemj",
+          "seed": 9999,
+          "source": "ckpt/Pong-9999_Shared/shared_warmup_50935",
+          "hns": 1.048158640226629,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "36m2817w"
+          ],
+          "owner_note": "기존 큐 소유 GPU 3090"
+        }
+      ]
+    },
+    "PrivateEye": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.02661029183394108,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 0.026610291833941077,
+      "kept_hns": 0.1074789636846767,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2000,
+          "source": "ckpt/PrivateEye-2000_Both/shared_warmup_50000",
+          "hns": 0.00250839727146193,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "opw0lphp"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/PrivateEye-3333_WarmupSweep/shared_warmup_51262",
+          "hns": 0.21244953009789147,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "vznkly9o"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Qbert": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.2661912858980822,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 0.26619128589808216,
+      "kept_hns": 0.24573586836303993,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3000,
+          "source": "ckpt/Qbert-3000_Shared/shared_warmup_50142",
+          "hns": 0.2595609091798271,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "t2ae11sq"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
+          "hns": 0.23191082754625275,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "wr9me8cp"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "RoadRunner": {
+      "keep_count": 4,
+      "paper_warning": false,
+      "workbook_hns": 2.405342439522563,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 2.4053424395225633,
+      "kept_hns": 2.4053424395225633,
+      "scored_count": 4,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3010,
+          "source": "ckpt/RoadRunner-3010_Shared/shared_warmup_50571",
+          "hns": 2.9850641475713284,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "9tklyh03"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6030,
+          "source": "ckpt/RoadRunner-6030_Shared/shared_warmup_51024",
+          "hns": 2.2721005936043914,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "9otj3c2z"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6040,
+          "source": "ckpt/RoadRunner-6040_Shared/shared_warmup_50507",
+          "hns": 2.3569924044169275,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "c5owpc1z"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6060,
+          "source": "ckpt/RoadRunner-6060_Shared/shared_warmup_50218",
+          "hns": 2.0072126124976064,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "5oc6ezfk"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "Seaquest": {
+      "keep_count": 2,
+      "paper_warning": false,
+      "workbook_hns": 0.009183948097355567,
+      "workbook_gpu_types": [
+        "3090",
+        "TITAN_RTX"
+      ],
+      "before_consolidation_hns": 0.009183948097355567,
+      "kept_hns": 0.007933540226216649,
+      "scored_count": 2,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3000,
+          "source": "ckpt/Seaquest-3000_Shared/shared_warmup_50815",
+          "hns": 0.008802871412817992,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "qjpbwju5"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3010,
+          "source": "ckpt/Seaquest-3010_Shared/shared_warmup_50042",
+          "hns": 0.007064209039615304,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "az8saz20"
+          ],
+          "owner_note": ""
+        }
+      ]
+    },
+    "UpNDown": {
+      "keep_count": 4,
+      "paper_warning": false,
+      "workbook_hns": 0.8038166753287096,
+      "workbook_gpu_types": [
+        "3090",
+        "A6000"
+      ],
+      "before_consolidation_hns": 0.8038166753287096,
+      "kept_hns": 0.8038166753287096,
+      "scored_count": 3,
+      "keep": [
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 2000,
+          "source": "ckpt/UpNDown-2000_Shared/shared_warmup_50746",
+          "hns": null,
+          "score_method": null,
+          "run_ids": [],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3000,
+          "source": "ckpt/UpNDown-3000_Shared/shared_warmup_50438",
+          "hns": 0.5388178999623648,
+          "score_method": "Retrieval off",
+          "run_ids": [
+            "rcqqe7da"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "3090",
+          "machine": "gpuserver3090",
+          "seed": 3333,
+          "source": "ckpt/UpNDown-3333_WarmupSweep/shared_warmup_50053",
+          "hns": 1.2060341583182494,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "xfmouyp9"
+          ],
+          "owner_note": ""
+        },
+        {
+          "gpu_type": "A6000",
+          "machine": "A6000",
+          "seed": 6030,
+          "source": "ckpt/UpNDown-6030_Shared/shared_warmup_50056",
+          "hns": 0.6665979677055144,
+          "score_method": "Retrieval on (t=16)",
+          "run_ids": [
+            "22u5ouqe"
+          ],
+          "owner_note": ""
+        }
+      ]
+    }
+  },
+  "seed_owner_conflicts": [
+    {
+      "seed": 9997,
+      "planned_gpu_types": [
+        "TITAN_RTX"
+      ],
+      "existing_queue_owner": "3090"
+    },
+    {
+      "seed": 9998,
+      "planned_gpu_types": [
+        "TITAN_RTX"
+      ],
+      "existing_queue_owner": "3090"
+    },
+    {
+      "seed": 9999,
+      "planned_gpu_types": [
+        "TITAN_RTX"
+      ],
+      "existing_queue_owner": "3090"
+    }
+  ],
+  "plan_id": "08dae08810d3ece294067f765ac6ebcc544079934c6c29ed33ab6db0e3a4768a"
+}

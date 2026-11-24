@@ -29,4 +29,5 @@ job_queue_td_error_only.lock
 snap/
 training_queue/*
 !training_queue/warmup_scores
+!training_queue/warmup_prune_plan.json
 .wandb_api_key
