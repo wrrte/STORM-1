@@ -1,0 +1,617 @@
+{
+  "version": 1,
+  "round": "warmups-post-prune-20261124",
+  "profile_sha256": "2bc7ac1b6d0dd0abb9816784c9bcf94bd201785227370486e9684ec797311853",
+  "gpu_type": "A6000",
+  "machine": "A6000",
+  "gpu_assignment": "machine_location",
+  "scanned_at": "2026-11-24T06:22:00.027877+00:00",
+  "code_commit": "980bbdce07a892f9a4077c3bb5a5d08ffe2ba425",
+  "games": {
+    "BattleZone": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/BattleZone-6000_Shared/shared_warmup_50711",
+            "step": 50711,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6020": [
+          {
+            "source": "ckpt/BattleZone-6020_Shared/shared_warmup_50450",
+            "step": 50450,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "4672141ab1ca39ca7fd48fa8be91a0a8ecd8bb45424d8725d4b28029ccf576e4",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Boxing": {
+      "A6000": {
+        "6010": [
+          {
+            "source": "ckpt/Boxing-6010_Shared/shared_warmup_51575",
+            "step": 51575,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "a192a1c03009bc91145de80e7c13d73e8dc27983134967d5587daa7275932c58",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6020": [
+          {
+            "source": "ckpt/Boxing-6020_Both/shared_warmup_50406",
+            "step": 50406,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "bc35b8a9381768eefd2336f15b2812d1f596d9d76afb54352ea903a4f6e3d8f8",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6040": [
+          {
+            "source": "ckpt/Boxing-6040_Shared/shared_warmup_50048",
+            "step": 50048,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "CrazyClimber": {
+      "A6000": {
+        "6020": [
+          {
+            "source": "ckpt/CrazyClimber-6020_Shared/shared_warmup_53133",
+            "step": 53133,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Freeway": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/Freeway-6000_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "7eabbe47d7750eb362385ce809664f4a7b89ae19498b87cd5d6dfaa1aa780215",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6010": [
+          {
+            "source": "ckpt/Freeway-6010_Both/shared_warmup_50000",
+            "step": 50000,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value_diff"
+            ],
+            "saved_config_sha256": "7eabbe47d7750eb362385ce809664f4a7b89ae19498b87cd5d6dfaa1aa780215",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6020": [
+          {
+            "source": "ckpt/Freeway-6020_Shared/shared_warmup_51200",
+            "step": 51200,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "8e623bc0594a5bd902c54b3745658f449ab729c320028bd01305e2938be9f714",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Jamesbond": {
+      "A6000": {
+        "6010": [
+          {
+            "source": "ckpt/Jamesbond-6010_Shared/shared_warmup_50135",
+            "step": 50135,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "d73fb4959e8f17da420490ed00833507e2c983d814bdb6d4aebc557aa60e6226",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Kangaroo": {
+      "A6000": {
+        "6030": [
+          {
+            "source": "ckpt/Kangaroo-6030_Shared/shared_warmup_50067",
+            "step": 50067,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6040": [
+          {
+            "source": "ckpt/Kangaroo-6040_Shared/shared_warmup_50211",
+            "step": 50211,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "Krull": {
+      "A6000": {
+        "6050": [
+          {
+            "source": "ckpt/Krull-6050_Shared/shared_warmup_50452",
+            "step": 50452,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6070": [
+          {
+            "source": "ckpt/Krull-6070_Shared/shared_warmup_51367",
+            "step": 51367,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "7000": [
+          {
+            "source": "ckpt/Krull-7000_Shared/shared_warmup_51060",
+            "step": 51060,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "7020": [
+          {
+            "source": "ckpt/Krull-7020_Shared/shared_warmup_50529",
+            "step": 50529,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "f3fa9600a24cad5a3b293eaf7cab1545679c3c30cd8f41b5b112dc4c3067b500",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "KungFuMaster": {
+      "A6000": {
+        "6000": [
+          {
+            "source": "ckpt/KungFuMaster-6000_Shared/shared_warmup_50667",
+            "step": 50667,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "RoadRunner": {
+      "A6000": {
+        "6030": [
+          {
+            "source": "ckpt/RoadRunner-6030_Shared/shared_warmup_51024",
+            "step": 51024,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6040": [
+          {
+            "source": "ckpt/RoadRunner-6040_Shared/shared_warmup_50507",
+            "step": 50507,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ],
+        "6060": [
+          {
+            "source": "ckpt/RoadRunner-6060_Shared/shared_warmup_50218",
+            "step": 50218,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    },
+    "UpNDown": {
+      "A6000": {
+        "6030": [
+          {
+            "source": "ckpt/UpNDown-6030_Shared/shared_warmup_50056",
+            "step": 50056,
+            "warmup_steps": [
+              50000
+            ],
+            "statistics_signals": [
+              "td_error",
+              "value",
+              "value_diff"
+            ],
+            "saved_config_sha256": "c89fb4af667ea933f1891093ac35b8a21249c0f4232ab0a0f50317d37c570656",
+            "provenance": {
+              "kind": "machine_location",
+              "machine": "A6000",
+              "gpu_type": "A6000"
+            },
+            "checks": [
+              {
+                "request": 0,
+                "compatible": true,
+                "reason": null
+              }
+            ]
+          }
+        ]
+      }
+    }
+  },
+  "excluded": []
+}
