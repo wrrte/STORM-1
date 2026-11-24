@@ -1,0 +1,22 @@
+{
+  "attempts": 1,
+  "status": "running",
+  "command": [
+    "/home/choemj/STORM-1/../miniconda3/envs/storm/bin/python",
+    "-u",
+    "train.py",
+    "-n",
+    "Krull-td_only-b3f54884d761-seed10-attempt1",
+    "-seed",
+    "10",
+    "-config_path",
+    "/home/choemj/STORM-1/results/td_error_only_queue/b3f54884d761/config.yaml",
+    "-env_name",
+    "ALE/Krull-v5",
+    "-trajectory_path",
+    "D_TRAJ/Krull.pkl",
+    "JointTrainAgent.UseDemonstration",
+    "False"
+  ],
+  "log": "/home/choemj/STORM-1/results/td_error_only_queue/b3f54884d761/Krull-attempt1.log"
+}

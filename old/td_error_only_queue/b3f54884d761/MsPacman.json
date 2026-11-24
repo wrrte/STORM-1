@@ -1,0 +1,25 @@
+{
+  "attempts": 1,
+  "status": "done",
+  "command": [
+    "/home/choemj/STORM-1/../miniconda3/envs/storm/bin/python",
+    "-u",
+    "train.py",
+    "-n",
+    "MsPacman-td_only-b3f54884d761-seed2000-attempt1",
+    "-seed",
+    "2000",
+    "-config_path",
+    "/home/choemj/STORM-1/results/td_error_only_queue/b3f54884d761/config.yaml",
+    "-env_name",
+    "ALE/MsPacman-v5",
+    "-trajectory_path",
+    "D_TRAJ/MsPacman.pkl",
+    "JointTrainAgent.UseDemonstration",
+    "False"
+  ],
+  "log": "/home/choemj/STORM-1/results/td_error_only_queue/b3f54884d761/MsPacman-attempt1.log",
+  "returncode": 0,
+  "score": 2962.0,
+  "evaluation": "/home/choemj/STORM-1/runs/MsPacman-td_only-b3f54884d761-seed2000-attempt1_O/final_evaluation.json"
+}

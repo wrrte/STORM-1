@@ -1,0 +1,238 @@
+{
+  "created_at_utc": "2026-11-16T07:23:20.777041+00:00",
+  "metric": "Retrieval/triggered_anchors_step",
+  "step_unit": "one world-model update = one environment step in the selected configurations",
+  "confidence": 0.95,
+  "bootstrap_samples": 10000,
+  "bootstrap_seed": 0,
+  "campaigns": [
+    {
+      "campaign": "b3f54884d761",
+      "games": 8,
+      "runs": 8,
+      "thresholds": [
+        3.5
+      ],
+      "aggregation": "equal game weights; equal run weights within each game",
+      "ci_method": "percentile bootstrap of game means",
+      "uncertainty_unit": "games; not independent training-seed uncertainty",
+      "total_updates": 400000,
+      "total_anchor_insertions": 1950740,
+      "mean_anchors_per_step": 4.87685,
+      "se": 0.6974219245834019,
+      "ci_low": 3.619805,
+      "ci_high": 6.3415225,
+      "confidence": 0.95,
+      "independent_units": 8
+    }
+  ],
+  "skipped": [
+    {
+      "campaign": "b3f54884d761",
+      "game": "ChopperCommand",
+      "seed": 10,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "CrazyClimber",
+      "seed": 10,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "DemonAttack",
+      "seed": 10,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Freeway",
+      "seed": 1,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Frostbite",
+      "seed": 710,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Gopher",
+      "seed": 9994,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Hero",
+      "seed": 1,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Jamesbond",
+      "seed": 1,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Kangaroo",
+      "seed": 6000,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Krull",
+      "seed": 10,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "KungFuMaster",
+      "seed": 10,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "MsPacman",
+      "seed": 2000,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Pong",
+      "seed": 710,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "PrivateEye",
+      "seed": 2000,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Qbert",
+      "seed": 10,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "RoadRunner",
+      "seed": 6020,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "Seaquest",
+      "seed": 1,
+      "reason": "no selected completed run"
+    },
+    {
+      "campaign": "b3f54884d761",
+      "game": "UpNDown",
+      "seed": 6000,
+      "reason": "no selected completed run"
+    }
+  ],
+  "failures": [],
+  "sources": [
+    {
+      "run_name": "Alien-td_only-b3f54884d761-seed1-attempt1_O",
+      "version": 1,
+      "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/runs/Alien-td_only-b3f54884d761-seed1-attempt1_O/events.out.tfevents.1794789234.A6000",
+          "size": 220391244,
+          "mtime_ns": 1794802977801637491
+        }
+      ]
+    },
+    {
+      "run_name": "Amidar-td_only-b3f54884d761-seed1-attempt1_O",
+      "version": 1,
+      "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/runs/Amidar-td_only-b3f54884d761-seed1-attempt1_O/events.out.tfevents.1794789237.A6000",
+          "size": 236424055,
+          "mtime_ns": 1794802938788992601
+        }
+      ]
+    },
+    {
+      "run_name": "Assault-td_only-b3f54884d761-seed1-attempt1_O",
+      "version": 1,
+      "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/runs/Assault-td_only-b3f54884d761-seed1-attempt1_O/events.out.tfevents.1794789243.A6000",
+          "size": 209589030,
+          "mtime_ns": 1794803443077558315
+        }
+      ]
+    },
+    {
+      "run_name": "Asterix-td_only-b3f54884d761-seed10-attempt1_O",
+      "version": 1,
+      "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/runs/Asterix-td_only-b3f54884d761-seed10-attempt1_O/events.out.tfevents.1794789246.A6000",
+          "size": 214935191,
+          "mtime_ns": 1794802934624030674
+        }
+      ]
+    },
+    {
+      "run_name": "BankHeist-td_only-b3f54884d761-seed2010-attempt1_O",
+      "version": 1,
+      "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/runs/BankHeist-td_only-b3f54884d761-seed2010-attempt1_O/events.out.tfevents.1794789249.A6000",
+          "size": 227757478,
+          "mtime_ns": 1794803034979121698
+        }
+      ]
+    },
+    {
+      "run_name": "BattleZone-td_only-b3f54884d761-seed2010-attempt1_O",
+      "version": 1,
+      "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/runs/BattleZone-td_only-b3f54884d761-seed2010-attempt1_O/events.out.tfevents.1794789252.A6000",
+          "size": 211294468,
+          "mtime_ns": 1794802859046727451
+        }
+      ]
+    },
+    {
+      "run_name": "Boxing-td_only-b3f54884d761-seed2000-attempt1_O",
+      "version": 1,
+      "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/runs/Boxing-td_only-b3f54884d761-seed2000-attempt1_O/events.out.tfevents.1794789255.A6000",
+          "size": 221902789,
+          "mtime_ns": 1794803316256647987
+        }
+      ]
+    },
+    {
+      "run_name": "Breakout-td_only-b3f54884d761-seed10-attempt1_O",
+      "version": 1,
+      "config_sha256": "cb0d30b0cea30a72b107d6e74d5051c4157d9527ca72bd827faa0550b43e795f",
+      "files": [
+        {
+          "path": "/home/choemj/STORM-1/runs/Breakout-td_only-b3f54884d761-seed10-attempt1_O/events.out.tfevents.1794789258.A6000",
+          "size": 225160051,
+          "mtime_ns": 1794802935964018421
+        }
+      ]
+    }
+  ]
+}
