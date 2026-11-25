@@ -5,7 +5,8 @@ from pathlib import Path
 import sys
 
 from queue_train import (ROOT, SEED_DIR, PAIR_PREFIX, TrainingQueue, canonical_game,
-                         gpu_type, pair_key, override_args, read_seed_files, save_seed_files, locked)
+                         gpu_type, pair_key, override_args, read_seed_files, save_seed_files, locked,
+                         experiment_name)
 
 
 def validate_overrides(config_path, overrides):
@@ -45,6 +46,7 @@ def build_specs(pairs, model, config, overrides, priority):
 def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument("--gpu-type", default="A6000", help="Model pool, e.g. A6000 or RTX 3090")
+    parser.add_argument("--experiment", help="Name this fixed job batch; reports use the same --experiment name")
     games = parser.add_mutually_exclusive_group()
     games.add_argument("--games", nargs="+")
     games.add_argument("--game-seeds", type=json.loads)
@@ -61,6 +63,8 @@ def main(argv=None):
     try:
         import yaml
         model = gpu_type(args.gpu_type)
+        if args.experiment is not None:
+            experiment_name(args.experiment)
         if bool(args.games) != bool(args.seeds is not None or args.new_seeds is not None):
             raise ValueError("Use --games with --seeds or --new-seeds; --game-seeds supplies exact pairs")
         if args.new_seeds is not None and args.new_seeds < 1:
@@ -95,6 +99,10 @@ def main(argv=None):
             for _, seed in pairs:
                 queue.check_seed(db, seed, model)
         specs = build_specs(pairs, model, args.config, overrides, args.priority)
+        if args.experiment:
+            for spec in specs:
+                spec['experiment_id'] = args.experiment
+            print(f'Experiment: {args.experiment}')
         for spec in specs:
             record, incompatible = choose_warmup(spec, report)
             source = record["source"] if record else "collect new shared warmup"

@@ -41,6 +41,13 @@ def canonical_game(value):
     return {game.lower(): game for game in GAMES}.get(value.lower(), value)
 
 
+def experiment_name(value):
+    """A stable queue cohort name, also usable as a report directory name."""
+    if not isinstance(value, str) or not re.fullmatch(r'[A-Za-z0-9][A-Za-z0-9_.-]{0,79}', value):
+        raise ValueError('Experiment names must be 1–80 letters/digits, dots, underscores or hyphens, starting with a letter/digit')
+    return value
+
+
 def pair_key(game, seed):
     if type(seed) is not int or not 0 <= seed <= 2**32 - 1:
         raise ValueError("Seeds must be integers between 0 and 2**32 - 1")
@@ -242,22 +249,48 @@ class TrainingQueue:
     def enqueue_jobs(self, specs, model=None, python=sys.executable, priority=0):
         added, skipped = [], 0
         with self.connect() as db:
+            prepared, experiments = [], {}
             for spec in specs:
                 kind = gpu_type(spec.get("gpu_type", model or ""))
-                self.own_seed(db, spec["seed"], kind)
                 job = dict(spec, game=canonical_game(spec["game"]), gpu_type=kind,
                            python=str(Path(python).absolute()))
                 # Runtime progress never changes the identity of a requested experiment.
                 identity = {k: job.get(k) for k in ("game", "seed", "gpu_type", "config_text", "overrides", "python")}
+                experiment = job.get('experiment_id')
+                if experiment is not None:
+                    experiment_name(experiment)
+                    identity['experiment_id'] = experiment
                 fingerprint = hashlib.sha256(json.dumps(identity, sort_keys=True).encode()).hexdigest()
-                if db.execute("SELECT 1 FROM jobs WHERE fingerprint=? AND status IN ('pending','running')",
-                              (fingerprint,)).fetchone():
+                prepared.append((job, kind, fingerprint, experiment))
+                if experiment:
+                    experiments.setdefault(experiment, set()).add(fingerprint)
+            registered = {}
+            for experiment, fingerprints in experiments.items():
+                previous = db.execute('SELECT value FROM metadata WHERE key=?', ('experiment:' + experiment,)).fetchone()
+                if previous:
+                    record = json.loads(previous[0])
+                    if set(record['fingerprints']) != fingerprints:
+                        raise ValueError(f'Experiment {experiment!r} already names another job set; use a new --experiment name')
+                    current = {row[0] for row in db.execute('SELECT id FROM jobs')}
+                    if not set(record['job_ids']) <= current:
+                        raise ValueError(f'Experiment {experiment!r} has removed queue jobs; use a new name for a new queue')
+                    registered[experiment] = record
+                elif (self.directory.parent / 'results' / 'experiments' / experiment / 'manifest.json').exists():
+                    raise ValueError(f'Experiment {experiment!r} already has a saved report; use a new --experiment name')
+            for job, kind, fingerprint, experiment in prepared:
+                self.own_seed(db, job['seed'], kind)
+                sql = 'SELECT id FROM jobs WHERE fingerprint=?'
+                # Named cohorts remain one fixed set even after completion/failure.
+                # Use queue_train.py retry to resume a failed member.
+                if not experiment:
+                    sql += " AND status IN ('pending','running')"
+                if db.execute(sql, (fingerprint,)).fetchone():
                     skipped += 1
                     continue
                 job.setdefault("id", uuid.uuid4().hex)
                 job.setdefault("name", f"{job['game']}-seed{job['seed']}-queue-{job['id']}")
                 job.setdefault("completed_branches", [])
-                level = spec.get("priority", priority)
+                level = job.get("priority", priority)
                 if type(level) is not int:
                     raise ValueError("Priority must be an integer")
                 now = time.time()
@@ -266,6 +299,14 @@ class TrainingQueue:
                            (job["id"], kind, level, fingerprint, json_line(job), now, now))
                 self.event(db, job["id"], "enqueued", gpu_type=kind, priority=level)
                 added.append(job)
+            for experiment, fingerprints in experiments.items():
+                if experiment not in registered:
+                    job_ids = [row[0] for row in db.execute('SELECT id,payload FROM jobs')
+                               if json.loads(row[1]).get('experiment_id') == experiment]
+                    record = dict(experiment_id=experiment, fingerprints=sorted(fingerprints),
+                                  job_ids=job_ids, created=time.time())
+                    db.execute('INSERT INTO metadata(key,value) VALUES(?,?)',
+                               ('experiment:' + experiment, json.dumps(record)))
         return added, skipped
 
     def jobs(self, model=None, statuses=("pending", "running")):

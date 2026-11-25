@@ -1,484 +1,333 @@
-import sys
-import os
-_original_path = sys.path[:]
-sys.path = [p for p in sys.path if p and p != os.path.dirname(os.path.abspath(__file__))]
-import wandb
-sys.path = _original_path
-import subprocess
+"""Collect only a frozen hash/target queue cohort, including unfinished branches.
+
+    python results/classify_wandb_runs.py --excel
+    python results/classify_wandb_runs.py --offline --excel
+    python results/classify_wandb_runs.py --experiment grid-v2 --excel
+    python results/classify_wandb_runs.py --list-experiments
+
+Named experiments use results/experiments/NAME/{manifest.json,runs.csv,results.xlsx}.
+Without --experiment the original hash_target_* paths remain available.
+No queue is mutated by reporting.
+"""
+import argparse
+from concurrent.futures import ThreadPoolExecutor
+from datetime import datetime, timezone
 import csv
 import io
 import json
-import ast
-import tempfile
-import argparse
+import math
 from pathlib import Path
-from concurrent.futures import ThreadPoolExecutor, as_completed
-from functools import lru_cache
-from tqdm import tqdm
+import sqlite3
+from statistics import fmean, stdev
+import sys
+import tempfile
 
-HERE = Path(__file__).resolve().parent
+import yaml
 
-
-# W&B에서 삭제된 target: 1 (anchor 미설정) run 37개의 고정 백업.
-# 출처: STORM-1/wandb_runs_classification_all.csv (2026-09-18).
-# 원본의 모든 필드를 보존하며, 실행 시 백업 CSV 파일은 필요하지 않습니다.
-ARCHIVED_TARGET_1_CSV = """Run Name,Run ID,State,Commit,Logic,Eval Return,Retrieval Enable,Warmup Steps,Calculated Warmup Steps,Dynamic Warmup Delay Steps,Dynamic Warmup Target Steps,Min Warmup Steps,Batch Size Reduction,Z Score Threshold,Hash Bits,Retrieval Target,Anchor Weight,Seed,Created At
-Frostbite_nmi7yn4w_6000_O,nmi7yn4w,finished,486129f,num_valid_anchors,2119.5,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6000,2026-09-03T05:10:47Z
-Frostbite_ykunnmjg_6010_O,ykunnmjg,finished,486129f,num_valid_anchors,261.5,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6010,2026-09-03T05:11:08Z
-BattleZone_co5yu3w3_2000_O,co5yu3w3,finished,486129f,num_valid_anchors,5550,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,2000,2026-09-03T05:11:55Z
-Frostbite_lby3b31o_10_O,lby3b31o,finished,486129f,num_valid_anchors,2301,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,10,2026-09-03T05:56:53Z
-Frostbite_b6a6mk2q_710_O,b6a6mk2q,finished,486129f,num_valid_anchors,2609,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,710,2026-09-03T06:33:25Z
-BattleZone_00jmh25e_2010_O,00jmh25e,finished,486129f,num_valid_anchors,13900,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,2010,2026-09-03T07:07:06Z
-UpNDown_swshjz4c_6000_O,swshjz4c,finished,486129f,num_valid_anchors,5670,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6000,2026-09-03T07:38:12Z
-UpNDown_gfu9tg3g_6010_O,gfu9tg3g,finished,486129f,num_valid_anchors,7178,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6010,2026-09-03T07:39:25Z
-Frostbite_pzj25g3d_3710_O,pzj25g3d,finished,486129f,num_valid_anchors,3242.5,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,3710,2026-09-03T08:36:44Z
-Qbert_ox9latfb_10_O,ox9latfb,finished,486129f,num_valid_anchors,1918.75,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,10,2026-09-03T09:19:09Z
-UpNDown_x7uzwomw_6020_O,x7uzwomw,finished,486129f,num_valid_anchors,3066,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6020,2026-09-03T10:12:39Z
-Qbert_ocgw5bmo_6000_O,ocgw5bmo,finished,486129f,num_valid_anchors,3782.5,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6000,2026-09-03T10:16:15Z
-Qbert_2gi0no2u_1_O,2gi0no2u,finished,486129f,num_valid_anchors,2818.75,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,1,2026-09-03T11:18:08Z
-Qbert_7y38q8bu_3710_O,7y38q8bu,finished,486129f,num_valid_anchors,2553.75,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,3710,2026-09-03T12:10:25Z
-BattleZone_cnv22oap_6000_O,cnv22oap,finished,486129f,num_valid_anchors,10950,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6000,2026-09-03T12:44:45Z
-BattleZone_yrq4azxd_6010_O,yrq4azxd,finished,486129f,num_valid_anchors,5900,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6010,2026-09-03T12:45:29Z
-Krull_6foystrq_2000_O,6foystrq,finished,486129f,num_valid_anchors,4851,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,2000,2026-09-03T13:19:19Z
-Alien_3810f6xi_1_O,3810f6xi,finished,486129f,num_valid_anchors,1151,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,1,2026-09-03T13:57:06Z
-Amidar_zl4mdqxb_1_O,zl4mdqxb,finished,486129f,num_valid_anchors,144.6,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,1,2026-09-03T14:51:15Z
-BattleZone_tmr7bbn5_6020_O,tmr7bbn5,finished,486129f,num_valid_anchors,7450,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6020,2026-09-03T15:18:56Z
-Alien_jkskja9j_6000_O,jkskja9j,finished,486129f,num_valid_anchors,1303.5,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6000,2026-09-03T15:19:42Z
-Krull_uk1s6s8x_2010_O,uk1s6s8x,finished,486129f,num_valid_anchors,6044,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,2010,2026-09-03T16:00:44Z
-Assault_e6itftuv_1_O,e6itftuv,finished,486129f,num_valid_anchors,740.75,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,1,2026-09-03T16:37:01Z
-Asterix_h7aofkuv_10_O,h7aofkuv,finished,486129f,num_valid_anchors,467.5,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,10,2026-09-03T17:32:10Z
-Alien_7lc9bxth_6010_O,7lc9bxth,finished,486129f,num_valid_anchors,1032,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6010,2026-09-03T17:52:24Z
-Amidar_jbm316dm_6000_O,jbm316dm,finished,486129f,num_valid_anchors,211.7,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6000,2026-09-03T17:52:56Z
-Asterix_toxgeo04_3710_O,toxgeo04,finished,486129f,num_valid_anchors,677.5,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,3710,2026-09-03T19:16:44Z
-Boxing_zsaukhwx_10_O,zsaukhwx,finished,486129f,num_valid_anchors,74.85,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,10,2026-09-03T20:13:21Z
-Amidar_rxipad36_6010_O,rxipad36,finished,486129f,num_valid_anchors,124.75,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6010,2026-09-03T20:22:34Z
-Amidar_ginz9ksm_6020_O,ginz9ksm,finished,486129f,num_valid_anchors,159.3,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6020,2026-09-03T20:25:20Z
-Alien_ts6fn9ut_2000_O,ts6fn9ut,finished,486129f,num_valid_anchors,641,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,2000,2026-09-03T21:18:33Z
-Breakout_ix0b33ni_10_O,ix0b33ni,finished,486129f,num_valid_anchors,12.1,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,10,2026-09-03T21:55:23Z
-Breakout_hkojwxtr_3710_O,hkojwxtr,finished,486129f,num_valid_anchors,15.6,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,3710,2026-09-03T22:55:26Z
-Assault_piki59lv_6000_O,piki59lv,finished,486129f,num_valid_anchors,1033.7,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6000,2026-09-03T22:55:34Z
-Assault_holuktxi_6010_O,holuktxi,finished,486129f,num_valid_anchors,867.85,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,6010,2026-09-03T22:58:32Z
-Assault_d0c7w16z_2000_O,d0c7w16z,finished,486129f,num_valid_anchors,693.3,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,2000,2026-09-03T23:48:23Z
-ChopperCommand_as286v3o_710_O,as286v3o,finished,486129f,num_valid_anchors,1360,True,50000,50000,3000,20000,5000,retrieved,3.5,11,1,N/A,710,2026-09-04T00:34:10Z
-"""
+from hash_target_common import (
+    ROOT, FIELDS, atomic_text,
+    build_manifest, command_arg, config_mismatch, expected_rows, get, load_manifest,
+    now, number, read_csv_rows, read_jobs, report_lock, same_path, stage_config,
+    report_paths, list_experiments,
+)
 
 
-def merge_archived_target_1_runs(results):
-    """W&B 결과에 없는 백업 Run ID만 추가하며 동일 ID는 W&B 값을 우선합니다."""
-    live_ids = {row["Run ID"] for row in results}
-    archived_rows = csv.DictReader(io.StringIO(ARCHIVED_TARGET_1_CSV))
-    return list(results) + [row for row in archived_rows if row["Run ID"] not in live_ids]
+def plan_proves_source(job, stage, live):
+    command = (live or {}).get('plan', {}).get(stage['key'])
+    source = command_arg(command, '--resume_from') if command else job.get('plan_sources', {}).get(stage['key'])
+    if source is None:
+        return False
+    if not (same_path(source, job['resume_warmup']) or same_path(source, job['warmup_source'])):
+        raise ValueError('Queue plan changed the frozen shared warmup')
+    if command and (command_arg(command, '-seed') != str(job['seed'])
+                    or command_arg(command, '-env_name') != f'ALE/{job["game"]}-v5'):
+        raise ValueError('Queue plan changed the frozen game/seed')
+    return True
 
 
-@lru_cache(maxsize=None)
-def get_logic_for_commit(commit_hash):
-    """
-    주어진 커밋 해시에서 train.py 파일을 읽어와
-    random_batch_size 설정 로직을 파악합니다.
-    """
-    if not commit_hash:
-        return "Unknown (No commit hash)"
-
-    try:
-        # git show <commit>:train.py 명령어로 해당 커밋 시점의 코드 내용 추출
-        result = subprocess.run(
-            ["git", "show", f"{commit_hash}:train.py"],
-            capture_output=True, text=True, check=True
-        )
-        code = result.stdout
-
-        # 코드 내용에 따른 분류
-        # 최신 코드의 경우 num_valid_anchors와 retrieved_count 조건이 모두 포함될 수 있으므로, 두 개가 다 있을 땐 num_valid_anchors로 분류
-        if "random_batch_size = max(0, imagine_batch_size - retrieved_count)" in code and "random_batch_size = max(0, imagine_batch_size - num_valid_anchors)" in code:
-            return "num_valid_anchors"
-        elif "random_batch_size = imagine_batch_size - num_valid_anchors" in code or "random_batch_size = max(0, imagine_batch_size - num_valid_anchors)" in code:
-            return "num_valid_anchors"
-        elif "random_batch_size = max(0, imagine_batch_size - retrieved_count)" in code:
-            return "retrieved_count (with max)"
-        elif "random_batch_size = imagine_batch_size - retrieved_count" in code:
-            return "retrieved_count (without max)"
-        elif "random_batch_size = imagine_batch_size" in code:
-            return "imagine_batch_size (No retrieval deduction)"
-        else:
-            return "Unknown (Logic not found in code)"
-
-    except subprocess.CalledProcessError:
-        # 파일이 존재하지 않거나 커밋을 찾을 수 없는 경우
-        return "Unknown (Git error or train.py missing)"
+def check_source(source, job, stage, root, plan_proof):
+    if same_path(source, job['resume_warmup']) or same_path(source, job['warmup_source']):
+        return
+    path = Path(source).resolve() if source else None
+    # Interrupted branches resume their own full checkpoint, retaining the original plan.
+    if (plan_proof and path and path.parent == (root / 'ckpt' / stage['local_name']).resolve()
+            and path.name.startswith('queue_resume_')):
+        return
+    raise ValueError('Run resumed a different or unverifiable shared warmup')
 
 
-def parse_save_warmup_request(args):
-    """실행 인자의 명시적인 save_warmup 요청을 읽습니다 (마지막 지정 우선)."""
-    if not isinstance(args, list):
+def evaluation_fields(score, returns, precision, step, episodes, seed, manifest):
+    required = manifest['evaluation']
+    value = number(score)
+    if value is None or number(step) != required['checkpoint_step'] or precision != required['precision']:
+        raise ValueError('Missing final score or incompatible evaluation checkpoint/precision')
+    if number(episodes) != required['episodes'] or number(seed) != required['seed']:
+        raise ValueError('Incompatible evaluation episodes/seed')
+    if len(returns) != required['episodes'] or any(number(v) is None for v in returns):
+        raise ValueError('Final evaluation does not contain all episode returns')
+    returns = [float(v) for v in returns]
+    if not math.isclose(value, fmean(returns), rel_tol=1e-6, abs_tol=1e-5):
+        raise ValueError('Final score disagrees with its episode returns')
+    return {'State': 'completed', 'Eval Return': value, 'Eval Checkpoint Step': int(step),
+            'Eval Precision': precision, 'Eval Episodes': len(returns), 'Eval Seed': int(seed),
+            'Episode SD': stdev(returns) if len(returns) > 1 else None}
+
+
+def local_result(root, job, stage, live, manifest):
+    directory = root / 'runs' / stage['local_name']
+    result_path = directory / 'final_evaluation.json'
+    if not result_path.exists():
         return None
-    requested = None
-    for key, value in zip(args, args[1:]):
-        if key == 'JointTrainAgent.Retrieval.save_warmup':
-            requested = {'true': True, 'false': False}.get(str(value).strip().lower())
-    return requested
+    conf = yaml.safe_load((directory / 'config.yaml').read_text())
+    reason = config_mismatch(conf, stage_config(job, stage))
+    if reason:
+        raise ValueError(reason)
+    result = json.loads(result_path.read_text())
+    if (result.get('run_name') != stage['local_name'] or result.get('seed') != job['seed']
+            or result.get('env_name') != f'ALE/{job["game"]}-v5'
+            or result.get('sample_max_steps') != manifest['evaluation']['sample_max_steps']):
+        raise ValueError('Local final evaluation identity/training budget mismatch')
+    proof = plan_proves_source(job, stage, live)
+    shared = directory / 'shared_warmup.json'
+    if shared.exists():
+        check_source(json.loads(shared.read_text()).get('checkpoint_dir'), job, stage, root, proof)
+    elif not proof:
+        raise ValueError('Cannot verify local shared warmup provenance')
+    marker = root / 'ckpt' / stage['local_name'] / 'queue_stage_complete.json'
+    if not marker.exists():
+        return {'State': 'evaluating', 'Notes': 'Final evaluation exists; waiting for branch completion marker'}
+    if json.loads(marker.read_text()).get('stage') != f'{job["id"]}:{stage["key"]}':
+        raise ValueError('Completion marker belongs to another queue branch')
+    fields = evaluation_fields(result.get('episode_avg_return'), result.get('episode_returns', []),
+                               result.get('precision'), result.get('checkpoint_step'),
+                               len(result.get('episode_returns', [])), get(conf, 'JointTrainAgent.EvalSeed'), manifest)
+    return dict(fields, Source='local', **{'Updated At': datetime.fromtimestamp(result_path.stat().st_mtime, timezone.utc).isoformat()})
 
 
 def get_run_args(run):
-    """자식 분기의 원래 실험 순서와 save_warmup 요청을 metadata에서 읽습니다."""
-    try:
-        with tempfile.TemporaryDirectory(prefix='storm-run-metadata-') as directory:
-            with run.file('wandb-metadata.json').download(root=directory, replace=True) as source:
-                metadata = json.load(source)
-        return metadata.get('args')
-    except Exception as error:
-        tqdm.write(
-            f'[{run.name}] 실행 인자를 확인하지 못했습니다 '
-            f'({type(error).__name__}). config 값으로 표시합니다.'
-        )
-        return None
-
-
-def scheduling_metadata(args, retrieval_enable):
-    """큐 스케줄러가 기존 warmup의 실제 경로와 현재 단계를 식별할 정보."""
-    values = dict(zip(args, args[1:])) if isinstance(args, list) else {}
-    for argument in args or []:
-        if argument.startswith('--') and '=' in argument:
-            key, value = argument.split('=', 1)
-            values[key] = value
-    checkpoint = values.get('--resume_from', '')
-    shared = isinstance(retrieval_enable, list) or str(retrieval_enable).lower() == 'both'
-    base = values.get('-n', '')
-    experiment = values.get('--branch_experiment')
-    branch_mode = values.get('--branch_mode')
-    if experiment:
-        local_name = f'{base}_{experiment.lower()}' if base else ''
-    elif branch_mode:
-        local_name = f"{base}_{'O' if branch_mode.lower() == 'true' else 'X'}" if base else ''
-    elif shared:
-        local_name = f"{base}_{'Both' if str(retrieval_enable).lower() == 'both' else 'Shared'}" if base else ''
-    else:
-        local_name = ''
-    return {
-        'Warmup Directory': checkpoint or values.get('--resume_warmup', ''),
-        'Base Run Name': values.get('-n', ''),
-        'Training Phase': 'warmup' if shared else ('branch' if checkpoint else ''),
-        'Local Run Name': local_name,
-    }
-
-
-def parse_pending_retrieval_configs(args):
-    """현재 분기 다음에 실행할 실험을 CSV 열에 적용할 부분 설정으로 반환합니다."""
+    with tempfile.TemporaryDirectory(prefix='storm-grid-metadata-') as directory:
+        downloaded = run.file('wandb-metadata.json').download(root=directory, replace=True)
+        path = Path(downloaded.name)
+        downloaded.close()
+        args = json.loads(path.read_text()).get('args')
     if not isinstance(args, list):
-        return []
-    values = dict(zip(args, args[1:]))
-    # argparse는 --branch_experiment=value 형식도 허용합니다.
-    for argument in args:
-        if argument.startswith('--branch_experiment='):
-            values['--branch_experiment'] = argument.split('=', 1)[1]
-    try:
-        experiments = ast.literal_eval(values.get('JointTrainAgent.Retrieval.enable', 'None'))
-    except (ValueError, SyntaxError):
-        return []
-    if not isinstance(experiments, list):
-        return []
-    experiments = [str(name).strip().lower() for name in experiments]
-    branch = values.get('--branch_experiment')
-    overrides = {
-        'baseline': {'Retrieval Enable': False},
-        'retrieval': {'Retrieval Enable': True},
-        'target1': {'Retrieval Enable': True, 'Retrieval Target': 1},
-        'value': {'Retrieval Enable': True, 'Value Signal': 'value'},
-        'add': {'Retrieval Enable': True, 'Score Combination': 'add'},
-        'td_error_only': {'Retrieval Enable': True, 'Score Combination': 'td_error_only'},
-        'randomneighor': {'Retrieval Enable': True, 'Neighbor Source': 'random'},
-    }
-    if branch not in experiments or any(name not in overrides for name in experiments):
-        return []
-
-    # 각 자식은 공통 설정에서 시작하므로 현재 분기의 강제 설정을 전파하지 않습니다.
-    # 원래 CLI 값을 우선하고, 지정하지 않은 키는 STORM.yaml 기본값을 사용합니다.
-    defaults = {
-        'Retrieval Target': ('target', 16),
-        'Value Signal': ('value_signal', 'value_diff'),
-        'Score Combination': ('score_combination', 'multiply'),
-        'Neighbor Source': ('neighbor_source', 'retrieval'),
-    }
-    common = {
-        column: values.get(f'JointTrainAgent.Retrieval.{key}', default)
-        for column, (key, default) in defaults.items() if column in overrides[branch]
-    }
-    return [
-        {**common, **overrides[name]}
-        for name in experiments[experiments.index(branch) + 1:]
-    ]
-
-
-def get_config_val(config, key_path):
-    if key_path in config:
-        return config[key_path]
-    keys = key_path.split('.')
-    val = config
-    for k in keys:
-        if isinstance(val, dict) and k in val:
-            val = val[k]
-        else:
-            return None
-    return val
-
-
-def classify_run(run):
-    """단일 run을 기존 CSV 열로 변환하며 제외 대상이면 None을 반환합니다."""
-    if run.state == "killed":
-        return None
-
-    ret_enable = get_config_val(run.config, 'JointTrainAgent.Retrieval.enable')
-    is_random_neighor = str(ret_enable).strip().lower() == 'randomneighor'
-    is_td_error_only = str(ret_enable).strip().lower() == 'td_error_only'
-    is_both = (
-        str(ret_enable).strip().lower() == 'both'
-        or str(run.name).lower().endswith('_both')
-    )
-    is_experiment_list = isinstance(ret_enable, list)
-    if (is_both or is_experiment_list) and run.state != "running":
-        return None
-    if is_both:
-        ret_enable = 'Both'
-    elif not is_experiment_list:
-        ret_enable = is_random_neighor or is_td_error_only or str(ret_enable).strip().lower() in ('true', '1', 't')
-    save_warmup = get_config_val(run.config, 'JointTrainAgent.Retrieval.save_warmup')
-    check_save_warmup = str(save_warmup).strip().lower() == 'false'
-    check_pending = run.state == 'running' and not (is_both or is_experiment_list)
-    needs_metadata = (
-        check_save_warmup or check_pending or run.state == 'running'
-        or str(save_warmup).strip().lower() == 'true'
-    )
-    run_args = get_run_args(run) if needs_metadata else None
-    save_warmup_requested = parse_save_warmup_request(run_args) if check_save_warmup else None
-    pending_configs = parse_pending_retrieval_configs(run_args) if check_pending else []
-
-    # WandB는 기본적으로 github 연동이나 git 추적 시 commit 정보를 남깁니다.
-    commit_hash = run.commit
-
-    # run.commit이 없는 경우 config나 summary 등 다른 곳에 수동 기록했는지 확인
-    if not commit_hash and 'commit' in run.config:
-        commit_hash = run.config['commit']
-
-    logic_type = get_logic_for_commit(commit_hash)
-
-    eval_return = run.summary.get('eval/episode_avg_return',
-                                  run.summary.get('eval/bf16/episode_avg_return', 'N/A'))
-
-    warmup_steps = 'N/A'
-    calculated_warmup_steps = 'N/A'
-    shared_warmup_step = run.summary.get('Retrieval/shared_warmup_ended_at_step')
-    if ret_enable or shared_warmup_step is not None:
-        w_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_steps')
-        warmup_steps = w_steps if w_steps is not None else 'N/A'
-        calculated_warmup_steps = shared_warmup_step if shared_warmup_step is not None else warmup_steps
-
-        # warmup_steps가 -1인 경우, Retrieval/retrieved_contexts 그래프의 첫 스텝에서 가져옴
-        if str(warmup_steps) == '-1':
-            try:
-                # 백엔드 샘플링을 방지하기 위해 samples 값을 크게 설정하여 전체를 가져옵니다.
-                hist_df = run.history(keys=["Retrieval/retrieved_contexts"], samples=1000000)
-                if not hist_df.empty and "_step" in hist_df.columns:
-                    first_step = int(hist_df["_step"].min())
-                    calculated_warmup_steps = first_step + 1024
-                else:
-                    tqdm.write(f"[{run.name}] 히스토리에 '_step' 정보가 없습니다.")
-            except Exception as e:
-                tqdm.write(f"[{run.name}] 히스토리에서 warmup steps를 가져오지 못했습니다: {e}")
-
-    # 1. 런 이름에서 시드 추출 우선 시도 (형식: {env}_{id}_{seed}_{O/X/Both})
-    seed = None
-    parts = str(run.name).split('_')
-    if len(parts) >= 4 and parts[-1].upper() in ['O', 'X', 'BOTH']:
-        try:
-            seed = int(parts[-2])
-        except ValueError:
-            pass
-    elif len(parts) >= 3 and parts[-1].isdigit():
-        # Both 공통 단계의 Logger는 O/X 접미사 없이 이름을 기록합니다.
-        seed = int(parts[-1])
-
-    # 2. 런 이름에서 유추 실패 시 Config에서 읽어오기 ('Seed' 또는 'seed' 확인)
-    if seed is None:
-        seed = get_config_val(run.config, 'RunMetadata.seed')
-        if seed is None:
-            seed = get_config_val(run.config, 'Seed')
-        if seed is None:
-            seed = get_config_val(run.config, 'seed')
-
-    seed = seed if seed is not None else 'N/A'
-
-    dynamic_warmup_delay_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_delay_steps')
-    dynamic_warmup_delay_steps = dynamic_warmup_delay_steps if dynamic_warmup_delay_steps is not None else 'N/A'
-
-    dynamic_warmup_target_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.dynamic_warmup_target_steps')
-    dynamic_warmup_target_steps = dynamic_warmup_target_steps if dynamic_warmup_target_steps is not None else 'N/A'
-
-    min_warmup_steps = get_config_val(run.config, 'JointTrainAgent.Retrieval.min_warmup_steps')
-    min_warmup_steps = min_warmup_steps if min_warmup_steps is not None else 'N/A'
-
-    batch_size_reduction = get_config_val(run.config, 'JointTrainAgent.Retrieval.batch_size_reduction')
-    batch_size_reduction = batch_size_reduction if batch_size_reduction is not None else 'N/A'
-
-    z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.z_score_threshold')
-    z_score_threshold = z_score_threshold if z_score_threshold is not None else 'N/A'
-
-    value_signal = get_config_val(run.config, 'JointTrainAgent.Retrieval.value_signal')
-    score_combination = get_config_val(run.config, 'JointTrainAgent.Retrieval.score_combination')
-    if is_td_error_only:
-        score_combination = 'td_error_only'
-    neighbor_source = get_config_val(run.config, 'JointTrainAgent.Retrieval.neighbor_source')
-    if is_random_neighor:
-        # 이름으로 지정한 preset은 공통 neighbor_source 설정보다 우선합니다.
-        neighbor_source = 'random'
-    additive_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.additive_z_score_threshold')
-    td_error_z_score_threshold = get_config_val(run.config, 'JointTrainAgent.Retrieval.td_error_z_score_threshold')
-
-    hash_bits = get_config_val(run.config, 'JointTrainAgent.Retrieval.hash_bits')
-    hash_bits = hash_bits if hash_bits is not None else 'N/A'
-
-    retrieval_target = get_config_val(run.config, 'JointTrainAgent.Retrieval.target')
-    retrieval_target = retrieval_target if retrieval_target is not None else 'N/A'
-
-    anchor_weight = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight')
-    anchor_weight = anchor_weight if anchor_weight is not None else 'N/A'
-    anchor_weight_r = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_weight_r')
-    anchor_offset = get_config_val(run.config, 'JointTrainAgent.Retrieval.anchor_offset')
-    warmup_offset_pairs = get_config_val(run.config, 'JointTrainAgent.Retrieval.warmup_offset_pairs')
-
-    scheduling = scheduling_metadata(run_args, ret_enable)
-    local_name = get_config_val(run.config, 'RunMetadata.local_run_name')
-    if local_name:
-        scheduling['Local Run Name'] = local_name
-    return {
-        "Run Name": run.name,
-        "Run ID": run.id,
-        "State": run.state,
-        "Commit": commit_hash[:7] if commit_hash else "None",
-        "Logic": logic_type,
-        "Eval Return": eval_return,
-        "Eval Return BF16": run.summary.get('eval/bf16/episode_avg_return', 'N/A'),
-        "Eval Return FP32": run.summary.get('eval/fp32/episode_avg_return', 'N/A'),
-        "Eval Checkpoint Step": run.summary.get('eval/checkpoint_step', 'N/A'),
-        "Retrieval Enable": json.dumps(ret_enable) if isinstance(ret_enable, list) else ret_enable,
-        "Pending Retrieval Configs": json.dumps(pending_configs),
-        "Save Warmup": save_warmup if save_warmup is not None else 'N/A',
-        "Save Warmup Requested": save_warmup_requested if save_warmup_requested is not None else 'N/A',
-        "Warmup Steps": warmup_steps,
-        "Calculated Warmup Steps": calculated_warmup_steps,
-        "Dynamic Warmup Delay Steps": dynamic_warmup_delay_steps,
-        "Dynamic Warmup Target Steps": dynamic_warmup_target_steps,
-        "Min Warmup Steps": min_warmup_steps,
-        "Batch Size Reduction": batch_size_reduction,
-        "Z Score Threshold": z_score_threshold,
-        "Value Signal": value_signal if value_signal is not None else 'N/A',
-        "Score Combination": score_combination if score_combination is not None else 'N/A',
-        "Neighbor Source": neighbor_source if neighbor_source is not None else 'retrieval',
-        "Additive Z Score Threshold": additive_z_score_threshold if additive_z_score_threshold is not None else 'N/A',
-        "TD Error Z Score Threshold": td_error_z_score_threshold if td_error_z_score_threshold is not None else 'N/A',
-        "Hash Bits": hash_bits,
-        "Retrieval Target": retrieval_target,
-        "Anchor Weight": anchor_weight,
-        "Anchor Weight R": anchor_weight_r if anchor_weight_r is not None else 'N/A',
-        "Anchor Offset": anchor_offset if anchor_offset is not None else 'N/A',
-        "Warmup Offset Pairs": json.dumps(warmup_offset_pairs or []),
-        "Seed": seed,
-        "Created At": run.created_at,
-        **scheduling,
-    }
-
-
-def classify_runs(runs, workers=100):
-    """run별 조회를 병렬화하고 CSV에는 원래 W&B 목록 순서를 보존합니다."""
-    if workers < 1:
-        raise ValueError('workers는 1 이상이어야 합니다')
-    results = {}
-    with tqdm(
-        total=len(runs), desc="Classifying", unit="run",
-        dynamic_ncols=True, file=sys.stdout,
-    ) as progress, ThreadPoolExecutor(max_workers=workers) as executor:
-        # W&B paginator는 이 스레드에서만 순회하며 각 run은 한 worker만 처리합니다.
-        futures = {executor.submit(classify_run, run): index for index, run in enumerate(runs)}
-        for future in as_completed(futures):
-            row = future.result()
-            if row is not None:
-                results[futures[future]] = row
-                progress.set_postfix_str(
-                    f"Run: {' '.join(str(row['Run Name']).split())}", refresh=False,
-                )
-            progress.update(1)
-    return [results[index] for index in sorted(results)]
-
-
-def parse_args(argv=None):
-    parser = argparse.ArgumentParser(description='W&B run 분류 결과를 CSV로 저장합니다.')
-    parser.add_argument('--workers', type=int, default=100,
-                        help='동시 처리할 run 수 (기본값: 100, 순차 처리: 1)')
-    parser.add_argument('--output', type=Path, default=HERE/'wandb_runs_classification.csv')
-    parser.add_argument('--offline', action='store_true', help='기존 CSV와 로컬 최종 평가만 반영')
-    parser.add_argument('--excel', action='store_true', help='CSV 저장 후 converted_results.xlsx도 갱신')
-    args = parser.parse_args(argv)
-    if args.workers < 1:
-        parser.error('--workers는 1 이상이어야 합니다')
+        raise ValueError('W&B run has no usable training arguments')
     return args
 
 
-def main(workers=100, output_path=None, offline=False):
-    output_csv = Path(output_path) if output_path is not None else HERE/'wandb_runs_classification.csv'
-    if offline:
-        with output_csv.open(newline='', encoding='utf-8') as source:
-            results = list(csv.DictReader(source))
-    else:
-        results = fetch_results(workers)
-    live_count = len(results)
-    results = merge_archived_target_1_runs(results)
-    print(f'고정 백업에서 target: 1 run {len(results)-live_count}개를 추가했습니다.')
-    # A completed local evaluation also survives delayed or unavailable W&B sync.
-    import pandas as pd
-    from convert_csv_to_excel import merge_local_results
-    frame = merge_local_results(pd.DataFrame(results), HERE.parent)
-    frame = frame.replace('nan', None)
-    results = frame.astype(object).where(pd.notna(frame), None).to_dict('records')
-    fieldnames = ["Run Name", "Run ID", "State", "Commit", "Logic", "Eval Return", "Retrieval Enable", "Pending Retrieval Configs", "Save Warmup", "Save Warmup Requested", "Warmup Steps", "Calculated Warmup Steps", "Dynamic Warmup Delay Steps", "Dynamic Warmup Target Steps", "Min Warmup Steps", "Batch Size Reduction", "Z Score Threshold", "Value Signal", "Score Combination", "Additive Z Score Threshold", "TD Error Z Score Threshold", "Hash Bits", "Retrieval Target", "Anchor Weight", "Seed", "Created At", "Neighbor Source", "Warmup Directory", "Base Run Name", "Training Phase", "Anchor Weight R", "Anchor Offset", "Warmup Offset Pairs", "Local Run Name", "Eval Return BF16", "Eval Return FP32", "Eval Checkpoint Step"]
-    fieldnames += sorted({key for row in results for key in row} - set(fieldnames))
-    output_csv.parent.mkdir(parents=True, exist_ok=True)
-    with output_csv.open('w', newline='', encoding='utf-8') as target:
-        writer = csv.DictWriter(target, fieldnames=fieldnames, lineterminator='\n')
+def classify_run(run, job, stage, manifest, root, live=None):
+    """An exact UUID-containing local run name is required; names/seeds alone never match."""
+    if get(run.config, 'RunMetadata.local_run_name') != stage['local_name']:
+        return None
+    if (get(run.config, 'RunMetadata.seed') != job['seed']
+            or get(run.config, 'RunMetadata.game') != job['game']):
+        raise ValueError('W&B game/seed mismatch')
+    created = datetime.fromisoformat(str(run.created_at).replace('Z', '+00:00'))
+    if created.tzinfo is None:
+        created = created.replace(tzinfo=timezone.utc)
+    if created.timestamp() + 1 < job['created']:
+        raise ValueError('W&B run predates its frozen queue job')
+    reason = config_mismatch(run.config, stage_config(job, stage))
+    if reason:
+        raise ValueError(reason)
+    common = {'Run ID': run.id, 'Created At': created.isoformat(), 'Source': 'wandb',
+              'Updated At': getattr(run, 'updated_at', None) or now()}
+    if run.state != 'finished':
+        return dict(common, State={'running': 'running', 'crashed': 'failed', 'failed': 'failed',
+                                   'killed': 'interrupted'}.get(run.state, 'pending'))
+    precision = manifest['evaluation']['precision']
+    summary = run.summary
+    score = summary.get(f'eval/{precision}/episode_avg_return', summary.get('eval/episode_avg_return'))
+    if number(score) is None or summary.get('eval/checkpoint_step') is None:
+        # The queue's SIGTERM handler calls wandb.finish() before exiting 143.
+        # W&B may therefore say finished even though no final evaluation occurred.
+        return dict(common, State='interrupted', Notes='Run ended before final evaluation; awaiting queue continuation')
+    args = get_run_args(run)
+    proof = plan_proves_source(job, stage, live)
+    check_source(command_arg(args, '--resume_from'), job, stage, root, proof)
+    returns = [summary.get(f'eval/{precision}/episode_return_{i}', summary.get(f'eval/episode_return_{i}'))
+               for i in range(manifest['evaluation']['episodes'])]
+    fields = evaluation_fields(score, returns, precision, summary.get('eval/checkpoint_step'),
+                               get(run.config, 'JointTrainAgent.EvalEpisodes'), summary.get('eval/seed'), manifest)
+    return dict(common, **fields)
+
+
+def fetch_results(manifest, live_jobs, root, workers=8, project='choemj-kaist/STORM', api=None):
+    if api is None:
+        import wandb
+        api = wandb.Api(timeout=20)
+    lookup = {stage['local_name']: (job, stage) for job, stage, _ in expected_rows(manifest)}
+    names = sorted(lookup)
+    runs, seen = [], set()
+    # Server-side scope filter avoids downloading the historical project.
+    for start in range(0, len(names), 80):
+        for run in api.runs(project, filters={'config.RunMetadata.local_run_name': {'$in': names[start:start+80]}},
+                            per_page=100, lazy=False):
+            local_name = get(run.config, 'RunMetadata.local_run_name')
+            if local_name in lookup and run.id not in seen:
+                runs.append(run)
+                seen.add(run.id)
+    def inspect(run):
+        name = get(run.config, 'RunMetadata.local_run_name')
+        job, stage = lookup[name]
+        try:
+            row = classify_run(run, job, stage, manifest, root, live_jobs.get(job['id']))
+            return (job['id'], stage['key']), row, None
+        except Exception as error:
+            return (job['id'], stage['key']), None, f'{run.id}: {error}'
+    grouped, issues = {}, {}
+    with ThreadPoolExecutor(max_workers=workers) as executor:
+        for key, row, error in executor.map(inspect, runs):
+            if row:
+                grouped.setdefault(key, []).append(row)
+            if error:
+                issues.setdefault(key, []).append(error)
+    print(f'W&B: {len(runs)} run(s) matching this campaign only.')
+    return grouped, issues
+
+
+def base_state(job, stage, live):
+    if not live:
+        return 'pending'
+    remaining = [key for key in (live.get('plan') or {s['key']: None for s in job['stages']})
+                 if key not in live.get('completed_branches', [])]
+    if remaining and stage['key'] == remaining[0]:
+        return {'running': 'running', 'failed': 'failed'}.get(live['status'], 'pending')
+    return 'pending'
+
+
+def collect_rows(manifest, live_jobs, root, cached=None, remote=None, remote_issues=None):
+    output = []
+    for job, stage, expected in expected_rows(manifest):
+        key = job['id'], stage['key']
+        live = live_jobs.get(job['id'])
+        row = dict(expected, State=base_state(job, stage, live), **{'Attempt Count': 0, 'Notes': ''})
+        notes = list((remote_issues or {}).get(key, []))
+        candidates = list((remote or {}).get(key, []))
+        previous = (cached or {}).get(key)
+        if previous and previous.get('State') == 'completed':
+            candidates.append({**previous, 'Source': 'cached:' + previous.get('Source', '').removeprefix('cached:')})
+        try:
+            plan_proves_source(job, stage, live)
+        except ValueError as error:
+            row.update(State='invalid', Notes=str(error))
+            output.append(row)
+            continue
+        try:
+            local = local_result(root, job, stage, live, manifest)
+            if local:
+                candidates.append(local)
+        except (ValueError, KeyError, TypeError, OSError, yaml.YAMLError) as error:
+            notes.append(f'local: {error}')
+        complete = [candidate for candidate in candidates if candidate.get('State') == 'completed']
+        if complete:
+            # One observation per branch; never average retry attempts.
+            complete.sort(key=lambda c: (c.get('Source') == 'local', c.get('Source') == 'wandb',
+                                         str(c.get('Created At', '')), str(c.get('Run ID', ''))), reverse=True)
+            chosen = complete[0]
+            row.update({k: v for k, v in chosen.items() if k not in expected})
+            if len(complete) > 1:
+                notes.append(f'{len(complete)} completed records; selected {chosen.get("Source")}, no retry averaging')
+        elif candidates:
+            chosen = max(candidates, key=lambda c: (c.get('State') == 'evaluating', str(c.get('Created At', ''))))
+            # The queue owns scheduling state. A stale running/finished W&B
+            # attempt must not turn a pending retry into an active/completed run.
+            row.update({k: v for k, v in chosen.items() if k not in expected and k != 'State'})
+            if live is None or (row['State'] == 'running' and chosen.get('State') == 'evaluating'):
+                row['State'] = chosen['State']
+        elif notes:
+            row['State'] = 'invalid'
+        row['Attempt Count'] = len([c for c in candidates if c.get('Run ID')])
+        row['Notes'] = '; '.join(filter(None, [row.get('Notes'), *notes]))
+        # Incomplete results never carry a numeric final score into Excel.
+        if row['State'] != 'completed':
+            for column in ('Eval Return', 'Eval Checkpoint Step', 'Eval Precision', 'Eval Episodes', 'Eval Seed', 'Episode SD'):
+                row[column] = None
+        output.append(row)
+    return output
+
+
+def main(workers=8, output_path=None, offline=False, *, manifest_path=None,
+         root=ROOT, queue_db=None, gpu_type=None, job_ids=None, project='choemj-kaist/STORM',experiment=None):
+    root=Path(root).resolve()
+    manifest_path,output,_=report_paths(experiment,manifest=manifest_path,csv=output_path,results_dir=root/'results')
+    database = Path(queue_db) if queue_db else root / 'training_queue/queue.sqlite3'
+    manifest_path = Path(manifest_path)
+    with report_lock(manifest_path):
+        live = read_jobs(database) if database.exists() else {}
+        if manifest_path.exists():
+            manifest = load_manifest(manifest_path)
+            if experiment and manifest.get('experiment_name') not in (None,experiment):
+                raise ValueError('The selected manifest belongs to another --experiment')
+            if experiment:
+                extra={identity for identity,job in live.items() if job.get('experiment_id')==experiment} - {job['id'] for job in manifest['jobs']}
+                if extra:
+                    raise ValueError('New jobs reused a frozen experiment name. Use a different --experiment name.')
+        else:
+            pool=gpu_type if gpu_type is not None else None if experiment else '3090'
+            manifest = build_manifest(live, root, gpu_type=pool, job_ids=job_ids,experiment=experiment)
+            atomic_text(manifest_path, json.dumps(manifest, ensure_ascii=False, indent=2) + '\n')
+            print(f'Frozen campaign: {len(manifest["jobs"])} jobs → {manifest_path}')
+        try:
+            cached = read_csv_rows(output, manifest, allow_missing=True)
+        except ValueError as error:
+            print(f'Ignoring previous CSV: {error}', file=sys.stderr)
+            cached = {}
+        if offline:
+            remote, issues = {}, {}
+        else:
+            try:
+                remote, issues = fetch_results(manifest, live, root, workers, project)
+            except Exception as error:
+                raise RuntimeError('W&B query failed. Use --offline --excel to refresh local results.') from error
+        rows = collect_rows(manifest, live, root, cached, remote, issues)
+        buffer = io.StringIO(newline='')
+        writer = csv.DictWriter(buffer, fieldnames=FIELDS, lineterminator='\n')
         writer.writeheader()
-        writer.writerows(results)
-    print(f'상세 결과: {output_csv} ({len(results)} runs)')
-    return output_csv
+        writer.writerows(rows)
+        atomic_text(output, buffer.getvalue())
+    completed = sum(row['State'] == 'completed' for row in rows)
+    print(f'{completed}/{len(rows)} completed branches → {output}')
+    return output
 
 
-def fetch_results(workers):
-    # 1. 자동 로그인 처리
-    api_key_path = os.path.join(os.path.dirname(__file__), '.wandb_api_key')
-    if os.path.exists(api_key_path):
-        with open(api_key_path, 'r') as f:
-            api_key = f.read().strip()
-            wandb.login(key=api_key)
-            print("✅ .wandb_api_key를 사용하여 성공적으로 로그인했습니다.")
-    else:
-        print("⚠️ .wandb_api_key 파일을 찾을 수 없습니다. 기존 설정된 자격 증명을 시도합니다.")
+def parse_args(argv=None):
+    parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--workers', type=int, default=8)
+    parser.add_argument('--experiment', help='Experiment name used by enqueue_train.py; automatically selects its own report directory')
+    parser.add_argument('--list-experiments', action='store_true', help='List named queues and saved experiment reports without contacting W&B')
+    parser.add_argument('--output', type=Path, help='Optional override of the experiment CSV path')
+    parser.add_argument('--manifest', type=Path, help='Optional override of the experiment manifest path')
+    parser.add_argument('--root', type=Path, default=ROOT)
+    parser.add_argument('--queue-db', type=Path)
+    parser.add_argument('--gpu-type', help='Optional GPU pool filter for first capture (legacy default: 3090)')
+    parser.add_argument('--job-id', action='append', help='Optional exact Job IDs for first capture')
+    parser.add_argument('--project', default='choemj-kaist/STORM')
+    parser.add_argument('--offline', action='store_true', help='Read local final evaluations and this campaign CSV only')
+    parser.add_argument('--excel', action='store_true')
+    parser.add_argument('--excel-output', type=Path)
+    args = parser.parse_args(argv)
+    if args.workers < 1:
+        parser.error('--workers must be positive')
+    return args
 
-    # 2. WandB API 객체 생성 및 엔티티 자동 추출
-    api = wandb.Api()
-    try:
-        # 명시적으로 choemj-kaist 엔티티 사용
-        entity = "choemj-kaist"
-        wandb_path = f"{entity}/STORM"
-        print(f"'{wandb_path}' 프로젝트의 run들을 분석합니다...")
-        runs = api.runs(wandb_path, per_page=100, lazy=False)
-    except Exception as e:
-        print(f"WandB API 호출 실패: {e}")
-        raise RuntimeError('W&B 조회에 실패했습니다. 로컬 결과는 --offline으로 갱신할 수 있습니다.') from e
 
-    total_runs = len(runs)
-    print(f"총 {total_runs}개의 run을 확인했습니다. 최대 {workers}개씩 병렬 분류합니다...")
-
-    return classify_runs(runs, workers=workers)
-
-if __name__ == "__main__":
+if __name__ == '__main__':
     args = parse_args()
-    output = main(workers=args.workers, output_path=args.output, offline=args.offline)
-    if args.excel:
-        from convert_csv_to_excel import main as convert_excel
-        convert_excel(csv_path=output)
+    try:
+        if args.list_experiments:
+            database=args.queue_db or args.root/'training_queue/queue.sqlite3'
+            live=read_jobs(database) if database.exists() else {}
+            for name,count in list_experiments(live,args.root/'results'):
+                print(f'{name}: {count} job(s)')
+            raise SystemExit(0)
+        manifest,csv_path,excel_path=report_paths(args.experiment,manifest=args.manifest,csv=args.output,
+                                                excel=args.excel_output,results_dir=args.root/'results')
+        output = main(args.workers, csv_path, args.offline, manifest_path=manifest, root=args.root,
+                      queue_db=args.queue_db, gpu_type=args.gpu_type, job_ids=args.job_id, project=args.project,
+                      experiment=args.experiment)
+        if args.excel:
+            from convert_csv_to_excel import main as convert_excel
+            convert_excel(csv_path=output, output_path=excel_path, manifest_path=manifest,experiment=args.experiment)
+    except (ValueError, RuntimeError, OSError, sqlite3.Error) as error:
+        raise SystemExit(str(error))

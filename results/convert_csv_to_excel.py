@@ -1,1258 +1,402 @@
-import ast
-import fcntl
-import json
-import math
-import re
-import shlex
-import warnings
-from contextlib import ExitStack
-from copy import copy
+"""Export the current hash/target campaign, using only common completed warmups.
+
+    python results/convert_csv_to_excel.py
+
+Refresh collection first with classify_wandb_runs.py --excel or --offline --excel.
+Historical CSV files, manual scores, and previous experiment backups are not used.
+"""
+import argparse
+from collections import defaultdict
+from datetime import datetime, timezone
+import os
 from pathlib import Path
+from statistics import fmean, median, stdev
+import tempfile
+from zoneinfo import ZoneInfo
 
-import pandas as pd
-import yaml
+from openpyxl import Workbook
 from openpyxl.comments import Comment
-from openpyxl.styles import Alignment, Border, Side, Font, PatternFill
+from openpyxl.formatting.rule import ColorScaleRule
+from openpyxl.styles import Alignment, Border, Font, PatternFill, Side
 from openpyxl.utils import get_column_letter
-from neighbor_reuse import STUDY as REUSE_STUDY, load_reuse_plan, reuse_control_names, reuse_study_table
+from openpyxl.worksheet.table import Table, TableStyleInfo
 
-# (Random, Human, STORM 논문) 고정 참조 점수.
-# Random/Human: iclr2027_conference.tex의 tab:main_performance (2026-09-17).
-# STORM: 첨부된 논문 표의 STORM (ours) 열. 실행 시 원본 문서를 읽지 않습니다.
-REFERENCE_SCORES = {
-    'Alien': (227.8, 7127.7, 984),
-    'Amidar': (5.8, 1719.5, 205),
-    'Assault': (222.4, 742.0, 801),
-    'Asterix': (210.0, 8503.3, 1028),
-    'BankHeist': (14.2, 753.1, 641),
-    'BattleZone': (2360.0, 37187.5, 13540),
-    'Boxing': (0.1, 12.1, 80),
-    'Breakout': (1.7, 30.5, 16),
-    'ChopperCommand': (811.0, 7387.8, 1888),
-    'CrazyClimber': (10780.5, 35829.4, 66776),
-    'DemonAttack': (152.1, 1971.0, 165),
-    'Freeway': (0.0, 29.6, 34),
-    'Frostbite': (65.2, 4334.7, 1316),
-    'Gopher': (257.6, 2412.5, 8240),
-    'Hero': (1027.0, 30826.4, 11044),
-    'Jamesbond': (29.0, 302.8, 509),
-    'Kangaroo': (52.0, 3035.0, 4208),
-    'Krull': (1598.0, 2665.5, 8413),
-    'KungFuMaster': (258.5, 22736.3, 26182),
-    'MsPacman': (307.3, 6951.6, 2673),
-    'Pong': (-20.7, 14.6, 11),
-    'PrivateEye': (24.9, 69571.3, 7781),
-    'Qbert': (163.9, 13455.0, 4522),
-    'RoadRunner': (11.5, 7845.0, 17564),
-    'Seaquest': (68.4, 42054.7, 525),
-    'UpNDown': (533.4, 11693.2, 7985),
-}
-
-# 사용자 제공 이미지 및 results/MoW.pdf의 Table 11 (p. 27),
-# STORM (reproduced) 열의 표시값을 그대로 사용합니다.
-# 원 논문 점수와 Random/Human 참조값은 위 REFERENCE_SCORES에 보존합니다.
-REPRODUCED_SCORES = {
-    'Alien': 748,
-    'Amidar': 144,
-    'Assault': 1377,
-    'Asterix': 1318,
-    'BankHeist': 990,
-    'BattleZone': 5830,
-    'Boxing': 81,
-    'Breakout': 41,
-    'ChopperCommand': 1644,
-    'CrazyClimber': 79196,
-    'DemonAttack': 324,
-    'Freeway': 0,
-    'Frostbite': 366,
-    'Gopher': 5307,
-    'Hero': 11434,
-    'Jamesbond': 408,
-    'Kangaroo': 3512,
-    'Krull': 6522,
-    'KungFuMaster': 20046,
-    'MsPacman': 1490,
-    'Pong': 18,
-    'PrivateEye': 100,
-    'Qbert': 2910,
-    'RoadRunner': 14841,
-    'Seaquest': 557,
-    'UpNDown': 6128,
-}
-REPRODUCED_SCORE_SOURCE = (
-    'Mixture-of-World Models: Scaling Multi-Task Reinforcement Learning with '
-    'Modular Latent Dynamics, arXiv:2602.01270v1, Table 11 (p. 27), '
-    'STORM (reproduced) column. Local source: results/MoW.pdf. '
-    'https://arxiv.org/abs/2602.01270'
+from hash_target_common import (
+    expected_rows, load_manifest, number, read_csv_rows, report_paths,
 )
 
-
-def reference_rows(game):
-    """논문/재현 점수는 시드별 실험값과 구분된 참조 행으로 표시합니다."""
-    rows = []
-    if game in REFERENCE_SCORES:
-        rows.append((f'STORM (논문): {REFERENCE_SCORES[game][2]}', REFERENCE_SCORES[game][2]))
-    if game in REPRODUCED_SCORES:
-        rows.append((f'STORM (reproduced): {REPRODUCED_SCORES[game]}', REPRODUCED_SCORES[game]))
-    return rows
-
-
-PAIRED_MEAN_COLUMN = 'Mean (공통 시드)'
-SCORE_DELTA_COLUMN = 'Δ Score (행별 비교)'
-HNS_DELTA_COLUMN = 'Δ HNS (행별 비교)'
-HERE = Path(__file__).resolve().parent
-RETRIEVAL_COLUMNS = {
-    'enable': 'Retrieval Enable', 'warmup_steps': 'Warmup Steps',
-    'target': 'Retrieval Target', 'batch_size_reduction': 'Batch Size Reduction',
-    'z_score_threshold': 'Z Score Threshold', 'anchor_weight': 'Anchor Weight',
-    'anchor_weight_r': 'Anchor Weight R',
-    'anchor_offset': 'Anchor Offset', 'warmup_offset_pairs': 'Warmup Offset Pairs',
-    'value_signal': 'Value Signal', 'score_combination': 'Score Combination',
-    'neighbor_source': 'Neighbor Source',
-    'additive_z_score_threshold': 'Additive Z Score Threshold',
-    'td_error_z_score_threshold': 'TD Error Z Score Threshold',
-    'hash_bits': 'Hash Bits', 'save_warmup': 'Save Warmup',
+# Keep these literal constants readable by baseline_campaign.py. The report uses
+# only Random/Human normalization constants, never paper/reproduced run scores.
+REFERENCE_SCORES = {
+    'Alien': (227.8, 7127.7, 984), 'Amidar': (5.8, 1719.5, 205),
+    'Assault': (222.4, 742.0, 801), 'Asterix': (210.0, 8503.3, 1028),
+    'BankHeist': (14.2, 753.1, 641), 'BattleZone': (2360.0, 37187.5, 13540),
+    'Boxing': (0.1, 12.1, 80), 'Breakout': (1.7, 30.5, 16),
+    'ChopperCommand': (811.0, 7387.8, 1888), 'CrazyClimber': (10780.5, 35829.4, 66776),
+    'DemonAttack': (152.1, 1971.0, 165), 'Freeway': (0.0, 29.6, 34),
+    'Frostbite': (65.2, 4334.7, 1316), 'Gopher': (257.6, 2412.5, 8240),
+    'Hero': (1027.0, 30826.4, 11044), 'Jamesbond': (29.0, 302.8, 509),
+    'Kangaroo': (52.0, 3035.0, 4208), 'Krull': (1598.0, 2665.5, 8413),
+    'KungFuMaster': (258.5, 22736.3, 26182), 'MsPacman': (307.3, 6951.6, 2673),
+    'Pong': (-20.7, 14.6, 11), 'PrivateEye': (24.9, 69571.3, 7781),
+    'Qbert': (163.9, 13455.0, 4522), 'RoadRunner': (11.5, 7845.0, 17564),
+    'Seaquest': (68.4, 42054.7, 525), 'UpNDown': (533.4, 11693.2, 7985),
+}
+REPRODUCED_SCORES = {
+    'Alien': 748, 'Amidar': 144, 'Assault': 1377, 'Asterix': 1318,
+    'BankHeist': 990, 'BattleZone': 5830, 'Boxing': 81, 'Breakout': 41,
+    'ChopperCommand': 1644, 'CrazyClimber': 79196, 'DemonAttack': 324, 'Freeway': 0,
+    'Frostbite': 366, 'Gopher': 5307, 'Hero': 11434, 'Jamesbond': 408,
+    'Kangaroo': 3512, 'Krull': 6522, 'KungFuMaster': 20046, 'MsPacman': 1490,
+    'Pong': 18, 'PrivateEye': 100, 'Qbert': 2910, 'RoadRunner': 14841,
+    'Seaquest': 557, 'UpNDown': 6128,
 }
 
-
-def queue_command_row(command, queue_dir):
-    """학습을 실행하지 않고 큐 명령의 YAML/CLI 설정을 CSV와 같은 열로 읽습니다."""
-    tokens = shlex.split(command, comments=True)
-    if not tokens:
-        return None
-    if any(token in {';', '&&', '||', '|', '&', '>', '>>', '<'} for token in tokens):
-        raise ValueError('복합 셸 명령은 지원하지 않습니다')
-    td_queue_index = next((i for i, token in enumerate(tokens)
-                           if Path(token).name == 'td_error_only_queue.py'), None)
-    if td_queue_index is not None:
-        arguments = tokens[td_queue_index + 1:]
-        if not arguments or arguments[0] != 'run-job':
-            raise ValueError('TD-error only run-job 명령이 아닙니다')
-        values = {}
-        index = 1
-        while index < len(arguments):
-            key = arguments[index]
-            if '=' in key:
-                key, value = key.split('=', 1)
-                index += 1
-            else:
-                if index + 1 == len(arguments):
-                    raise ValueError(f'{key}: 값이 없습니다')
-                value = arguments[index + 1]
-                index += 2
-            values[key] = value
-        manifest_path = Path(values['--manifest'])
-        if not manifest_path.is_absolute():
-            manifest_path = Path(queue_dir) / manifest_path
-        elif not manifest_path.is_file() and 'results' in manifest_path.parts:
-            manifest_path = Path(queue_dir).joinpath(*manifest_path.parts[manifest_path.parts.index('results'):])
-        game = values['--game']
-        state_path = manifest_path.with_name(f'{game}.json')
-        state = json.loads(state_path.read_text()) if state_path.is_file() else {}
-        attempt = state.get('attempts', 0) + (state.get('status') != 'running')
-        return td_error_only_job_row(manifest_path, game, queue_dir, max(1, attempt))
-    train_index = next((i for i, token in enumerate(tokens) if Path(token).name == 'train.py'), None)
-    if train_index is None:
-        raise ValueError('train.py 명령이 아닙니다')
-    args = {}
-    index = train_index + 1
-    while index < len(tokens):
-        key = tokens[index]
-        if key.startswith('-') and '=' in key:
-            key, item = key.split('=', 1)
-            index += 1
-        else:
-            if index + 1 == len(tokens):
-                raise ValueError(f'{key}: 값이 없습니다')
-            item = tokens[index + 1]
-            index += 2
-        args[key] = item
-
-    def local_path(raw):
-        path = Path(raw)
-        if not path.is_absolute():
-            return queue_dir / path
-        # 다른 worker의 절대 경로도 공유 저장소의 동일 파일로 조회합니다.
-        if not path.exists():
-            for root in ('ckpt', 'runs', 'config_files'):
-                if root in path.parts:
-                    return queue_dir.joinpath(*path.parts[path.parts.index(root):])
-        return path
-
-    metadata = {}
-    resume = args.get('--resume_warmup')
-    if resume:
-        checkpoint = local_path(resume)
-        locator = checkpoint / 'warmup.json'
-        if locator.is_file():
-            checkpoint /= json.loads(locator.read_text(encoding='utf-8'))['checkpoint']
-        metadata_path = checkpoint / 'warmup_metadata.json'
-        if metadata_path.is_file():
-            metadata = json.loads(metadata_path.read_text(encoding='utf-8'))
-        config_path = checkpoint / 'config.yaml'
-    else:
-        config_path = local_path(args.get('-config_path', 'config_files/STORM.yaml'))
-
-    if resume and not config_path.is_file():
-        # 다른 GPU의 warmup은 정상 존재한다고 가정하고 기본 설정 + CLI로 표시합니다.
-        config_path = queue_dir / 'config_files/STORM.yaml'
-        if not config_path.is_file():
-            config_path = HERE.parent / 'config_files/STORM.yaml'
-    if not config_path.is_file():
-        raise ValueError(f'설정 파일을 찾을 수 없습니다: {config_path}')
-    config = yaml.safe_load(config_path.read_text(encoding='utf-8'))
-    retrieval = dict(config['JointTrainAgent']['Retrieval'])
-    prefix = 'JointTrainAgent.Retrieval.'
-    for key, item in args.items():
-        if key.startswith(prefix):
-            try:
-                item = ast.literal_eval(item)
-            except (ValueError, SyntaxError):
-                pass
-            retrieval[key[len(prefix):]] = item
-    if '--branch_experiment' in args:
-        retrieval['enable'] = [args['--branch_experiment']]
-    elif '--branch_mode' in args:
-        retrieval['enable'] = args['--branch_mode']
-    mode = retrieval.get('enable')
-    named_modes = {'baseline', 'retrieval', 'target1', 'value', 'add', 'td_error_only', 'randomneighor'}
-    if isinstance(mode, str) and mode.strip().lower() in named_modes:
-        mode = [mode.strip().lower()]
-    if isinstance(mode, list):
-        mode = [str(name).strip().lower() for name in mode]
-        if not mode or any(name not in named_modes for name in mode):
-            raise ValueError(f'알 수 없는 Retrieval.enable 실험 목록: {mode}')
-        retrieval['enable'] = repr(mode)
-    elif str(mode).lower() not in {'true', 'false', 'both'}:
-        raise ValueError(f'알 수 없는 Retrieval.enable: {mode}')
-
-    base = args.get('-n', metadata.get('run_name', ''))
-    if not base and resume:
-        # Shared warmup과 일반 run 모두 지원하며 하위 checkpoint 경로도 읽습니다.
-        base = next((part.removesuffix('_Shared') for part in reversed(Path(resume).parts)
-                     if part.endswith('_Shared') or re.fullmatch(r'.+-(?:seed)?\d+', part)), '')
-    env = args.get('-env_name', metadata.get('env_name', ''))
-    game = env.split('/')[-1].removesuffix('-v5') if env else base.split('-')[0]
-    seed = args.get('-seed', metadata.get('seed'))
-    if seed is None:
-        match = re.search(r'-(?:seed)?(\d+)$', base)
-        seed = match.group(1) if match else None
-    if not game or seed is None or not str(seed).isdigit():
-        raise ValueError('게임/시드를 읽을 수 없습니다')
-    return {
-        **{column: (json.dumps(retrieval.get(key, [])) if key == 'warmup_offset_pairs'
-                    else retrieval.get(key, 'N/A')) for key, column in RETRIEVAL_COLUMNS.items()},
-        'Run Name': f'{game}_queued_{seed}', 'Seed': int(seed),
-        'Base Run Name': base,
-        'Local Run Name': f'{base}_{mode[0]}' if isinstance(mode, list) and len(mode) == 1 else '',
-        'Training Phase': 'queued',
-        'Warmup Directory': args.get('--resume_from', resume or ''),
-        'State': 'queued', 'Eval Return': 'N/A',
-        'Created At': pd.Timestamp.now(tz='UTC').isoformat(),
-        'Calculated Warmup Steps': metadata.get('step', retrieval.get('warmup_steps', 'N/A')),
-    }
+NAVY, LIGHT, GREEN, GRAY = '172B4D', 'F5F8FC', 'DFF2E7', 'E6EDF5'
+FONT = '맑은 고딕'
+STATE_LABELS = {'completed': '완료', 'running': '진행 중', 'pending': '대기',
+                'failed': '실패', 'interrupted': '중단', 'invalid': '검증 오류', 'evaluating': '평가 종료 대기'}
 
 
-def td_error_only_job_row(manifest_path, game, queue_dir, attempt):
-    """전용 큐의 고정 설정과 시드를 읽으며 학습 명령은 실행하지 않습니다."""
-    manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
-    seed = manifest['seeds'][game]
-    base = f"{game}-td_only-{manifest['id']}-seed{seed}-attempt{attempt}"
-    config_path = Path(manifest['config'])
-    if not config_path.is_file():
-        config_path = manifest_path.with_name('config.yaml')
-    row = queue_command_row(shlex.join([
-        'python', 'train.py', '-n', base, '-seed', str(seed),
-        '-config_path', str(config_path), '-env_name', f'ALE/{game}-v5',
-    ]), queue_dir)
-    row['Local Run Name'] = f'{base}_O'
-    return row
+def hns(game, score):
+    random, human, _ = REFERENCE_SCORES[game]
+    return (score - random) / (human - random)
 
 
-def read_local_td_error_only_runs(queue_dir):
-    """W&B 동기화 전에도 전용 campaign의 완료 결과와 실행 상태를 읽습니다."""
-    queue_dir = Path(queue_dir)
-    rows = []
-    for manifest_path in sorted((queue_dir / 'results/td_error_only_queue').glob('*/manifest.json')):
-        manifest = json.loads(manifest_path.read_text(encoding='utf-8'))
-        config = yaml.safe_load(manifest_path.with_name('config.yaml').read_text())['JointTrainAgent']
-        for game, seed in manifest['seeds'].items():
-            state_path = manifest_path.with_name(f'{game}.json')
-            state = json.loads(state_path.read_text()) if state_path.is_file() else {}
-            for attempt in range(1, state.get('attempts', 0) + 1):
-                row = td_error_only_job_row(manifest_path, game, queue_dir, attempt)
-                path = queue_dir / 'runs' / row['Local Run Name'] / 'final_evaluation.json'
-                if not path.is_file():
-                    if attempt != state['attempts'] or state.get('status') != 'running':
-                        continue
-                    row.update({'State': 'running', 'Training Phase': 'training'})
-                    timestamp_path = state_path
-                else:
-                    try:
-                        result = json.loads(path.read_text(encoding='utf-8'))
-                        returns = result['episode_returns']
-                        score = float(result['episode_avg_return'])
-                        precision = 'bf16' if config['EvalPrecision'] == 'both' else config['EvalPrecision']
-                        if (result['run_name'] != row['Local Run Name'] or result['seed'] != seed
-                                or result['env_name'] != f'ALE/{game}-v5'
-                                or result['checkpoint_step'] != config['FinalEvalStep']
-                                or result['sample_max_steps'] != config['SampleMaxSteps']
-                                or result['precision'] != precision
-                                or len(returns) != config['EvalEpisodes']
-                                or not math.isfinite(score)
-                                or not all(math.isfinite(float(value)) for value in returns)
-                                or not math.isclose(sum(returns) / len(returns), score,
-                                                    rel_tol=1e-7, abs_tol=1e-5)):
-                            raise ValueError('TD-error only final evaluation does not match the campaign')
-                        row.update({'State': 'finished', 'Eval Return': score,
-                                    'Eval Checkpoint Step': result['checkpoint_step'],
-                                    'Training Phase': 'training', 'Local Evaluation': str(path)})
-                        if precision == 'bf16':
-                            row['Eval Return BF16'] = score
-                        elif precision == 'fp32':
-                            row['Eval Return FP32'] = score
-                    except (ValueError, TypeError, KeyError, OSError, ZeroDivisionError) as error:
-                        warnings.warn(f'{path}: 로컬 평가를 건너뜁니다: {error}', stacklevel=2)
-                        continue
-                    timestamp_path = path
-                row.update({'Run Name': f'{game}_local_{seed}_O',
-                            'Run ID': f"local:{row['Local Run Name']}", 'Queue Details': '',
-                            'Created At': pd.Timestamp(timestamp_path.stat().st_mtime,
-                                                       unit='s', tz='UTC').isoformat()})
-                rows.append(row)
-    return rows
+def calculate_metrics(by_game):
+    """Project convention: macro game means, pooled-seed IQM, per-game hinged gap."""
+    if not by_game:
+        return dict(mean=None, median=None, iqm=None, gap=None)
+    game_means = [fmean(values) for values in by_game.values()]
+    pooled = sorted(value for values in by_game.values() for value in values)
+    trim = len(pooled) // 4
+    return dict(mean=fmean(game_means), median=median(game_means),
+                iqm=fmean(pooled[trim:len(pooled)-trim]),
+                gap=fmean(max(0, 1 - value) for value in game_means))
 
 
-def read_queued_runs(queue_dir):
-    """등록 이력 대신 현재 모든 job_queue*.txt의 스냅샷을 읽습니다."""
-    queue_dir = Path(queue_dir)
-    paths = sorted({*queue_dir.glob('job_queue_*.txt'), *queue_dir.glob('job_queue.txt')})
-    rows = []
-    for path in paths:
-        with ExitStack() as stack:
-            lock_path = path.with_suffix('.lock')
-            if lock_path.exists():
-                lock = stack.enter_context(lock_path.open('r'))
-                fcntl.flock(lock, fcntl.LOCK_SH)
-            lines = path.read_text(encoding='utf-8').splitlines()
-        for line_number, command in enumerate(lines, start=1):
-            source = f'{path.name}:{line_number}'
-            try:
-                row = queue_command_row(command, queue_dir)
-            except (ValueError, SyntaxError, KeyError, TypeError, OSError, yaml.YAMLError) as error:
-                warnings.warn(f'{source}: 큐 표시를 건너뜁니다: {error}', stacklevel=2)
-                continue
-            if row is not None:
-                row['Queue Details'] = f'{source}\n{command.strip()}'
-                rows.append(row)
-    return rows
+def aggregate(manifest, csv_rows):
+    jobs = {job['id']: job for job in manifest['jobs']}
+    games = sorted({job['game'] for job in jobs.values()})
+    if set(games) - REFERENCE_SCORES.keys():
+        raise ValueError(f'Missing Random/Human references: {set(games)-REFERENCE_SCORES.keys()}')
+    settings = ['Baseline'] + [f'h{h} / t{t}' for h, t in manifest['pairs']]
+    rows = {}
+    for _, _, expected in expected_rows(manifest):
+        key = expected['Job ID'], expected['Stage']
+        row = dict(expected, State='pending', **{'Eval Return': None, 'Notes': ''})
+        row.update(csv_rows.get(key, {}))
+        if row['State'] not in STATE_LABELS:
+            raise ValueError(f'Unknown result state: {row["State"]}')
+        row['Eval Return'] = number(row.get('Eval Return')) if row['State'] == 'completed' else None
+        rows[key] = row
+    # A job is one frozen (game, GPU model, seed, shared warmup) observation.
+    common = {identity for identity, job in jobs.items()
+              if all(rows[identity, stage['key']]['Eval Return'] is not None for stage in job['stages'])}
+    common_by_game = {game: [identity for identity in common if jobs[identity]['game'] == game] for game in games}
+    records = {(row['Job ID'], row['Setting']): row for row in rows.values()}
+    statistics, metrics, counts = {}, {}, {}
+    for setting in settings:
+        by_game = {}
+        for game, identities in common_by_game.items():
+            scores = [records[identity, setting]['Eval Return'] for identity in identities]
+            controls = [records[identity, 'Baseline']['Eval Return'] for identity in identities]
+            avg, control = (fmean(scores), fmean(controls)) if scores else (None, None)
+            delta = avg - control if scores else None
+            statistics[game, setting] = dict(n=len(scores), mean=avg,
+                sd=stdev(scores) if len(scores)>1 else None, hns=hns(game, avg) if scores else None,
+                control=control, delta=delta,
+                delta_hns=delta/(REFERENCE_SCORES[game][1]-REFERENCE_SCORES[game][0]) if scores else None,
+                improvement=delta/abs(control) if scores and control != 0 else None,
+                wins=sum(score>base for score,base in zip(scores,controls)))
+            if scores:
+                by_game[game] = [hns(game, score) for score in scores]
+        metrics[setting] = calculate_metrics(by_game)
+        counts[setting] = sum(row['Setting']==setting and row['Eval Return'] is not None for row in rows.values())
+    ranked = sorted(settings[1:], key=lambda s: (metrics[s]['mean'] is None, -(metrics[s]['mean'] or 0), settings.index(s)))
+    ranks = {s: 1+sum(metrics[other]['mean']>metrics[s]['mean'] for other in settings[1:])
+             for s in settings[1:] if metrics[s]['mean'] is not None}
+    return dict(jobs=jobs, games=games, settings=settings, rows=rows, records=records, common=common,
+                common_by_game=common_by_game, stats=statistics, metrics=metrics, counts=counts,
+                ranked=ranked, ranks=ranks, provisional=len(common)<len(jobs))
 
 
-def read_paper_plans(queue_dir):
-    for path in sorted((Path(queue_dir)/'results').glob('paper_random_neighbor_*/plan.json')):
-        plan = json.loads(path.read_text(encoding='utf-8'))
-        for job in plan['jobs']:
-            yield path.parent.name, plan, job
-    reuse = load_reuse_plan(queue_dir)
-    if reuse:
-        for job in reuse['training_jobs']:
-            yield REUSE_STUDY, reuse, job
+def set_cell(ws, row, col, value):
+    cell = ws.cell(row, col, value)
+    if isinstance(value, str):
+        cell.data_type = 's'
+    return cell
 
 
-def read_local_paper_results(queue_dir):
-    """Read final evaluations of exactly the runs reserved by the paper study."""
-    queue_dir = Path(queue_dir)
-    rows = []
-    for study, plan, job in read_paper_plans(queue_dir):
-        path = queue_dir/job['final_evaluation_path']
-        if not path.is_file():
-            continue
-        try:
-            result = json.loads(path.read_text(encoding='utf-8'))
-            if (result['run_name'] != job['final_run_name'] or result['seed'] != job['seed']
-                    or result['env_name'] != f"ALE/{job['game']}-v5"
-                    or result['checkpoint_step'] != plan['evaluation']['checkpoint_step']):
-                raise ValueError('final evaluation identity/checkpoint does not match the study')
-            returns = result['episode_returns']
-            score = float(result['episode_avg_return'])
-            if (len(returns) != plan['evaluation']['episodes'] or not math.isfinite(score)
-                    or not all(math.isfinite(float(x)) for x in returns)
-                    or not math.isclose(sum(returns)/len(returns), score, rel_tol=1e-7, abs_tol=1e-5)):
-                raise ValueError('invalid final episode returns or mean')
-            if result['precision'] != 'bf16':
-                raise ValueError('paper random study expects the BF16 primary evaluation')
-            row = queue_command_row(job['command'], queue_dir)
-            row = expand_shared_runs(pd.DataFrame([row])).iloc[0].to_dict()
-            actual_config = path.parent/'config.yaml'
-            if actual_config.is_file():
-                retrieval = yaml.safe_load(actual_config.read_text())['JointTrainAgent']['Retrieval']
-                expected = {'neighbor_source': plan.get('neighbor_source', 'random'), 'warmup_steps': 50000,
-                            'anchor_offset': -2, 'target': 16,
-                            'anchor_weight': .0625, 'anchor_weight_r': None}
-                if any(retrieval.get(key) != value for key, value in expected.items()):
-                    raise ValueError('saved run configuration differs from the paper ablation')
-            shared = path.parent/'shared_warmup.json'
-            actual_warmup = (json.loads(shared.read_text())['resume_step'] if shared.is_file()
-                             else job['resume_step'] or plan['warmup_steps'])
-            row.update({
-                'Run Name': f"{job['game']}_local_{job['seed']}",
-                'Run ID': f"local:{job['final_run_name']}",
-                'State': 'finished', 'Eval Return': score, 'Eval Return BF16': score,
-                'Eval Checkpoint Step': result['checkpoint_step'],
-                'Base Run Name': job['run_base'], 'Local Run Name': job['final_run_name'],
-                'Training Phase': 'branch', 'Study': study, 'Queue Details': '',
-                'Calculated Warmup Steps': actual_warmup,
-                'Created At': pd.Timestamp(path.stat().st_mtime, unit='s', tz='UTC').isoformat(),
-                'Local Evaluation': str(path),
-            })
-            rows.append(row)
-        except (ValueError, TypeError, KeyError, OSError, yaml.YAMLError) as error:
-            warnings.warn(f'{path}: 로컬 평가를 건너뜁니다: {error}', stacklevel=2)
-    return rows
+def sheet(wb, name, title, subtitle, last_col):
+    ws = wb.create_sheet(name)
+    ws.sheet_view.showGridLines = False
+    ws.sheet_view.zoomScale = 85
+    ws.sheet_properties.tabColor = '087F8C'
+    for row, text, size, color in [(1,title,18,NAVY),(2,subtitle,10,'61758A')]:
+        ws.merge_cells(start_row=row,start_column=1,end_row=row,end_column=last_col)
+        cell = set_cell(ws,row,1,text)
+        cell.font = Font(name=FONT,size=size,bold=row==1,color=color)
+        cell.alignment = Alignment(vertical='center',wrap_text=True)
+        ws.row_dimensions[row].height = 34 if row==1 else 30
+    ws.sheet_properties.pageSetUpPr.fitToPage = True
+    ws.page_setup.orientation = 'landscape'
+    ws.page_setup.paperSize = ws.PAPERSIZE_A3
+    ws.page_setup.fitToWidth,ws.page_setup.fitToHeight = 1,0
+    ws.oddFooter.right.text = 'Page &P / &N'
+    return ws
 
 
-def merge_local_run_rows(df, local_rows):
-    """One row per local run; keep W&B provenance and prefer its local final mean."""
-    records = df.to_dict('records')
-    for local in local_rows:
-        matches = [row for row in records if (
-            row.get('Local Run Name') == local['Local Run Name'] or (
-                row.get('Base Run Name') == local['Base Run Name']
-                and row.get('Training Phase') != 'warmup'))]
-        remote = max(matches, key=lambda row: str(row.get('Created At', '')), default={})
-        if local['State'] == 'running' and remote:
-            continue  # W&B has the authoritative status once this run is synced.
-        if remote and pd.to_datetime(remote.get('Created At'), utc=True, errors='coerce') > pd.to_datetime(local['Created At']):
-            continue  # A later retry must not inherit the previous run's result.
-        records = [row for row in records if row not in matches and not (
-            row.get('Base Run Name') == local['Base Run Name']
-            and row.get('Training Phase') == 'warmup')]
-        merged = {**remote, **local}
-        for key in ('Run Name', 'Run ID', 'Commit', 'Logic', 'Eval Return FP32'):
-            if key in remote and not pd.isna(remote[key]):
-                merged[key] = remote[key]
-        records.append(merged)
-    return pd.DataFrame(records)
+def headers(ws,row,labels):
+    for col,label in enumerate(labels,1):
+        cell = set_cell(ws,row,col,label)
+        cell.fill = PatternFill('solid',fgColor=NAVY)
+        cell.font = Font(name=FONT,size=10,bold=True,color='FFFFFF')
+        cell.alignment = Alignment(horizontal='center',vertical='center',wrap_text=True)
+    ws.row_dimensions[row].height = 34
 
 
-def merge_local_paper_results(df, queue_dir):
-    return merge_local_run_rows(df, read_local_paper_results(queue_dir))
+def line(ws,row,values,control=False,best=False):
+    for col,value in enumerate(values,1):
+        cell = set_cell(ws,row,col,value)
+        cell.font = Font(name=FONT,size=10,color=NAVY,bold=control or best)
+        cell.alignment = Alignment(vertical='center',horizontal='left' if isinstance(value,str) else 'right')
+        cell.fill = PatternFill('solid',fgColor=GRAY if control else GREEN if best else LIGHT if row%2 else 'FFFFFF')
+        cell.border = Border(bottom=Side(style='hair',color='DCE5EF'))
+    ws.row_dimensions[row].height = 24
 
 
-def merge_local_results(df, queue_dir):
-    df = merge_local_paper_results(df, queue_dir)
-    return merge_local_run_rows(df, read_local_td_error_only_runs(queue_dir))
+def table(ws,name,row,last,col):
+    item = Table(displayName=name,ref=f'A{row}:{get_column_letter(col)}{last}')
+    item.tableStyleInfo = TableStyleInfo(name='TableStyleMedium2',showRowStripes=False,showColumnStripes=False)
+    ws.add_table(item)
 
 
-def paper_study_table(df, queue_dir, queued_rows):
-    """Expose the 103 new study jobs independently of older same-seed scores."""
-    reuse = load_reuse_plan(queue_dir)
-    if reuse:
-        return reuse_study_table(df, queue_dir, queued_rows, reuse)
-    records = df.to_dict('records')
-    pending = {row.get('Base Run Name') for row in queued_rows}
-    output = []
-    for study, plan, job in read_paper_plans(queue_dir):
-        matches = [row for row in records if row.get('Local Run Name') == job['final_run_name']
-                   or row.get('Base Run Name') == job['run_base']]
-        completed = [row for row in matches if str(row.get('State')).lower() == 'finished'
-                     and pd.notna(pd.to_numeric(row.get('Eval Return'), errors='coerce'))]
-        selected = max(completed or matches, key=lambda row: str(row.get('Created At', '')), default={})
-        score = float(selected['Eval Return']) if completed else None
-        status = ('FINISHED' if completed else str(selected['State']).upper() if selected
-                  else 'QUEUED' if job['run_base'] in pending
-                  else 'STARTED / NO FINAL RESULT' if (Path(queue_dir)/'runs'/job['final_run_name']).exists()
-                  or (Path(queue_dir)/'runs'/(job['run_base']+'_Shared')).exists()
-                  else 'NOT IN QUEUE')
-        output.append({'Study': study, 'Game': job['game'], 'Seed': job['seed'],
-                       'Status': status, 'Paper Full FLASH': job['paper_retrieval_score'],
-                       'Random Neighbor': score,
-                       'Random minus FLASH': score-job['paper_retrieval_score'] if score is not None else None,
-                       'Mode': job['mode'], 'Local Run Name': job['final_run_name'],
-                       'W&B Run ID': selected.get('Run ID', ''),
-                       'Eval Checkpoint Step': selected.get('Eval Checkpoint Step', ''),
-                       'Eval Return FP32': selected.get('Eval Return FP32', ''),
-                       'Warmup Steps': plan['warmup_steps'], 'Anchor Offset': plan['anchor_offset'],
-                       'Final Evaluation': job['final_evaluation_path']})
-    return pd.DataFrame(output)
+def widths(ws,values):
+    for col,width in enumerate(values,1):
+        ws.column_dimensions[get_column_letter(col)].width = width
 
 
-def expand_shared_runs(df):
-    """공통 warmup과 실행 중인 분기의 예정 실험을 실제 config로 펼칩니다."""
-    # training_branches.py의 RETRIEVAL_EXPERIMENTS와 동일한 부분 설정입니다.
-    overrides = {
-        'baseline': {'Retrieval Enable': False},
-        'retrieval': {'Retrieval Enable': True},
-        'target1': {'Retrieval Enable': True, 'Retrieval Target': 1},
-        'value': {'Retrieval Enable': True, 'Value Signal': 'value'},
-        'add': {'Retrieval Enable': True, 'Score Combination': 'add'},
-        'td_error_only': {'Retrieval Enable': True, 'Score Combination': 'td_error_only'},
-        'randomneighor': {'Retrieval Enable': True, 'Neighbor Source': 'random'},
-    }
-    rows = []
-    for row in df.to_dict('records'):
-        pair_value = row.get('Warmup Offset Pairs')
-        pairs = pair_value if isinstance(pair_value, list) else ast.literal_eval(
-            str(config_value(row, 'Warmup Offset Pairs', '[]')))
-        enable = str(row['Retrieval Enable']).strip()
-        if enable.lower() in {'randomneighor', 'td_error_only'}:
-            # 단독 preset은 완료된 점수도 보존하며 실제 설정으로 변환합니다.
-            row.update(overrides[enable.lower()])
-            enable = str(row['Retrieval Enable'])
-        if enable.startswith('['):
-            experiments = ast.literal_eval(enable)
-            if not isinstance(experiments, list) or not experiments:
-                raise ValueError(f'Invalid Retrieval.enable experiment list: {enable}')
-            experiments = [str(name).strip().lower() for name in experiments]
-        elif enable.lower() == 'both' or str(row['Run Name']).lower().endswith('_both'):
-            experiments = ['baseline', 'retrieval']
-        elif pairs:
-            experiments = ['retrieval' if enable.lower() in ('true', '1', 't') else 'baseline']
-        else:
-            rows.append(row)
-            if row['State'] == 'running':
-                pending_configs = json.loads(config_value(row, 'Pending Retrieval Configs', '[]'))
-                rows.extend({**row, **config} for config in pending_configs)
-            continue
-
-        if row['State'] not in {'running', 'queued'}:
-            continue
-        seen_baselines = set()
-        for warmup, offset in (pairs or [(None, None)]):
-            for name in dict.fromkeys(experiments):
-                if name not in overrides:
-                    raise ValueError(f'Unknown Retrieval.enable experiment: {name}')
-                if name == 'baseline' and warmup in seen_baselines:
-                    continue
-                if name == 'baseline':
-                    seen_baselines.add(warmup)
-                expanded = {**row, **overrides[name]}
-                if warmup is not None:
-                    expanded.update({'Warmup Steps': warmup, 'Calculated Warmup Steps': warmup,
-                                     'Anchor Offset': offset, 'Warmup Offset Pairs': '[]'})
-                rows.append(expanded)
-    return pd.DataFrame(rows, columns=list(dict.fromkeys([
-        *df.columns, 'Value Signal', 'Score Combination', 'Neighbor Source', 'Anchor Offset',
-    ])))
+def formats(ws,row,values):
+    for col,pattern in values.items():
+        ws.cell(row,col).number_format = pattern
 
 
-def config_value(row, column, default):
-    """새 config 필드가 없는 과거 CSV/백업에는 학습 코드의 기본값을 적용합니다."""
-    value = row.get(column)
-    if pd.isna(value) or str(value).strip().lower() in {'', 'n/a', 'nan', 'none'}:
-        return default
-    return value
+def parameters(setting,manifest):
+    if setting == 'Baseline':
+        return '—','—'
+    return next((h,t) for h,t in manifest['pairs'] if setting==f'h{h} / t{t}')
 
 
-def ablation_config_label(config):
-    """Preserve the pre-sweep grouping of fixed-weight offsets -2 and -3."""
-    base, separator, suffix = config.partition(' [')
-    if base not in {'target: 1 (anchor 미설정)', 'target: 16 (anchor 미설정)'}:
-        return config
-    if not separator or not suffix.endswith(']'):
-        return config
-    variants = suffix[:-1].split(', ')
-    if (variants[-1] != 'offset: -3'
-            or any(item not in {'value', 'add', 'RandomNeighor'} for item in variants[:-1])):
-        return config
-    variants.pop()
-    return base + (f" [{', '.join(variants)}]" if variants else '')
+def add_heatmaps(ws,start,manifest,data):
+    bits = sorted({h for h,t in manifest['pairs']})
+    targets = sorted({t for h,t in manifest['pairs']})
+    width = len(targets)+1
+    right = max(7,width+3)
+    for name,key,top,left,higher in [
+        ('Mean HNS','mean',start,1,True),('Median HNS','median',start,right,True),
+        ('IQM','iqm',start+len(bits)+6,1,True),('Optimality Gap','gap',start+len(bits)+6,right,False)]:
+        ws.merge_cells(start_row=top,start_column=left,end_row=top,end_column=left+width-1)
+        cell = set_cell(ws,top,left,f'{name} {"↑" if higher else "↓"}')
+        cell.font = Font(name=FONT,size=12,bold=True,color=NAVY)
+        cell.fill = PatternFill('solid',fgColor='EEF4FA')
+        ws.row_dimensions[top].height = 28
+        header = top+2
+        for offset,label in enumerate(['h / t',*targets]):
+            cell = set_cell(ws,header,left+offset,label)
+            cell.font = Font(name=FONT,bold=True,color='FFFFFF',size=10)
+            cell.fill = PatternFill('solid',fgColor=NAVY)
+            cell.alignment = Alignment(horizontal='center')
+        for rr,h in enumerate(bits,header+1):
+            cell = set_cell(ws,rr,left,h)
+            cell.font = Font(name=FONT,bold=True,color=NAVY)
+            cell.fill = PatternFill('solid',fgColor='EEF4FA')
+            cell.alignment = Alignment(horizontal='center')
+            ws.row_dimensions[rr].height = 29
+            for offset,t in enumerate(targets,1):
+                value = data['metrics'].get(f'h{h} / t{t}',{}).get(key)
+                cell = set_cell(ws,rr,left+offset,value)
+                cell.number_format = '0.0000'
+                cell.font = Font(name=FONT,size=11,color=NAVY)
+                cell.alignment = Alignment(horizontal='center')
+                cell.fill = PatternFill('solid',fgColor=GRAY)
+        ref = f'{get_column_letter(left+1)}{header+1}:{get_column_letter(left+width-1)}{header+len(bits)}'
+        ws.conditional_formatting.add(ref,ColorScaleRule(start_type='min',start_color='FFF3D6' if higher else '75C3AB',
+                                      end_type='max',end_color='75C3AB' if higher else 'FFF3D6'))
+    return start+2*len(bits)+11
 
 
-def load_excluded_seeds():
-    """update_tex.py를 실행하지 않고 현재 EXCLUDED_SEEDS 설정을 읽습니다."""
-    source_path = Path(__file__).resolve().with_name('update_tex.py')
-    tree = ast.parse(source_path.read_text(encoding='utf-8'), filename=str(source_path))
-    for node in tree.body:
-        if isinstance(node, ast.Assign):
-            targets = node.targets
-        elif isinstance(node, ast.AnnAssign):
-            targets = [node.target]
-        else:
-            continue
-        if any(isinstance(target, ast.Name) and target.id == 'EXCLUDED_SEEDS' for target in targets):
-            return ast.literal_eval(node.value)
-    raise ValueError(f'EXCLUDED_SEEDS 설정을 찾을 수 없습니다: {source_path}')
+def build_workbook(manifest,data,manifest_path):
+    wb = Workbook()
+    wb.remove(wb.active)
+    wb.properties.title = 'STORM hash_bits × target comparison'
+    wb.properties.description = manifest['campaign_id']
+    games,settings = data['games'],data['settings']
+    last_col = max(10,9+len(games))
+    ws = sheet(wb,'전체 비교','전체 비교 | hash_bits × target',manifest['campaign_id'],last_col)
+    common_games = sum(bool(v) for v in data['common_by_game'].values())
+    ws.merge_cells(start_row=3,start_column=1,end_row=3,end_column=last_col)
+    timestamp = datetime.now(timezone.utc).astimezone(ZoneInfo('Asia/Seoul')).strftime('%Y-%m-%d %H:%M KST')
+    ws['A3'] = (f'비교 표본: 공통 완료 {common_games}/{len(games)}게임 · {len(data["common"])}/{len(data["jobs"])}개 warmup'
+                f' | {"잠정 순위" if data["provisional"] else "전체 완료"} | {timestamp}')
+    ws['A3'].font = Font(name=FONT,size=10,color='9C6500' if data['provisional'] else '087F8C')
+    labels = ['순위','설정','hash_bits','target','완료 / 예정','Mean HNS','Median HNS','IQM','Optimality Gap',*[f'{game} 평균 점수' for game in games]]
+    headers(ws,4,labels)
+    for row,setting in enumerate(['Baseline']+data['ranked'],5):
+        metric = data['metrics'][setting]
+        rank = data['ranks'].get(setting,'—')
+        h,t = parameters(setting,manifest)
+        line(ws,row,[rank,setting,h,t,f'{data["counts"][setting]} / {len(data["jobs"])}',
+                     metric['mean'],metric['median'],metric['iqm'],metric['gap'],
+                     *[data['stats'][game,setting]['mean'] for game in games]],control=setting=='Baseline',best=rank==1)
+        formats(ws,row,{**{c:'0.0000' for c in range(6,10)},**{c:'#,##0.00' for c in range(10,len(labels)+1)}})
+    for address,text in {
+        'A4':'Mean HNS 내림차순. 일부 게임/시드만 공통 완료되면 잠정 순위입니다.',
+        'E4':'이 설정의 최종 평가 완료 수 / 예정 warmup 수. 일부 설정만 완료된 warmup도 진행률에는 반영합니다.',
+        'F4':'게임별 공통 warmup의 평균 HNS를 게임 간 동일 가중 평균합니다.',
+        'G4':'게임별 공통 warmup 평균 HNS의 중앙값입니다.',
+        'H4':'공통 표본의 개별 시드 HNS를 합쳐 정렬하고 양 끝에서 floor(N/4)개씩 제외한 평균입니다. 시드별 동일 가중입니다.',
+        'I4':'게임별 max(0, 1 − 공통 warmup 평균 HNS)의 평균. 낮을수록 좋습니다.',
+    }.items():
+        ws[address].comment = Comment(text,'STORM')
+    end = 4+len(settings)
+    table(ws,'Overview',4,end,len(labels))
+    last = add_heatmaps(ws,end+3,manifest,data)
+    widths(ws,[8,18,12,11,16,16,16,16,19,*([22]*len(games))])
+    ws.freeze_panes = 'F5'
+    ws.print_title_rows = '1:4'
+    ws.print_area = f'A1:{get_column_letter(last_col)}{last}'
+
+    ws = sheet(wb,'게임별 비교','게임별 | 공통 완료 warmup의 설정 비교',
+               '모든 설정과 baseline이 최종 평가를 완료한 warmup만 사용 · SD는 시드 평균의 표본 표준편차',12)
+    for index,game in enumerate(games):
+        top = 5+index*(len(settings)+4)
+        ws.merge_cells(start_row=top,start_column=1,end_row=top,end_column=12)
+        ws.cell(top,1,f'{game} · 공통 완료 {len(data["common_by_game"][game])}개 warmup').font = Font(name=FONT,bold=True,color=NAVY,size=12)
+        headers(ws,top+1,['설정','hash_bits','target','공통 warmup n','평균 점수','시드 간 SD','평균 HNS','Baseline 공통 평균','Δ Score','Δ HNS','개선율','승리 시드'])
+        available = [s for s in settings[1:] if data['stats'][game,s]['mean'] is not None]
+        best = max(available,key=lambda s:data['stats'][game,s]['mean']) if available else None
+        for offset,setting in enumerate(settings,top+2):
+            st = data['stats'][game,setting]
+            h,t = parameters(setting,manifest)
+            line(ws,offset,[setting,h,t,st['n'],st['mean'],st['sd'],st['hns'],st['control'],st['delta'],st['delta_hns'],st['improvement'],
+                            f'{st["wins"]} / {st["n"]}' if st['n'] and setting!='Baseline' else None],control=setting=='Baseline',best=setting==best)
+            formats(ws,offset,{5:'#,##0.00',6:'#,##0.00',7:'0.0000',8:'#,##0.00',9:'+#,##0.00;-#,##0.00;0.00',10:'+0.0000;-0.0000;0.0000',11:'+0.0%;-0.0%;0.0%'})
+        table(ws,f'Game{index}',top+1,top+1+len(settings),12)
+    widths(ws,[19,12,11,18,18,16,16,22,18,16,14,14])
+    ws.freeze_panes='E7'
+
+    columns = sorted({(job['gpu_type'],job['seed']) for job in data['jobs'].values()})
+    models = sorted({gpu for gpu,seed in columns})
+    ws = sheet(wb,'GPU·시드별 점수','GPU·시드별 | 부분 완료 결과 포함',
+               '개별 완료 점수를 즉시 표시 · 완료분 평균은 진행 상황 확인용이며 전체 비교의 공통 표본 평균과 다를 수 있습니다.',6+len(columns)+len(models))
+    for gpu in models:
+        positions = [7+i for i,(model,seed) in enumerate(columns) if model==gpu]
+        if len(positions)>1:
+            ws.merge_cells(start_row=6,start_column=min(positions),end_row=6,end_column=max(positions))
+        ws.cell(6,min(positions),gpu).font=Font(name=FONT,bold=True,color=NAVY)
+    headers(ws,7,['게임','설정','hash_bits','target','완료분 평균 [참고]','완료분 SD',
+                  *[f'{gpu}: seed {seed}' for gpu,seed in columns],*[f'{gpu} 평균 [참고]' for gpu in models]])
+    unit_lookup = {(job['game'],job['gpu_type'],job['seed']):job['id'] for job in data['jobs'].values()}
+    for row,(game,setting) in enumerate(((g,s) for g in games for s in settings),8):
+        individual=[]
+        for gpu,seed in columns:
+            identity=unit_lookup.get((game,gpu,seed))
+            individual.append(data['records'].get((identity,setting)))
+        scores=[r['Eval Return'] for r in individual if r and r['Eval Return'] is not None]
+        model_averages=[]
+        for gpu in models:
+            selected=[r['Eval Return'] for (model,_),r in zip(columns,individual) if model==gpu and r and r['Eval Return'] is not None]
+            model_averages.append(fmean(selected) if selected else None)
+        line(ws,row,[game,setting,*parameters(setting,manifest),fmean(scores) if scores else None,stdev(scores) if len(scores)>1 else None,
+                     *[None if r is None else r['Eval Return'] if r['Eval Return'] is not None else STATE_LABELS[r['State']] for r in individual],
+                     *model_averages],control=setting=='Baseline')
+        formats(ws,row,{c:'#,##0.00' for c in range(5,7+len(columns)+len(models))})
+        for col,record in enumerate(individual,7):
+            if record:
+                ws.cell(row,col).comment=Comment(f'Warmup: {record["Warmup ID"]}\nJob: {record["Job ID"]}\n공통 비교 포함: {record["Job ID"] in data["common"]}\n{record.get("Notes", "")}','STORM')
+                if record['State']!='completed':
+                    ws.cell(row,col).fill=PatternFill('solid',fgColor='FFF2CC' if record['State'] in ('running','evaluating') else GRAY)
+    table(ws,'SeedScores',7,7+len(games)*len(settings),6+len(columns)+len(models))
+    widths(ws,[17,19,12,11,23,17,*([24]*(len(columns)+len(models)))])
+    ws.freeze_panes='G8'
+
+    ws=sheet(wb,'실행 상세','실행 상세 | 이번 실험에 배정된 분기만 표시',
+             '1행 = 1개 warmup의 1개 설정 · 미완료 점수는 빈칸 · 같은 분기의 재시도는 한 결과만 채택',16)
+    headers(ws,6,['게임','GPU 모델','시드','설정','hash_bits','target','상태','평가 평균 점수','HNS','평가 체크포인트','평가 정밀도','평가 episodes',
+                  '실제 warmup step','Warmup ID','공통 비교 포함','비고','Run ID','큐 Job ID','Stage','로컬 Run 이름','Warmup 경로','출처','갱신 시각'])
+    for rr,record in enumerate(data['rows'].values(),7):
+        score=record['Eval Return']
+        line(ws,rr,[record['Game'],record['GPU Type'],int(record['Seed']),record['Setting'],record['Hash Bits'],record['Retrieval Target'],
+                    STATE_LABELS[record['State']],score,hns(record['Game'],score) if score is not None else None,
+                    number(record.get('Eval Checkpoint Step')),record.get('Eval Precision'),number(record.get('Eval Episodes')),
+                    int(record['Actual Warmup Step']),record['Warmup ID'],record['Job ID'] in data['common'],record.get('Notes'),
+                    record.get('Run ID'),record['Job ID'],record['Stage'],record['Local Run Name'],record['Warmup Directory'],record.get('Source'),record.get('Updated At')],
+             control=record['Setting']=='Baseline')
+        formats(ws,rr,{8:'#,##0.00',9:'0.0000'})
+    table(ws,'RunDetails',6,6+len(data['rows']),23)
+    widths(ws,[17,16,12,19,12,11,17,20,16,21,17,17,22,26,19,65,20,38,24,65,85,20,30])
+    ws.column_dimensions.group('Q','W',outline_level=1,hidden=True)
+    ws.freeze_panes='H7'
+
+    ws=sheet(wb,'집계 기준','집계 기준','범위와 계산 방법',8)
+    rules=[
+        ('실험 ID',manifest['campaign_id']),('고정 목록',str(Path(manifest_path).resolve())),
+        ('대상',f'{len(data["jobs"])}개 warmup · {len(settings)-1}개 hash/target 쌍 + baseline · {len(data["rows"])}개 예정 분기'),
+        ('수집 범위','고정 목록의 Job ID와 정확한 로컬 Run 이름에 해당하는 결과만 사용. 과거 CSV·수동 점수·고정 백업은 제외.'),
+        ('완료 판정','설정/게임/시드/warmup 및 최종 평가 조건을 검증. 로컬 완료 마커 또는 finished W&B run과 모든 episode 결과가 필요.'),
+        ('공통 표본','게임·GPU·시드·warmup별로 모든 설정과 baseline이 완료된 표본만 비교표와 히트맵에 동시 포함.'),
+        ('진행률 / 빈칸','완료/예정은 부분 완료도 포함. 미완료 점수와 공통 표본 없는 지표는 빈칸. 시드별 상세는 개별 완료 점수를 즉시 표시.'),
+        ('잠정 순위','전체 warmup 완료 전에는 잠정 순위. 공통 완료 게임 수와 warmup 수를 상단에 표시. 순위는 Mean HNS 내림차순.'),
+        ('평가 조건',str(manifest['evaluation'])),
+        ('HNS','(score − Random) / (Human − Random). 음수와 1 초과 값을 자르지 않음.'),
+        ('Mean / Median','게임별 공통 warmup 평균 HNS의 평균 / 중앙값. 게임별 동일 가중.'),
+        ('IQM','공통 개별 시드 HNS를 합쳐 정렬하고 양 끝에서 floor(N/4)개씩 제거한 평균. 시드별 동일 가중.'),
+        ('Optimality Gap','게임별 max(0, 1 − 평균 HNS)의 평균. 낮을수록 좋음.'),
+        ('재시도','한 분기를 한 관측으로 집계. 검증된 로컬 결과 우선, 그다음 최신 완료 W&B run. 재시도 평균을 만들지 않음.'),
+        ('색상','Baseline 회색. 최고 평균 설정 녹색 행. 히트맵은 모두 진한 녹색이 좋은 성능. 공통 표본 없으면 회색.'),
+    ]
+    for rr,(label,text) in enumerate(rules,5):
+        ws.cell(rr,1,label).font=Font(name=FONT,bold=True,color=NAVY)
+        ws.merge_cells(start_row=rr,start_column=2,end_row=rr,end_column=8)
+        cell=set_cell(ws,rr,2,text)
+        cell.font=Font(name=FONT,size=10,color=NAVY)
+        cell.alignment=Alignment(wrap_text=True,vertical='center')
+        ws.row_dimensions[rr].height=40
+    widths(ws,[26,*([20]*7)])
+    wb.active=0
+    return wb
 
 
-def mark_excluded_seeds(worksheet, pivot_df, start_row, excluded_seeds):
-    """점수와 시드 열 이름을 보존하면서 제외된 실험 셀의 서식만 변경합니다."""
-    excluded_fill = PatternFill(fill_type='solid', fgColor='E7E6E6')
-    for row_idx, (game, config) in enumerate(pivot_df.index):
-        if config.startswith(('STORM (논문)', 'STORM (reproduced)')):
-            continue
-        for seed in excluded_seeds.get(game, set()):
-            if seed not in pivot_df.columns:
-                continue
-            cell = worksheet.cell(
-                row=start_row + row_idx,
-                column=pivot_df.columns.get_loc(seed) + 3,
-            )
-            font = copy(cell.font)
-            font.strike = True
-            if 'RUNNING' not in str(cell.value):
-                cell.fill = excluded_fill
-                font.color = '808080'
-            cell.font = font
-            cell.comment = Comment(
-                f'EXCLUDED_SEEDS: {game}, seed {seed}\n'
-                'STORM/results/update_tex.py의 EXCLUDED_SEEDS에 지정되어 '
-                '공통 시드 평균, Δ Score, Δ HNS 및 LaTeX 결과 집계에서 제외되는 시드입니다.\n'
-                '취소선은 제외된 시드, 노란색 배경은 실행 중인 run을 뜻합니다.',
-                'STORM',
-            )
-
-
-def parse_score(value):
-    """update_tex.py의 parse_val과 동일하게 셀의 첫 번째 점수만 사용."""
-    value = str(value).strip()
-    if value.lower() in {'', 'nan', 'n/a', 'na', 'none', 'running'}:
-        return float('nan')
-    value = value.split(',')[0].split('(')[0].strip()
+def main(csv_path=None,output_path=None,*,manifest_path=None,experiment=None):
+    manifest_path,csv_path,output_path=report_paths(experiment,manifest=manifest_path,csv=csv_path,excel=output_path)
+    manifest=load_manifest(manifest_path)
+    if experiment and manifest.get('experiment_name') not in (None,experiment):
+        raise ValueError('The selected manifest belongs to another --experiment')
+    rows=read_csv_rows(csv_path,manifest)
+    data=aggregate(manifest,rows)
+    wb=build_workbook(manifest,data,manifest_path)
+    output_path.parent.mkdir(parents=True,exist_ok=True)
+    descriptor,temporary=tempfile.mkstemp(dir=output_path.parent,prefix='.'+output_path.stem,suffix='.xlsx')
+    os.close(descriptor)
     try:
-        return float(value)
-    except (TypeError, ValueError):
-        return float('nan')
+        wb.save(temporary)
+        os.replace(temporary,output_path)
+    finally:
+        if os.path.exists(temporary):
+            os.unlink(temporary)
+    print(f'Excel: {output_path} (common completed warmups: {len(data["common"])}/{len(data["jobs"])})')
+    return output_path
 
 
-def mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells):
-    """config 또는 실행 인자에서 save_warmup=True인 run의 시드 셀을 강조합니다."""
-    warmup_fill = PatternFill(fill_type='solid', fgColor='C6EFCE')
-    warmup_side = Side(border_style='medium', color='00B050')
-    for game, config, seed in highlighted_cells:
-        cell = worksheet.cell(
-            row=start_row + pivot_df.index.get_loc((game, config)),
-            column=pivot_df.columns.get_loc(seed) + 3,
-        )
-        font = copy(cell.font)
-        font.bold = True
-        # 실행 중/제외 시드의 배경색과 취소선을 보존하고 초록 테두리로 함께 표시합니다.
-        if not any(marker in str(cell.value) for marker in ('RUNNING', 'QUEUED')) and not font.strike:
-            cell.fill = warmup_fill
-            font.color = '006100'
-        cell.font = font
-        border = copy(cell.border)
-        border.left = border.right = border.top = border.bottom = warmup_side
-        cell.border = border
-        note = (
-            '초록색 테두리: 이 셀에 표시된 run 중 config 또는 실행 인자에서 '
-            'JointTrainAgent.Retrieval.save_warmup=True인 run이 있습니다. '
-            '자식 분기는 재저장을 방지하기 위해 최종 config가 False일 수 있습니다.'
-        )
-        if cell.comment:
-            cell.comment.text += '\n\n' + note
-        else:
-            cell.comment = Comment(note, 'STORM')
-
-
-def mark_queued_runs(worksheet, pivot_df, start_row, agg_df):
-    """대기 셀과 출처를 표시하며 실행 중 배경/제외 시드 취소선을 유지합니다."""
-    queued_fill = PatternFill(fill_type='solid', fgColor='DDEBF7')
-    for _, row in agg_df[agg_df['Queue Details'].ne('')].iterrows():
-        cell = worksheet.cell(
-            row=start_row + pivot_df.index.get_loc((row['Game'], row['Config'])),
-            column=pivot_df.columns.get_loc(row['Seed']) + 3,
-        )
-        font = copy(cell.font)
-        font.bold = True
-        if 'RUNNING' not in str(cell.value):
-            cell.fill = queued_fill
-            font.color = '1F4E78'
-        cell.font = font
-        note = (
-            'QUEUED (파란색): 엑셀 생성 시 현재 job queue에 남아 있는 예정 실험입니다. '
-            'RUNNING과 함께 있으면 실행 중을 뜻하는 노란색을 우선합니다. '
-            '기존 점수는 유지하며 대기 표시는 점수 집계에 포함하지 않습니다.\n\n'
-            + row['Queue Details']
-        )
-        if cell.comment:
-            cell.comment.text += '\n\n' + note
-        else:
-            cell.comment = Comment(note, 'STORM')
-
-
-def add_paired_baseline_mean(pivot_df, excluded_seeds):
-    """공통 시드 평균과 논문/재현/target 16 행의 baseline 대비 비교를 추가."""
-    seed_columns = [column for column in pivot_df.columns if str(column).strip().isdigit()]
-    columns = list(pivot_df.columns)
-    columns += [
-        '   ', PAIRED_MEAN_COLUMN, SCORE_DELTA_COLUMN, HNS_DELTA_COLUMN,
-    ]
-    pivot_df = pivot_df.reindex(columns=columns, fill_value='')
-
-    for game in pivot_df.index.get_level_values('Game').unique():
-        baseline_key = (game, 'Retrieval 미사용')
-        target_key = (game, 'target: 16 (anchor 미설정)')
-        if baseline_key not in pivot_df.index or target_key not in pivot_df.index:
-            continue
-        game_seed_columns = [
-            column for column in seed_columns
-            if int(str(column).strip()) not in excluded_seeds.get(game, set())
-        ]
-        baseline = pivot_df.loc[baseline_key, game_seed_columns].map(parse_score)
-        target = pivot_df.loc[target_key, game_seed_columns].map(parse_score)
-        valid = baseline.notna() & target.notna()
-        if valid.any():
-            baseline_mean = baseline[valid].mean()
-            target_mean = target[valid].mean()
-            target_delta = target_mean - baseline_mean
-            pivot_df.at[baseline_key, PAIRED_MEAN_COLUMN] = baseline_mean
-            pivot_df.at[target_key, PAIRED_MEAN_COLUMN] = target_mean
-            pivot_df.at[target_key, SCORE_DELTA_COLUMN] = abs(target_delta)
-            if game in REFERENCE_SCORES:
-                random_score, human_score, _ = REFERENCE_SCORES[game]
-                for label, reference_score in reference_rows(game):
-                    reference_key = (game, label)
-                    if reference_key not in pivot_df.index:
-                        continue
-                    score_delta = baseline_mean - reference_score
-                    pivot_df.at[reference_key, SCORE_DELTA_COLUMN] = score_delta
-                    if human_score != random_score:
-                        pivot_df.at[reference_key, HNS_DELTA_COLUMN] = (
-                            score_delta / (human_score - random_score)
-                        )
-                if human_score != random_score:
-                    # HNS는 Random=0, Human=1 기준의 정규화 점수이며 백분율이 아닙니다.
-                    pivot_df.at[target_key, HNS_DELTA_COLUMN] = (
-                        target_delta / (human_score - random_score)
-                    )
-    return pivot_df
-
-
-def main(csv_path=None, output_path=None, queue_dir=None):
-    csv_path = Path(csv_path) if csv_path is not None else HERE / 'wandb_runs_classification.csv'
-    output_path = Path(output_path) if output_path is not None else HERE / 'converted_results.xlsx'
-    queue_dir = Path(queue_dir) if queue_dir is not None else HERE.parent
-    excluded_seeds = load_excluded_seeds()
-    # Load CSV
-    df = pd.read_csv(csv_path)
-    if 'State' not in df:
-        df['State'] = ''
-    df['State'] = df['State'].fillna('').astype(str).str.strip().str.lower()
-    df = merge_local_results(df, queue_dir)
-
-    # W&B에 누락된 수동 점수는 스케줄러와 같은 원본을 사용합니다.
-    manual_path = Path(__file__).resolve().with_name('manual_results.json')
-    manual_rows = json.loads(manual_path.read_text(encoding='utf-8'))
-    queued_rows = read_queued_runs(queue_dir)
-    study_table = paper_study_table(df, queue_dir, queued_rows)
-    recorded_names = set(df.get('Local Run Name', pd.Series(dtype=str)).dropna())
-    queued_rows = [row for row in queued_rows if not row.get('Local Run Name')
-                   or row['Local Run Name'] not in recorded_names]
-    df = pd.concat([df, pd.DataFrame(manual_rows), pd.DataFrame(queued_rows)], ignore_index=True)
-    df = expand_shared_runs(df)
-
-    # Data extraction
-    data = []
-    controls = reuse_control_names(load_reuse_plan(queue_dir))
-    for idx, row in df.iterrows():
-        # Dedicated paired controls are reported in Paper Random Neighbor. Do
-        # not add their extra seeds/reruns to the historical main-table inputs.
-        if row.get('Local Run Name') in controls:
-            continue
-        run_name = str(row['Run Name'])
-        hash_sweep = bool(re.search(r'(?:^|_)h\d+_t\d+(?:_|$)', ' '.join(
-            str(row.get(key, '')) for key in ('Run Name', 'Local Run Name', 'Base Run Name'))))
-        parts = run_name.split('_')
-        game = parts[0]
-        
-        # Extract seed
-        seed = str(row['Seed'])
-        if seed.endswith('.0'):
-            seed = seed[:-2]
-        if seed == 'N/A' or seed == 'nan' or seed == 'None':
-            # Try to extract from Run Name (e.g., Amidar_f05wv0rj_2000_X)
-            if len(parts) >= 3 and parts[2].isdigit():
-                seed = parts[2]
-            elif len(parts) == 4 and parts[3].isdigit():
-                seed = parts[3]
-            
-        if not str(seed).isdigit():
-            continue # Ignore if seed cannot be found
-            
-        seed = int(seed)
-        
-        ret_enable = str(row['Retrieval Enable']).strip().lower() in ['true', '1', 't']
-        created_at_utc = pd.to_datetime(row.get('Created At', '2000-01-01T00:00:00Z'), utc=True)
-        
-        # ---------------------------------------------------------
-        # 날짜 필터링: EMA 기법이 최신 코드에 적용된 시점 이후의 실험만 포함
-        # 기준 시점: 2026-08-24 11:05:43 UTC
-        #
-        # [AGENT INSTRUCTION] 
-        # Retrieval 미사용(ret_enable == False) 설정은 이 날짜 필터링을 무시하고
-        # 모든 시점의 데이터를 가져오며, 중복 시 최신 점수를 기록하도록 항상 이 로직을 유지해야 합니다.
-        # 향후 이 코드를 수정할 계획을 세울 때, AI 에이전트는 반드시 사용자에게 
-        # "Retrieval 미사용은 예전 데이터를 유지하는 로직이 적용되어 있다"는 사실을 사전에 알려야 합니다.
-        # ---------------------------------------------------------
-        ema_applied_date = pd.to_datetime("2026-08-24T11:05:43Z", utc=True)
-        if ret_enable and created_at_utc < ema_applied_date:
-            continue
-        
-        # Safely parse warmup_steps to int if possible
-        try:
-            w_float = float(row['Warmup Steps'])
-            if not pd.isna(w_float):
-                warmup_steps = int(w_float)
-            else:
-                warmup_steps = 'N/A'
-        except (ValueError, TypeError):
-            warmup_steps = 'N/A'
-
-        try:
-            cw_float = float(row.get('Calculated Warmup Steps', row['Warmup Steps']))
-            if not pd.isna(cw_float):
-                calculated_warmup_steps = int(cw_float)
-            else:
-                calculated_warmup_steps = 'N/A'
-        except (ValueError, TypeError, KeyError):
-            calculated_warmup_steps = 'N/A'
-
-        # ---------------------------------------------------------
-        # 실험 필터링 및 표기법 변경 로직
-        # 1. Retrieval을 사용하지 않은 실험은 'Retrieval 미사용'으로 표기
-        # 2. 고정 warmup과 offset을 구분하고 BSR/임계값 필터는 유지합니다.
-        # 3. target 1/16의 기존 anchor 미설정 실험과 상대 가중치 실험을 구분합니다.
-        # 4. value / add / td_error_only는 별도 config 행으로 표시
-        # ---------------------------------------------------------
-        if not ret_enable:
-            config = 'Retrieval 미사용'
-            if isinstance(warmup_steps, int) and warmup_steps >= 0 and warmup_steps != 50000:
-                config += f' [warmup: {warmup_steps}]'
-        else:
-            bsr = row.get('Batch Size Reduction', 'N/A')
-            if pd.isna(bsr) or str(bsr).strip() == '' or str(bsr) == 'nan':
-                bsr = 'N/A'
-
-            value_signal = str(config_value(row, 'Value Signal', 'value_diff')).strip().lower()
-            score_combination = str(config_value(row, 'Score Combination', 'multiply')).strip().lower()
-            neighbor_source = str(config_value(row, 'Neighbor Source', 'retrieval')).strip().lower()
-            if neighbor_source not in ('retrieval', 'random'):
-                continue
-            if value_signal not in ('value_diff', 'value') or score_combination not in ('multiply', 'add', 'td_error_only'):
-                continue
-            if score_combination == 'td_error_only':
-                z_score = config_value(row, 'TD Error Z Score Threshold', 3.5)
-                expected_z_score = None  # Keep every configured ablation threshold on a separate row.
-            elif score_combination == 'add':
-                z_score = config_value(row, 'Additive Z Score Threshold', 4.0)
-                expected_z_score = 4.0
-            else:
-                z_score = row.get('Z Score Threshold', 'N/A')
-                expected_z_score = 3.5
-            try:
-                z_score_float = float(z_score)
-            except (ValueError, TypeError):
-                z_score_float = None
-
-            if (isinstance(warmup_steps, int) and warmup_steps >= 0
-                    and str(bsr) == 'retrieved' and z_score_float is not None
-                    and math.isfinite(z_score_float) and z_score_float >= 0
-                    and (expected_z_score is None or z_score_float == expected_z_score)):
-                r_target = row.get('Retrieval Target', 'N/A')
-                try:
-                    r_target = float(r_target)
-                    if (not math.isfinite(r_target) or not r_target.is_integer() or r_target < 1
-                            or (not hash_sweep and r_target not in (1, 16))):
-                        continue
-                except (ValueError, TypeError):
-                    continue
-                
-                relative_weight = config_value(row, 'Anchor Weight R', None)
-                if relative_weight is not None:
-                    try:
-                        ratio = float(relative_weight)
-                    except (ValueError, TypeError):
-                        continue
-                    if not math.isfinite(ratio) or ratio <= 0:
-                        continue
-                    ratio_label = str(ratio).removesuffix('.0')
-                    config = f'target: {int(r_target)} (anchor r: {ratio_label})'
-                else:
-                    a_weight = row.get('Anchor Weight', 'N/A')
-                    try:
-                        anchor_is_unset = float(a_weight) == 0.0625
-                    except (ValueError, TypeError):
-                        anchor_is_unset = False
-
-                    if (pd.isna(a_weight) or str(a_weight).strip() == '' or
-                            str(a_weight) == 'nan' or str(a_weight) == 'N/A' or
-                            anchor_is_unset):
-                        config = f'target: {int(r_target)} (anchor 미설정)'
-                    else:
-                        continue
-                variants = []
-                if hash_sweep:
-                    try:
-                        hash_bits = float(row.get('Hash Bits', 'N/A'))
-                    except (ValueError, TypeError):
-                        continue
-                    if not math.isfinite(hash_bits) or not hash_bits.is_integer() or not 1 <= hash_bits <= 62:
-                        continue
-                    variants.append(f'hash_bits: {int(hash_bits)}')
-                if value_signal == 'value' and score_combination != 'td_error_only':
-                    variants.append('value')
-                if score_combination == 'add':
-                    variants.append('add')
-                if score_combination == 'td_error_only':
-                    threshold_label = str(z_score_float).removesuffix('.0')
-                    variants.append(f'td_error_only, threshold: {threshold_label}')
-                if neighbor_source == 'random':
-                    variants.append('RandomNeighor')
-                try:
-                    anchor_offset = float(config_value(row, 'Anchor Offset', -2))
-                except (TypeError, ValueError):
-                    continue
-                if not math.isfinite(anchor_offset) or not anchor_offset.is_integer():
-                    continue
-                if warmup_steps != 50000:
-                    variants.append(f'warmup: {warmup_steps}')
-                if anchor_offset != -2:
-                    variants.append(f'offset: {int(anchor_offset)}')
-                if variants:
-                    config += f" [{', '.join(variants)}]"
-            else:
-                # 위 경우에 해당하지 않는 실험은 제외
-                continue
-                
-        eval_return = row['Eval Return']
-        h_bits = row.get('Hash Bits', 'N/A')
-        if pd.isna(h_bits) or str(h_bits).strip() == '' or str(h_bits) == 'nan':
-            h_bits = 'N/A'
-
-        data.append({
-            'Game': game,
-            'Config': config,
-            'Seed': seed,
-            'State': row['State'],
-            'Eval Return': eval_return,
-            'Warmup Steps': calculated_warmup_steps,
-            'Hash Bits': h_bits,
-            'Queue Details': config_value(row, 'Queue Details', ''),
-            'Save Warmup': any(
-                str(row.get(column, '')).strip().lower() == 'true'
-                for column in ('Save Warmup', 'Save Warmup Requested')
-            ),
-            'Created At': created_at_utc
-        })
-
-    parsed_df = pd.DataFrame(data)
-
-    # 1. 실행 중/대기 중인 run은 평가 점수가 없어도 유지합니다.
-    parsed_df['Eval Return'] = parsed_df['Eval Return'].astype(str)
-    parsed_df = parsed_df[
-        parsed_df['State'].isin(['running', 'queued']) | (
-            (parsed_df['Eval Return'] != 'N/A') &
-            (parsed_df['Eval Return'] != 'nan') &
-            (parsed_df['Eval Return'].str.strip() != '')
-        )
-    ]
-    
-    # 2. 모든 실험 결과 표시 (중복 런 포함 모두 나열하기 위해 중복 제거 로직 삭제)
-    # 먼저 Created At 기준으로 내림차순 정렬 (최신이 위로 오도록)
-    parsed_df = parsed_df.sort_values(by='Created At', ascending=False)
-    
-    # 3. 동일한 시드에서 여러 결과가 있을 경우, 셀 하나에 여러 줄로 나열
-    def aggregate_cell(group):
-        queued = group[group['State'].eq('queued')]
-        group = group[~group['State'].eq('queued')]
-        # 점수와 강조 여부 모두 실제로 표시되는 run만 기준으로 계산합니다.
-        is_hb_10 = group['Hash Bits'].apply(lambda x: str(x).strip() in ['10', '10.0'])
-        if is_hb_10.any():
-            group = group[is_hb_10 | group['State'].eq('running')]
-
-        def format_single_row(r):
-            val = 'RUNNING' if r['State'] == 'running' else r['Eval Return']
-            try:
-                val = f"{float(val):.2f}"
-            except ValueError:
-                pass
-                
-            # 단일 결과여도 50000이 아니면 명시
-            warmup = r['Warmup Steps']
-            try:
-                w_val = int(float(warmup))
-                if w_val != 50000:
-                    val = f"{val} (w: {w_val})"
-            except (ValueError, TypeError):
-                pass
-                
-            return str(val)
-
-        if group.empty:
-            value = ''
-        elif len(group) == 1:
-            value = format_single_row(group.iloc[0])
-        else:
-            items = []
-            has_diff_hash = group['Hash Bits'].nunique() > 1
-            has_diff_warmup = group['Warmup Steps'].nunique() > 1
-            for _, r in group.iterrows():
-                val = 'RUNNING' if r['State'] == 'running' else r['Eval Return']
-                try:
-                    val = f"{float(val):.2f}"
-                except ValueError:
-                    pass
-                
-                extras = []
-                if has_diff_hash:
-                    extras.append(f"hb: {r['Hash Bits']}")
-                
-                warmup = r['Warmup Steps']
-                # 값이 다를 경우 구분을 위해 무조건 덧붙여 표기
-                if has_diff_warmup or (str(warmup) != '50000' and str(warmup) != 'N/A'):
-                    extras.append(f"w: {warmup}")
-                
-                if extras:
-                    items.append(f"{val} ({', '.join(extras)})")
-                else:
-                    items.append(f"{val}")
-            value = ", ".join(items)
-
-        # 점수 뒤에 붙여 첫 점수를 사용하는 평균/LaTeX 집계를 보존합니다.
-        if not queued.empty:
-            marker = 'QUEUED' if len(queued) == 1 else f'QUEUED ×{len(queued)}'
-            value = f'{value}, {marker}' if value else marker
-        return pd.Series({
-            'Final Eval Return': value,
-            'Save Warmup': group['Save Warmup'].any() or queued['Save Warmup'].any(),
-            'Queue Details': '\n\n'.join(queued['Queue Details']),
-        })
-
-    agg_df = parsed_df.groupby(['Game', 'Config', 'Seed']).apply(aggregate_cell, include_groups=False).reset_index()
-    # Aggregate before pivoting so the historical latest-run and hash-bit
-    # priorities also apply when one seed appears in both offset rows.
-    ablation_df = parsed_df.assign(Config=parsed_df['Config'].map(ablation_config_label))
-    ablation_agg_df = ablation_df.groupby(['Game', 'Config', 'Seed']).apply(
-        aggregate_cell, include_groups=False).reset_index()
-    highlighted_cells = set(
-        agg_df.loc[agg_df['Save Warmup'], ['Game', 'Config', 'Seed']]
-        .itertuples(index=False, name=None)
-    )
-    
-    # Pivot table
-    pivot_df = agg_df.pivot_table(
-        index=['Game', 'Config'],
-        columns='Seed',
-        values='Final Eval Return',
-        aggfunc='first'
-    )
-
-    # 시드 그룹 순서. 6020은 결과가 없어도 60*0 그룹 내에 표시합니다.
-    target_columns = [1, 2, 10, 710, 1710, 2710, 3710]
-    extra_seeds = sorted((set(pivot_df.columns) | {6020}) - set(target_columns))
-    # 2710/3710을 제외한 2000~3999는 한 구역에, 9000~9999는 마지막 구역에 모읍니다.
-    seeds_2000_3000 = sorted({2000, 2010} | {
-        seed for seed in extra_seeds if 2000 <= seed < 4000
-    })
-    seeds_9000 = [seed for seed in extra_seeds if 9000 <= seed < 10000]
-    target_columns += [' '] + seeds_2000_3000 + ['  ', 5090]
-    full_columns = target_columns + [
-        seed for seed in extra_seeds if seed not in target_columns and seed not in seeds_9000
-    ]
-    if seeds_9000:
-        full_columns += ['    '] + seeds_9000
-    
-    pivot_df = pivot_df.reindex(columns=full_columns)
-    pivot_df = pivot_df.fillna('')
-    ablation_pivot = ablation_agg_df.pivot_table(
-        index=['Game', 'Config'], columns='Seed', values='Final Eval Return', aggfunc='first',
-    ).reindex(columns=full_columns).fillna('')
-
-    # 논문 및 재현 점수는 Config 열의 별도 참조 행에 표시합니다.
-    reference_index = pd.MultiIndex.from_tuples(
-        [(game, label)
-         for game in pivot_df.index.get_level_values('Game').unique()
-         for label, _ in reference_rows(game)],
-        names=['Game', 'Config'],
-    )
-    reference_df = pd.DataFrame('', index=reference_index, columns=pivot_df.columns)
-    pivot_df = pd.concat([pivot_df, reference_df])
-
-    # Sorting Index
-    base_order = [
-        'STORM (논문)',
-        'STORM (reproduced)',
-        'Retrieval 미사용',
-        'target'
-    ]
-
-    def get_sort_key(config_str):
-        variant_order = next((
-            order for order, suffix in enumerate([' [value]', ' [add]', ' [value, add]'], start=1)
-            if config_str.endswith(suffix)
-        ), 0)
-        for i, base in enumerate(base_order):
-            if config_str.startswith(base):
-                return i, variant_order, config_str
-        return len(base_order), variant_order, config_str
-
-    # Sort the multi-index: alphabetical by Game, then by specified Config order
-    sorted_index = sorted(pivot_df.index, key=lambda x: (x[0], get_sort_key(x[1])))
-    pivot_df = pivot_df.reindex(sorted_index)
-    pivot_df = add_paired_baseline_mean(pivot_df, excluded_seeds)
-
-    # TD-error only ablation run이 있는 시드를 평균 열 왼쪽에 모읍니다.
-    # 완료 점수뿐 아니라 RUNNING/QUEUED도 포함하며 각 시드 그룹의 기존 순서를 유지합니다.
-    priority_rows = pivot_df.loc[
-        pivot_df.index.get_level_values('Config').str.contains(r'\btd_error_only\b', regex=True)
-    ]
-    priority_seeds = [
-        column for column in pivot_df.columns
-        if str(column).strip().isdigit()
-        and priority_rows[column].fillna('').astype(str).str.strip().ne('').any()
-    ]
-    metric_columns = [PAIRED_MEAN_COLUMN, SCORE_DELTA_COLUMN, HNS_DELTA_COLUMN]
-    remaining_columns = [
-        column for column in pivot_df.columns
-        if column not in priority_seeds and column not in metric_columns and column != '   '
-    ]
-    pivot_df = pivot_df.reindex(columns=[*priority_seeds, *metric_columns, *remaining_columns])
-
-    with pd.ExcelWriter(output_path, engine='openpyxl') as writer:
-        pivot_df.to_excel(writer, sheet_name='Results')
-        # Keep the visible offset-separated results and the historical table
-        # inputs in the same workbook, without changing the reporting UI.
-        ablation_pivot.to_excel(writer, sheet_name='Ablation Results')
-        writer.sheets['Ablation Results'].sheet_state = 'hidden'
-        if not study_table.empty:
-            study_table.to_excel(writer, sheet_name='Paper Random Neighbor', index=False)
-            writer.sheets['Paper Random Neighbor'].freeze_panes = 'D2'
-            writer.sheets['Paper Random Neighbor'].auto_filter.ref = writer.sheets['Paper Random Neighbor'].dimensions
-        
-        workbook = writer.book
-        worksheet = writer.sheets['Results']
-        # 세로 스크롤 시 첫 행의 시드 번호 헤더를 고정합니다.
-        worksheet.freeze_panes = 'A2'
-
-        mean_col = pivot_df.columns.get_loc(PAIRED_MEAN_COLUMN) + 3
-        for column_idx, column in enumerate(pivot_df.columns, start=3):
-            if not str(column).strip():
-                worksheet.column_dimensions[get_column_letter(column_idx)].width = 3
-        for offset, (width, number_format) in enumerate([
-            (30, '0.00'),
-            (46, '+0.00;-0.00;0.00'),
-            (32, '+0.0000;-0.0000;0.0000'),
-        ]):
-            column = mean_col + offset
-            worksheet.column_dimensions[get_column_letter(column)].width = width
-            for row in worksheet.iter_rows(min_row=2, min_col=column, max_col=column):
-                row[0].number_format = number_format
-
-        worksheet.cell(row=1, column=mean_col).comment = Comment(
-            'Retrieval 미사용과 target: 16 양쪽에 유효한 점수가 있는 공통 시드만 사용합니다. '
-            'update_tex.py의 EXCLUDED_SEEDS에 지정된 시드는 제외합니다. '
-            '각 시드에 여러 결과가 있으면 첫 번째 점수를 사용합니다.',
-            'STORM',
-        )
-        worksheet.cell(row=1, column=mean_col + 1).comment = Comment(
-            'STORM (논문) 행: Retrieval 미사용의 공통 시드 평균 − STORM 논문 점수.\n'
-            'STORM (reproduced) 행: Retrieval 미사용의 공통 시드 평균 − MoW 논문의 STORM 재현 점수.\n'
-            'target: 16 행: |target: 16의 공통 시드 평균 − Retrieval 미사용의 공통 시드 평균|.',
-            'STORM',
-        )
-        worksheet.cell(row=1, column=mean_col + 2).comment = Comment(
-            'STORM (논문) 행: (Retrieval 미사용 평균 − STORM 논문 점수) / (Human − Random).\n'
-            'STORM (reproduced) 행: (Retrieval 미사용 평균 − STORM 재현 점수) / (Human − Random).\n'
-            'target: 16 행: (target: 16 평균 − Retrieval 미사용 평균) / (Human − Random).\n'
-            '모든 평균은 EXCLUDED_SEEDS를 제외한 공통 시드 기준이며 '
-            'HNS 차이는 부호를 유지합니다. 백분율이 아닙니다.',
-            'STORM',
-        )
-
-        start_row = worksheet.max_row - len(pivot_df) + 1
-        game_row_counts = pivot_df.groupby(level='Game').size()
-        for row_idx, (game, config) in enumerate(pivot_df.index):
-            excel_row = row_idx + start_row
-            if config.startswith('STORM (reproduced)'):
-                worksheet.cell(row=excel_row, column=2).comment = Comment(
-                    REPRODUCED_SCORE_SOURCE + '\n'
-                    '재현 열의 표시값을 전사했으며, 시드별 실험값이 아닙니다.\n'
-                    'HNS 비교에는 게임 셀의 기존 Random/Human 참조값을 사용합니다.',
-                    'STORM',
-                )
-            if 'td_error_only' in config:
-                worksheet.cell(row=excel_row, column=2).comment = Comment(
-                    'TD-error only ablation: value/value_diff 신호를 결합하지 않고 '
-                    'ReLU(z(|TD error|))만으로 anchor를 선택합니다.\n'
-                    'threshold는 JointTrainAgent.Retrieval.td_error_z_score_threshold이며 '
-                    'threshold, anchor 가중치, warmup, offset이 다른 실험은 별도 행입니다.\n'
-                    '이 ablation의 점수 또는 RUNNING/QUEUED가 있는 시드를 '
-                    'Mean (공통 시드) 왼쪽에 배치합니다.',
-                    'STORM',
-                )
-            if config == 'target: 16 (anchor 미설정)':
-                worksheet.cell(row=excel_row, column=mean_col + 1).number_format = '0.00'
-            # 병합된 게임 셀의 세 줄이 모두 보이도록 높이와 줄바꿈 설정.
-            worksheet.row_dimensions[excel_row].height = max(24, 72 / game_row_counts[game])
-            if row_idx == 0 or game != pivot_df.index[row_idx - 1][0]:
-                if game in REFERENCE_SCORES:
-                    random_score, human_score, _ = REFERENCE_SCORES[game]
-                    cell = worksheet.cell(row=excel_row, column=1)
-                    cell.value = f'{game}\nRandom: {random_score:.1f}\nHuman: {human_score:.1f}'
-                    cell.alignment = Alignment(horizontal='left', vertical='center', wrap_text=True)
-        
-        # 1. 모든 셀 폰트 크기 16으로 설정
-        for row in worksheet.iter_rows():
-            for cell in row:
-                if cell.font:
-                    cell.font = Font(name=cell.font.name, size=16, bold=cell.font.bold, italic=cell.font.italic, color=cell.font.color)
-                else:
-                    cell.font = Font(size=16)
-
-        # Drama와 동일한 색상으로 실행 중인 run이 포함된 시드 셀을 강조합니다.
-        running_fill = PatternFill(fill_type='solid', fgColor='FFF2CC')
-        for column_idx, column in enumerate(pivot_df.columns, start=3):
-            if not str(column).strip().isdigit():
-                continue
-            for row in worksheet.iter_rows(min_row=start_row, min_col=column_idx, max_col=column_idx):
-                cell = row[0]
-                if 'RUNNING' in str(cell.value):
-                    cell.fill = running_fill
-                    cell.font = Font(name=cell.font.name, size=16, bold=True, color='9C6500')
-
-        mark_excluded_seeds(worksheet, pivot_df, start_row, excluded_seeds)
-        mark_queued_runs(worksheet, pivot_df, start_row, agg_df)
-                    
-        # 2. A, B열 내용에 맞게 열 너비 자동 맞춤
-        for col_letter, col_idx in [('A', 1), ('B', 2)]:
-            max_len = 0
-            for row in worksheet.iter_rows(min_col=col_idx, max_col=col_idx):
-                for cell in row:
-                    if cell.value:
-                        # 줄바꿈이 있는 경우 가장 긴 줄 기준
-                        lines = str(cell.value).split('\n')
-                        for line in lines:
-                            max_len = max(max_len, len(line))
-                            
-            # 폰트 사이즈 16이므로, 일반(11)보다 크기 때문에 가중치(약 1.7배)를 줍니다.
-            worksheet.column_dimensions[col_letter].width = (max_len * 1.7) + 2
-
-        # medium border for visibility between games
-        top_side = Side(border_style="medium", color="000000")
-        
-        # Calculate start_row dynamically
-        start_row = worksheet.max_row - len(pivot_df) + 1
-        
-        for row_idx, (game, config) in enumerate(pivot_df.index):
-            excel_row = row_idx + start_row
-            
-            # Draw line above the first row of each new game
-            if row_idx == 0 or pivot_df.index[row_idx][0] != pivot_df.index[row_idx-1][0]:
-                for col_idx in range(1, len(pivot_df.columns) + 3):
-                    cell = worksheet.cell(row=excel_row, column=col_idx)
-                    cell.border = Border(
-                        top=top_side,
-                        left=cell.border.left,
-                        right=cell.border.right,
-                        bottom=cell.border.bottom
-                    )
-
-        mark_save_warmup(worksheet, pivot_df, start_row, highlighted_cells)
-
-    print(f"Successfully saved to {output_path}")
-    print(f"Current job queues: {len(queued_rows)} jobs, "
-          f"{agg_df['Queue Details'].ne('').sum()} queued experiment cells")
-
-if __name__ == '__main__':
-    main()
+if __name__=='__main__':
+    parser=argparse.ArgumentParser(description=__doc__,formatter_class=argparse.RawDescriptionHelpFormatter)
+    parser.add_argument('--experiment',help='Select the experiment report directory by name')
+    parser.add_argument('--csv',type=Path)
+    parser.add_argument('--output',type=Path)
+    parser.add_argument('--manifest',type=Path)
+    args=parser.parse_args()
+    try:
+        main(args.csv,args.output,manifest_path=args.manifest,experiment=args.experiment)
+    except (ValueError,OSError) as error:
+        parser.exit(1,f'{error}\n')

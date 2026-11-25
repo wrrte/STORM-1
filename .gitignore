@@ -31,3 +31,5 @@ training_queue/*
 !training_queue/warmup_scores
 !training_queue/warmup_prune_plan.json
 .wandb_api_key
+results/*.json.lock
+results/experiments/*/*.json.lock

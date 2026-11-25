@@ -230,6 +230,51 @@ Runtime data is stored under `training_queue/` (excluded from Git):
 | `imported_warmups/` | Metadata/config adapters and symlinks for reusable legacy snapshots |
 | `legacy_backup/` | Original per-card selections, queues and history from migration |
 
+### Exporting the current hash/target comparison
+
+Name each new grid when enqueueing by adding `--experiment grid-v2` to the
+usual `enqueue_train.py` command (keep the desired game/seed selection, grid,
+and `Retrieval.enable Both` options). Collect it using the same name:
+
+```bash
+python results/classify_wandb_runs.py --experiment grid-v2 --excel
+# Refresh from local final evaluations without contacting W&B:
+python results/classify_wandb_runs.py --experiment grid-v2 --offline --excel
+# Rebuild only the workbook from the already collected CSV:
+python results/convert_csv_to_excel.py --experiment grid-v2
+# List experiment names without contacting W&B:
+python results/classify_wandb_runs.py --list-experiments
+```
+
+Named queues store the experiment name in each job. The batch membership is
+immutable: repeating the same named command skips its existing jobs, even when
+completed, while reusing that name with another grid/game/seed set is rejected.
+Resume failed members with `queue_train.py retry`; use a new experiment name
+for another trial. Unnamed queues retain their previous deduplication behavior.
+
+The collector reads games, seeds and grid pairs from the named queue and freezes
+those Job IDs and warmups on first collection. No source-code changes or manual
+output path changes are needed for a new grid. Each experiment gets its own
+`results/experiments/NAME/manifest.json`, `runs.csv`, and `results.xlsx`. Later
+collections reuse only those exact jobs, including retries. Historical W&B
+runs, other experiments, old CSVs and archived/manual results are excluded.
+`--gpu-type` and repeated `--job-id` optionally filter the first capture.
+
+Without `--experiment`, the original `results/hash_target_campaign.json`,
+`results/hash_target_runs.csv` and `results/hash_target_results.xlsx` paths
+remain available. Reporting reads the queue database without
+claiming, recovering, or changing training jobs. Local completed evaluations
+take priority over W&B; retry attempts are never averaged together.
+
+The overview contains ranks, settings, completion counts, Mean/Median HNS, IQM,
+Optimality Gap, game mean scores, and four global metric heatmaps. Comparison
+statistics use only warmups where every grid setting and baseline have finished
+the same final evaluation. Partially completed scores remain visible in the
+GPU/seed and run detail sheets. Missing scores remain blank; ranks are provisional
+until all selected warmups finish. The overview states the common game/warmup
+counts. IQM trims `floor(N/4)` pooled seed scores at each tail; Optimality Gap is
+the game mean of `max(0, 1 - mean_seed_HNS)`.
+
 ### Shared warmup inventory across A6000, RTX 3090 and TITAN RTX
 
 `warmup_registry.py` collects **game → GPU model → seed → snapshots** and
