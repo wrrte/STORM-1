@@ -6,7 +6,6 @@ Refresh collection first with classify_wandb_runs.py --excel or --offline --exce
 Historical CSV files, manual scores, and previous experiment backups are not used.
 """
 import argparse
-from collections import defaultdict
 from datetime import datetime, timezone
 from itertools import combinations
 import os
@@ -76,6 +75,67 @@ def calculate_metrics(by_game):
                 gap=fmean(max(0, 1 - value) for value in game_means))
 
 
+def select_cohorts(completed, job_ids):
+    """Return the settings-first and samples-first matched comparisons."""
+    order = {setting: index for index, setting in enumerate(completed)}
+    per_job = {tuple(setting for setting, jobs in completed.items() if identity in jobs)
+               for identity in job_ids}
+    max_settings = max(map(len, per_job), default=0)
+    if not max_settings:
+        empty = frozenset(), ()
+        return empty, empty
+
+    # Any set of comparable settings must occur together on at least one job.
+    overall = min(
+        ((frozenset.intersection(*(completed[setting] for setting in settings)), settings)
+         for settings in per_job if len(settings) == max_settings),
+        key=lambda choice: (-len(choice[0]), tuple(order[setting] for setting in choice[1])),
+    )
+    if max_settings == 1:
+        return overall, overall
+
+    # A sample shared by at least two settings is contained in their intersection.
+    intersections = {left & right for left, right in combinations(completed.values(), 2)}
+    max_samples = max(map(len, intersections))
+    interim = min(
+        ((jobs, tuple(setting for setting, done in completed.items() if jobs <= done))
+         for jobs in intersections if len(jobs) == max_samples),
+        key=lambda choice: (-len(choice[1]), tuple(order[setting] for setting in choice[1])),
+    )
+    return overall, interim
+
+
+def comparison_statistics(jobs, games, settings, records, cohort):
+    common, selected = cohort
+    common_by_game = {game: [identity for identity in jobs if identity in common and jobs[identity]['game'] == game]
+                      for game in games}
+    baseline = bool(common) and all(records[identity, 'Baseline']['Eval Return'] is not None for identity in common)
+    scored = {*selected, 'Baseline'} if baseline else set(selected)
+    statistics, metrics = {}, {}
+    for setting in settings:
+        by_game = {}
+        for game, identities in common_by_game.items():
+            scores = [records[identity, setting]['Eval Return'] for identity in identities] if setting in scored else []
+            controls = [records[identity, 'Baseline']['Eval Return'] for identity in identities] if scores and baseline else []
+            avg = fmean(scores) if scores else None
+            control = fmean(controls) if controls else None
+            delta = avg - control if controls else None
+            statistics[game, setting] = dict(n=len(scores), mean=avg,
+                sd=stdev(scores) if len(scores)>1 else None, hns=hns(game, avg) if scores else None,
+                control=control, delta=delta,
+                delta_hns=delta/(REFERENCE_SCORES[game][1]-REFERENCE_SCORES[game][0]) if controls else None,
+                improvement=delta/abs(control) if controls and control != 0 else None,
+                wins=sum(score>base for score,base in zip(scores,controls)) if controls else None)
+            if scores:
+                by_game[game] = [hns(game, score) for score in scores]
+        metrics[setting] = calculate_metrics(by_game)
+    ordered = sorted(selected, key=lambda setting: -metrics[setting]['mean'])
+    ranks = {setting: 1 + sum(metrics[other]['mean'] > metrics[setting]['mean'] for other in ordered)
+             for setting in ordered} if len(ordered) > 1 else {}
+    return dict(common=common, selected=selected, baseline=baseline, scored=scored,
+                common_by_game=common_by_game, stats=statistics, metrics=metrics, ranked=ordered, ranks=ranks)
+
+
 def aggregate(manifest, csv_rows):
     jobs = {job['id']: job for job in manifest['jobs']}
     games = sorted({job['game'] for job in jobs.values()})
@@ -91,35 +151,16 @@ def aggregate(manifest, csv_rows):
             raise ValueError(f'Unknown result state: {row["State"]}')
         row['Eval Return'] = number(row.get('Eval Return')) if row['State'] == 'completed' else None
         rows[key] = row
-    # A job is one frozen (game, GPU model, seed, shared warmup) observation.
-    common = {identity for identity, job in jobs.items()
-              if all(rows[identity, stage['key']]['Eval Return'] is not None for stage in job['stages'])}
-    common_by_game = {game: [identity for identity in common if jobs[identity]['game'] == game] for game in games}
     records = {(row['Job ID'], row['Setting']): row for row in rows.values()}
-    statistics, metrics, counts = {}, {}, {}
-    for setting in settings:
-        by_game = {}
-        for game, identities in common_by_game.items():
-            scores = [records[identity, setting]['Eval Return'] for identity in identities]
-            controls = [records[identity, 'Baseline']['Eval Return'] for identity in identities]
-            avg, control = (fmean(scores), fmean(controls)) if scores else (None, None)
-            delta = avg - control if scores else None
-            statistics[game, setting] = dict(n=len(scores), mean=avg,
-                sd=stdev(scores) if len(scores)>1 else None, hns=hns(game, avg) if scores else None,
-                control=control, delta=delta,
-                delta_hns=delta/(REFERENCE_SCORES[game][1]-REFERENCE_SCORES[game][0]) if scores else None,
-                improvement=delta/abs(control) if scores and control != 0 else None,
-                wins=sum(score>base for score,base in zip(scores,controls)))
-            if scores:
-                by_game[game] = [hns(game, score) for score in scores]
-        metrics[setting] = calculate_metrics(by_game)
-        counts[setting] = sum(row['Setting']==setting and row['Eval Return'] is not None for row in rows.values())
-    ranked = sorted(settings[1:], key=lambda s: (metrics[s]['mean'] is None, -(metrics[s]['mean'] or 0), settings.index(s)))
-    ranks = {s: 1+sum(metrics[other]['mean']>metrics[s]['mean'] for other in settings[1:])
-             for s in settings[1:] if metrics[s]['mean'] is not None}
-    return dict(jobs=jobs, games=games, settings=settings, rows=rows, records=records, common=common,
-                common_by_game=common_by_game, stats=statistics, metrics=metrics, counts=counts,
-                ranked=ranked, ranks=ranks, provisional=len(common)<len(jobs))
+    # A job is one frozen (game, GPU model, seed, shared warmup) observation.
+    completed = {setting: frozenset(identity for identity in jobs if records[identity, setting]['Eval Return'] is not None)
+                 for setting in settings}
+    overall, interim = select_cohorts({setting: completed[setting] for setting in settings[1:]}, jobs)
+    comparison = comparison_statistics(jobs, games, settings, records, overall)
+    return dict(jobs=jobs, games=games, settings=settings, rows=rows, records=records,
+                counts={setting: len(done) for setting, done in completed.items()}, **comparison,
+                interim=comparison_statistics(jobs, games, settings, records, interim),
+                provisional=any(len(done) < len(jobs) for done in completed.values()))
 
 
 def set_cell(ws, row, col, value):
@@ -189,62 +230,57 @@ def parameters(setting,manifest):
     return next((h,t) for h,t in manifest['pairs'] if setting==f'h{h} / t{t}')
 
 
-def interim_cohort(data):
-    """Select a shared set of warmups using completion status alone."""
-    completed = {
-        setting: frozenset(identity for identity in data['jobs']
-                           if data['records'][identity, setting]['Eval Return'] is not None)
-        for setting in data['settings'][1:]
-    }
-    cohorts = {left & right for left, right in combinations(completed.values(), 2)}
-    cohorts.discard(frozenset())
-    choices = [(cohort, [setting for setting, finished in completed.items() if cohort <= finished])
-               for cohort in cohorts]
-    return max(choices, key=lambda choice: (len(choice[0]) * len(choice[1]), len(choice[0]),
-                                            tuple(sorted(choice[0]))), default=(frozenset(), []))
+def comparison_status(data, comparison):
+    settings = len(comparison['selected'])
+    games = sum(bool(jobs) for jobs in comparison['common_by_game'].values())
+    if not settings:
+        status = '최종 평가 완료 대기'
+    elif settings == 1:
+        status = '조합 간 순위 대기'
+    else:
+        status = 'Mean HNS 잠정 순위' if data['provisional'] else '전체 완료'
+    return (f'조합 {settings}/{len(data["settings"])-1}개 · '
+            f'사용 표본 {len(comparison["common"])}/{len(data["jobs"])}개 · '
+            f'{games}/{len(data["games"])}게임 | {status}')
 
 
 def add_interim_comparison(wb, manifest, data):
-    common, settings = interim_cohort(data)
-    if not settings or common == data['common']:
-        return
-
-    jobs = sorted((data['jobs'][identity] for identity in common),
+    comparison = data['interim']
+    settings = (['Baseline'] if comparison['baseline'] else []) + comparison['ranked']
+    jobs = sorted((data['jobs'][identity] for identity in comparison['common']),
                   key=lambda job: (job['game'], job['gpu_type'], job['seed'], job['id']))
-    games = sorted({job['game'] for job in jobs})
-    results = {}
-    for setting in settings:
-        scores = defaultdict(list)
-        for job in jobs:
-            scores[job['game']].append(data['records'][job['id'], setting]['Eval Return'])
-        metrics = calculate_metrics({game: [hns(game, score) for score in scores[game]] for game in games})
-        results[setting] = metrics, [fmean(scores[game]) for game in games]
-
-    labels = ['순위', 'hash_bits', 'target', 'Mean HNS', 'Median HNS', 'IQM', 'Optimality Gap',
+    games = [game for game in data['games'] if comparison['common_by_game'][game]]
+    labels = ['순위', '설정', 'hash_bits', 'target', 'Mean HNS', 'Median HNS', 'IQM', 'Optimality Gap',
               *[f'{game} 평균 점수' for game in games]]
-    ws = sheet(wb, '중간 비교', '중간 비교 | 완료된 hash_bits × target',
-               f'공통 warmup {len(jobs)}개 · {len(games)}게임 · {len(settings)}개 조합 · Mean HNS 기준 잠정 순위', len(labels))
+    sample_labels = ['게임', 'GPU 모델', '시드', '실제 warmup step', *settings]
+    last_col = max(len(labels), len(sample_labels))
+    ws = sheet(wb, '중간 비교', '중간 비교 | 게임·시드 표본 수 우선', comparison_status(data, comparison), last_col)
     headers(ws, 4, labels)
-    ranked = sorted(settings, key=lambda setting: -results[setting][0]['mean'])
-    for row, setting in enumerate(ranked, 5):
-        metrics, means = results[setting]
-        rank = 1 + sum(results[other][0]['mean'] > metrics['mean'] for other in ranked)
-        line(ws, row, [rank, *parameters(setting, manifest), metrics['mean'], metrics['median'], metrics['iqm'],
-                       metrics['gap'], *means], best=rank == 1)
-        formats(ws, row, {**{col: '0.0000' for col in range(4, 8)},
-                          **{col: '#,##0.00' for col in range(8, len(labels) + 1)}})
-    table(ws, 'InterimComparison', 4, 4 + len(ranked), len(labels))
-    ws['D4'].comment = Comment('각 게임의 공통 warmup 평균 HNS를 구한 뒤 게임에 동일한 가중치를 적용합니다.', 'STORM')
+    for row, setting in enumerate(settings, 5):
+        metrics = comparison['metrics'][setting]
+        means = [comparison['stats'][game, setting]['mean'] for game in games]
+        rank = comparison['ranks'].get(setting, '—')
+        line(ws, row, [rank, setting, *parameters(setting, manifest), metrics['mean'], metrics['median'], metrics['iqm'],
+                       metrics['gap'], *means], control=setting == 'Baseline', best=rank == 1)
+        formats(ws, row, {**{col: '0.0000' for col in range(5, 9)},
+                          **{col: '#,##0.00' for col in range(9, len(labels) + 1)}})
+    if settings:
+        table(ws, 'InterimComparison', 4, 4 + len(settings), len(labels))
+    ws['E4'].comment = Comment('각 게임의 공통 warmup 평균 HNS를 구한 뒤 게임에 동일한 가중치를 적용합니다.', 'STORM')
 
-    top = 7 + len(ranked)
-    ws.merge_cells(start_row=top, start_column=1, end_row=top, end_column=len(labels))
-    ws.cell(top, 1, '모든 조합에 사용한 공통 warmup').font = Font(name=FONT, bold=True, color=NAVY)
-    headers(ws, top + 1, ['게임', 'GPU 모델', '시드', '실제 warmup step'])
+    top = 7 + len(settings)
+    ws.merge_cells(start_row=top, start_column=1, end_row=top, end_column=last_col)
+    ws.cell(top, 1, '사용한 게임·시드별 최종 점수').font = Font(name=FONT, bold=True, color=NAVY)
+    headers(ws, top + 1, sample_labels)
     for row, job in enumerate(jobs, top + 2):
-        line(ws, row, [job['game'], job['gpu_type'], job['seed'], job['warmup_step']])
+        scores = [data['records'][job['id'], setting]['Eval Return'] for setting in settings]
+        line(ws, row, [job['game'], job['gpu_type'], job['seed'], job['warmup_step'], *scores])
+        formats(ws, row, {col: '#,##0.00' for col in range(5, len(sample_labels) + 1)})
         ws.cell(row, 1).comment = Comment(job['warmup_source'], 'STORM')
-    widths(ws, [14, 13, 11, 19, 16, 14, 19, *([22] * len(games))])
-    ws.freeze_panes = 'D5'
+    if jobs:
+        table(ws, 'InterimSeedScores', top + 1, top + 1 + len(jobs), len(sample_labels))
+    widths(ws, [19, 18, 11, 19, 16, 14, 14, 19, *([22] * (last_col - 8))])
+    ws.freeze_panes = 'E5'
 
 
 def add_heatmaps(ws,start,manifest,data):
@@ -290,20 +326,17 @@ def build_workbook(manifest,data,manifest_path):
     wb.remove(wb.active)
     wb.properties.title = 'STORM hash_bits × target comparison'
     wb.properties.description = manifest['campaign_id']
-    if data['provisional']:
-        add_interim_comparison(wb, manifest, data)
     games,settings = data['games'],data['settings']
     last_col = max(10,9+len(games))
-    ws = sheet(wb,'전체 비교','전체 비교 | hash_bits × target',manifest['campaign_id'],last_col)
-    common_games = sum(bool(v) for v in data['common_by_game'].values())
+    ws = sheet(wb,'전체 비교','전체 비교 | 해시·타깃 조합 수 우선',manifest['campaign_id'],last_col)
     ws.merge_cells(start_row=3,start_column=1,end_row=3,end_column=last_col)
     timestamp = datetime.now(timezone.utc).astimezone(ZoneInfo('Asia/Seoul')).strftime('%Y-%m-%d %H:%M KST')
-    ws['A3'] = (f'비교 표본: 공통 완료 {common_games}/{len(games)}게임 · {len(data["common"])}/{len(data["jobs"])}개 warmup'
-                f' | {"잠정 순위" if data["provisional"] else "전체 완료"} | {timestamp}')
+    ws['A3'] = f'{comparison_status(data, data)} | {timestamp}'
     ws['A3'].font = Font(name=FONT,size=10,color='9C6500' if data['provisional'] else '087F8C')
     labels = ['순위','설정','hash_bits','target','완료 / 예정','Mean HNS','Median HNS','IQM','Optimality Gap',*[f'{game} 평균 점수' for game in games]]
     headers(ws,4,labels)
-    for row,setting in enumerate(['Baseline']+data['ranked'],5):
+    overview_settings = ['Baseline', *data['ranked'], *(s for s in settings[1:] if s not in data['selected'])]
+    for row,setting in enumerate(overview_settings,5):
         metric = data['metrics'][setting]
         rank = data['ranks'].get(setting,'—')
         h,t = parameters(setting,manifest)
@@ -312,7 +345,7 @@ def build_workbook(manifest,data,manifest_path):
                      *[data['stats'][game,setting]['mean'] for game in games]],control=setting=='Baseline',best=rank==1)
         formats(ws,row,{**{c:'0.0000' for c in range(6,10)},**{c:'#,##0.00' for c in range(10,len(labels)+1)}})
     for address,text in {
-        'A4':'Mean HNS 내림차순. 일부 게임/시드만 공통 완료되면 잠정 순위입니다.',
+        'A4':'같은 게임·시드에서 평가를 마친 조합이 둘 이상이면 Mean HNS 내림차순으로 순위를 매깁니다.',
         'E4':'이 설정의 최종 평가 완료 수 / 예정 warmup 수. 일부 설정만 완료된 warmup도 진행률에는 반영합니다.',
         'F4':'게임별 공통 warmup의 평균 HNS를 게임 간 동일 가중 평균합니다.',
         'G4':'게임별 공통 warmup 평균 HNS의 중앙값입니다.',
@@ -328,20 +361,21 @@ def build_workbook(manifest,data,manifest_path):
     ws.print_title_rows = '1:4'
     ws.print_area = f'A1:{get_column_letter(last_col)}{last}'
 
+    add_interim_comparison(wb, manifest, data)
     ws = sheet(wb,'게임별 비교','게임별 | 공통 완료 warmup의 설정 비교',
-               '모든 설정과 baseline이 최종 평가를 완료한 warmup만 사용 · SD는 시드 평균의 표본 표준편차',12)
+               '전체 비교와 같은 조합·게임·시드 사용 · SD는 시드 점수의 표본 표준편차',12)
     for index,game in enumerate(games):
         top = 5+index*(len(settings)+4)
         ws.merge_cells(start_row=top,start_column=1,end_row=top,end_column=12)
         ws.cell(top,1,f'{game} · 공통 완료 {len(data["common_by_game"][game])}개 warmup').font = Font(name=FONT,bold=True,color=NAVY,size=12)
         headers(ws,top+1,['설정','hash_bits','target','공통 warmup n','평균 점수','시드 간 SD','평균 HNS','Baseline 공통 평균','Δ Score','Δ HNS','개선율','승리 시드'])
         available = [s for s in settings[1:] if data['stats'][game,s]['mean'] is not None]
-        best = max(available,key=lambda s:data['stats'][game,s]['mean']) if available else None
+        best = max(available,key=lambda s:data['stats'][game,s]['mean']) if len(available) > 1 else None
         for offset,setting in enumerate(settings,top+2):
             st = data['stats'][game,setting]
             h,t = parameters(setting,manifest)
             line(ws,offset,[setting,h,t,st['n'],st['mean'],st['sd'],st['hns'],st['control'],st['delta'],st['delta_hns'],st['improvement'],
-                            f'{st["wins"]} / {st["n"]}' if st['n'] and setting!='Baseline' else None],control=setting=='Baseline',best=setting==best)
+                            f'{st["wins"]} / {st["n"]}' if st['wins'] is not None and setting!='Baseline' else None],control=setting=='Baseline',best=setting==best)
             formats(ws,offset,{5:'#,##0.00',6:'#,##0.00',7:'0.0000',8:'#,##0.00',9:'+#,##0.00;-#,##0.00;0.00',10:'+0.0000;-0.0000;0.0000',11:'+0.0%;-0.0%;0.0%'})
         table(ws,f'Game{index}',top+1,top+1+len(settings),12)
     widths(ws,[19,12,11,18,18,16,16,22,18,16,14,14])
@@ -375,7 +409,8 @@ def build_workbook(manifest,data,manifest_path):
         formats(ws,row,{c:'#,##0.00' for c in range(5,7+len(columns)+len(models))})
         for col,record in enumerate(individual,7):
             if record:
-                ws.cell(row,col).comment=Comment(f'Warmup: {record["Warmup ID"]}\nJob: {record["Job ID"]}\n공통 비교 포함: {record["Job ID"] in data["common"]}\n{record.get("Notes", "")}','STORM')
+                included = record['Job ID'] in data['common'] and setting in data['scored']
+                ws.cell(row,col).comment=Comment(f'Warmup: {record["Warmup ID"]}\nJob: {record["Job ID"]}\n공통 비교 포함: {included}\n{record.get("Notes", "")}','STORM')
                 if record['State']!='completed':
                     ws.cell(row,col).fill=PatternFill('solid',fgColor='FFF2CC' if record['State'] in ('running','evaluating') else GRAY)
     table(ws,'SeedScores',7,7+len(games)*len(settings),6+len(columns)+len(models))
@@ -388,10 +423,11 @@ def build_workbook(manifest,data,manifest_path):
                   '실제 warmup step','Warmup ID','공통 비교 포함','비고','Run ID','큐 Job ID','Stage','로컬 Run 이름','Warmup 경로','출처','갱신 시각'])
     for rr,record in enumerate(data['rows'].values(),7):
         score=record['Eval Return']
+        included = record['Job ID'] in data['common'] and record['Setting'] in data['scored']
         line(ws,rr,[record['Game'],record['GPU Type'],int(record['Seed']),record['Setting'],record['Hash Bits'],record['Retrieval Target'],
                     STATE_LABELS[record['State']],score,hns(record['Game'],score) if score is not None else None,
                     number(record.get('Eval Checkpoint Step')),record.get('Eval Precision'),number(record.get('Eval Episodes')),
-                    int(record['Actual Warmup Step']),record['Warmup ID'],record['Job ID'] in data['common'],record.get('Notes'),
+                    int(record['Actual Warmup Step']),record['Warmup ID'],included,record.get('Notes'),
                     record.get('Run ID'),record['Job ID'],record['Stage'],record['Local Run Name'],record['Warmup Directory'],record.get('Source'),record.get('Updated At')],
              control=record['Setting']=='Baseline')
         formats(ws,rr,{8:'#,##0.00',9:'0.0000'})
@@ -406,10 +442,11 @@ def build_workbook(manifest,data,manifest_path):
         ('대상',f'{len(data["jobs"])}개 warmup · {len(settings)-1}개 hash/target 쌍 + baseline · {len(data["rows"])}개 예정 분기'),
         ('수집 범위','고정 목록의 Job ID와 정확한 로컬 Run 이름에 해당하는 결과만 사용. 과거 CSV·수동 점수·고정 백업은 제외.'),
         ('완료 판정','설정/게임/시드/warmup 및 최종 평가 조건을 검증. 로컬 완료 마커 또는 finished W&B run과 모든 episode 결과가 필요.'),
-        ('공통 표본','게임·GPU·시드·warmup별로 모든 설정과 baseline이 완료된 표본만 비교표와 히트맵에 동시 포함.'),
-        ('중간 비교','두 조합의 완료 warmup 교집합을 후보로 삼습니다. 공통 warmup 수 × 그 표본에서 완료된 조합 수가 가장 큰 후보를 표시합니다.'),
-        ('진행률 / 빈칸','완료/예정은 부분 완료도 포함. 미완료 점수와 공통 표본 없는 지표는 빈칸. 시드별 상세는 개별 완료 점수를 즉시 표시.'),
-        ('잠정 순위','전체 warmup 완료 전에는 잠정 순위. 공통 완료 게임 수와 warmup 수를 상단에 표시. 순위는 Mean HNS 내림차순.'),
+        ('전체 비교','같은 warmup에서 비교할 수 있는 조합 수를 최대화하고, 동률이면 공통 게임·시드 수가 많은 후보를 선택합니다. 게임별 비교와 히트맵에도 같은 표본을 사용합니다.'),
+        ('중간 비교','두 조합 이상에 공통인 게임·시드 수를 최대화하고, 동률이면 조합 수가 많은 후보를 선택합니다. 사용한 게임·시드의 최종 점수를 아래에 표시합니다.'),
+        ('Baseline','각 표의 공통 게임·시드에서 모두 완료됐을 때 비교 점수를 표시합니다. Baseline은 조합 수와 순위에서 제외합니다.'),
+        ('진행률 / 빈칸','완료/예정에는 표본에 포함되지 않은 분기의 완료도 반영합니다. 시드별 상세는 개별 완료 점수를 즉시 표시합니다.'),
+        ('잠정 순위','조합 하나만 집계할 수 있을 때는 점수만 표시합니다. 공통 표본에서 비교할 수 있는 조합이 두 개 이상이면 Mean HNS 내림차순으로 순위를 계산합니다.'),
         ('평가 조건',str(manifest['evaluation'])),
         ('HNS','(score − Random) / (Human − Random). 음수와 1 초과 값을 자르지 않음.'),
         ('Mean / Median','게임별 공통 warmup 평균 HNS의 평균 / 중앙값. 게임별 동일 가중.'),
@@ -447,7 +484,9 @@ def main(csv_path=None,output_path=None,*,manifest_path=None,experiment=None):
     finally:
         if os.path.exists(temporary):
             os.unlink(temporary)
-    print(f'Excel: {output_path} (common completed warmups: {len(data["common"])}/{len(data["jobs"])})')
+    print(f'Excel: {output_path}')
+    print(f'  전체 비교  {comparison_status(data, data)}')
+    print(f'  중간 비교  {comparison_status(data, data["interim"])}')
     return output_path
 
 

@@ -6,6 +6,7 @@
     python results/classify_wandb_runs.py --list-experiments
 
 Named experiments use results/experiments/NAME/{manifest.json,runs.csv,results.xlsx}.
+With --excel, both matched comparisons are refreshed from the collected scores.
 Without --experiment the original hash_target_* paths remain available.
 No queue is mutated by reporting.
 """
@@ -248,7 +249,8 @@ def collect_rows(manifest, live_jobs, root, cached=None, remote=None, remote_iss
 
 
 def main(workers=8, output_path=None, offline=False, *, manifest_path=None,
-         root=ROOT, queue_db=None, gpu_type=None, job_ids=None, project='choemj-kaist/STORM',experiment=None):
+         root=ROOT, queue_db=None, gpu_type=None, job_ids=None, project='choemj-kaist/STORM',
+         experiment=None, excel_path=None):
     root=Path(root).resolve()
     manifest_path,output,_=report_paths(experiment,manifest=manifest_path,csv=output_path,results_dir=root/'results')
     database = Path(queue_db) if queue_db else root / 'training_queue/queue.sqlite3'
@@ -286,8 +288,11 @@ def main(workers=8, output_path=None, offline=False, *, manifest_path=None,
         writer.writeheader()
         writer.writerows(rows)
         atomic_text(output, buffer.getvalue())
-    completed = sum(row['State'] == 'completed' for row in rows)
-    print(f'{completed}/{len(rows)} completed branches → {output}')
+        completed = sum(row['State'] == 'completed' for row in rows)
+        print(f'{completed}/{len(rows)} completed branches → {output}')
+        if excel_path is not None:
+            from convert_csv_to_excel import main as convert_excel
+            convert_excel(csv_path=output, output_path=excel_path, manifest_path=manifest_path, experiment=experiment)
     return output
 
 
@@ -304,7 +309,7 @@ def parse_args(argv=None):
     parser.add_argument('--job-id', action='append', help='Optional exact Job IDs for first capture')
     parser.add_argument('--project', default='choemj-kaist/STORM')
     parser.add_argument('--offline', action='store_true', help='Read local final evaluations and this campaign CSV only')
-    parser.add_argument('--excel', action='store_true')
+    parser.add_argument('--excel', action='store_true', help='Refresh the settings-first and samples-first Excel comparisons')
     parser.add_argument('--excel-output', type=Path)
     args = parser.parse_args(argv)
     if args.workers < 1:
@@ -323,11 +328,8 @@ if __name__ == '__main__':
             raise SystemExit(0)
         manifest,csv_path,excel_path=report_paths(args.experiment,manifest=args.manifest,csv=args.output,
                                                 excel=args.excel_output,results_dir=args.root/'results')
-        output = main(args.workers, csv_path, args.offline, manifest_path=manifest, root=args.root,
-                      queue_db=args.queue_db, gpu_type=args.gpu_type, job_ids=args.job_id, project=args.project,
-                      experiment=args.experiment)
-        if args.excel:
-            from convert_csv_to_excel import main as convert_excel
-            convert_excel(csv_path=output, output_path=excel_path, manifest_path=manifest,experiment=args.experiment)
+        main(args.workers, csv_path, args.offline, manifest_path=manifest, root=args.root,
+             queue_db=args.queue_db, gpu_type=args.gpu_type, job_ids=args.job_id, project=args.project,
+             experiment=args.experiment, excel_path=excel_path if args.excel else None)
     except (ValueError, RuntimeError, OSError, sqlite3.Error) as error:
         raise SystemExit(str(error))

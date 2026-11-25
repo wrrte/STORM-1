@@ -187,27 +187,52 @@ class ReportTests(unittest.TestCase):
         self.assertIsNone(data['stats']['Frostbite','h9 / t4']['mean'])
         self.assertTrue(data['provisional'])
 
-    def test_interim_comparison_uses_the_same_warmups_for_every_pair(self):
+    def test_overall_prioritizes_settings_and_interim_prioritizes_samples(self):
         rows = self.completed_rows(set())
         for identity, first, second in [('j0', 1000, 800), ('j1', 1200, 900), ('j2', 1500, 1400)]:
             rows[identity, 'retrieval_h9_t4'].update(State='completed', **{'Eval Return': first})
             rows[identity, 'retrieval_h10_t4'].update(State='completed', **{'Eval Return': second})
         rows['j3', 'retrieval_h9_t4'].update(State='completed', **{'Eval Return': 999999})
         rows['j0', 'retrieval_h11_t4'].update(State='completed', **{'Eval Return': 999999})
+        rows['j0', 'baseline'].update(State='completed', **{'Eval Return': 500})
 
         data = report.aggregate(self.manifest, rows)
-        self.assertFalse(data['common'])
-        common, settings = report.interim_cohort(data)
-        self.assertEqual(common, {'j0', 'j1', 'j2'})
-        self.assertEqual(settings, ['h9 / t4', 'h10 / t4'])
+        self.assertEqual(data['common'], {'j0'})
+        self.assertEqual(data['selected'], ('h9 / t4', 'h10 / t4', 'h11 / t4'))
+        self.assertEqual(data['stats']['Alien', 'h9 / t4']['mean'], 1000)
+        self.assertEqual(data['stats']['Alien', 'h9 / t4']['delta'], 500)
+        interim = data['interim']
+        self.assertEqual(interim['common'], {'j0', 'j1', 'j2'})
+        self.assertEqual(interim['selected'], ('h9 / t4', 'h10 / t4'))
+        self.assertIsNone(interim['stats']['Alien', 'h9 / t4']['delta'])
+        self.assertIsNone(interim['metrics']['Baseline']['mean'])
 
         wb = report.build_workbook(self.manifest, data, self.manifest_path)
+        self.assertEqual(wb.active.title, '전체 비교')
         ws = wb['중간 비교']
-        self.assertEqual(wb.active.title, '중간 비교')
-        self.assertEqual([ws['H5'].value, ws['I5'].value], [1100, 1500])
-        self.assertEqual([ws['H6'].value, ws['I6'].value], [850, 1400])
-        self.assertAlmostEqual(ws['D5'].value, (report.hns('Alien', 1100) + report.hns('Frostbite', 1500)) / 2)
-        self.assertIn('공통 warmup 3개', ws['A2'].value)
+        self.assertEqual([ws['I5'].value, ws['J5'].value], [1100, 1500])
+        self.assertEqual([ws['I6'].value, ws['J6'].value], [850, 1400])
+        self.assertAlmostEqual(ws['E5'].value, (report.hns('Alien', 1100) + report.hns('Frostbite', 1500)) / 2)
+        self.assertIn('사용 표본 3/4개', ws['A2'].value)
+        self.assertEqual([ws['E11'].value, ws['F11'].value], [1000, 800])
+
+    def test_comparison_ties_use_the_other_dimension(self):
+        completed = {
+            'A': frozenset({'j0', 'j1', 'j2'}),
+            'B': frozenset({'j0', 'j1'}),
+            'C': frozenset({'j0', 'j1'}),
+            'D': frozenset({'j0', 'j2'}),
+            'E': frozenset({'j2'}),
+        }
+        overall, interim = report.select_cohorts(completed, {'j0', 'j1', 'j2'})
+        self.assertEqual(overall, ({'j0'}, ('A', 'B', 'C', 'D')))
+        self.assertEqual(interim, ({'j0', 'j1'}, ('A', 'B', 'C')))
+        completed.pop('D')
+        completed['E'] = frozenset({'j2', 'j3'})
+        completed['F'] = frozenset({'j2', 'j3'})
+        overall, interim = report.select_cohorts(completed, {'j0', 'j1', 'j2', 'j3'})
+        self.assertEqual(overall, ({'j0', 'j1'}, ('A', 'B', 'C')))
+        self.assertEqual(interim, overall)
 
     def test_same_seed_on_different_gpus_is_a_separate_observation(self):
         data=report.aggregate(self.manifest,self.completed_rows({'j0','j3'}))
@@ -303,8 +328,8 @@ class ReportTests(unittest.TestCase):
         self.assertAlmostEqual(ws['H23'].value,data['metrics']['h9 / t4']['median'])
         self.assertAlmostEqual(ws['B33'].value,data['metrics']['h9 / t4']['iqm'])
         self.assertAlmostEqual(ws['H33'].value,data['metrics']['h9 / t4']['gap'])
-        self.assertIn('3/4개 warmup',ws['A3'].value)
-        # The partial high score is visible in details but never in an aggregate comparison.
+        self.assertIn('사용 표본 3/4개',ws['A3'].value)
+        # The unmatched high score appears in the run details and progress count.
         self.assertEqual(data['stats']['Alien','h9 / t4']['n'],2)
         self.assertEqual(set(data['ranks'].values()),{1})
 
@@ -355,28 +380,33 @@ class ReportTests(unittest.TestCase):
         for name in ['../other','/tmp/other','','has space']:
             with self.assertRaises(ValueError):report_paths(name,results_dir=self.root)
 
-    def test_offline_export_keeps_partial_score_only_in_detail_and_preserves_v3_layout(self):
+    def test_offline_export_shows_one_setting_without_ranking_it(self):
         self.write_local(score=1234)
         # A historical same-game result has a different directory and cannot enter.
         old=self.root/'runs/Alien-old-study'
         old.mkdir(parents=True)
         (old/'final_evaluation.json').write_text(json.dumps(dict(episode_avg_return=999999)))
         csv_path=self.root/'grid.csv'
-        collector.main(output_path=csv_path,offline=True,manifest_path=self.manifest_path,root=self.root)
-        output=report.main(csv_path,self.root/'grid.xlsx',manifest_path=self.manifest_path)
+        output=self.root/'grid.xlsx'
+        collector.main(output_path=csv_path,offline=True,manifest_path=self.manifest_path,root=self.root,excel_path=output)
         wb=load_workbook(output,data_only=True)
         ws=wb['전체 비교']
         self.assertEqual([cell.value for cell in ws[4]][:9],['순위','설정','hash_bits','target','완료 / 예정','Mean HNS','Median HNS','IQM','Optimality Gap'])
         self.assertEqual(ws.max_column,11)
         self.assertEqual(len(ws.conditional_formatting),4)
         self.assertEqual(len(ws._charts),0)
-        self.assertIn('0/2게임',ws['A3'].value)
-        for row in ws.iter_rows(min_row=5,max_row=17,min_col=6,max_col=11):
+        self.assertIn('1/2게임 | 조합 간 순위 대기',ws['A3'].value)
+        self.assertEqual([ws[cell].value for cell in ('A6','B6','E6','J6')],['—','h9 / t4','1 / 4',1234])
+        self.assertAlmostEqual(ws['F6'].value,report.hns('Alien',1234))
+        for row in ws.iter_rows(min_row=7,max_row=17,min_col=6,max_col=11):
             self.assertTrue(all(cell.value is None for cell in row))
+        interim=wb['중간 비교']
+        self.assertIn('조합 간 순위 대기',interim['A2'].value)
+        self.assertEqual([interim[cell].value for cell in ('A5','B5','E10')],['—','h9 / t4',1234])
         details=list(wb['실행 상세'].iter_rows(min_row=7,values_only=True))
         self.assertEqual(len(details),52)
         self.assertEqual([row[7] for row in details if row[7] is not None],[1234])
-        self.assertEqual(wb.sheetnames,['전체 비교','게임별 비교','GPU·시드별 점수','실행 상세','집계 기준'])
+        self.assertEqual(wb.sheetnames,['전체 비교','중간 비교','게임별 비교','GPU·시드별 점수','실행 상세','집계 기준'])
 
 
 class NamedQueueTests(unittest.TestCase):

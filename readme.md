@@ -267,13 +267,15 @@ claiming, recovering, or changing training jobs. Local completed evaluations
 take priority over W&B; retry attempts are never averaged together.
 
 The overview contains ranks, settings, completion counts, Mean/Median HNS, IQM,
-Optimality Gap, game mean scores, and four global metric heatmaps. Comparison
-statistics use only warmups where every grid setting and baseline have finished
-the same final evaluation. Partially completed scores remain visible in the
-GPU/seed and run detail sheets. Missing scores remain blank; ranks are provisional
-until all selected warmups finish. The overview states the common game/warmup
-counts. IQM trims `floor(N/4)` pooled seed scores at each tail; Optimality Gap is
-the game mean of `max(0, 1 - mean_seed_HNS)`.
+Optimality Gap, game mean scores, and four global metric heatmaps. It maximizes
+the number of settings compared on the same game/seed warmups, then the number
+of shared samples. The interim sheet maximizes the number of shared samples
+across at least two settings, then the number of settings. Both sheets show
+scores without ranks when only one setting can be included. Baseline scores
+appear when ready for every sample used by that sheet. The GPU/seed and run
+detail sheets show each completed final evaluation. IQM trims `floor(N/4)`
+pooled seed scores at each tail. Optimality Gap averages
+`max(0, 1 - mean_seed_HNS)` across games.
 
 ### Shared warmup inventory across A6000, RTX 3090 and TITAN RTX
 
