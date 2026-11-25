@@ -187,6 +187,28 @@ class ReportTests(unittest.TestCase):
         self.assertIsNone(data['stats']['Frostbite','h9 / t4']['mean'])
         self.assertTrue(data['provisional'])
 
+    def test_interim_comparison_uses_the_same_warmups_for_every_pair(self):
+        rows = self.completed_rows(set())
+        for identity, first, second in [('j0', 1000, 800), ('j1', 1200, 900), ('j2', 1500, 1400)]:
+            rows[identity, 'retrieval_h9_t4'].update(State='completed', **{'Eval Return': first})
+            rows[identity, 'retrieval_h10_t4'].update(State='completed', **{'Eval Return': second})
+        rows['j3', 'retrieval_h9_t4'].update(State='completed', **{'Eval Return': 999999})
+        rows['j0', 'retrieval_h11_t4'].update(State='completed', **{'Eval Return': 999999})
+
+        data = report.aggregate(self.manifest, rows)
+        self.assertFalse(data['common'])
+        common, settings = report.interim_cohort(data)
+        self.assertEqual(common, {'j0', 'j1', 'j2'})
+        self.assertEqual(settings, ['h9 / t4', 'h10 / t4'])
+
+        wb = report.build_workbook(self.manifest, data, self.manifest_path)
+        ws = wb['중간 비교']
+        self.assertEqual(wb.active.title, '중간 비교')
+        self.assertEqual([ws['H5'].value, ws['I5'].value], [1100, 1500])
+        self.assertEqual([ws['H6'].value, ws['I6'].value], [850, 1400])
+        self.assertAlmostEqual(ws['D5'].value, (report.hns('Alien', 1100) + report.hns('Frostbite', 1500)) / 2)
+        self.assertIn('공통 warmup 3개', ws['A2'].value)
+
     def test_same_seed_on_different_gpus_is_a_separate_observation(self):
         data=report.aggregate(self.manifest,self.completed_rows({'j0','j3'}))
         self.assertEqual(len(data['common']),2)

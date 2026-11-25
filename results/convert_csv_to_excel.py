@@ -1,4 +1,4 @@
-"""Export the current hash/target campaign, using only common completed warmups.
+"""Export matched interim and full comparisons for the current hash/target campaign.
 
     python results/convert_csv_to_excel.py
 
@@ -8,6 +8,7 @@ Historical CSV files, manual scores, and previous experiment backups are not use
 import argparse
 from collections import defaultdict
 from datetime import datetime, timezone
+from itertools import combinations
 import os
 from pathlib import Path
 from statistics import fmean, median, stdev
@@ -188,6 +189,64 @@ def parameters(setting,manifest):
     return next((h,t) for h,t in manifest['pairs'] if setting==f'h{h} / t{t}')
 
 
+def interim_cohort(data):
+    """Select a shared set of warmups using completion status alone."""
+    completed = {
+        setting: frozenset(identity for identity in data['jobs']
+                           if data['records'][identity, setting]['Eval Return'] is not None)
+        for setting in data['settings'][1:]
+    }
+    cohorts = {left & right for left, right in combinations(completed.values(), 2)}
+    cohorts.discard(frozenset())
+    choices = [(cohort, [setting for setting, finished in completed.items() if cohort <= finished])
+               for cohort in cohorts]
+    return max(choices, key=lambda choice: (len(choice[0]) * len(choice[1]), len(choice[0]),
+                                            tuple(sorted(choice[0]))), default=(frozenset(), []))
+
+
+def add_interim_comparison(wb, manifest, data):
+    common, settings = interim_cohort(data)
+    if not settings or common == data['common']:
+        return
+
+    jobs = sorted((data['jobs'][identity] for identity in common),
+                  key=lambda job: (job['game'], job['gpu_type'], job['seed'], job['id']))
+    games = sorted({job['game'] for job in jobs})
+    results = {}
+    for setting in settings:
+        scores = defaultdict(list)
+        for job in jobs:
+            scores[job['game']].append(data['records'][job['id'], setting]['Eval Return'])
+        metrics = calculate_metrics({game: [hns(game, score) for score in scores[game]] for game in games})
+        results[setting] = metrics, [fmean(scores[game]) for game in games]
+
+    labels = ['순위', 'hash_bits', 'target', 'Mean HNS', 'Median HNS', 'IQM', 'Optimality Gap',
+              *[f'{game} 평균 점수' for game in games]]
+    ws = sheet(wb, '중간 비교', '중간 비교 | 완료된 hash_bits × target',
+               f'공통 warmup {len(jobs)}개 · {len(games)}게임 · {len(settings)}개 조합 · Mean HNS 기준 잠정 순위', len(labels))
+    headers(ws, 4, labels)
+    ranked = sorted(settings, key=lambda setting: -results[setting][0]['mean'])
+    for row, setting in enumerate(ranked, 5):
+        metrics, means = results[setting]
+        rank = 1 + sum(results[other][0]['mean'] > metrics['mean'] for other in ranked)
+        line(ws, row, [rank, *parameters(setting, manifest), metrics['mean'], metrics['median'], metrics['iqm'],
+                       metrics['gap'], *means], best=rank == 1)
+        formats(ws, row, {**{col: '0.0000' for col in range(4, 8)},
+                          **{col: '#,##0.00' for col in range(8, len(labels) + 1)}})
+    table(ws, 'InterimComparison', 4, 4 + len(ranked), len(labels))
+    ws['D4'].comment = Comment('각 게임의 공통 warmup 평균 HNS를 구한 뒤 게임에 동일한 가중치를 적용합니다.', 'STORM')
+
+    top = 7 + len(ranked)
+    ws.merge_cells(start_row=top, start_column=1, end_row=top, end_column=len(labels))
+    ws.cell(top, 1, '모든 조합에 사용한 공통 warmup').font = Font(name=FONT, bold=True, color=NAVY)
+    headers(ws, top + 1, ['게임', 'GPU 모델', '시드', '실제 warmup step'])
+    for row, job in enumerate(jobs, top + 2):
+        line(ws, row, [job['game'], job['gpu_type'], job['seed'], job['warmup_step']])
+        ws.cell(row, 1).comment = Comment(job['warmup_source'], 'STORM')
+    widths(ws, [14, 13, 11, 19, 16, 14, 19, *([22] * len(games))])
+    ws.freeze_panes = 'D5'
+
+
 def add_heatmaps(ws,start,manifest,data):
     bits = sorted({h for h,t in manifest['pairs']})
     targets = sorted({t for h,t in manifest['pairs']})
@@ -231,6 +290,8 @@ def build_workbook(manifest,data,manifest_path):
     wb.remove(wb.active)
     wb.properties.title = 'STORM hash_bits × target comparison'
     wb.properties.description = manifest['campaign_id']
+    if data['provisional']:
+        add_interim_comparison(wb, manifest, data)
     games,settings = data['games'],data['settings']
     last_col = max(10,9+len(games))
     ws = sheet(wb,'전체 비교','전체 비교 | hash_bits × target',manifest['campaign_id'],last_col)
@@ -346,6 +407,7 @@ def build_workbook(manifest,data,manifest_path):
         ('수집 범위','고정 목록의 Job ID와 정확한 로컬 Run 이름에 해당하는 결과만 사용. 과거 CSV·수동 점수·고정 백업은 제외.'),
         ('완료 판정','설정/게임/시드/warmup 및 최종 평가 조건을 검증. 로컬 완료 마커 또는 finished W&B run과 모든 episode 결과가 필요.'),
         ('공통 표본','게임·GPU·시드·warmup별로 모든 설정과 baseline이 완료된 표본만 비교표와 히트맵에 동시 포함.'),
+        ('중간 비교','두 조합의 완료 warmup 교집합을 후보로 삼습니다. 공통 warmup 수 × 그 표본에서 완료된 조합 수가 가장 큰 후보를 표시합니다.'),
         ('진행률 / 빈칸','완료/예정은 부분 완료도 포함. 미완료 점수와 공통 표본 없는 지표는 빈칸. 시드별 상세는 개별 완료 점수를 즉시 표시.'),
         ('잠정 순위','전체 warmup 완료 전에는 잠정 순위. 공통 완료 게임 수와 warmup 수를 상단에 표시. 순위는 Mean HNS 내림차순.'),
         ('평가 조건',str(manifest['evaluation'])),
