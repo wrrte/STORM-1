@@ -23,6 +23,8 @@ ROOT = Path(__file__).resolve().parent
 QUEUE_DIR = ROOT / "training_queue"
 SEED_DIR = ROOT / "config_files/game_seeds"
 PAIR_PREFIX = "JointTrainAgent.Retrieval."
+# Private runner exit code for a completed job recovered entirely from saved progress.
+NO_BRANCH_NEEDED = 20
 # New seeds encode the model in million-sized ranges. Legacy seeds keep their values.
 SEED_RANGES = {name: ((i + 1) * 1000000, (i + 2) * 1000000 - 1)
                for i, name in enumerate(("A6000", "3090", "TITAN_RTX", "PRO6000_BLACKWELL",
@@ -374,7 +376,10 @@ class TrainingQueue:
             raise ValueError(status)
         with self.connect() as db:
             db.execute("UPDATE jobs SET status=?,worker=NULL,updated=? WHERE id=?", (status, time.time(), job_id))
-            self.event(db, job_id, "interrupted" if status == "pending" else status, returncode=returncode)
+            event = status
+            if status == "pending":
+                event = "yielded" if returncode == 0 else "interrupted"
+            self.event(db, job_id, event, returncode=returncode)
 
     def reprioritize(self, job_id, priority):
         with self.connect() as db:
@@ -496,8 +501,11 @@ def run_worker(index, *, once=False, max_jobs=0):
                        "STORM_GPU_TYPE": device["gpu_type"],
                        "STORM_QUEUE_FDS": f"{guard.fileno()},{lease.fileno()}"}
                 # The runner keeps the lease through collection and every branch, even if this worker dies.
-                child = subprocess.Popen([job["python"], "-u", str(ROOT / "queue_job.py"),
-                                          "--queue-dir", str(queue.directory), "--job-id", job["id"]],
+                command = [job["python"], "-u", str(ROOT / "queue_job.py"),
+                           "--queue-dir", str(queue.directory), "--job-id", job["id"]]
+                if once:
+                    command.append("--once")
+                child = subprocess.Popen(command,
                                          cwd=ROOT, env=env, start_new_session=True,
                                          pass_fds=(guard.fileno(), lease.fileno()))
                 result = child.wait()
@@ -509,6 +517,8 @@ def run_worker(index, *, once=False, max_jobs=0):
                     queue.finish(job["id"], "pending" if result < 0 else "failed", result)
                 lease.close()
                 lease, job = None, None
+                if once and status == "completed" and result == NO_BRANCH_NEEDED:
+                    continue
                 completed += 1
                 if once or (max_jobs and completed >= max_jobs):
                     return result if result >= 0 else 128 - result
@@ -545,8 +555,8 @@ def main(argv=None):
     worker = sub.add_parser("worker")
     worker.add_argument("gpu")
     limits = worker.add_mutually_exclusive_group()
-    limits.add_argument("--once", action="store_true")
-    limits.add_argument("--max-jobs", type=int, default=0)
+    limits.add_argument("--once", action="store_true", help="Run one unfinished training configuration and exit")
+    limits.add_argument("--max-jobs", type=int, default=0, help="Process up to N whole queue jobs", metavar="N")
     migrate = sub.add_parser("migrate")
     migrate.add_argument("--gpu-type", required=True)
     priority = sub.add_parser("priority")

@@ -8,7 +8,7 @@ import subprocess
 import sys
 import time
 
-from queue_train import ROOT, TrainingQueue, json_line, write_atomic
+from queue_train import NO_BRANCH_NEEDED, ROOT, TrainingQueue, write_atomic
 
 
 def stage_run_name(command):
@@ -40,19 +40,20 @@ class JobRunner:
     def __init__(self, queue, job, root=ROOT):
         self.queue, self.job, self.root = queue, job, Path(root)
         self.stopping = False
+        self.ran_branch = False
         self.child = None
         self.fds = tuple(int(fd) for fd in os.environ.get('STORM_QUEUE_FDS', '').split(',') if fd)
 
     def stop(self, *_):
         self.stopping = True
 
+    def has_completion_marker(self, command, stage):
+        marker = self.root / 'ckpt' / stage_run_name(command) / 'queue_stage_complete.json'
+        return marker.exists() and json.loads(marker.read_text()).get('stage') == f"{self.job['id']}:{stage}"
+
     def execute(self, command, stage, *, collect=False):
         if self.stopping:
             return 143
-        name = stage_run_name(command)
-        marker = self.root / 'ckpt' / name / 'queue_stage_complete.json'
-        if marker.exists() and json.loads(marker.read_text()).get('stage') == f"{self.job['id']}:{stage}":
-            return 0
         env = {**os.environ, 'STORM_QUEUE_JOB': self.job['id'],
                'STORM_QUEUE_STAGE': f"{self.job['id']}:{stage}",
                'STORM_GPU_TYPE': self.job['gpu_type'],
@@ -79,7 +80,7 @@ class JobRunner:
                 pass
             self.child = None
 
-    def run(self):
+    def run(self, *, once=False):
         from warmup_catalog import discover, choose_warmup, request_config, branch_commands, prune_replaced
         job, queue = self.job, self.queue
         if not job.get('plan'):
@@ -100,9 +101,10 @@ class JobRunner:
                            '-seed', str(job['seed']), '-config_path', str(config),
                            '-env_name', f"ALE/{job['game']}-v5",
                            '-trajectory_path', str(self.root / 'D_TRAJ' / f"{job['game']}.pkl")]
-                code = self.execute(command, 'collect', collect=True)
-                if code or self.stopping:
-                    return code or 143
+                if not self.has_completion_marker(command, 'collect'):
+                    code = self.execute(command, 'collect', collect=True)
+                    if code or self.stopping:
+                        return code or 143
                 report = discover(job['gpu_type'], root=self.root, queue_dir=queue.directory, seed_dir=queue.seed_directory)
                 record, _ = choose_warmup(job, report)
                 if record is None:
@@ -116,13 +118,18 @@ class JobRunner:
             removed = prune_replaced(job, record, incompatible, queue, root=self.root)
             for source in removed:
                 print(f"Removed replaced incompatible warmup: {source}", flush=True)
+        completed = job.setdefault('completed_branches', [])
         for stage, command in job['plan'].items():
-            if stage in job.get('completed_branches', []):
+            if stage in completed:
                 continue
-            code = self.execute(command, stage)
-            if code or self.stopping:
-                return code or 143
-            job.setdefault('completed_branches', []).append(stage)
+            if not self.has_completion_marker(command, stage):
+                if once and self.ran_branch:
+                    break
+                code = self.execute(command, stage)
+                if code or self.stopping:
+                    return code or 143
+                self.ran_branch = True
+            completed.append(stage)
             queue.update_job(job)
         return 0
 
@@ -131,6 +138,7 @@ def main(argv=None):
     parser = argparse.ArgumentParser(description=__doc__)
     parser.add_argument('--queue-dir', type=Path, required=True)
     parser.add_argument('--job-id', required=True)
+    parser.add_argument('--once', action='store_true', help='Run at most one unfinished training branch')
     args = parser.parse_args(argv)
     queue = TrainingQueue(args.queue_dir)
     with queue.connect() as db:
@@ -141,16 +149,25 @@ def main(argv=None):
     handlers = {sig: signal.signal(sig, runner.stop) for sig in (signal.SIGINT, signal.SIGTERM)}
     code = 1
     try:
-        code = runner.run()
+        code = runner.run(once=args.once)
     except Exception as error:
         print(f"Job failed: {type(error).__name__}: {error}", file=sys.stderr, flush=True)
         with queue.connect() as db:
             queue.event(db, args.job_id, 'error', message=str(error))
     finally:
-        status = 'pending' if runner.stopping or code < 0 or code in (130, 143) else ('completed' if code == 0 else 'failed')
+        if runner.stopping or code < 0 or code in (130, 143):
+            status = 'pending'
+        elif code:
+            status = 'failed'
+        elif runner.job['plan'].keys() <= set(runner.job['completed_branches']):
+            status = 'completed'
+        else:
+            status = 'pending'
         queue.finish(args.job_id, status, code)
         for sig, handler in handlers.items():
             signal.signal(sig, handler)
+    if args.once and status == 'completed' and not runner.ran_branch:
+        return NO_BRANCH_NEEDED
     return code if code >= 0 else 128 - code
 
 

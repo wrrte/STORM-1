@@ -151,7 +151,7 @@ ablation instead.
 # In separate tmux sessions, start only the cards you want to use.
 bash 0_train.sh
 bash 4_train.sh
-bash 7_train.sh
+bash 7_train.sh --once  # Run one unfinished training configuration on GPU 7.
 
 # Any physical index is supported; there is no 0–7 restriction.
 bash queue_train.sh 12 --once
@@ -181,7 +181,15 @@ resume checkpoints are removed after branch success.
 A dead worker's running job is recovered when its lease lock is released.
 A surviving trainer retains that lock, preventing duplicate execution after a
 worker-only SIGKILL. Errors are recorded as failed jobs rather than retried in
-an endless loop. `--once` handles at most one job; `--max-jobs N` limits a worker.
+an endless loop.
+
+With the model queue, `--once` runs one unfinished branch through final evaluation.
+For a hash/target sweep, this is one hash/target pair for the selected game,
+seed and warmup/offset pair. A requested baseline counts as its own run.
+The worker collects a missing shared warmup before that run. Remaining branches
+return to the queue with the job's original priority and insertion order.
+If no work is available, the worker exits immediately. `--max-jobs N` counts
+whole queue jobs, including all their remaining branches.
 
 New seeds can be allocated without choosing numbers manually:
 
