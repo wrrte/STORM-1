@@ -805,8 +805,8 @@ if __name__ == "__main__":
             vectorized_sampling=conf.Performance.VectorizedReplaySampling
         )
 
-        # judge whether to load demonstration trajectory
-        if conf.JointTrainAgent.UseDemonstration and not args.resume_from:
+        # The replay checkpoint does not include the external demonstration buffer.
+        if conf.JointTrainAgent.UseDemonstration:
             print(colorama.Fore.MAGENTA + f"loading demonstration trajectory from {args.trajectory_path}" + colorama.Style.RESET_ALL)
             replay_buffer.load_trajectory(path=args.trajectory_path)
 

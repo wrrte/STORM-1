@@ -414,6 +414,144 @@
       "seed": 3710,
       "enabled": true,
       "warmups": []
+    },
+    {
+      "game": "Boxing",
+      "seed": 1000008,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BattleZone",
+      "seed": 1000006,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BattleZone",
+      "seed": 1000007,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "UpNDown",
+      "seed": 1000020,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "UpNDown",
+      "seed": 1000021,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "UpNDown",
+      "seed": 1000022,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Qbert",
+      "seed": 1000019,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Assault",
+      "seed": 1000000,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Assault",
+      "seed": 1000001,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BankHeist",
+      "seed": 1000002,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BankHeist",
+      "seed": 1000003,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BankHeist",
+      "seed": 1000004,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BankHeist",
+      "seed": 1000005,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Breakout",
+      "seed": 1000009,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Breakout",
+      "seed": 1000010,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 1000011,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 1000012,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 1000013,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "CrazyClimber",
+      "seed": 1000014,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Pong",
+      "seed": 1000015,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Pong",
+      "seed": 1000016,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Pong",
+      "seed": 1000017,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Pong",
+      "seed": 1000018,
+      "enabled": true,
+      "warmups": []
     }
   ]
 }
