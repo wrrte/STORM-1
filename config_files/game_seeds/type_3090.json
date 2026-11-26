@@ -30,9 +30,7 @@
       "seed": 3333,
       "enabled": true,
       "warmups": [
-        "ckpt/Alien-3333_WarmupSweep/shared_warmup_30332",
-        "ckpt/Alien-3333_WarmupSweep/shared_warmup_50062",
-        "ckpt/Alien-3333_WarmupSweep/shared_warmup_70015"
+        "ckpt/Alien-3333_WarmupSweep/shared_warmup_50062"
       ]
     },
     {
@@ -40,9 +38,7 @@
       "seed": 3334,
       "enabled": true,
       "warmups": [
-        "ckpt/Alien-3334_WarmupSweep/shared_warmup_30811",
-        "ckpt/Alien-3334_WarmupSweep/shared_warmup_50721",
-        "ckpt/Alien-3334_WarmupSweep/shared_warmup_70153"
+        "ckpt/Alien-3334_WarmupSweep/shared_warmup_50721"
       ]
     },
     {
@@ -80,9 +76,7 @@
       "seed": 3333,
       "enabled": true,
       "warmups": [
-        "ckpt/Amidar-3333_WarmupSweep/shared_warmup_30897",
-        "ckpt/Amidar-3333_WarmupSweep/shared_warmup_50728",
-        "ckpt/Amidar-3333_WarmupSweep/shared_warmup_70150"
+        "ckpt/Amidar-3333_WarmupSweep/shared_warmup_50728"
       ]
     },
     {
@@ -90,9 +84,7 @@
       "seed": 3334,
       "enabled": true,
       "warmups": [
-        "ckpt/Amidar-3334_WarmupSweep/shared_warmup_30523",
-        "ckpt/Amidar-3334_WarmupSweep/shared_warmup_50264",
-        "ckpt/Amidar-3334_WarmupSweep/shared_warmup_70023"
+        "ckpt/Amidar-3334_WarmupSweep/shared_warmup_50264"
       ]
     },
     {
@@ -123,21 +115,13 @@
       "game": "Assault",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Assault-3333_WarmupSweep/shared_warmup_30109",
-        "ckpt/Assault-3333_WarmupSweep/shared_warmup_51098",
-        "ckpt/Assault-3333_WarmupSweep/shared_warmup_70254"
-      ]
+      "warmups": []
     },
     {
       "game": "Assault",
       "seed": 3334,
       "enabled": true,
-      "warmups": [
-        "ckpt/Assault-3334_WarmupSweep/shared_warmup_30127",
-        "ckpt/Assault-3334_WarmupSweep/shared_warmup_50219",
-        "ckpt/Assault-3334_WarmupSweep/shared_warmup_70317"
-      ]
+      "warmups": []
     },
     {
       "game": "Assault",
@@ -168,9 +152,7 @@
       "seed": 3333,
       "enabled": true,
       "warmups": [
-        "ckpt/Asterix-3333_WarmupSweep/shared_warmup_30208",
-        "ckpt/Asterix-3333_WarmupSweep/shared_warmup_50106",
-        "ckpt/Asterix-3333_WarmupSweep/shared_warmup_70257"
+        "ckpt/Asterix-3333_WarmupSweep/shared_warmup_50106"
       ]
     },
     {
@@ -178,9 +160,7 @@
       "seed": 3334,
       "enabled": true,
       "warmups": [
-        "ckpt/Asterix-3334_WarmupSweep/shared_warmup_30053",
-        "ckpt/Asterix-3334_WarmupSweep/shared_warmup_50312",
-        "ckpt/Asterix-3334_WarmupSweep/shared_warmup_70146"
+        "ckpt/Asterix-3334_WarmupSweep/shared_warmup_50312"
       ]
     },
     {
@@ -193,9 +173,7 @@
       "game": "BankHeist",
       "seed": 2010,
       "enabled": true,
-      "warmups": [
-        "ckpt/BankHeist-2010_Shared/shared_warmup_50918"
-      ]
+      "warmups": []
     },
     {
       "game": "BankHeist",
@@ -219,19 +197,13 @@
       "game": "BankHeist",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/BankHeist-3333_WarmupSweep/shared_warmup_30069",
-        "ckpt/BankHeist-3333_WarmupSweep/shared_warmup_70521"
-      ]
+      "warmups": []
     },
     {
       "game": "BankHeist",
       "seed": 3334,
       "enabled": true,
-      "warmups": [
-        "ckpt/BankHeist-3334_WarmupSweep/shared_warmup_30498",
-        "ckpt/BankHeist-3334_WarmupSweep/shared_warmup_70121"
-      ]
+      "warmups": []
     },
     {
       "game": "BankHeist",
@@ -279,21 +251,13 @@
       "game": "BattleZone",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/BattleZone-3333_WarmupSweep/shared_warmup_30102",
-        "ckpt/BattleZone-3333_WarmupSweep/shared_warmup_50048",
-        "ckpt/BattleZone-3333_WarmupSweep/shared_warmup_70944"
-      ]
+      "warmups": []
     },
     {
       "game": "BattleZone",
       "seed": 3334,
       "enabled": true,
-      "warmups": [
-        "ckpt/BattleZone-3334_WarmupSweep/shared_warmup_30329",
-        "ckpt/BattleZone-3334_WarmupSweep/shared_warmup_50079",
-        "ckpt/BattleZone-3334_WarmupSweep/shared_warmup_70364"
-      ]
+      "warmups": []
     },
     {
       "game": "BattleZone",
@@ -329,20 +293,13 @@
       "game": "Boxing",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Boxing-3333_WarmupSweep/shared_warmup_30362",
-        "ckpt/Boxing-3333_WarmupSweep/shared_warmup_50981",
-        "ckpt/Boxing-3333_WarmupSweep/shared_warmup_70738"
-      ]
+      "warmups": []
     },
     {
       "game": "Boxing",
       "seed": 3334,
       "enabled": true,
-      "warmups": [
-        "ckpt/Boxing-3334_WarmupSweep/shared_warmup_31041",
-        "ckpt/Boxing-3334_WarmupSweep/shared_warmup_71015"
-      ]
+      "warmups": []
     },
     {
       "game": "Breakout",
@@ -366,21 +323,13 @@
       "game": "Breakout",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Breakout-3333_WarmupSweep/shared_warmup_30061",
-        "ckpt/Breakout-3333_WarmupSweep/shared_warmup_50333",
-        "ckpt/Breakout-3333_WarmupSweep/shared_warmup_70429"
-      ]
+      "warmups": []
     },
     {
       "game": "Breakout",
       "seed": 3334,
       "enabled": true,
-      "warmups": [
-        "ckpt/Breakout-3334_WarmupSweep/shared_warmup_30067",
-        "ckpt/Breakout-3334_WarmupSweep/shared_warmup_50466",
-        "ckpt/Breakout-3334_WarmupSweep/shared_warmup_70062"
-      ]
+      "warmups": []
     },
     {
       "game": "ChopperCommand",
@@ -392,9 +341,7 @@
       "game": "ChopperCommand",
       "seed": 3000,
       "enabled": true,
-      "warmups": [
-        "ckpt/ChopperCommand-3000_Shared/shared_warmup_50390"
-      ]
+      "warmups": []
     },
     {
       "game": "ChopperCommand",
@@ -406,28 +353,19 @@
       "game": "ChopperCommand",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/ChopperCommand-3333_WarmupSweep/shared_warmup_30627",
-        "ckpt/ChopperCommand-3333_WarmupSweep/shared_warmup_70812"
-      ]
+      "warmups": []
     },
     {
       "game": "ChopperCommand",
       "seed": 3334,
       "enabled": true,
-      "warmups": [
-        "ckpt/ChopperCommand-3334_WarmupSweep/shared_warmup_30415",
-        "ckpt/ChopperCommand-3334_WarmupSweep/shared_warmup_50968",
-        "ckpt/ChopperCommand-3334_WarmupSweep/shared_warmup_72125"
-      ]
+      "warmups": []
     },
     {
       "game": "CrazyClimber",
       "seed": 2000,
       "enabled": true,
-      "warmups": [
-        "ckpt/CrazyClimber-2000_Shared/shared_warmup_52441"
-      ]
+      "warmups": []
     },
     {
       "game": "CrazyClimber",
@@ -445,21 +383,13 @@
       "game": "CrazyClimber",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/CrazyClimber-3333_WarmupSweep/shared_warmup_31384",
-        "ckpt/CrazyClimber-3333_WarmupSweep/shared_warmup_50890",
-        "ckpt/CrazyClimber-3333_WarmupSweep/shared_warmup_71550"
-      ]
+      "warmups": []
     },
     {
       "game": "CrazyClimber",
       "seed": 3334,
       "enabled": true,
-      "warmups": [
-        "ckpt/CrazyClimber-3334_WarmupSweep/shared_warmup_31388",
-        "ckpt/CrazyClimber-3334_WarmupSweep/shared_warmup_50552",
-        "ckpt/CrazyClimber-3334_WarmupSweep/shared_warmup_70269"
-      ]
+      "warmups": []
     },
     {
       "game": "DemonAttack",
@@ -484,9 +414,7 @@
       "seed": 3333,
       "enabled": true,
       "warmups": [
-        "ckpt/DemonAttack-3333_WarmupSweep/shared_warmup_31008",
-        "ckpt/DemonAttack-3333_WarmupSweep/shared_warmup_50223",
-        "ckpt/DemonAttack-3333_WarmupSweep/shared_warmup_70301"
+        "ckpt/DemonAttack-3333_WarmupSweep/shared_warmup_50223"
       ]
     },
     {
@@ -494,9 +422,7 @@
       "seed": 3334,
       "enabled": true,
       "warmups": [
-        "ckpt/DemonAttack-3334_WarmupSweep/shared_warmup_30033",
-        "ckpt/DemonAttack-3334_WarmupSweep/shared_warmup_51189",
-        "ckpt/DemonAttack-3334_WarmupSweep/shared_warmup_70312"
+        "ckpt/DemonAttack-3334_WarmupSweep/shared_warmup_51189"
       ]
     },
     {
@@ -527,20 +453,13 @@
       "game": "Freeway",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Freeway-3333_WarmupSweep/shared_warmup_30720",
-        "ckpt/Freeway-3333_WarmupSweep/shared_warmup_51200",
-        "ckpt/Freeway-3333_WarmupSweep/shared_warmup_71680"
-      ]
+      "warmups": []
     },
     {
       "game": "Freeway",
       "seed": 3334,
       "enabled": true,
-      "warmups": [
-        "ckpt/Freeway-3334_WarmupSweep/shared_warmup_30720",
-        "ckpt/Freeway-3334_WarmupSweep/shared_warmup_71680"
-      ]
+      "warmups": []
     },
     {
       "game": "Frostbite",
@@ -565,9 +484,7 @@
       "seed": 3333,
       "enabled": true,
       "warmups": [
-        "ckpt/Frostbite-3333_WarmupSweep/shared_warmup_30230",
-        "ckpt/Frostbite-3333_WarmupSweep/shared_warmup_50135",
-        "ckpt/Frostbite-3333_WarmupSweep/shared_warmup_70028"
+        "ckpt/Frostbite-3333_WarmupSweep/shared_warmup_50135"
       ]
     },
     {
@@ -622,10 +539,7 @@
       "game": "Gopher",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Gopher-3333_WarmupSweep/shared_warmup_31171",
-        "ckpt/Gopher-3333_WarmupSweep/shared_warmup_70292"
-      ]
+      "warmups": []
     },
     {
       "game": "Hero",
@@ -652,9 +566,7 @@
       "seed": 3333,
       "enabled": true,
       "warmups": [
-        "ckpt/Hero-3333_WarmupSweep/shared_warmup_31663",
-        "ckpt/Hero-3333_WarmupSweep/shared_warmup_50030",
-        "ckpt/Hero-3333_WarmupSweep/shared_warmup_70133"
+        "ckpt/Hero-3333_WarmupSweep/shared_warmup_50030"
       ]
     },
     {
@@ -688,9 +600,7 @@
       "seed": 3333,
       "enabled": true,
       "warmups": [
-        "ckpt/Jamesbond-3333_WarmupSweep/shared_warmup_30573",
-        "ckpt/Jamesbond-3333_WarmupSweep/shared_warmup_51705",
-        "ckpt/Jamesbond-3333_WarmupSweep/shared_warmup_70794"
+        "ckpt/Jamesbond-3333_WarmupSweep/shared_warmup_51705"
       ]
     },
     {
@@ -718,9 +628,7 @@
       "seed": 2235,
       "enabled": true,
       "warmups": [
-        "ckpt/Kangaroo-2235_WarmupSweep/shared_warmup_30240",
-        "ckpt/Kangaroo-2235_WarmupSweep/shared_warmup_50403",
-        "ckpt/Kangaroo-2235_WarmupSweep/shared_warmup_72671"
+        "ckpt/Kangaroo-2235_WarmupSweep/shared_warmup_50403"
       ]
     },
     {
@@ -751,10 +659,7 @@
       "game": "Krull",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Krull-3333_WarmupSweep/shared_warmup_30619",
-        "ckpt/Krull-3333_WarmupSweep/shared_warmup_70168"
-      ]
+      "warmups": []
     },
     {
       "game": "KungFuMaster",
@@ -772,35 +677,25 @@
       "game": "KungFuMaster",
       "seed": 3000,
       "enabled": true,
-      "warmups": [
-        "ckpt/KungFuMaster-3000_Shared/shared_warmup_50459"
-      ]
+      "warmups": []
     },
     {
       "game": "KungFuMaster",
       "seed": 3010,
       "enabled": true,
-      "warmups": [
-        "ckpt/KungFuMaster-3010_Shared/shared_warmup_50213"
-      ]
+      "warmups": []
     },
     {
       "game": "KungFuMaster",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/KungFuMaster-3333_WarmupSweep/shared_warmup_31229",
-        "ckpt/KungFuMaster-3333_WarmupSweep/shared_warmup_50477",
-        "ckpt/KungFuMaster-3333_WarmupSweep/shared_warmup_71466"
-      ]
+      "warmups": []
     },
     {
       "game": "MsPacman",
       "seed": 2000,
       "enabled": true,
-      "warmups": [
-        "ckpt/MsPacman-2000_Both/shared_warmup_50000"
-      ]
+      "warmups": []
     },
     {
       "game": "MsPacman",
@@ -812,9 +707,7 @@
       "game": "MsPacman",
       "seed": 3000,
       "enabled": true,
-      "warmups": [
-        "ckpt/MsPacman-3000_Shared/shared_warmup_50008"
-      ]
+      "warmups": []
     },
     {
       "game": "MsPacman",
@@ -826,10 +719,7 @@
       "game": "MsPacman",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/MsPacman-3333_WarmupSweep/shared_warmup_30011",
-        "ckpt/MsPacman-3333_WarmupSweep/shared_warmup_70398"
-      ]
+      "warmups": []
     },
     {
       "game": "Pong",
@@ -841,9 +731,7 @@
       "game": "Pong",
       "seed": 2010,
       "enabled": true,
-      "warmups": [
-        "ckpt/Pong-2010_Shared/shared_warmup_50148"
-      ]
+      "warmups": []
     },
     {
       "game": "Pong",
@@ -855,19 +743,13 @@
       "game": "Pong",
       "seed": 3000,
       "enabled": true,
-      "warmups": [
-        "ckpt/Pong-3000_Shared/shared_warmup_50006"
-      ]
+      "warmups": []
     },
     {
       "game": "Pong",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Pong-3333_WarmupSweep/shared_warmup_30230",
-        "ckpt/Pong-3333_WarmupSweep/shared_warmup_51828",
-        "ckpt/Pong-3333_WarmupSweep/shared_warmup_72056"
-      ]
+      "warmups": []
     },
     {
       "game": "PrivateEye",
@@ -900,9 +782,7 @@
       "seed": 3333,
       "enabled": true,
       "warmups": [
-        "ckpt/PrivateEye-3333_WarmupSweep/shared_warmup_32376",
-        "ckpt/PrivateEye-3333_WarmupSweep/shared_warmup_51262",
-        "ckpt/PrivateEye-3333_WarmupSweep/shared_warmup_70148"
+        "ckpt/PrivateEye-3333_WarmupSweep/shared_warmup_51262"
       ]
     },
     {
@@ -921,9 +801,7 @@
       "game": "Qbert",
       "seed": 3000,
       "enabled": true,
-      "warmups": [
-        "ckpt/Qbert-3000_Shared/shared_warmup_50142"
-      ]
+      "warmups": []
     },
     {
       "game": "Qbert",
@@ -935,11 +813,7 @@
       "game": "Qbert",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Qbert-3333_WarmupSweep/shared_warmup_30334",
-        "ckpt/Qbert-3333_WarmupSweep/shared_warmup_50193",
-        "ckpt/Qbert-3333_WarmupSweep/shared_warmup_70447"
-      ]
+      "warmups": []
     },
     {
       "game": "RoadRunner",
@@ -971,10 +845,7 @@
       "game": "RoadRunner",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/RoadRunner-3333_WarmupSweep/shared_warmup_31218",
-        "ckpt/RoadRunner-3333_WarmupSweep/shared_warmup_70601"
-      ]
+      "warmups": []
     },
     {
       "game": "Seaquest",
@@ -1008,18 +879,13 @@
       "game": "Seaquest",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/Seaquest-3333_WarmupSweep/shared_warmup_30555",
-        "ckpt/Seaquest-3333_WarmupSweep/shared_warmup_70315"
-      ]
+      "warmups": []
     },
     {
       "game": "UpNDown",
       "seed": 2000,
       "enabled": true,
-      "warmups": [
-        "ckpt/UpNDown-2000_Shared/shared_warmup_50746"
-      ]
+      "warmups": []
     },
     {
       "game": "UpNDown",
@@ -1031,9 +897,7 @@
       "game": "UpNDown",
       "seed": 3000,
       "enabled": true,
-      "warmups": [
-        "ckpt/UpNDown-3000_Shared/shared_warmup_50438"
-      ]
+      "warmups": []
     },
     {
       "game": "UpNDown",
@@ -1045,11 +909,7 @@
       "game": "UpNDown",
       "seed": 3333,
       "enabled": true,
-      "warmups": [
-        "ckpt/UpNDown-3333_WarmupSweep/shared_warmup_30671",
-        "ckpt/UpNDown-3333_WarmupSweep/shared_warmup_50053",
-        "ckpt/UpNDown-3333_WarmupSweep/shared_warmup_70264"
-      ]
+      "warmups": []
     },
     {
       "game": "Jamesbond",

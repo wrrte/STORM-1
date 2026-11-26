@@ -170,6 +170,24 @@ def preflight(root, batch, plan_id, audit, jobs):
     return operations, issues
 
 
+def apply_deletions(root, operations, audit_path, audit):
+    save(audit_path, audit)
+    for name, source, retired, stamp, _ in operations:
+        if name not in audit["started"]:
+            audit["started"].append(name)
+            save(audit_path, audit)
+        if source.exists():
+            if source_stamp(safe_source(root, name)) != stamp:
+                raise ValueError(f"Snapshot changed before deletion: {name}")
+            os.replace(source, retired)
+        if retired.exists():
+            shutil.rmtree(retired)
+        apply_locator_updates(locator_updates(root, source))
+        remove_references(root, [name])
+        audit["deleted"].append(name)
+        save(audit_path, audit)
+
+
 def execute(plan_path, model, machine, *, apply=False, root=ROOT):
     root = Path(root).resolve()
     model, machine = gpu_type(model), identifier(machine)
@@ -193,21 +211,7 @@ def execute(plan_path, model, machine, *, apply=False, root=ROOT):
             raise ValueError("\n".join(issues))
         if not apply:
             return audit
-        save(audit_path, audit)
-        for name, source, retired, stamp, _ in operations:
-            if name not in audit["started"]:
-                audit["started"].append(name)
-                save(audit_path, audit)
-            if source.exists():
-                if source_stamp(safe_source(root, name)) != stamp:
-                    raise ValueError(f"Snapshot changed before deletion: {name}")
-                os.replace(source, retired)
-            if retired.exists():
-                shutil.rmtree(retired)
-            apply_locator_updates(locator_updates(root, source))
-            remove_references(root, [name])
-            audit["deleted"].append(name)
-            save(audit_path, audit)
+        apply_deletions(root, operations, audit_path, audit)
     print(f"Deleted {len(audit['deleted'])} planned snapshots in total. Audit: {audit_path}")
     return audit
 
