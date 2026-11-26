@@ -97,9 +97,7 @@
       "game": "CrazyClimber",
       "seed": 6020,
       "enabled": true,
-      "warmups": [
-        "ckpt/CrazyClimber-6020_Shared/shared_warmup_53133"
-      ]
+      "warmups": []
     },
     {
       "game": "Jamesbond",
@@ -226,9 +224,7 @@
       "game": "Freeway",
       "seed": 6020,
       "enabled": true,
-      "warmups": [
-        "ckpt/Freeway-6020_Shared/shared_warmup_51200"
-      ]
+      "warmups": []
     },
     {
       "game": "Kangaroo",

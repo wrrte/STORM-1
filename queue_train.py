@@ -252,12 +252,23 @@ class TrainingQueue:
         added, skipped = [], 0
         with self.connect() as db:
             prepared, experiments = [], {}
+            existing_ids = None
             for spec in specs:
                 kind = gpu_type(spec.get("gpu_type", model or ""))
                 job = dict(spec, game=canonical_game(spec["game"]), gpu_type=kind,
                            python=str(Path(python).absolute()))
                 # Runtime progress never changes the identity of a requested experiment.
                 identity = {k: job.get(k) for k in ("game", "seed", "gpu_type", "config_text", "overrides", "python")}
+                dependencies = job.get("depends_on", [])
+                if not isinstance(dependencies, list) or any(not isinstance(value, str) for value in dependencies):
+                    raise ValueError("Job dependencies must be a list of existing job IDs")
+                if dependencies:
+                    if existing_ids is None:
+                        existing_ids = {row[0] for row in db.execute("SELECT id FROM jobs")}
+                    if not existing_ids.issuperset(dependencies):
+                        raise ValueError("Job dependencies must refer to existing jobs")
+                    job["depends_on"] = sorted(set(dependencies))
+                    identity["depends_on"] = job["depends_on"]
                 experiment = job.get('experiment_id')
                 if experiment is not None:
                     experiment_name(experiment)
@@ -344,11 +355,18 @@ class TrainingQueue:
             # Serialize discovery/collection for a pair; published warmups can be used by many cards.
             busy = {pair_key(j["game"], j["seed"]) for row in db.execute(
                 "SELECT payload FROM jobs WHERE status='running'") for j in [json.loads(row[0])] if not j.get("plan")}
+            completed_ids = None
             for row in db.execute("SELECT * FROM jobs WHERE status='pending' AND gpu_type=? "
                                   "ORDER BY priority DESC,seq", (model,)).fetchall():
                 job = json.loads(row["payload"])
                 if pair_key(job["game"], job["seed"]) in busy:
                     continue
+                if dependencies := job.get("depends_on"):
+                    if completed_ids is None:
+                        completed_ids = {row[0] for row in db.execute(
+                            "SELECT id FROM jobs WHERE status='completed'")}
+                    if not completed_ids.issuperset(dependencies):
+                        continue
                 path = self.lease_path(job["id"])
                 path.parent.mkdir(parents=True, exist_ok=True)
                 lease = path.open("a")
