@@ -10,6 +10,7 @@ import json
 import math
 from pathlib import Path
 import sqlite3
+import subprocess
 import tempfile
 import sys
 from types import SimpleNamespace
@@ -369,6 +370,25 @@ class ReportTests(unittest.TestCase):
         # Queue jobs from another experiment never extend an already saved scope.
         collector.main(offline=True,root=self.root,experiment='grid-a')
         self.assertEqual(before,path.read_bytes())
+
+    def test_cli_uses_configured_experiment_unless_explicitly_overridden(self):
+        default = collector.DEFAULT_EXPERIMENT
+        alternate = 'grid-alternate'
+        with sqlite3.connect(self.database) as db:
+            for identity, name in [('j0', default), ('j1', alternate)]:
+                self.jobs[identity]['experiment_id'] = name
+                db.execute('UPDATE jobs SET payload=? WHERE id=?', (json.dumps(self.jobs[identity]), identity))
+        command = [sys.executable, '-B', 'classify_wandb_runs.py', '--offline', '--excel', '--root', str(self.root)]
+        for name, identity, extra in [(default, 'j0', []), (alternate, 'j1', ['--experiment', alternate])]:
+            with self.subTest(name=name):
+                result = subprocess.run(command + extra, cwd=ROOT/'results', capture_output=True, text=True)
+                self.assertEqual(result.returncode, 0, result.stderr)
+                manifest, csv_path, excel_path = report_paths(name, results_dir=self.root/'results')
+                self.assertEqual([job['id'] for job in load_manifest(manifest)['jobs']], [identity])
+                self.assertTrue(csv_path.is_file())
+                self.assertTrue(excel_path.is_file())
+        legacy_manifest, _, _ = report_paths(results_dir=self.root/'results')
+        self.assertFalse(legacy_manifest.exists())
 
     def test_named_report_rejects_new_jobs_reusing_an_already_frozen_name(self):
         self.jobs['j0']['experiment_id']='fixed'

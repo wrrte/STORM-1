@@ -242,11 +242,14 @@ Runtime data is stored under `training_queue/` (excluded from Git):
 
 Name each new grid when enqueueing by adding `--experiment grid-v2` to the
 usual `enqueue_train.py` command (keep the desired game/seed selection, grid,
-and `Retrieval.enable Both` options). Collect it using the same name:
+and `Retrieval.enable Both` options). Set `DEFAULT_EXPERIMENT` near the top of
+`results/classify_wandb_runs.py` to make it the default report, or supply the
+name with `--experiment` on the command line.
 
 ```bash
-python results/classify_wandb_runs.py --experiment grid-v2 --excel
-# Refresh from local final evaluations without contacting W&B:
+# Refresh the configured experiment from local final evaluations:
+python results/classify_wandb_runs.py --offline --excel
+# Select an experiment explicitly:
 python results/classify_wandb_runs.py --experiment grid-v2 --offline --excel
 # Rebuild only the workbook from the already collected CSV:
 python results/convert_csv_to_excel.py --experiment grid-v2
@@ -268,9 +271,8 @@ collections reuse only those exact jobs, including retries. Historical W&B
 runs, other experiments, old CSVs and archived/manual results are excluded.
 `--gpu-type` and repeated `--job-id` optionally filter the first capture.
 
-Without `--experiment`, the original `results/hash_target_campaign.json`,
-`results/hash_target_runs.csv` and `results/hash_target_results.xlsx` paths
-remain available. Reporting reads the queue database without
+To refresh the original `hash_target_*` report, select
+`--manifest results/hash_target_campaign.json`. Reporting reads the queue database without
 claiming, recovering, or changing training jobs. Local completed evaluations
 take priority over W&B; retry attempts are never averaged together.
 

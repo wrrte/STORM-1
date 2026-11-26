@@ -7,7 +7,7 @@
 
 Named experiments use results/experiments/NAME/{manifest.json,runs.csv,results.xlsx}.
 With --excel, both matched comparisons use equal total weight per game for IQM.
-Without --experiment the original hash_target_* paths remain available.
+The default experiment is configured by DEFAULT_EXPERIMENT in this file.
 No queue is mutated by reporting.
 """
 import argparse
@@ -31,6 +31,10 @@ from hash_target_common import (
     now, number, read_csv_rows, read_jobs, report_lock, same_path, stage_config,
     report_paths, list_experiments,
 )
+
+
+# Update this when switching the default report to a different experiment.
+DEFAULT_EXPERIMENT = 'hash-grid-anchor-rehash-20261125'
 
 
 def plan_proves_source(job, stage, live):
@@ -299,7 +303,7 @@ def main(workers=8, output_path=None, offline=False, *, manifest_path=None,
 def parse_args(argv=None):
     parser = argparse.ArgumentParser(description=__doc__, formatter_class=argparse.RawDescriptionHelpFormatter)
     parser.add_argument('--workers', type=int, default=8)
-    parser.add_argument('--experiment', help='Experiment name used by enqueue_train.py; automatically selects its own report directory')
+    parser.add_argument('--experiment', help=f'Experiment name used by enqueue_train.py (default: {DEFAULT_EXPERIMENT!r})')
     parser.add_argument('--list-experiments', action='store_true', help='List named queues and saved experiment reports without contacting W&B')
     parser.add_argument('--output', type=Path, help='Optional override of the experiment CSV path')
     parser.add_argument('--manifest', type=Path, help='Optional override of the experiment manifest path')
@@ -326,10 +330,13 @@ if __name__ == '__main__':
             for name,count in list_experiments(live,args.root/'results'):
                 print(f'{name}: {count} job(s)')
             raise SystemExit(0)
-        manifest,csv_path,excel_path=report_paths(args.experiment,manifest=args.manifest,csv=args.output,
+        experiment = args.experiment
+        if experiment is None and not (args.manifest or args.job_id or args.gpu_type):
+            experiment = DEFAULT_EXPERIMENT
+        manifest,csv_path,excel_path=report_paths(experiment,manifest=args.manifest,csv=args.output,
                                                 excel=args.excel_output,results_dir=args.root/'results')
         main(args.workers, csv_path, args.offline, manifest_path=manifest, root=args.root,
              queue_db=args.queue_db, gpu_type=args.gpu_type, job_ids=args.job_id, project=args.project,
-             experiment=args.experiment, excel_path=excel_path if args.excel else None)
+             experiment=experiment, excel_path=excel_path if args.excel else None)
     except (ValueError, RuntimeError, OSError, sqlite3.Error) as error:
         raise SystemExit(str(error))
