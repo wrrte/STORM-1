@@ -281,8 +281,9 @@ of shared samples. The interim sheet maximizes the number of shared samples
 across at least two settings, then the number of settings. Both sheets show
 scores without ranks when only one setting can be included. Baseline scores
 appear when ready for every sample used by that sheet. The GPU/seed and run
-detail sheets show each completed final evaluation. IQM trims `floor(N/4)`
-pooled seed scores at each tail. Optimality Gap averages
+detail sheets show each completed final evaluation. IQM gives each game equal
+total weight and averages the middle 50% of the weighted seed scores.
+Optimality Gap averages
 `max(0, 1 - mean_seed_HNS)` across games.
 
 ### Shared warmup inventory across A6000, RTX 3090 and TITAN RTX

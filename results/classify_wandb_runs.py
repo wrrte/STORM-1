@@ -6,7 +6,7 @@
     python results/classify_wandb_runs.py --list-experiments
 
 Named experiments use results/experiments/NAME/{manifest.json,runs.csv,results.xlsx}.
-With --excel, both matched comparisons are refreshed from the collected scores.
+With --excel, both matched comparisons use equal total weight per game for IQM.
 Without --experiment the original hash_target_* paths remain available.
 No queue is mutated by reporting.
 """

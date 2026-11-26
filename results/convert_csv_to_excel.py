@@ -7,7 +7,9 @@ Historical CSV files, manual scores, and previous experiment backups are not use
 """
 import argparse
 from datetime import datetime, timezone
+from fractions import Fraction
 from itertools import combinations
+from math import fsum
 import os
 from pathlib import Path
 from statistics import fmean, median, stdev
@@ -56,6 +58,8 @@ NAVY, LIGHT, GREEN, GRAY = '172B4D', 'F5F8FC', 'DFF2E7', 'E6EDF5'
 FONT = '맑은 고딕'
 STATE_LABELS = {'completed': '완료', 'running': '진행 중', 'pending': '대기',
                 'failed': '실패', 'interrupted': '중단', 'invalid': '검증 오류', 'evaluating': '평가 종료 대기'}
+IQM_DESCRIPTION = ('각 게임에 같은 총 가중치를 주고 공통 시드에 균등하게 나눕니다. '
+                   'HNS를 정렬해 누적 가중치 25~75% 구간을 평균하며, 경계 점수는 해당 구간에 걸친 비중만 반영합니다.')
 
 
 def hns(game, score):
@@ -63,15 +67,33 @@ def hns(game, score):
     return (score - random) / (human - random)
 
 
+def game_weighted_iqm(by_game):
+    weighted_scores = []
+    for scores in by_game.values():
+        weight = Fraction(1, len(by_game) * len(scores))
+        weighted_scores.extend((score, weight) for score in scores)
+
+    lower, upper = Fraction(1, 4), Fraction(3, 4)
+    cumulative = Fraction(0)
+    contributions = []
+    for score, weight in sorted(weighted_scores):
+        end = cumulative + weight
+        retained = min(end, upper) - max(cumulative, lower)
+        if retained > 0:
+            contributions.append(score * float(retained / (upper - lower)))
+        if end >= upper:
+            break
+        cumulative = end
+    return fsum(contributions)
+
+
 def calculate_metrics(by_game):
-    """Project convention: macro game means, pooled-seed IQM, per-game hinged gap."""
+    """Compute game-weighted aggregate metrics on the matched sample."""
     if not by_game:
         return dict(mean=None, median=None, iqm=None, gap=None)
     game_means = [fmean(values) for values in by_game.values()]
-    pooled = sorted(value for values in by_game.values() for value in values)
-    trim = len(pooled) // 4
     return dict(mean=fmean(game_means), median=median(game_means),
-                iqm=fmean(pooled[trim:len(pooled)-trim]),
+                iqm=game_weighted_iqm(by_game),
                 gap=fmean(max(0, 1 - value) for value in game_means))
 
 
@@ -267,6 +289,7 @@ def add_interim_comparison(wb, manifest, data):
     if settings:
         table(ws, 'InterimComparison', 4, 4 + len(settings), len(labels))
     ws['E4'].comment = Comment('각 게임의 공통 warmup 평균 HNS를 구한 뒤 게임에 동일한 가중치를 적용합니다.', 'STORM')
+    ws['G4'].comment = Comment(IQM_DESCRIPTION, 'STORM')
 
     top = 7 + len(settings)
     ws.merge_cells(start_row=top, start_column=1, end_row=top, end_column=last_col)
@@ -349,7 +372,7 @@ def build_workbook(manifest,data,manifest_path):
         'E4':'이 설정의 최종 평가 완료 수 / 예정 warmup 수. 일부 설정만 완료된 warmup도 진행률에는 반영합니다.',
         'F4':'게임별 공통 warmup의 평균 HNS를 게임 간 동일 가중 평균합니다.',
         'G4':'게임별 공통 warmup 평균 HNS의 중앙값입니다.',
-        'H4':'공통 표본의 개별 시드 HNS를 합쳐 정렬하고 양 끝에서 floor(N/4)개씩 제외한 평균입니다. 시드별 동일 가중입니다.',
+        'H4':IQM_DESCRIPTION,
         'I4':'게임별 max(0, 1 − 공통 warmup 평균 HNS)의 평균. 낮을수록 좋습니다.',
     }.items():
         ws[address].comment = Comment(text,'STORM')
@@ -450,7 +473,7 @@ def build_workbook(manifest,data,manifest_path):
         ('평가 조건',str(manifest['evaluation'])),
         ('HNS','(score − Random) / (Human − Random). 음수와 1 초과 값을 자르지 않음.'),
         ('Mean / Median','게임별 공통 warmup 평균 HNS의 평균 / 중앙값. 게임별 동일 가중.'),
-        ('IQM','공통 개별 시드 HNS를 합쳐 정렬하고 양 끝에서 floor(N/4)개씩 제거한 평균. 시드별 동일 가중.'),
+        ('IQM',IQM_DESCRIPTION),
         ('Optimality Gap','게임별 max(0, 1 − 평균 HNS)의 평균. 낮을수록 좋음.'),
         ('재시도','한 분기를 한 관측으로 집계. 검증된 로컬 결과 우선, 그다음 최신 완료 W&B run. 재시도 평균을 만들지 않음.'),
         ('색상','Baseline 회색. 최고 평균 설정 녹색 행. 히트맵은 모두 진한 녹색이 좋은 성능. 공통 표본 없으면 회색.'),

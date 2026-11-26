@@ -246,9 +246,15 @@ class ReportTests(unittest.TestCase):
         self.assertEqual(metrics['iqm'],1)
         self.assertEqual(metrics['gap'],0)
         metrics=report.calculate_metrics({'a':[-2,0,1]})
-        self.assertAlmostEqual(metrics['iqm'],-1/3)
+        self.assertAlmostEqual(metrics['iqm'],-1/6)
         self.assertAlmostEqual(metrics['gap'],4/3)
         self.assertIsNone(report.calculate_metrics({})['mean'])
+
+    def test_iqm_gives_equal_total_weight_to_games_with_unequal_seed_counts(self):
+        by_game = {'a': [0, .8], 'b': [0, 0, .4, 1.2]}
+        self.assertAlmostEqual(report.calculate_metrics(by_game)['iqm'], .30)
+        by_game['c'] = [.2, .5, .6]
+        self.assertAlmostEqual(report.calculate_metrics(by_game)['iqm'], 16/45)
 
     def test_wandb_filters_exact_current_names_and_rejects_old_or_wrong_setting_runs(self):
         current=self.fake_run()
