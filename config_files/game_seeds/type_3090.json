@@ -1050,6 +1050,60 @@
         "ckpt/UpNDown-3333_WarmupSweep/shared_warmup_50053",
         "ckpt/UpNDown-3333_WarmupSweep/shared_warmup_70264"
       ]
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 2000000,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Jamesbond",
+      "seed": 2000001,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 2000002,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Kangaroo",
+      "seed": 2000003,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 2000004,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "PrivateEye",
+      "seed": 2000005,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 2000006,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 2000007,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "RoadRunner",
+      "seed": 2000008,
+      "enabled": true,
+      "warmups": []
     }
   ]
 }
