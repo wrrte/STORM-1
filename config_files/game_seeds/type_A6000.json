@@ -2,12 +2,6 @@
   "gpu_type": "A6000",
   "game_seeds": [
     {
-      "game": "Amidar",
-      "seed": 6020,
-      "enabled": true,
-      "warmups": []
-    },
-    {
       "game": "Boxing",
       "seed": 6040,
       "enabled": true,
@@ -16,26 +10,8 @@
       ]
     },
     {
-      "game": "Hero",
-      "seed": 3710,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Kangaroo",
-      "seed": 7010,
-      "enabled": true,
-      "warmups": []
-    },
-    {
       "game": "Krull",
       "seed": 7010,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "PrivateEye",
-      "seed": 6040,
       "enabled": true,
       "warmups": []
     },
@@ -60,20 +36,6 @@
       "warmups": []
     },
     {
-      "game": "Jamesbond",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": [
-        "ckpt/Jamesbond-6000_Both/shared_warmup_50000"
-      ]
-    },
-    {
-      "game": "Kangaroo",
-      "seed": 7020,
-      "enabled": true,
-      "warmups": []
-    },
-    {
       "game": "Krull",
       "seed": 7020,
       "enabled": true,
@@ -82,52 +44,14 @@
       ]
     },
     {
-      "game": "PrivateEye",
-      "seed": 6010,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Asterix",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
       "game": "CrazyClimber",
       "seed": 6020,
       "enabled": true,
       "warmups": []
     },
     {
-      "game": "Jamesbond",
-      "seed": 6010,
-      "enabled": true,
-      "warmups": [
-        "ckpt/Jamesbond-6010_Shared/shared_warmup_50135"
-      ]
-    },
-    {
-      "game": "Kangaroo",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
       "game": "Krull",
       "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "PrivateEye",
-      "seed": 6020,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Asterix",
-      "seed": 6010,
       "enabled": true,
       "warmups": []
     },
@@ -141,30 +65,12 @@
       ]
     },
     {
-      "game": "Kangaroo",
-      "seed": 6020,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Kangaroo",
-      "seed": 6010,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "KungFuMaster",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": [
-        "ckpt/KungFuMaster-6000_Shared/shared_warmup_50667"
-      ]
-    },
-    {
       "game": "Qbert",
       "seed": 6010,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Qbert-seed6010-queue-36392963f9a341929bb4f7b7b66839bb_collector_Shared/shared_warmup_50406"
+      ]
     },
     {
       "game": "BattleZone",
@@ -183,14 +89,6 @@
       ]
     },
     {
-      "game": "Kangaroo",
-      "seed": 6030,
-      "enabled": true,
-      "warmups": [
-        "ckpt/Kangaroo-6030_Shared/shared_warmup_50067"
-      ]
-    },
-    {
       "game": "Krull",
       "seed": 6020,
       "enabled": true,
@@ -202,14 +100,6 @@
       "enabled": true,
       "warmups": [
         "ckpt/MsPacman-6000_Both/shared_warmup_50000"
-      ]
-    },
-    {
-      "game": "RoadRunner",
-      "seed": 6030,
-      "enabled": true,
-      "warmups": [
-        "ckpt/RoadRunner-6030_Shared/shared_warmup_51024"
       ]
     },
     {
@@ -227,14 +117,6 @@
       "warmups": []
     },
     {
-      "game": "Kangaroo",
-      "seed": 6040,
-      "enabled": true,
-      "warmups": [
-        "ckpt/Kangaroo-6040_Shared/shared_warmup_50211"
-      ]
-    },
-    {
       "game": "Krull",
       "seed": 6050,
       "enabled": true,
@@ -246,14 +128,8 @@
       "game": "MsPacman",
       "seed": 6010,
       "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "RoadRunner",
-      "seed": 6040,
-      "enabled": true,
       "warmups": [
-        "ckpt/RoadRunner-6040_Shared/shared_warmup_50507"
+        "ckpt/MsPacman-seed6010-queue-ff0a2c288c8148dd846c4988e91e4503_collector_Shared/shared_warmup_50159"
       ]
     },
     {
@@ -264,18 +140,6 @@
         "ckpt/Boxing-6010_Shared/shared_warmup_51575",
         "ckpt/Boxing-myserver-6010_Both/shared_warmup_50000"
       ]
-    },
-    {
-      "game": "Frostbite",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Kangaroo",
-      "seed": 6050,
-      "enabled": true,
-      "warmups": []
     },
     {
       "game": "Krull",
@@ -289,14 +153,8 @@
       "game": "MsPacman",
       "seed": 6020,
       "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "RoadRunner",
-      "seed": 6060,
-      "enabled": true,
       "warmups": [
-        "ckpt/RoadRunner-6060_Shared/shared_warmup_50218"
+        "ckpt/MsPacman-seed6020-queue-4d9ccc7bd75546b68014dcf552c9b4f0_collector_Shared/shared_warmup_50388"
       ]
     },
     {
@@ -308,18 +166,6 @@
       ]
     },
     {
-      "game": "Frostbite",
-      "seed": 6010,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Kangaroo",
-      "seed": 7000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
       "game": "Krull",
       "seed": 7000,
       "enabled": true,
@@ -328,36 +174,6 @@
       ]
     },
     {
-      "game": "PrivateEye",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Seaquest",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Alien",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Alien",
-      "seed": 6010,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Amidar",
-      "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
       "game": "Assault",
       "seed": 3710,
       "enabled": true,
@@ -366,12 +182,6 @@
     {
       "game": "Assault",
       "seed": 6000,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Asterix",
-      "seed": 3710,
       "enabled": true,
       "warmups": []
     },
@@ -382,25 +192,7 @@
       "warmups": []
     },
     {
-      "game": "ChopperCommand",
-      "seed": 3710,
-      "enabled": true,
-      "warmups": []
-    },
-    {
       "game": "CrazyClimber",
-      "seed": 3710,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "DemonAttack",
-      "seed": 3710,
-      "enabled": true,
-      "warmups": []
-    },
-    {
-      "game": "Frostbite",
       "seed": 3710,
       "enabled": true,
       "warmups": []
@@ -415,127 +207,169 @@
       "game": "Boxing",
       "seed": 1000008,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Boxing-seed1000008-queue-1443371c4b05402f908b8843746449a9_collector_Shared/shared_warmup_51277"
+      ]
     },
     {
       "game": "BattleZone",
       "seed": 1000006,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/BattleZone-seed1000006-queue-89407fd10f5546c8ade4f2e919a8bf41_collector_Shared/shared_warmup_50715"
+      ]
     },
     {
       "game": "BattleZone",
       "seed": 1000007,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/BattleZone-seed1000007-queue-13971c7d076f41e2ab71682abe3b1023_collector_Shared/shared_warmup_50370"
+      ]
     },
     {
       "game": "UpNDown",
       "seed": 1000020,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/UpNDown-seed1000020-queue-3d2ca7fb81b94642aa59ff594e4e7289_collector_Shared/shared_warmup_50472"
+      ]
     },
     {
       "game": "UpNDown",
       "seed": 1000021,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/UpNDown-seed1000021-queue-c4abb5839e994072a1afff4da923b102_collector_Shared/shared_warmup_50406"
+      ]
     },
     {
       "game": "UpNDown",
       "seed": 1000022,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/UpNDown-seed1000022-queue-9a5ef7b5117a418abc5e27c53c77c99d_collector_Shared/shared_warmup_50281"
+      ]
     },
     {
       "game": "Qbert",
       "seed": 1000019,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Qbert-seed1000019-queue-7b75162c998c454abbf34e05f7dca959_collector_Shared/shared_warmup_50021"
+      ]
     },
     {
       "game": "Assault",
       "seed": 1000000,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Assault-seed1000000-queue-a70dc5f169b44a4c8fdd71f25f2fb306_collector_Shared/shared_warmup_50792"
+      ]
     },
     {
       "game": "Assault",
       "seed": 1000001,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Assault-seed1000001-queue-2ce62491679942ea8bb9b3f7ecacede9_collector_Shared/shared_warmup_50796"
+      ]
     },
     {
       "game": "BankHeist",
       "seed": 1000002,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/BankHeist-seed1000002-queue-44a5202af5c249bdaa0466c92423a742_collector_Shared/shared_warmup_50490"
+      ]
     },
     {
       "game": "BankHeist",
       "seed": 1000003,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/BankHeist-seed1000003-queue-001149f0288347be9606ba16334a21d5_collector_Shared/shared_warmup_50221"
+      ]
     },
     {
       "game": "BankHeist",
       "seed": 1000004,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/BankHeist-seed1000004-queue-08a13f2682a24873b25ae1ab46cc7369_collector_Shared/shared_warmup_50067"
+      ]
     },
     {
       "game": "BankHeist",
       "seed": 1000005,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/BankHeist-seed1000005-queue-6825496feb7c4df5a100478012668e2b_collector_Shared/shared_warmup_50170"
+      ]
     },
     {
       "game": "Breakout",
       "seed": 1000009,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Breakout-seed1000009-queue-e7945c570ffe4ec2ac231c4780bf42ef_collector_Shared/shared_warmup_50167"
+      ]
     },
     {
       "game": "Breakout",
       "seed": 1000010,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Breakout-seed1000010-queue-5af671514cff4e549a82324d9051b7d7_collector_Shared/shared_warmup_50091"
+      ]
     },
     {
       "game": "CrazyClimber",
       "seed": 1000011,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/CrazyClimber-seed1000011-queue-5577fd423e0a40aa95ffbca060dfe2db_collector_Shared/shared_warmup_52386"
+      ]
     },
     {
       "game": "CrazyClimber",
       "seed": 1000012,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/CrazyClimber-seed1000012-queue-197dfffca7424b21a1e3b861241b6624_collector_Shared/shared_warmup_51840"
+      ]
     },
     {
       "game": "CrazyClimber",
       "seed": 1000013,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/CrazyClimber-seed1000013-queue-f60cfe9b2ba94eed90a6dbbb803ede3e_collector_Shared/shared_warmup_50328"
+      ]
     },
     {
       "game": "CrazyClimber",
       "seed": 1000014,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/CrazyClimber-seed1000014-queue-b86d8e4566b242618fbd7aade4283d14_collector_Shared/shared_warmup_51904"
+      ]
     },
     {
       "game": "Pong",
       "seed": 1000015,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Pong-seed1000015-queue-e745df66990145a5ac0410369e036925_collector_Shared/shared_warmup_51691"
+      ]
     },
     {
       "game": "Pong",
       "seed": 1000016,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Pong-seed1000016-queue-4840655183624356b5f762c44cd92ca4_collector_Shared/shared_warmup_52085"
+      ]
     },
     {
       "game": "Pong",
@@ -546,6 +380,96 @@
     {
       "game": "Pong",
       "seed": 1000018,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Qbert",
+      "seed": 1000023,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Assault",
+      "seed": 1000024,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BankHeist",
+      "seed": 1000028,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Breakout",
+      "seed": 1000032,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "UpNDown",
+      "seed": 1000034,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Assault",
+      "seed": 1000025,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BankHeist",
+      "seed": 1000029,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Breakout",
+      "seed": 1000033,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "UpNDown",
+      "seed": 1000035,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Assault",
+      "seed": 1000026,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BankHeist",
+      "seed": 1000030,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "UpNDown",
+      "seed": 1000036,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "Assault",
+      "seed": 1000027,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "BankHeist",
+      "seed": 1000031,
+      "enabled": true,
+      "warmups": []
+    },
+    {
+      "game": "UpNDown",
+      "seed": 1000037,
       "enabled": true,
       "warmups": []
     }

@@ -170,7 +170,7 @@ def preflight(root, batch, plan_id, audit, jobs):
     return operations, issues
 
 
-def apply_deletions(root, operations, audit_path, audit):
+def apply_deletions(root, operations, audit_path, audit, *, seed_file=None):
     save(audit_path, audit)
     for name, source, retired, stamp, _ in operations:
         if name not in audit["started"]:
@@ -183,7 +183,7 @@ def apply_deletions(root, operations, audit_path, audit):
         if retired.exists():
             shutil.rmtree(retired)
         apply_locator_updates(locator_updates(root, source))
-        remove_references(root, [name])
+        remove_references(root, [name], seed_file=seed_file)
         audit["deleted"].append(name)
         save(audit_path, audit)
 

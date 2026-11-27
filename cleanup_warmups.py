@@ -112,11 +112,12 @@ def protected(root, source, record, jobs):
     return None
 
 
-def remove_references(root, deleted):
+def remove_references(root, deleted, *, seed_file=None):
     """Keep seed selections and local discovery cache consistent with disk."""
     deleted = set(deleted)
     absolute = {str(root / value) for value in deleted}
-    for path in (root / 'config_files/game_seeds').glob('type_*.json'):
+    seed_files = (root / seed_file,) if seed_file is not None else (root / 'config_files/game_seeds').glob('type_*.json')
+    for path in seed_files:
         data = json.loads(path.read_text())
         changed = False
         for entry in data['game_seeds']:
