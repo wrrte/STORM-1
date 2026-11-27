@@ -915,55 +915,73 @@
       "game": "Jamesbond",
       "seed": 2000000,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Jamesbond-seed2000000-queue-990aa1ab4b2b48a7a3f8bee08cd5bc95_collector_Shared/shared_warmup_50445"
+      ]
     },
     {
       "game": "Jamesbond",
       "seed": 2000001,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Jamesbond-seed2000001-queue-6822814a1da24d098a2a64a11ea71109_collector_Shared/shared_warmup_51857"
+      ]
     },
     {
       "game": "Kangaroo",
       "seed": 2000002,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Kangaroo-seed2000002-queue-e95a06cb40df42d99e2c4a14062b6a87_collector_Shared/shared_warmup_50030"
+      ]
     },
     {
       "game": "Kangaroo",
       "seed": 2000003,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/Kangaroo-seed2000003-queue-bcc7c208462b4d67b9e7bb5df06cc469_collector_Shared/shared_warmup_50019"
+      ]
     },
     {
       "game": "PrivateEye",
       "seed": 2000004,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/PrivateEye-seed2000004-queue-11a3e56bc40241a58a37e99c8e5c1041_collector_Shared/shared_warmup_51262"
+      ]
     },
     {
       "game": "PrivateEye",
       "seed": 2000005,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/PrivateEye-seed2000005-queue-572f4db1756344d2983a4b920be4542e_collector_Shared/shared_warmup_51262"
+      ]
     },
     {
       "game": "RoadRunner",
       "seed": 2000006,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/RoadRunner-seed2000006-queue-5d81e4cf13b6471e9352ee7aa16b3d23_collector_Shared/shared_warmup_50054"
+      ]
     },
     {
       "game": "RoadRunner",
       "seed": 2000007,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/RoadRunner-seed2000007-queue-96e0009253364fd48c847926aabbb7bb_collector_Shared/shared_warmup_50456"
+      ]
     },
     {
       "game": "RoadRunner",
       "seed": 2000008,
       "enabled": true,
-      "warmups": []
+      "warmups": [
+        "ckpt/RoadRunner-seed2000008-queue-894667c4b738440dbc27e19547a401a2_collector_Shared/shared_warmup_51000"
+      ]
     }
   ]
 }
