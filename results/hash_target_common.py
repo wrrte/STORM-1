@@ -10,6 +10,7 @@ import os
 from pathlib import Path
 import re
 import sqlite3
+from statistics import fmean, stdev
 import tempfile
 
 import yaml
@@ -150,6 +151,79 @@ def command_arg(command, key):
 
 def same_path(first, second):
     return bool(first and second) and Path(first).resolve() == Path(second).resolve()
+
+
+def plan_proves_source(job, stage, live):
+    command = (live or {}).get('plan', {}).get(stage['key'])
+    source = command_arg(command, '--resume_from') if command else job.get('plan_sources', {}).get(stage['key'])
+    if source is None:
+        return False
+    if not (same_path(source, job['resume_warmup']) or same_path(source, job['warmup_source'])):
+        raise ValueError('Queue plan changed the frozen shared warmup')
+    if command and (command_arg(command, '-seed') != str(job['seed'])
+                    or command_arg(command, '-env_name') != f'ALE/{job["game"]}-v5'):
+        raise ValueError('Queue plan changed the frozen game/seed')
+    return True
+
+
+def check_source(source, job, stage, root, plan_proof):
+    if same_path(source, job['resume_warmup']) or same_path(source, job['warmup_source']):
+        return
+    path = Path(source).resolve() if source else None
+    # Interrupted branches resume their own full checkpoint, retaining the original plan.
+    if (plan_proof and path and path.parent == (root / 'ckpt' / stage['local_name']).resolve()
+            and path.name.startswith('queue_resume_')):
+        return
+    raise ValueError('Run resumed a different or unverifiable shared warmup')
+
+
+def evaluation_fields(score, returns, precision, step, episodes, seed, manifest):
+    required = manifest['evaluation']
+    value = number(score)
+    if value is None or number(step) != required['checkpoint_step'] or precision != required['precision']:
+        raise ValueError('Missing final score or incompatible evaluation checkpoint/precision')
+    if number(episodes) != required['episodes'] or number(seed) != required['seed']:
+        raise ValueError('Incompatible evaluation episodes/seed')
+    if len(returns) != required['episodes'] or any(number(v) is None for v in returns):
+        raise ValueError('Final evaluation does not contain all episode returns')
+    returns = [float(v) for v in returns]
+    if not math.isclose(value, fmean(returns), rel_tol=1e-6, abs_tol=1e-5):
+        raise ValueError('Final score disagrees with its episode returns')
+    return {'State': 'completed', 'Eval Return': value, 'Eval Checkpoint Step': int(step),
+            'Eval Precision': precision, 'Eval Episodes': len(returns), 'Eval Seed': int(seed),
+            'Episode SD': stdev(returns) if len(returns) > 1 else None}
+
+
+def local_result(root, job, stage, live, manifest, *, expected_config=None):
+    directory = root / 'runs' / stage['local_name']
+    result_path = directory / 'final_evaluation.json'
+    if not result_path.exists():
+        return None
+    conf = yaml.safe_load((directory / 'config.yaml').read_text())
+    expected = stage_config(job, stage) if expected_config is None else expected_config
+    reason = config_mismatch(conf, expected)
+    if reason:
+        raise ValueError(reason)
+    result = json.loads(result_path.read_text())
+    if (result.get('run_name') != stage['local_name'] or result.get('seed') != job['seed']
+            or result.get('env_name') != f'ALE/{job["game"]}-v5'
+            or result.get('sample_max_steps') != manifest['evaluation']['sample_max_steps']):
+        raise ValueError('Local final evaluation identity/training budget mismatch')
+    proof = plan_proves_source(job, stage, live)
+    shared = directory / 'shared_warmup.json'
+    if shared.exists():
+        check_source(json.loads(shared.read_text()).get('checkpoint_dir'), job, stage, root, proof)
+    elif not proof:
+        raise ValueError('Cannot verify local shared warmup provenance')
+    marker = root / 'ckpt' / stage['local_name'] / 'queue_stage_complete.json'
+    if not marker.exists():
+        return {'State': 'evaluating', 'Notes': 'Final evaluation exists; waiting for branch completion marker'}
+    if json.loads(marker.read_text()).get('stage') != f'{job["id"]}:{stage["key"]}':
+        raise ValueError('Completion marker belongs to another queue branch')
+    fields = evaluation_fields(result.get('episode_avg_return'), result.get('episode_returns', []),
+                               result.get('precision'), result.get('checkpoint_step'),
+                               len(result.get('episode_returns', [])), get(conf, 'JointTrainAgent.EvalSeed'), manifest)
+    return dict(fields, Source='local', **{'Updated At': datetime.fromtimestamp(result_path.stat().st_mtime, timezone.utc).isoformat()})
 
 
 def resolved_warmup(job, root):
